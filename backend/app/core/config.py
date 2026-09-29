@@ -1,0 +1,147 @@
+from pathlib import Path
+
+from dotenv import load_dotenv
+from pydantic import model_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Cura's backend/.env must win over inherited SuperShyft DATABASE_URL values.
+load_dotenv(Path(__file__).resolve().parents[2] / ".env", override=True)
+load_dotenv(Path(__file__).resolve().parents[1] / ".env", override=True)
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=Path(__file__).resolve().parents[1] / ".env",
+        extra="ignore",
+    )
+
+    app_env: str = "development"
+    database_url: str = "sqlite:///./cura.db"
+    auth_provider: str = "mock"
+    health_provider: str = "mock"
+    auth_jwt_secret: str = ""
+    auth_jwt_algorithm: str = "HS256"
+    auth_jwt_issuer: str = ""
+    auth_jwt_audience: str = ""
+    auth_subject_claim: str = "sub"
+
+    # OpenRouter is the only inference gateway (Jev routing + medical LLM).
+    llm_provider: str = "openrouter"
+    llm_api_key: str = ""
+    openrouter_api_key: str = ""
+    openrouter_base_url: str = "https://openrouter.ai/api/v1"
+    openrouter_http_referer: str = ""
+    openrouter_app_title: str = "Cura"
+    llm_base_url: str = "https://openrouter.ai/api/v1"
+    llm_model: str = ""
+    medical_llm_model: str = "openai/gpt-4o-mini"
+    jev_model: str = "typesafe/jev-1.13"
+    jev_enabled: bool = True
+    jev_timeout_seconds: int = 10
+    llm_timeout_seconds: int = 180
+    llm_max_retries: int = 1
+    llm_max_output_tokens: int = 800
+    enable_llm: bool = False
+
+    # SuperShyft read-only Postgres (never used for Cura conversation tables)
+    supershyft_database_url: str = ""
+    supershyft_db_connect_timeout: int = 10
+
+    log_level: str = "INFO"
+    dev_auth_header: bool = True
+    cors_origins: str = (
+        "http://localhost:5173,http://127.0.0.1:5173,"
+        "http://localhost:5174,http://127.0.0.1:5174,"
+        "http://localhost:5175,http://127.0.0.1:5175"
+    )
+    redis_url: str = ""
+    redis_required: bool = False
+    rate_limit_requests: int = 30
+    rate_limit_window_seconds: int = 60
+    idempotency_ttl_seconds: int = 300
+
+    # Voice / STT — optional. Typed chat works when this is off.
+    voice_enabled: bool = False
+    stt_provider: str = "none"
+    stt_api_key: str = ""
+    stt_base_url: str = "http://127.0.0.1:8001/v1"
+    stt_model: str = "whisper-1"
+    stt_timeout_seconds: int = 60
+    stt_max_audio_bytes: int = 10_000_000
+
+    def resolved_stt_api_key(self) -> str:
+        return (self.stt_api_key or self.openrouter_api_key or self.llm_api_key).strip()
+
+    def resolved_stt_base_url(self) -> str:
+        provider = (self.stt_provider or "").strip().lower()
+        if provider in {"openrouter", "openai_compatible", "openai", "api"}:
+            return (self.openrouter_base_url or self.llm_base_url or "https://openrouter.ai/api/v1").rstrip("/")
+        if (self.stt_api_key or "").strip():
+            return (self.stt_base_url or "http://127.0.0.1:8001/v1").rstrip("/")
+        return (self.openrouter_base_url or self.llm_base_url or self.stt_base_url).rstrip("/")
+
+    def resolved_stt_model(self) -> str:
+        model = (self.stt_model or "").strip()
+        if (self.stt_provider or "").strip().lower() == "openrouter" and model in {"", "whisper-1"}:
+            return "openai/whisper-1"
+        return model or "whisper-1"
+
+    # User-uploaded medical documents (Phase 7). Files live outside SuperShyft.
+    document_storage_backend: str = "local"
+    document_storage_path: str = "./data/uploads"
+    document_max_upload_bytes: int = 20_000_000
+    document_ocr_provider: str = "none"
+    document_min_text_chars: int = 80
+    document_sparse_page_chars: int = 40
+    document_max_pages: int = 50
+    document_max_ocr_pages: int = 20
+    document_max_extracted_chars: int = 200_000
+    document_ocr_timeout_seconds: int = 60
+    document_chunk_size: int = 900
+    document_chunk_overlap: int = 100
+    document_retrieve_limit: int = 5
+
+    @model_validator(mode="after")
+    def validate_database_separation(self) -> "Settings":
+        if (
+            self.supershyft_database_url
+            and self.database_url.strip() == self.supershyft_database_url.strip()
+        ):
+            raise ValueError("DATABASE_URL must never point to the SuperShyft source database")
+        if "+asyncpg" in self.database_url.lower():
+            raise ValueError(
+                "DATABASE_URL is Cura's conversation store and uses a sync engine. "
+                "Do not use postgresql+asyncpg here. For local development use sqlite:///./cura.db. "
+                "Put SuperShyft Postgres in SUPERSHYFT_DATABASE_URL."
+            )
+        if not self.is_development and self.auth_provider == "mock":
+            # Startup remains possible for health checks, but protected routes reject mock auth.
+            self.dev_auth_header = False
+        return self
+
+    @property
+    def is_development(self) -> bool:
+        return self.app_env.lower() in {"development", "dev", "test"}
+
+    def resolved_llm_provider(self) -> str:
+        raw = (self.llm_provider or "openrouter").strip().lower()
+        if raw in {"local", "ollama", "qwen"}:
+            return "openrouter"
+        if raw in {"openai_compatible", "api", "huggingface", "remote", "openai"}:
+            return "openrouter"
+        return "openrouter"
+
+    def active_llm_base_url(self) -> str:
+        return (self.openrouter_base_url or self.llm_base_url or "https://openrouter.ai/api/v1").rstrip("/")
+
+    def active_llm_model(self) -> str:
+        return (self.medical_llm_model or self.llm_model or "openai/gpt-4o-mini").strip()
+
+    def active_llm_api_key(self) -> str:
+        return (self.openrouter_api_key or self.llm_api_key).strip()
+
+    def cura_database_is_sqlite(self) -> bool:
+        return self.database_url.startswith("sqlite")
+
+
+settings = Settings()

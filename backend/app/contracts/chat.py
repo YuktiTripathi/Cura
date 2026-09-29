@@ -1,0 +1,127 @@
+from pydantic import BaseModel, Field
+
+from app.contracts.evidence import EvidenceRecord
+from app.contracts.followup import FollowUpSuggestion
+from app.contracts.context_ref import ContextRef
+from app.contracts.recommendation import ApprovedRecommendation
+
+
+class ChatRequest(BaseModel):
+    message: str
+    conversation_id: str | None = None
+    language: str | None = None
+    language_mode: str = "auto"
+    document_ids: list[str] = Field(default_factory=list)
+    context_ref: ContextRef | None = None
+
+
+class FollowUp(FollowUpSuggestion):
+    prompt: str | None = None
+
+
+class ChatMeta(BaseModel):
+    intent: str | None = None
+    answer_depth: str | None = None
+    status: str = "ok"
+    llm_mode: str = "disabled"
+    request_id: str | None = None
+    detected_language: str | None = None
+    response_language: str | None = None
+    language_mode: str | None = None
+    sources_used: list[str] = Field(default_factory=list)
+    knowledge_scope: str | None = None
+    sources_requested: list[str] = Field(default_factory=list)
+    llm_called: bool = False
+    supershyft_called: bool = False
+    document_retrieval_called: bool = False
+    db_status: str | None = None
+    supershyft_record_count: int | None = None
+    safety_flags: list[str] = Field(default_factory=list)
+    recommendation_flags: list[str] = Field(default_factory=list)
+    grounding_flags: list[str] = Field(default_factory=list)
+    escalation: str | None = None
+    model: str | None = None
+    provider: str | None = None
+    cache_hit: bool = False
+    prompt_version: str = "cura-v1"
+    input_tokens: int | None = None
+    output_tokens: int | None = None
+    jev_called: bool = False
+    jev_fallback: bool = False
+    jev_intent: str | None = None
+    jev_source: str | None = None
+    jev_operation: str | None = None
+    jev_confidence: float | None = None
+    jev_validated: bool = False
+    jev_overridden: bool = False
+    jev_validation_error: str | None = None
+    jev_latency_ms: int | None = None
+    jev_input_tokens: int | None = None
+    jev_output_tokens: int | None = None
+    medical_llm_latency_ms: int | None = None
+    router: str | None = None
+    requires_retrieval: bool | None = None
+    requires_personal_data: bool | None = None
+    requires_historical_data: bool | None = None
+    requires_document_search: bool | None = None
+    conversation_context_used: bool | None = None
+    fallback_used: bool | None = None
+    retrieval_status: str | None = None
+    retrieval_used: bool | None = None
+    retrieval_sources: list[str] = Field(default_factory=list)
+    ihr_queried: bool | None = None
+    documents_queried: bool | None = None
+    grounding_passed: bool | None = None
+    safety_passed: bool | None = None
+    debug: dict | None = None
+
+
+class EvidenceItem(EvidenceRecord):
+    pass
+
+
+class ProvenanceSource(BaseModel):
+    name: str
+    url: str | None = None
+    source_type: str
+
+
+class UserProvenance(BaseModel):
+    type: str = "none"
+    sources: list[ProvenanceSource] = Field(default_factory=list)
+
+
+class ChatResponse(BaseModel):
+    conversation_id: str
+    answer: str
+    evidence: list[EvidenceItem] = Field(default_factory=list)
+    follow_ups: list[FollowUpSuggestion] = Field(default_factory=list)
+    recommendations: list[ApprovedRecommendation] = Field(default_factory=list)
+    meta: ChatMeta = Field(default_factory=ChatMeta)
+    provenance: UserProvenance = Field(default_factory=UserProvenance)
+
+
+class ConversationSummary(BaseModel):
+    id: str
+    title: str | None = None
+    updated_at: str
+
+
+class MessageOut(BaseModel):
+    id: str
+    role: str
+    content: str
+    created_at: str
+
+
+class ConversationDetail(BaseModel):
+    id: str
+    title: str | None = None
+    messages: list[MessageOut]
+
+
+class FeedbackRequest(BaseModel):
+    conversation_id: str
+    message_id: str | None = None
+    rating: str
+    comment: str | None = None

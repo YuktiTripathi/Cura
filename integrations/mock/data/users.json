@@ -1,0 +1,18 @@
+[
+  {
+    "subject_id": "demo-user-001",
+    "first_name": "Alex",
+    "last_name": null,
+    "display_name": "Alex",
+    "age_band": "26-35",
+    "sex": "male"
+  },
+  {
+    "subject_id": "demo-user-002",
+    "first_name": "Jordan",
+    "last_name": null,
+    "display_name": "Jordan",
+    "age_band": "36-45",
+    "sex": "female"
+  }
+]

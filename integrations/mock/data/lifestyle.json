@@ -1,0 +1,14 @@
+[
+  {
+    "subject_id": "demo-user-001",
+    "activity_level": "moderate",
+    "sleep_quality": "fair",
+    "notes": ["Desk-based workdays", "Walks most evenings"]
+  },
+  {
+    "subject_id": "demo-user-002",
+    "activity_level": "high",
+    "sleep_quality": "good",
+    "notes": ["Regular training"]
+  }
+]

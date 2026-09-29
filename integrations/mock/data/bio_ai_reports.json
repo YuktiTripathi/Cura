@@ -1,0 +1,50 @@
+[
+  {
+    "subject_id": "demo-user-001",
+    "report_id": "bioai-a",
+    "report_date": "2026-07-09",
+    "source_line": "bio_ai",
+    "metabolic_age": 34,
+    "metabolic_score": 62,
+    "risks": [
+      {"code": "cardiac_health", "name": "Cardiac health", "score": 30, "status": "moderate", "percentile": 55, "lifestyle_contribution": 40},
+      {"code": "nafld", "name": "NAFLD", "score": 22, "status": "mild", "percentile": 40, "lifestyle_contribution": 35},
+      {"code": "obesity", "name": "Obesity", "score": 28, "status": "moderate", "percentile": 48, "lifestyle_contribution": 50},
+      {"code": "oxidative_stress", "name": "Oxidative stress", "score": 18, "status": "mild", "percentile": 30, "lifestyle_contribution": 25},
+      {"code": "thyroid", "name": "Thyroid", "score": 12, "status": "low", "percentile": 20, "lifestyle_contribution": 15},
+      {"code": "type_2_diabetes", "name": "Type 2 diabetes", "score": 16, "status": "mild", "percentile": 28, "lifestyle_contribution": 30},
+      {"code": "dyslipidemia", "name": "Dyslipidemia", "score": 40, "status": "moderate", "percentile": 62, "lifestyle_contribution": 45},
+      {"code": "hypertension", "name": "Hypertension", "score": 19, "status": "mild", "percentile": 33, "lifestyle_contribution": 22}
+    ]
+  },
+  {
+    "subject_id": "demo-user-001",
+    "report_id": "bioai-b",
+    "report_date": "2026-07-09",
+    "source_line": "advanced_bio_ai",
+    "metabolic_age": 36,
+    "metabolic_score": 58,
+    "risks": [
+      {"code": "cardiac_health", "name": "Cardiac health", "score": 48, "status": "elevated", "percentile": 71, "lifestyle_contribution": 52},
+      {"code": "nafld", "name": "NAFLD", "score": 31, "status": "moderate", "percentile": 54, "lifestyle_contribution": 41},
+      {"code": "obesity", "name": "Obesity", "score": 33, "status": "moderate", "percentile": 57, "lifestyle_contribution": 55},
+      {"code": "oxidative_stress", "name": "Oxidative stress", "score": 24, "status": "mild", "percentile": 42, "lifestyle_contribution": 28},
+      {"code": "thyroid", "name": "Thyroid", "score": 14, "status": "low", "percentile": 22, "lifestyle_contribution": 18},
+      {"code": "type_2_diabetes", "name": "Type 2 diabetes", "score": 21, "status": "mild", "percentile": 36, "lifestyle_contribution": 33},
+      {"code": "dyslipidemia", "name": "Dyslipidemia", "score": 46, "status": "elevated", "percentile": 68, "lifestyle_contribution": 48},
+      {"code": "hypertension", "name": "Hypertension", "score": 25, "status": "moderate", "percentile": 44, "lifestyle_contribution": 27}
+    ]
+  },
+  {
+    "subject_id": "demo-user-002",
+    "report_id": "bioai-j-1",
+    "report_date": "2026-08-02",
+    "source_line": "bio_ai",
+    "metabolic_age": 40,
+    "metabolic_score": 70,
+    "risks": [
+      {"code": "cardiac_health", "name": "Cardiac health", "score": 11, "status": "low", "percentile": 15, "lifestyle_contribution": 10},
+      {"code": "nafld", "name": "NAFLD", "score": 9, "status": "low", "percentile": 12, "lifestyle_contribution": 8}
+    ]
+  }
+]
