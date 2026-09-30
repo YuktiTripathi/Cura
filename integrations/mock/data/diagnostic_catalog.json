@@ -1,0 +1,119 @@
+{
+  "packages": [
+    {
+      "catalog_id": "6",
+      "kind": "package",
+      "display_name": "Supershyft Basic",
+      "provider": "SuperShyft",
+      "price": 1500,
+      "currency": "INR",
+      "status": "active",
+      "collection_type": "home_collection",
+      "included_tests": ["iron", "tibc", "transferrin", "tsh", "hba1c", "hemoglobin", "mcv", "mch", "ldl", "hdl", "triglycerides", "cholesterol"]
+    },
+    {
+      "catalog_id": "7",
+      "kind": "package",
+      "display_name": "Supershyft Core",
+      "provider": "SuperShyft",
+      "price": 2000,
+      "currency": "INR",
+      "status": "active",
+      "collection_type": "home_collection",
+      "included_tests": ["iron", "tibc", "transferrin", "tsh", "hba1c", "vitamin_d", "vitamin_b12", "hemoglobin", "mcv", "mch", "ldl", "hdl", "triglycerides", "cholesterol"]
+    },
+    {
+      "catalog_id": "12",
+      "kind": "package",
+      "display_name": "Peak Performance Women",
+      "provider": "SuperShyft",
+      "price": 3999,
+      "currency": "INR",
+      "status": "active",
+      "collection_type": "home_collection",
+      "included_tests": ["ferritin", "iron", "tibc", "transferrin", "vitamin_d", "vitamin_b12", "tsh", "hba1c", "hemoglobin", "mcv", "mch", "ldl", "hdl", "triglycerides", "cholesterol"]
+    },
+    {
+      "catalog_id": "23",
+      "kind": "package",
+      "display_name": "Fatigue",
+      "provider": "SuperShyft",
+      "price": 1899,
+      "currency": "INR",
+      "status": "inactive",
+      "included_tests": ["ferritin", "iron", "tibc", "transferrin", "vitamin_d", "hba1c", "tsh"]
+    }
+  ],
+  "test_groups": [
+    {
+      "catalog_id": "30",
+      "kind": "test_group",
+      "display_name": "Iron Studies",
+      "provider": "SuperShyft",
+      "price": 599,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["iron", "tibc", "transferrin"]
+    },
+    {
+      "catalog_id": "31",
+      "kind": "test_group",
+      "display_name": "Iron Studies with Ferritin",
+      "provider": "SuperShyft",
+      "price": 699,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["ferritin", "iron", "tibc", "transferrin"]
+    },
+    {
+      "catalog_id": "32",
+      "kind": "test_group",
+      "display_name": "Lipid Profile",
+      "provider": "SuperShyft",
+      "price": 499,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["cholesterol", "hdl", "triglycerides", "ldl"]
+    },
+    {
+      "catalog_id": "34",
+      "kind": "test_group",
+      "display_name": "Vitamin Profile",
+      "provider": "SuperShyft",
+      "price": 799,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["vitamin_b12", "vitamin_d"]
+    },
+    {
+      "catalog_id": "35",
+      "kind": "test_group",
+      "display_name": "Diabetes Profile Pro",
+      "provider": "SuperShyft",
+      "price": 499,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["fasting_blood_glucose", "hba1c"]
+    },
+    {
+      "catalog_id": "36",
+      "kind": "test_group",
+      "display_name": "Diabetes Profile",
+      "provider": "SuperShyft",
+      "price": 399,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["hba1c"]
+    },
+    {
+      "catalog_id": "29",
+      "kind": "test_group",
+      "display_name": "Thyroid Profile",
+      "provider": "SuperShyft",
+      "price": 599,
+      "currency": "INR",
+      "status": "active",
+      "included_tests": ["t3", "t4", "tsh"]
+    }
+  ]
+}

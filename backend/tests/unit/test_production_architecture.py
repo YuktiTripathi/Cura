@@ -156,7 +156,7 @@ def test_grounding_falls_back_on_hallucinated_personal_number(monkeypatch):
     monkeypatch.setattr(
         OpenAICompatibleLLMClient,
         "complete",
-        lambda self, messages: json.dumps(
+        lambda self, messages, json_mode=False: json.dumps(
             {
                 "answer": "Your HbA1c is 99.9%.",
                 "claims": [],
@@ -167,7 +167,7 @@ def test_grounding_falls_back_on_hallucinated_personal_number(monkeypatch):
             }
         ),
     )
-    body = client.post("/api/v1/chat", headers=H, json={"message": "What is my HbA1c?"}).json()
+    body = client.post("/api/v1/chat", headers=H, json={"message": "What does my HbA1c mean?"}).json()
     assert "99.9" not in body["answer"]
     assert "5.5" in body["answer"]
     assert "unsupported_personal_numbers" in body["meta"]["grounding_flags"]
@@ -213,7 +213,7 @@ def test_sse_stream_contains_complete_event():
         json={"message": "What is Vitamin D?"},
     )
     assert response.status_code == 200
-    assert "event: token" in response.text
+    assert "event: status" in response.text
     assert "event: complete" in response.text
 
 

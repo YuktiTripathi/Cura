@@ -89,10 +89,39 @@ class RequestControlStore:
         raw = self._get(key)
         if not raw:
             return None
+        if raw == "pending":
+            return None
         stored = json.loads(raw)
         if stored.get("payload_hash") != payload_hash:
             raise ValidationAppError("Idempotency-Key was already used for a different request")
         return ChatResponse.model_validate(stored["response"])
+
+    def begin_idempotency(
+        self,
+        subject_id: str,
+        idempotency_key: str | None,
+        payload: ChatRequest,
+    ) -> ChatResponse | None:
+        """Atomically claim the key. Returns a cached response if the work already finished."""
+        if not idempotency_key:
+            return None
+        cached = self.idempotency_lookup(subject_id, idempotency_key, payload)
+        if cached:
+            return cached
+        key = self._idempotency_key(subject_id, idempotency_key)
+        ttl = max(1, settings.idempotency_ttl_seconds)
+        if not self._set_nx(key, "pending", ttl):
+            deadline = time.time() + 8
+            while time.time() < deadline:
+                cached = self.idempotency_lookup(subject_id, idempotency_key, payload)
+                if cached:
+                    return cached
+                time.sleep(0.05)
+            cached = self.idempotency_lookup(subject_id, idempotency_key, payload)
+            if cached:
+                return cached
+            raise ValidationAppError("A matching request is already in progress")
+        return None
 
     def idempotency_store(
         self,
@@ -132,15 +161,27 @@ class RequestControlStore:
             client.setex(key, ttl, value)
             return
         with self._lock:
+            if len(self._memory) > 5000:
+                for old in list(self._memory)[:1000]:
+                    self._memory.pop(old, None)
             self._memory[key] = _Entry(time.time() + ttl, value)
+
+    def _set_nx(self, key: str, value: str, ttl: int) -> bool:
+        client = self._client()
+        if client:
+            return bool(client.set(key, value, nx=True, ex=ttl))
+        with self._lock:
+            now = time.time()
+            self._prune(now)
+            if key in self._memory:
+                return False
+            self._memory[key] = _Entry(now + ttl, value)
+            return True
 
     def _prune(self, now: float) -> None:
         expired = [key for key, entry in self._memory.items() if entry.expires_at <= now]
         for key in expired:
             self._memory.pop(key, None)
-        if len(self._memory) > 5000:
-            for key in list(self._memory)[:1000]:
-                self._memory.pop(key, None)
 
     def _idempotency_key(self, subject_id: str, supplied: str) -> str:
         digest = hashlib.sha256(supplied.encode()).hexdigest()

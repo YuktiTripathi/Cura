@@ -1,8 +1,11 @@
 from pydantic import BaseModel, Field
 
+from app.contracts.diagnostics import TestingOption
 from app.contracts.evidence import EvidenceRecord
 from app.contracts.followup import FollowUpSuggestion
 from app.contracts.context_ref import ContextRef
+from app.contracts.operations import SourceOutcome
+from app.contracts.presentation import StructuredResponse
 from app.contracts.recommendation import ApprovedRecommendation
 
 
@@ -73,6 +76,18 @@ class ChatMeta(BaseModel):
     documents_queried: bool | None = None
     grounding_passed: bool | None = None
     safety_passed: bool | None = None
+    jev_complexity: str | None = None
+    reasoning_depth: str | None = None
+    answer_model_tier: str | None = None
+    answer_model: str | None = None
+    model_fallback_used: bool | None = None
+    estimated_cost_usd: float | None = None
+    source_outcomes: list[SourceOutcome] = Field(default_factory=list)
+    question_type: str | None = None
+    operations: list[str] = Field(default_factory=list)
+    requested_entities: list[str] = Field(default_factory=list)
+    response_mode: str | None = None
+    timing: dict | None = None
     debug: dict | None = None
 
 
@@ -84,6 +99,8 @@ class ProvenanceSource(BaseModel):
     name: str
     url: str | None = None
     source_type: str
+    source_id: str | None = None
+    occurred_at: str | None = None
 
 
 class UserProvenance(BaseModel):
@@ -99,6 +116,8 @@ class ChatResponse(BaseModel):
     recommendations: list[ApprovedRecommendation] = Field(default_factory=list)
     meta: ChatMeta = Field(default_factory=ChatMeta)
     provenance: UserProvenance = Field(default_factory=UserProvenance)
+    presentation: StructuredResponse | None = None
+    testing_option: TestingOption | None = None
 
 
 class ConversationSummary(BaseModel):

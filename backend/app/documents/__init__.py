@@ -1,1 +1,1 @@
-"""User-uploaded medical document storage (Phase 7: store only, no extraction)."""
+"""User-uploaded medical documents: structured facts plus PageIndex narrative retrieval."""

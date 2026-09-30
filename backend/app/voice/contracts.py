@@ -13,6 +13,8 @@ class TranscriptResult(BaseModel):
 
 class TranscribeResponse(BaseModel):
     transcript: str
+    text: str | None = None
+    language: str | None = None
     detected_language: str | None = None
     confidence: float | None = Field(default=None)
     language_mode: str = "auto"

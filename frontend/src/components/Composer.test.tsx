@@ -75,7 +75,7 @@ describe("Composer voice input", () => {
     });
     render(<Composer disabled={false} onSend={vi.fn()} />);
     fireEvent.click(screen.getByLabelText("Start voice input"));
-    await waitFor(() => expect(screen.getByText(/Microphone access is blocked/i)).toBeTruthy());
+    await waitFor(() => expect(screen.getByText(/I couldn't access your microphone/i)).toBeTruthy());
   });
 
   it("explains an unsupported browser", () => {

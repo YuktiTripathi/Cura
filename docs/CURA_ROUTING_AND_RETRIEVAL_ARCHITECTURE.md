@@ -2,98 +2,71 @@
 
 ## Goal
 
-CURA must safely handle four major classes of user requests:
+CURA must safely handle compositional health questions: many entities, many sources, and many operations in one turn.
 
-1. **Personal blood/lab values** — retrieve the correct authenticated user's value/report.
+1. **Personal blood/lab values** — retrieve every requested authenticated marker, not the first match.
 2. **Personal Bio-AI reports** — retrieve the user's Bio-AI assessment from SuperShyft.
 3. **Medical/diagnostic questions and guidance** — retrieve medical evidence first, then let the medical LLM explain it.
 4. **Nutrition/lifestyle questions** — general LLM guidance, or personalized guidance only when the user explicitly asks for it.
+5. **Pattern / review questions** — retrieve the full entity set and sources; the model synthesizes; the validator grounds.
 
-## Routing contract
-
-Jev is the **request classifier**, not the retrieval engine and not the medical answer generator.
-
-Flow:
+## Six-stage pipeline
 
 ```text
 User message
    |
    v
-Conversation context + auth/document availability
+SafetyStage
    |
    v
-JEV Decisions API
-   |
-   |  primary route + request_type confidence
-   v
-CURA validation
-   |
-   |  reject unsafe/inconsistent/low-confidence route -> deterministic fallback
-   |  (deterministic path still uses attach_ontology + source_routing)
-   v
-Jev mapper -> QueryPlan
-   |
-   |  normalize_requested_metrics (names only; no source/intent rewrite)
-   |
-   +--> personal blood -> SuperShyft read-only IHR
-   +--> personal Bio-AI -> SuperShyft read-only IHR
-   +--> uploaded report -> owned-document retrieval
-   +--> general medical/guidance -> medical evidence retrieval
-   +--> nutrition/lifestyle -> LLM (+ personal context only when required)
+TaskPlanner  (Jev primary; EntityResolver fills entities[]; deterministic fallback never uses labs[0] as the only topic)
    |
    v
-Context + provenance
+HealthRetrievalRouter  (blood, Bio-AI, questionnaire, goals, documents independently)
    |
    v
-Medical/general LLM
+HealthContextBuilder  (all entities + derived Mentzer/BMI + user_stated + premise + missing)
    |
    v
-Safety + grounding + renderer
+ReasoningService  (LOOKUP-only single entity → renderer; otherwise LLM explains the supplied facts)
+   |
+   v
+ResponseValidator + ResponseComposer
 ```
 
-### Important invariant
+Rule: **the application determines facts; the model explains; the validator keeps the result grounded and safe.**
 
-After a Jev decision passes validation, **do not run the legacy heuristic source router again**.
+## TaskPlan
 
-The previous design was:
+`TaskPlan` is the semantic contract:
 
-```text
-Jev -> mapper -> attach_ontology -> source_routing -> QueryPlan
-```
+- `question_type`: `general_education | personal_lookup | personal_health_reasoning | safety`
+- `entities[]`: every mentioned biomarker/risk/derived code, not the first alias hit
+- `operations[]`: `RETRIEVE | EXPLAIN | INTERPRET | COMPARE | TREND | SUMMARIZE | CORRELATE | PRIORITIZE | IDENTIFY_GAPS | VERIFY_PREMISE | RECOMMEND | ...`
+- `sources[]`, `history_required`, `medical_evidence_required`, `user_stated[]`, `premise_claim`
 
-This allowed a second heuristic layer to reinterpret a valid Jev decision (for example, flipping a blood lookup to an uploaded PDF because `document_ids` were present).
+`QueryPlan` remains a **derived compatibility view** (primary operation + `requested_metrics` + `needs_*`) so `ChatMeta.intent` and existing retrieval flags still work. There is not a second semantic router that mutates a validated TaskPlan.
 
-The target design is:
+Jev stays a decision layer. After validation, CURA maps `JevDecision` → TaskPlan and does **not** run `apply_source_routing` or rewrite intent to `health_scenario`.
 
-```text
-Jev -> validation -> mapper -> QueryPlan
-```
+Jev also assigns a provider-independent **model tier**. It must not name vendors or model IDs.
 
-`normalize_requested_metrics` may still canonicalize marker/entity names (LDL Cholesterol → `ldl`, PCOD → `pcos`). It must not change the selected source, personal-data dependency, or operation.
+| Tier | Use | Configured model |
+| --- | --- | --- |
+| `DETERMINISTIC` | Lookup, lists, dates, reference-range status, deterministic trends | no answer LLM |
+| `FAST_REASONING` | Internal planning only | GPT-5.6 Luna |
+| `STANDARD_MEDICAL` | Default patient-facing medical reasoning | Gemini 3.8 Flash |
+| `DEEP_MEDICAL_REASONING` | High-complexity multi-source / longitudinal synthesis | Claude Sonnet 5 |
 
-`attach_ontology` and `apply_source_routing` remain on the **deterministic** path used when Jev is disabled, unavailable, invalid, or below the 0.80 `request_type` threshold.
+FAST_REASONING is never used as the user-facing medical-answer model. STANDARD_MEDICAL may escalate to DEEP_MEDICAL_REASONING after the quality gate. Safety, grounding, and emergency detection stay deterministic.
 
-## Confidence
+## Before / after
 
-The `confidence` field is the confidence of the **primary request classification** (`request_type`).
-
-It is intentionally **not**:
-
-```text
-min(intent_confidence, source_confidence, operation_confidence, time_confidence)
-```
-
-Those are independent decisions. A low confidence in `time_scope`, for example, should not downgrade an otherwise high-confidence request classification.
-
-CURA keeps auxiliary field confidences on `JevDecision.field_confidences` for observability.
-
-Current acceptance rule:
-
-```text
-request_type confidence >= 0.80
-```
-
-Below 0.80, or if the decision is malformed/inconsistent, CURA falls back to the deterministic router. CURA must never manufacture a confidence value above 0.80.
+| Question class | Before | After |
+| --- | --- | --- |
+| Hb + MCV + user-stated Mentzer | `topic = labs[0]`, structured blood dump of hemoglobin | all three entities in context; Mentzer is derived or user-stated, never invented as a lab |
+| Glucose + HbA1c + lipids + waist | collapsed to one marker | all retrieved or scoped-missing; connections explained |
+| Review everything that changed | hijack to `health_scenario` + one SUMMARIZE | blood + Bio-AI + questionnaire + goals retrieved; trends and gaps disclosed; LLM used when reasoning ops are present |
 
 ## Personal blood values
 
@@ -101,19 +74,25 @@ For a query such as:
 
 > What is my LDL?
 
-the route must resolve to:
+the route must resolve to a LOOKUP TaskPlan with entity `ldl`. The authenticated principal supplies the SuperShyft `user_id`. The IHR repository performs a parameterized read scoped to that user. The LLM is not allowed to invent or select the raw value.
+
+## Confidence
+
+The `confidence` field is the confidence of the **primary request classification** (`request_type`).
+
+Current acceptance rule:
 
 ```text
-intent: lab_result_lookup
-source: lab_results
-operation: lookup
-requires_personal_data: true
-time_range: latest
+request_type confidence >= 0.80
 ```
 
-The authenticated principal supplies the SuperShyft `user_id`. The IHR repository performs a parameterized read scoped to that user. The selected marker is then chosen from the returned reports using the canonical marker key and latest report date.
+Below 0.80, or if the decision is malformed/inconsistent, CURA falls back to the deterministic planner. CURA must never manufacture a confidence value above 0.80.
 
-The LLM is not allowed to invent or select the raw value.
+`normalize_requested_metrics` may still canonicalize marker/entity names. It must not change the selected source, personal-data dependency, or collapse the entity list to `metrics[0]`.
+
+`attach_ontology` and `apply_source_routing` remain on the **deterministic** path used when Jev is disabled, unavailable, invalid, or below the 0.80 `request_type` threshold.
+
+After a Jev decision passes validation, do not run the legacy heuristic source router again.
 
 ## Bio-AI
 
@@ -217,6 +196,17 @@ For each case, evaluate at least:
 - final QueryPlan flags
 - actual retrieval provider invoked
 - provenance in the final answer
+
+A biomarker mention must not automatically force a latest-value answer.
+`What does HbA1c measure?` is general EXPLAIN. `What is my HbA1c?` is LOOKUP.
+`Why did my HbA1c increase?` is TREND with premise verification.
+
+If a requested marker is absent, CURA returns a scoped missing result. It must
+not dump the rest of the report.
+
+Multi-source questions that name blood, Bio-AI, questionnaire, and/or goals must
+attempt each requested available source independently. `provider.data_collection
+= deny` is not sufficient evidence of zero retention.
 
 ## Safety boundary
 

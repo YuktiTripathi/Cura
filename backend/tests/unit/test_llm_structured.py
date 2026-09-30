@@ -87,3 +87,16 @@ def test_public_answer_text_strips_implementation_json():
     text = public_answer_text(json.dumps(SAMPLE))
     assert text == SAMPLE["answer"]
     assert "follow_up_questions" not in text
+
+
+def test_non_string_answer_object_is_contract_violation(caplog):
+    parsed = parse_llm_structured({"answer": {"hypertension": {"score": 16}}})
+    assert parsed.answer == ""
+    assert parsed.parse_error == "non_string_answer:dict"
+    assert "llm_structured_output_contract_violation" in caplog.text
+
+
+def test_numeric_answer_is_contract_violation():
+    parsed = parse_llm_structured({"answer": 42})
+    assert parsed.answer == ""
+    assert parsed.parse_error == "non_string_answer:int"

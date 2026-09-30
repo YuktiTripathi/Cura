@@ -4,7 +4,13 @@ from app.contracts.query import QueryPlan
 from app.pipeline.intent import NAMES
 from app.pipeline.ontology import canonicalize_metric_key, normalize_requested_metrics
 from app.pipeline.query_planner import _apply_context_ref
+from app.pipeline.questionnaire_intent import explicit_questionnaire_request
+from app.pipeline.questionnaire_topics import questionnaire_topic
 from app.pipeline.source_routing import annotate_plan
+from app.pipeline.health_sources import sync_plan_sources
+from app.pipeline.operations import named_personal_sources
+from app.pipeline.planner import attach_task_plan
+from app.routing.model_tier import apply_answer_model_routing
 from app.routing.schemas import JevDecision, JevIntent, JevOperation, JevSource, JevTimeRange
 
 
@@ -20,6 +26,7 @@ def force_general_plan(plan: QueryPlan) -> QueryPlan:
                 "needs_lifestyle": False,
                 "needs_profile": False,
                 "needs_goals": False,
+                "needs_questionnaire": False,
                 "needs_supershyft": False,
                 "needs_general": True,
                 "needs_user_uploaded": False,
@@ -54,7 +61,10 @@ def plan_from_jev(
     topic = _topic(decision, follow_up_topic)
     name = NAMES.get(topic or "", topic) or follow_up_name
     intent, scope, needs_blood, needs_bio, needs_life, history, compare = _flags(decision)
+    needs_questionnaire = _needs_questionnaire(decision, message)
     source = _query_source(decision.source)
+    if needs_questionnaire and source == QuerySource.lifestyle and not needs_life:
+        source = QuerySource.questionnaire
     if scope == KnowledgeScope.general:
         source = QuerySource.general
     metrics: list[str] = []
@@ -74,6 +84,7 @@ def plan_from_jev(
         needs_blood=needs_blood,
         needs_bio_ai=needs_bio,
         needs_lifestyle=needs_life,
+        needs_questionnaire=needs_questionnaire,
         compare=compare,
         follow_up=bool(follow_up_topic and not decision.requested_metrics),
         raw_message=message,
@@ -90,11 +101,13 @@ def plan_from_jev(
     # Ontology may canonicalize marker/entity names only. It must not change
     # source, personal-data dependency, or operation after a validated Jev route.
     plan = normalize_requested_metrics(plan)
+    ids = list(document_ids or [])
     if context_ref:
         plan = _apply_context_ref(plan, context_ref)
-        if context_ref.document_id and context_ref.document_id not in (document_ids or []):
-            document_ids = [*(document_ids or []), context_ref.document_id]
-    del document_ids
+        if context_ref.document_id and context_ref.document_id not in ids:
+            ids.append(context_ref.document_id)
+    plan.document_ids = ids
+    plan.active_document_id = ids[0] if len(ids) == 1 else None
 
     plan.time_operation = _time_operation(decision)
     plan.needs_guidance = _needs_guidance(decision)
@@ -112,9 +125,35 @@ def plan_from_jev(
         IntentType.nutrition_guidance,
     } or plan.needs_lifestyle
     plan.needs_goals = plan.intent == IntentType.health_goal_progress
+    if needs_questionnaire:
+        q_topic = questionnaire_topic(message)
+        if q_topic and not plan.topic:
+            plan.topic = q_topic
+            plan.topic_name = NAMES.get(q_topic, q_topic.replace("_", " "))
+        if plan.needs_blood or plan.needs_bio_ai:
+            plan.medical_evidence_required = True
+    named = named_personal_sources(message)
+    if plan.knowledge_scope == KnowledgeScope.personal or plan.needs_personal_data:
+        if "blood" in named:
+            plan.needs_blood = True
+            plan.needs_supershyft = True
+        if "bio_ai" in named:
+            plan.needs_bio_ai = True
+            plan.needs_supershyft = True
+        if "questionnaire" in named:
+            plan.needs_questionnaire = True
+        if "goals" in named:
+            plan.needs_goals = True
+            plan.needs_profile = True
+            plan.needs_supershyft = True
+        if named >= {"blood", "bio_ai"} or len(named) >= 2:
+            plan.source = QuerySource.mixed
+            plan.needs_supershyft = True
+            if decision.source == JevSource.multiple_sources or len(named) >= 2:
+                plan.needs_cross_source = False
     plan.data_sources = _data_sources(plan)
-    return plan
-
+    plan = attach_task_plan(sync_plan_sources(plan), message, decision=decision)
+    return apply_answer_model_routing(sync_plan_sources(plan), decision=decision)
 
 def _time_operation(decision: JevDecision) -> str:
     if decision.operation == JevOperation.compare:
@@ -155,6 +194,7 @@ def _needs_medical_evidence(decision: JevDecision) -> bool:
         JevIntent.fitness_question,
         JevIntent.lab_result_interpretation,
         JevIntent.bio_ai_report_interpretation,
+        JevIntent.questionnaire_interpretation,
     } or decision.operation in {JevOperation.interpret, JevOperation.retrieve_and_explain}
 
 
@@ -170,6 +210,8 @@ def _data_sources(plan: QueryPlan) -> list[str]:
         sources.append("health_goals")
     if plan.needs_user_uploaded:
         sources.append("uploaded_documents")
+    if plan.needs_questionnaire:
+        sources.append("questionnaire")
     return sources
 
 
@@ -203,7 +245,15 @@ def _flags(decision: JevDecision) -> tuple[IntentType, KnowledgeScope, bool, boo
         return IntentType.personal_profile, KnowledgeScope.personal, False, False, True, False, False
 
     if decision.intent in {JevIntent.questionnaire_lookup, JevIntent.questionnaire_interpretation}:
-        return IntentType.health_scenario, KnowledgeScope.personal, False, False, True, False, False
+        mixed = decision.source == JevSource.multiple_sources
+        history = decision.requires_historical_data
+        needs_blood = mixed and _jev_mentions_blood(decision)
+        needs_bio = mixed and _jev_mentions_bio(decision)
+        if mixed and not needs_blood and not needs_bio:
+            needs_blood = True
+        if mixed:
+            return IntentType.health_scenario, KnowledgeScope.personal, needs_blood, needs_bio, False, history, True
+        return IntentType.questionnaire_lookup, KnowledgeScope.personal, False, False, False, history, history
 
     if decision.intent in {JevIntent.nutrition_question, JevIntent.lifestyle_question}:
         return (
@@ -279,7 +329,7 @@ def _query_source(source: JevSource) -> QuerySource:
     return {
         JevSource.profile: QuerySource.supershyft,
         JevSource.assessment: QuerySource.supershyft,
-        JevSource.questionnaire: QuerySource.lifestyle,
+        JevSource.questionnaire: QuerySource.questionnaire,
         JevSource.blood_reports: QuerySource.blood,
         JevSource.lab_results: QuerySource.blood,
         JevSource.bio_ai_report: QuerySource.bio_ai,
@@ -290,3 +340,24 @@ def _query_source(source: JevSource) -> QuerySource:
         JevSource.multiple_sources: QuerySource.mixed,
         JevSource.none: QuerySource.none,
     }[source]
+
+
+def _needs_questionnaire(decision: JevDecision, message: str) -> bool:
+    if decision.intent in {JevIntent.questionnaire_lookup, JevIntent.questionnaire_interpretation}:
+        return True
+    if decision.source == JevSource.questionnaire:
+        return True
+    return explicit_questionnaire_request(message)
+
+
+def _jev_mentions_blood(decision: JevDecision) -> bool:
+    blob = " ".join((decision.requested_metrics or []) + (decision.requested_entities or [])).lower()
+    return any(
+        token in blob
+        for token in ("ldl", "hdl", "hba1c", "blood", "cholesterol", "triglyceride", "glucose")
+    )
+
+
+def _jev_mentions_bio(decision: JevDecision) -> bool:
+    blob = " ".join((decision.requested_metrics or []) + (decision.requested_entities or [])).lower()
+    return any(token in blob for token in ("dyslipidemia", "metabolic", "bio-ai", "bio ai", "score"))

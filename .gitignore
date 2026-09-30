@@ -28,3 +28,4 @@ frontend/.env
 *.pem
 *.p12
 credentials.json
+backend/tests/fixtures/eval_runs/

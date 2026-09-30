@@ -13,3 +13,6 @@ class InsightCandidate(BaseModel):
     delivery: str = "on_request"
     source: str = "cura_derived"
     report_ids: list[str] = Field(default_factory=list)
+    trigger: str | None = None
+    title: str | None = None
+    suppressed: bool = False

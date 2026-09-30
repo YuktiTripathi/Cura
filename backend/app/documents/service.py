@@ -27,6 +27,14 @@ def _iso(value: datetime | None) -> str:
 
 
 def to_out(row: Document) -> DocumentOut:
+    from app.documents.metadata import load_meta
+
+    meta = load_meta(row)
+    pageindex = meta.get("pageindex_status")
+    processing = meta.get("processing_status")
+    structured_ready = bool(meta.get("structured_facts_ready")) or (
+        row.extraction_status == "completed" and bool((meta.get("structured_health") or {}).get("biomarkers"))
+    )
     return DocumentOut(
         document_id=row.id,
         filename=row.original_filename,
@@ -39,6 +47,12 @@ def to_out(row: Document) -> DocumentOut:
         created_at=_iso(row.created_at),
         sha256=row.sha256,
         extraction_error=row.extraction_error,
+        processing_status=processing,
+        pageindex_status=pageindex,
+        document_kind=meta.get("document_kind"),
+        document_type=meta.get("document_subtype"),
+        structured_facts_ready=structured_ready or row.extraction_status == "completed",
+        narrative_ready=pageindex == "READY",
     )
 
 

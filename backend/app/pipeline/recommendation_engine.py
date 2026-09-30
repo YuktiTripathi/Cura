@@ -62,20 +62,54 @@ class RecommendationEngine:
             flags=list(dict.fromkeys(flags)),
         )
 
-    def deterministic_candidates(self, context: HealthContext) -> list[RecommendationCandidate]:
+    def deterministic_candidates(self, context: HealthContext, requested_category: str | None = None) -> list[RecommendationCandidate]:
         """Conservative educational candidates grounded in available context."""
         out: list[RecommendationCandidate] = []
         keys = {m.key for m in context.markers}
+        flags = {m.key: m.flag.value for m in context.markers}
         notes = " ".join(context.notes + (context.lifestyle.notes if context.lifestyle else [])).lower()
         vegetarian = "vegetarian" in notes and "non-vegetarian" not in notes
+        lipids_flagged = any(flags.get(k) in {"high", "low"} for k in ("ldl", "triglycerides", "cholesterol", "hdl"))
+        iron_pattern = sum(1 for k in ("hemoglobin", "mcv", "mch", "iron") if flags.get(k) == "low") >= 2
+        want_diet = requested_category in {None, "diet"}
+        want_activity = requested_category in {None, "activity"}
+        want_sleep = requested_category in {None, "sleep"}
 
-        if keys & {"ldl", "triglycerides", "cholesterol"}:
+        if want_diet and iron_pattern:
+            foods = "lentils, beans, fortified foods, nuts, and seeds" if vegetarian else (
+                "lentils, beans, eggs, fish or lean meat, and fortified foods"
+            )
+            out.append(
+                RecommendationCandidate(
+                    category="foods_to_include",
+                    text=f"Discuss including suitable iron-containing foods such as {foods} within your usual diet.",
+                    rationale="Food-only educational guidance related to low haemoglobin/red-cell/iron values; supplementation requires a clinician.",
+                    evidence_codes=sorted(keys & {"hemoglobin", "mcv", "mch", "iron", "ferritin"}),
+                )
+            )
+            out.append(
+                RecommendationCandidate(
+                    category="meal_patterns",
+                    text="If you eat plant sources of iron, consider pairing them with vitamin C-rich foods at the same meal.",
+                    rationale="Educational meal-pattern guidance related to the available iron-related blood values, not a treatment plan.",
+                    evidence_codes=sorted(keys & {"hemoglobin", "mcv", "mch", "iron"}),
+                )
+            )
+            out.append(
+                RecommendationCandidate(
+                    category="foods_to_limit",
+                    text="Avoid taking tea or coffee with iron-rich meals if you are trying to absorb more dietary iron; discuss persistent low values with a clinician.",
+                    rationale="Educational timing guidance related to the available iron-related blood values.",
+                    evidence_codes=sorted(keys & {"hemoglobin", "iron"}),
+                )
+            )
+        if want_diet and (keys & {"ldl", "triglycerides", "cholesterol"}) and lipids_flagged and not (iron_pattern and requested_category == "diet"):
             out.extend(
                 [
                     RecommendationCandidate(
                         category="foods_to_include",
                         text="Include more soluble-fibre foods such as oats, beans, lentils, fruit, and vegetables.",
-                        rationale="General heart-healthy food guidance related to the available lipid results.",
+                        rationale="General heart-healthy food guidance related to the available out-of-range lipid results.",
                         evidence_codes=sorted(keys & {"ldl", "triglycerides", "cholesterol"}),
                     ),
                     RecommendationCandidate(
@@ -86,7 +120,9 @@ class RecommendationEngine:
                     ),
                 ]
             )
-        if keys & {"glucose", "fasting_blood_glucose", "hba1c"}:
+        if want_diet and (keys & {"glucose", "fasting_blood_glucose", "hba1c"}) and any(
+            flags.get(k) in {"high", "low"} for k in ("glucose", "fasting_blood_glucose", "hba1c")
+        ):
             out.append(
                 RecommendationCandidate(
                     category="meal_patterns",
@@ -95,7 +131,7 @@ class RecommendationEngine:
                     evidence_codes=sorted(keys & {"glucose", "fasting_blood_glucose", "hba1c"}),
                 )
             )
-        if keys & {"vitamin_b12", "iron", "ferritin"}:
+        if want_diet and (keys & {"vitamin_b12", "ferritin"}) and not iron_pattern:
             foods = "lentils, beans, fortified foods, nuts, and seeds" if vegetarian else (
                 "lentils, beans, eggs, fish or lean meat, and fortified foods"
             )
@@ -107,7 +143,10 @@ class RecommendationEngine:
                     evidence_codes=sorted(keys & {"vitamin_b12", "iron", "ferritin"}),
                 )
             )
-        if context.lifestyle and context.lifestyle.activity_level:
+        supportive = []
+        if context.personalization:
+            supportive = list(context.personalization.known_lifestyle.already_supportive)
+        if want_activity and context.lifestyle and context.lifestyle.activity_level and "activity" not in supportive:
             out.append(
                 RecommendationCandidate(
                     category="activity",
@@ -116,7 +155,7 @@ class RecommendationEngine:
                     evidence_codes=["activity"],
                 )
             )
-        if context.lifestyle and context.lifestyle.sleep_quality:
+        if want_sleep and context.lifestyle and context.lifestyle.sleep_quality and "sleep" not in supportive:
             out.append(
                 RecommendationCandidate(
                     category="sleep",
@@ -125,7 +164,7 @@ class RecommendationEngine:
                     evidence_codes=["sleep"],
                 )
             )
-        if "hydration" in notes or "fluid" in notes:
+        if want_diet and ("hydration" in notes or "fluid" in notes):
             out.append(
                 RecommendationCandidate(
                     category="hydration",

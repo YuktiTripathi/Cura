@@ -43,6 +43,8 @@ def init_db() -> None:
             conn.execute(text("ALTER TABLE conversations ADD COLUMN current_marker_code VARCHAR(128)"))
         if "conversation_summary" not in conv_cols:
             conn.execute(text("ALTER TABLE conversations ADD COLUMN conversation_summary TEXT"))
+        if "conversation_state_json" not in conv_cols:
+            conn.execute(text("ALTER TABLE conversations ADD COLUMN conversation_state_json TEXT"))
         if "feedback" in tables:
             fb_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(feedback)")).fetchall()}
             if "helpful" not in fb_cols:

@@ -1,6 +1,7 @@
 import re
 
 from app.db.models import Conversation
+from app.pipeline.operations import is_provenance_request
 from app.pipeline.intent import (
     extract_topics,
     is_contextual_follow_up,
@@ -9,7 +10,8 @@ from app.pipeline.intent import (
 )
 
 ANAPHORA = re.compile(
-    r"\b(it|that|this|these|those|the above|that score|that result|the previous one|previous one)\b",
+    r"\b(it|that|this|these|those|they|them|the above|that score|that result|"
+    r"the previous one|previous one|the latest one|latest one)\b",
     re.I,
 )
 PERSONAL_DATA_INTENTS = {
@@ -27,6 +29,7 @@ PERSONAL_DATA_INTENTS = {
     "personal_profile",
     "report_explanation",
     "health_goal_progress",
+    "questionnaire_lookup",
 }
 
 
@@ -57,14 +60,27 @@ class FollowUpMemory:
         marker, bio = extract_topics(message)
         if marker or bio:
             return None, None
+        from app.pipeline.questionnaire_topics import questionnaire_topic
+        from app.pipeline.intent import NAMES
+
+        q_topic = questionnaire_topic(message)
+        if q_topic and conversation.follow_up_topic:
+            from app.pipeline.questionnaire_intent import is_questionnaire_topic
+
+            if is_questionnaire_topic(conversation.follow_up_topic):
+                return q_topic, NAMES.get(q_topic, q_topic.replace("_", " "))
         if (
             is_educational_utterance(message)
             and not requires_personal_record(message)
             and not is_contextual_follow_up(message)
+            and not is_provenance_request(message)
         ):
             return None, None
-        if is_contextual_follow_up(message) or ANAPHORA.search(message):
-            return conversation.follow_up_topic, conversation.follow_up_topic_name
+        if is_provenance_request(message) or is_contextual_follow_up(message) or ANAPHORA.search(message):
+            topic, name = conversation.follow_up_topic, conversation.follow_up_topic_name
+            if (topic or "") == "cholesterol" or (name or "").lower() == "cholesterol":
+                return "cholesterol", "cholesterol"
+            return topic, name
         return None, None
 
     def semantic_summary(self, conversation: Conversation | None) -> str:

@@ -210,6 +210,7 @@ class HealthSnapshot:
     has_nutrition: bool = False
     has_blood: bool = False
     has_bio: bool = False
+    has_questionnaire: bool = False
 
 
 def collect_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegistry) -> HealthSnapshot:
@@ -268,6 +269,20 @@ def collect_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegist
         snap.bio_risks = list(latest_bio.risks or [])
     if life and any("diet preference" in (n or "").lower() for n in (life.notes or [])):
         snap.has_nutrition = True
+    try:
+        provider = getattr(registry, "questionnaires", None)
+        if provider is not None:
+            instances = provider.query(
+                principal,
+                QueryPlan(
+                    intent=IntentType.questionnaire_lookup,
+                    needs_questionnaire=True,
+                    knowledge_scope=KnowledgeScope.personal,
+                ),
+            ) or []
+            snap.has_questionnaire = any(item.answers for item in instances)
+    except Exception:
+        snap.has_questionnaire = False
     return snap
 
 

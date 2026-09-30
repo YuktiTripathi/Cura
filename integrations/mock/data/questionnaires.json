@@ -1,0 +1,153 @@
+[
+  {
+    "subject_id": "demo-user-q1",
+    "instances": [
+      {
+        "assessment_instance_id": "q1-older",
+        "package_code": "METSIGHTS_BASIC",
+        "status": "completed",
+        "recorded_at": "2026-08-01",
+        "answers": [
+          {
+            "response_id": "q1-old-sleep",
+            "question_id": "11",
+            "question_key": "sleeping_hours",
+            "question": "How many hours do you sleep on an average?",
+            "value": "5-6 hours",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-old-diet",
+            "question_id": "20",
+            "question_key": "diet_preference",
+            "question": "What is your diet preference?",
+            "value": "Non-vegetarian",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-old-activity",
+            "question_id": "30",
+            "question_key": "physical_activity_frequency",
+            "question": "How often do you do physical activity?",
+            "value": "1-2 days a week",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-old-alcohol",
+            "question_id": "40",
+            "question_key": "alcohol_frequency",
+            "question": "How often do you consume alcohol?",
+            "value": "Weekly",
+            "response_type": "single_choice"
+          }
+        ]
+      },
+      {
+        "assessment_instance_id": "q1-latest",
+        "package_code": "METSIGHTS_BASIC",
+        "status": "completed",
+        "recorded_at": "2026-09-15",
+        "answers": [
+          {
+            "response_id": "q1-new-sleep",
+            "question_id": "11",
+            "question_key": "sleeping_hours",
+            "question": "How many hours do you sleep on an average?",
+            "value": "7-8 hours",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-new-diet",
+            "question_id": "20",
+            "question_key": "diet_preference",
+            "question": "What is your diet preference?",
+            "value": "Vegetarian",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-new-activity",
+            "question_id": "30",
+            "question_key": "physical_activity_frequency",
+            "question": "How often do you do physical activity?",
+            "value": "3-4 days a week",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q1-new-alcohol",
+            "question_id": "40",
+            "question_key": "alcohol_frequency",
+            "question": "How often do you consume alcohol?",
+            "value": "Occasionally",
+            "response_type": "single_choice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "subject_id": "demo-user-q2",
+    "instances": [
+      {
+        "assessment_instance_id": "q2-only",
+        "package_code": "METSIGHTS_BASIC",
+        "status": "completed",
+        "recorded_at": "2026-09-10",
+        "answers": [
+          {
+            "response_id": "q2-sleep",
+            "question_id": "11",
+            "question_key": "sleeping_hours",
+            "question": "How many hours do you sleep on an average?",
+            "value": "Less than 5 hours",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q2-diet",
+            "question_id": "20",
+            "question_key": "diet_preference",
+            "question": "What is your diet preference?",
+            "value": "Eggetarian",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "q2-activity",
+            "question_id": "30",
+            "question_key": "physical_activity_frequency",
+            "question": "How often do you do physical activity?",
+            "value": "Rarely",
+            "response_type": "single_choice"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "subject_id": "eval-user-iron",
+    "instances": [
+      {
+        "assessment_instance_id": "eval-q-latest",
+        "package_code": "METSIGHTS_BASIC",
+        "status": "completed",
+        "recorded_at": "2026-08-20",
+        "answers": [
+          {
+            "response_id": "eval-sleep",
+            "question_id": "11",
+            "question_key": "sleeping_hours",
+            "question": "How many hours do you sleep on an average?",
+            "value": "6-7 hours",
+            "response_type": "single_choice"
+          },
+          {
+            "response_id": "eval-diet",
+            "question_id": "20",
+            "question_key": "diet_preference",
+            "question": "What is your diet preference?",
+            "value": "Vegetarian",
+            "response_type": "single_choice"
+          }
+        ]
+      }
+    ]
+  }
+]

@@ -7,10 +7,11 @@ type Props = {
   onSelectedChange: (ids: string[]) => void;
 };
 
-function statusLabel(status: string): string {
-  if (status === "completed") return "Ready";
-  if (status === "processing" || status === "not_started") return "Processing…";
-  if (status === "failed") return "Could not read";
+function statusLabel(doc: UploadedDocument): string {
+  if (doc.extraction_status === "failed") return "Could not read";
+  if (doc.structured_facts_ready && doc.pageindex_status === "BUILDING") return "Measurements ready";
+  if (doc.extraction_status === "completed" || doc.structured_facts_ready) return "Ready";
+  if (doc.extraction_status === "processing" || doc.extraction_status === "not_started") return "Processing…";
   return "Uploaded";
 }
 
@@ -45,7 +46,7 @@ export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props)
               <input
                 type="checkbox"
                 checked={selected.includes(d.document_id)}
-                disabled={d.extraction_status !== "completed"}
+                disabled={d.extraction_status !== "completed" && !d.structured_facts_ready}
                 onChange={(event) =>
                   onSelectedChange(
                     event.target.checked
@@ -57,7 +58,7 @@ export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props)
               📄 {d.filename}
             </label>
             <span className="muted">
-              {statusLabel(d.extraction_status)}
+              {statusLabel(d)}
               {" · "}
               {new Date(d.created_at).toLocaleDateString(undefined, {
                 day: "2-digit",

@@ -22,6 +22,7 @@ class Conversation(Base):
     current_report_id: Mapped[str | None] = mapped_column(String(128), nullable=True)
     current_marker_code: Mapped[str | None] = mapped_column(String(128), nullable=True)
     conversation_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
+    conversation_state_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -201,3 +202,18 @@ class DocumentChunk(Base):
     source: Mapped[str] = mapped_column(String(32), default="user_uploaded")
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     document: Mapped["Document"] = relationship(back_populates="chunks")
+
+
+class ProcessingJob(Base):
+    """Durable document/work item. Survives process restart; workers claim by status."""
+
+    __tablename__ = "processing_jobs"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    kind: Mapped[str] = mapped_column(String(32), default="document_extract")
+    document_id: Mapped[str | None] = mapped_column(String(36), nullable=True, index=True)
+    user_id: Mapped[str] = mapped_column(String(128), index=True)
+    status: Mapped[str] = mapped_column(String(24), default="pending", index=True)
+    attempts: Mapped[int] = mapped_column(Integer, default=0)
+    last_error: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())

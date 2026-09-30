@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.core.errors import VoiceUnavailableError
 from app.voice.contracts import TranscriptResult
 from app.voice.interface import SpeechToTextProvider
+from app.voice.medical_stt import STT_PROMPT
 
 logger = logging.getLogger("cura.voice")
 
@@ -59,6 +60,7 @@ class OpenAICompatibleSTTProvider:
                 if "openrouter.ai" in base:
                     payload: dict[str, object] = {
                         "model": settings.resolved_stt_model(),
+                        "prompt": STT_PROMPT,
                         "input_audio": {
                             "data": base64.b64encode(audio).decode("ascii"),
                             "format": _audio_format(filename, content_type),
@@ -68,7 +70,7 @@ class OpenAICompatibleSTTProvider:
                         payload["language"] = hint
                     res = client.post(url, headers={**headers, "Content-Type": "application/json"}, json=payload)
                 else:
-                    data: dict[str, str] = {"model": settings.resolved_stt_model()}
+                    data: dict[str, str] = {"model": settings.resolved_stt_model(), "prompt": STT_PROMPT}
                     if hint:
                         data["language"] = hint
                     files = {"file": (filename or "audio.webm", audio, content_type or "application/octet-stream")}

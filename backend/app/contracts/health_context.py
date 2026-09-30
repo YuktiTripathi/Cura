@@ -11,10 +11,22 @@ from app.contracts.evidence import EvidenceRecord
 from app.contracts.facts import ProvenancedFact
 from app.contracts.goals import GoalProgress, HealthGoal
 from app.contracts.lifestyle import LifestyleContext
+from app.contracts.operations import PremiseCheck, SourceOutcome
+from app.contracts.questionnaire import QuestionnaireAnswer, QuestionnaireInstance
 from app.contracts.profile import PersonalHealthProfile
 from app.contracts.recommendation import ApprovedRecommendation
 from app.contracts.scenario import HealthScenario
 from app.contracts.timeline import PersonalHealthTimeline
+from app.contracts.personalization import (
+    ClinicianHandoff,
+    HealthJourney,
+    HealthStory,
+    PersonalBaseline,
+    PersonalizationContext,
+    ProactiveInsight,
+    QuietDecision,
+)
+from app.contracts.uploaded_document import UploadedDocumentContext
 
 
 class Comparison(BaseModel):
@@ -40,6 +52,9 @@ class MissingItem(BaseModel):
     key: str
     name: str
     reason: str = "not_present"
+    report_id: str | None = None
+    report_date: date | None = None
+    scope: str | None = None
 
 
 class DisambiguationCandidate(BaseModel):
@@ -47,6 +62,8 @@ class DisambiguationCandidate(BaseModel):
     report_date: date
     source_line: str | None = None
     label: str | None = None
+    assessment_instance_id: str | None = None
+    completed_at: str | None = None
 
 
 class ContextMeta(BaseModel):
@@ -77,6 +94,12 @@ class CrossSourceFinding(BaseModel):
     notes: list[str] = Field(default_factory=list)
 
 
+class SourceConflict(BaseModel):
+    metric: str
+    name: str
+    values: list[CrossSourceValue] = Field(default_factory=list)
+
+
 class HealthContext(BaseModel):
     intent: IntentType
     answer_depth: AnswerDepth
@@ -99,6 +122,8 @@ class HealthContext(BaseModel):
     notes: list[str] = Field(default_factory=list)
     medical_passages: list[str] = Field(default_factory=list)
     lifestyle: LifestyleContext | None = None
+    questionnaire: list[QuestionnaireAnswer] = Field(default_factory=list)
+    questionnaire_instances: list[QuestionnaireInstance] = Field(default_factory=list)
     profile: PersonalHealthProfile | None = None
     timeline: PersonalHealthTimeline | None = None
     facts: list[ProvenancedFact] = Field(default_factory=list)
@@ -109,3 +134,25 @@ class HealthContext(BaseModel):
     context_version: str = "health-context-v2"
     meta: ContextMeta = Field(default_factory=ContextMeta)
     cross_source: CrossSourceFinding | None = None
+    source_conflicts: list[SourceConflict] = Field(default_factory=list)
+    source_outcomes: list[SourceOutcome] = Field(default_factory=list)
+    premise: PremiseCheck | None = None
+    premise_verified: bool | None = None
+    noteworthy_keys: list[str] = Field(default_factory=list)
+    derived: list[ProvenancedFact] = Field(default_factory=list)
+    user_stated: list[ProvenancedFact] = Field(default_factory=list)
+    requested_entity_codes: list[str] = Field(default_factory=list)
+    operations: list[str] = Field(default_factory=list)
+    question_type: str | None = None
+    domains: list[str] = Field(default_factory=list)
+    selectors: list[str] = Field(default_factory=list)
+    display_entity_codes: list[str] = Field(default_factory=list)
+    reasoning_context_codes: list[str] = Field(default_factory=list)
+    personalization: PersonalizationContext | None = None
+    baselines: list[PersonalBaseline] = Field(default_factory=list)
+    health_story: HealthStory | None = None
+    health_journey: HealthJourney | None = None
+    quiet: QuietDecision | None = None
+    clinician_handoff: ClinicianHandoff | None = None
+    proactive_insights: list[ProactiveInsight] = Field(default_factory=list)
+    uploaded_documents: list[UploadedDocumentContext] = Field(default_factory=list)

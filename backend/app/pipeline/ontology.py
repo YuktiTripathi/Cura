@@ -10,7 +10,7 @@ from app.pipeline.intent import BIO_ALIASES, NAMES, _alias_in_text, _named_score
 from app.pipeline.lab_parameters import display_name_for, expand_requested_keys, match_lab_keys, primary_lab_key
 from app.pipeline.language import normalize_for_intent
 
-_BIO_CUE = re.compile(r"\b(score|bio-?ai|assessment|risk)\b", re.I)
+_BIO_CUE = re.compile(r"\b(scores?|bio-?ai|assessment|risks?)\b", re.I)
 _GUIDANCE = re.compile(
     r"\b("
     r"what should i (?:do|eat|change)|"
@@ -56,11 +56,9 @@ def requested_metrics_from_message(message: str) -> list[str]:
     labs = match_lab_keys(text)
     bios = match_bio_keys(text)
     score_cue = bool(_BIO_CUE.search(text))
-    if labs and bios and not score_cue:
-        return labs
+    if labs and bios:
+        return list(dict.fromkeys([*labs, *bios]))
     if bios and (score_cue or not labs):
-        if labs and score_cue:
-            return list(dict.fromkeys([*labs, *bios]))
         return bios
     if score_cue:
         named = _named_score_code(text)
@@ -161,4 +159,9 @@ def attach_ontology(plan: QueryPlan, message: str) -> QueryPlan:
 
 
 def retrieval_metric_keys(plan: QueryPlan) -> list[str]:
-    return expand_requested_keys(plan.requested_metrics or ([plan.topic] if plan.topic else []))
+    from app.pipeline.lab_parameters import FAMILY_QUERY_KEYS, is_lab_key
+
+    raw = list(plan.requested_metrics or [])
+    if not raw and plan.topic and (is_lab_key(plan.topic) or plan.topic in FAMILY_QUERY_KEYS):
+        raw = [plan.topic]
+    return expand_requested_keys([key for key in raw if is_lab_key(key) or key in FAMILY_QUERY_KEYS])

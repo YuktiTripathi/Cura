@@ -200,8 +200,8 @@ class PersonalizedFollowUpEngine:
             scope = "general" if not item.requires_personal_context else "personal"
             if plan.needs_cross_source and item.requires_personal_context:
                 scope = "personal"
-            scoped.append(item.model_copy(update={"knowledge_scope": scope}))
-        return scoped
+            scoped.append(self._bind_handling(item.model_copy(update={"knowledge_scope": scope})))
+        return [item for item in scoped if item.handling_path]
 
     def _candidates(self, plan: QueryPlan, context: HealthContext, inv: FollowUpInventory) -> list[FollowUpSuggestion]:
         topic = context.resolved_topic_name or plan.topic_name or "this result"
@@ -296,6 +296,63 @@ class PersonalizedFollowUpEngine:
             return out
 
         if personal and key and context.markers:
+            if plan.intent == IntentType.blood_marker_explanation and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
+                out.append(
+                    FollowUpSuggestion(
+                        text="Do you have any new symptoms or medication or supplement changes?",
+                        category="clinical_context",
+                        intent="blood_marker_explanation",
+                        requires_personal_context=True,
+                        expected_reply_type="CLINICAL_CONTEXT",
+                        handling_path="CONTINUE_INTERPRETATION",
+                    )
+                )
+            perso = context.personalization
+            story = context.health_story
+            if story and story.persistent_patterns:
+                out.append(
+                    FollowUpSuggestion(
+                        text="Why is this pattern still present?",
+                        category="persistent_pattern",
+                        intent="blood_marker_explanation",
+                        requires_personal_context=True,
+                        handling_path="CONTINUE_INTERPRETATION",
+                    )
+                )
+            if story and story.important_missing:
+                out.append(
+                    FollowUpSuggestion(
+                        text="Which information is still missing?",
+                        category="identify_gaps",
+                        intent="missing_data",
+                        requires_personal_context=True,
+                        handling_path="IDENTIFY_GAPS",
+                    )
+                )
+            if perso and perso.primary_health_goal:
+                out.append(
+                    FollowUpSuggestion(
+                        text="What should I focus on for my current goal?",
+                        category="goal_focus",
+                        intent="health_goal_progress",
+                        requires_personal_context=True,
+                        handling_path="ASSESS_GOAL_PROGRESS",
+                    )
+                )
+            if plan.intent in {
+                IntentType.report_explanation,
+                IntentType.broad_health_summary,
+                IntentType.health_scenario,
+            } or (story and (story.persistent_patterns or story.important_missing)):
+                out.append(
+                    FollowUpSuggestion(
+                        text="What should I discuss with my doctor?",
+                        category="clinician_handoff",
+                        intent="report_explanation",
+                        requires_personal_context=True,
+                        handling_path="PREPARE_CLINICIAN_DISCUSSION",
+                    )
+                )
             if plan.intent != IntentType.blood_marker_explanation:
                 out.append(
                     FollowUpSuggestion(
@@ -513,8 +570,61 @@ class PersonalizedFollowUpEngine:
         return True
 
     def _safe(self, item: FollowUpSuggestion) -> bool:
+        if item.category == "clinical_context":
+            return True
         lower = item.text.lower()
         return not any(token in lower for token in UNSAFE)
+
+    def _bind_handling(self, item: FollowUpSuggestion) -> FollowUpSuggestion:
+        if item.handling_path:
+            return item
+        category_paths = {
+            "clinical_context": ("CLINICAL_CONTEXT", "CONTINUE_INTERPRETATION"),
+            "explanation": (None, "CONTINUE_INTERPRETATION"),
+            "historical_trend": ("YES_NO", "TREND"),
+            "related_marker": (None, "SWITCH_ENTITY"),
+            "bio_ai_relationship": (None, "CONTINUE_INTERPRETATION"),
+            "comparison": ("YES_NO", "COMPARE"),
+            "clarification": ("REPORT_CHOICE", "CLARIFY_REPORT"),
+            "general_education": (None, "GENERAL_EDUCATION"),
+            "general_foods": (None, "GENERAL_EDUCATION"),
+            "general_lifestyle": (None, "GENERAL_EDUCATION"),
+            "cross_explain": (None, "GENERAL_EDUCATION"),
+            "cross_newer": ("YES_NO", "COMPARE"),
+            "cross_source_marker": (None, "SWITCH_ENTITY"),
+            "scenario_attention": (None, "HEALTH_SCENARIO"),
+            "scenario_trends": (None, "TREND"),
+            "scenario_nutrition": (None, "NUTRITION"),
+            "nutrition_include": (None, "NUTRITION"),
+            "nutrition_limit": (None, "NUTRITION"),
+            "nutrition_scenario": (None, "HEALTH_SCENARIO"),
+            "nutrition": (None, "NUTRITION"),
+            "lifestyle": (None, "CONTINUE_INTERPRETATION"),
+            "next_action": (None, "LOOKUP"),
+            "persistent_pattern": (None, "CONTINUE_INTERPRETATION"),
+            "identify_gaps": (None, "IDENTIFY_GAPS"),
+            "goal_focus": (None, "ASSESS_GOAL_PROGRESS"),
+            "clinician_handoff": (None, "PREPARE_CLINICIAN_DISCUSSION"),
+        }
+        expected, path = category_paths.get(item.category, (None, None))
+        if path is None and item.intent in {
+            "general_health_question",
+            "latest_result",
+            "trend",
+            "blood_marker_explanation",
+        }:
+            path = {
+                "general_health_question": "GENERAL_EDUCATION",
+                "latest_result": "LOOKUP",
+                "trend": "TREND",
+                "blood_marker_explanation": "CONTINUE_INTERPRETATION",
+            }.get(item.intent)
+        return item.model_copy(
+            update={
+                "handling_path": path,
+                "expected_reply_type": item.expected_reply_type or expected,
+            }
+        )
 
     def _limit(self, items: list[FollowUpSuggestion]) -> list[FollowUpSuggestion]:
         seen: set[str] = set()
@@ -524,6 +634,6 @@ class PersonalizedFollowUpEngine:
                 continue
             seen.add(item.category)
             unique.append(item)
-            if len(unique) >= 4:
+            if len(unique) >= 3:
                 break
         return unique

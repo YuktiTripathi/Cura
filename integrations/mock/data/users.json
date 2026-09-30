@@ -14,5 +14,29 @@
     "display_name": "Jordan",
     "age_band": "36-45",
     "sex": "female"
+  },
+  {
+    "subject_id": "demo-user-q1",
+    "first_name": "Quinn",
+    "last_name": null,
+    "display_name": "Quinn",
+    "age_band": "26-35",
+    "sex": "female"
+  },
+  {
+    "subject_id": "demo-user-q2",
+    "first_name": "Riley",
+    "last_name": null,
+    "display_name": "Riley",
+    "age_band": "36-45",
+    "sex": "male"
+  },
+  {
+    "subject_id": "eval-user-iron",
+    "first_name": "Sam",
+    "last_name": null,
+    "display_name": "Sam",
+    "age_band": "26-35",
+    "sex": "female"
   }
 ]

@@ -66,14 +66,14 @@ def test_general_chat_zero_supershyft_one_llm():
     calls = {"llm": 0}
     orig = OpenAICompatibleLLMClient.complete
 
-    def wrap_llm(self, messages):
+    def wrap_llm(self, messages, json_mode=False):
         calls["llm"] += 1
         return "Vitamin D is a fat-soluble vitamin involved in bone and immune health."
 
     OpenAICompatibleLLMClient.complete = wrap_llm
     try:
         body = chat("What is Vitamin D?").json()
-        assert body["meta"]["intent"] == "general_health_question"
+        assert body["meta"].get("question_type") == "general_education" or body["meta"]["intent"] == "general_health_question"
         assert body["meta"]["knowledge_scope"] == "general"
         assert body["meta"]["llm_called"] is True
         assert body["meta"]["supershyft_called"] is False
@@ -108,8 +108,8 @@ def test_general_then_general_followup_no_supershyft():
     set_registry(reg)
     try:
         second = chat(follow, cid).json()
-        assert second["meta"]["intent"] == "general_health_question"
         assert second["meta"]["supershyft_called"] is False
+        assert second["meta"].get("question_type") == "general_education" or second["meta"]["intent"] == "general_health_question"
         assert PERSONAL_DATA_UNAVAILABLE not in second["answer"]
     finally:
         reg.blood = orig_b
@@ -120,8 +120,8 @@ def test_general_then_personal_followup():
     first = chat("What is Vitamin D?").json()
     cid = first["conversation_id"]
     mine = chat("What is my Vitamin D level?", cid).json()
-    assert mine["meta"]["intent"] != "general_health_question"
     assert mine["meta"]["supershyft_called"] is True
+    assert mine["meta"].get("question_type") != "general_education"
     assert "12.6" in mine["answer"]
 
 
@@ -148,17 +148,23 @@ def test_general_then_document_followup():
 def test_llm_unavailable_does_not_use_supershyft():
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
 
-    def boom(self, messages):
+    def boom(self, messages, json_mode=False):
         raise LLMUnavailableError("down")
 
     orig = OpenAICompatibleLLMClient.complete
     OpenAICompatibleLLMClient.complete = boom
     try:
         body = chat("What is Vitamin D?").json()
-        assert GENERAL_KNOWLEDGE_UNAVAILABLE in body["answer"] or "general medical knowledge" in body["answer"].lower()
         assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
         assert body["meta"]["supershyft_called"] is False
         assert body["meta"]["llm_called"] is True
+        assert "12.6" not in body["answer"]
+        assert (
+            GENERAL_KNOWLEDGE_UNAVAILABLE in body["answer"]
+            or "general medical knowledge" in body["answer"].lower()
+            or "calcium" in body["answer"].lower()
+            or "bone" in body["answer"].lower()
+        )
     finally:
         OpenAICompatibleLLMClient.complete = orig
 

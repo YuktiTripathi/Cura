@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from datetime import date
 
 from app.contracts.blood import BloodMarker
+from app.contracts.uploaded_document import DocumentHealthFact
 from app.documents.value_extraction import ExtractedValue
 
 
@@ -64,6 +65,8 @@ class CrossSourceComparator:
             )
         ):
             notes.append("These reports use different reference ranges, so the flags should be interpreted separately.")
+        if uploaded.confidence != "high":
+            notes.append("The uploaded value was extracted with lower confidence and should be checked against the original page.")
         return ComparisonResult(
             parameter=parameter,
             name=name,
@@ -74,6 +77,26 @@ class CrossSourceComparator:
             direction=direction,
             notes=notes,
         )
+
+    def compare_many(self, parameter: str, name: str, values: list[SourceValue]) -> list[ComparisonResult]:
+        """Pair uploaded vs SuperShyft when both exist; otherwise compare adjacent retrieved sources."""
+        if len(values) < 2:
+            return []
+        uploaded = next(
+            (item for item in values if (item.source or "").lower() in {"user_uploaded", "uploaded_document"}),
+            None,
+        )
+        supershyft = next(
+            (
+                item
+                for item in values
+                if (item.source or "").lower() in {"supershyft", "supershyft_blood", "blood"}
+            ),
+            None,
+        )
+        if uploaded is not None and supershyft is not None:
+            return [self.compare(parameter, name, uploaded, supershyft)]
+        return [self.compare(parameter, name, values[index], values[index + 1]) for index in range(len(values) - 1)]
 
 
 def marker_to_source(marker: BloodMarker, report_date: date | None) -> SourceValue:
@@ -179,6 +202,92 @@ def render_comparison(result: ComparisonResult, *, why: bool = False, newer: boo
             lines.append("I can compare the values, but I cannot reliably say which report is newer without clear test dates on both sides.")
     lines.append("")
     lines.append("If you want, I can explain what this marker measures (general knowledge, not your personal result).")
+    return "\n".join(lines)
+
+
+def uploaded_fact_to_source(fact: DocumentHealthFact) -> SourceValue:
+    value = fact.value if isinstance(fact.value, (int, float)) else None
+    confidence = "high"
+    if fact.extraction_method in {"ocr", "vision"} or (fact.extraction_confidence is not None and fact.extraction_confidence < 0.6):
+        confidence = "low"
+    return SourceValue(
+        source="user_uploaded",
+        value=value,
+        unit=fact.unit,
+        date=fact.report_date,
+        date_kind="report_date" if fact.report_date else None,
+        page=fact.page_number,
+        document_id=fact.source_document_id,
+        excerpt=fact.provenance_text,
+        reference_low=fact.reference_low,
+        reference_high=fact.reference_high,
+        confidence=confidence,
+    )
+
+
+def compare_uploaded_with_blood(
+    facts: list[DocumentHealthFact],
+    markers: list[BloodMarker],
+    report_date: date | None,
+    *,
+    keys: list[str] | None = None,
+) -> list[ComparisonResult]:
+    wanted = {item.lower() for item in (keys or []) if item}
+    by_key = {item.key: item for item in markers if item.key}
+    comparator = CrossSourceComparator()
+    results: list[ComparisonResult] = []
+    seen: set[str] = set()
+    for fact in facts:
+        code = (fact.canonical_code or "").lower()
+        if not code or code in seen:
+            continue
+        if wanted and code not in wanted:
+            continue
+        marker = by_key.get(code)
+        if marker is None:
+            continue
+        seen.add(code)
+        results.append(
+            comparator.compare(
+                code,
+                fact.display_name or marker.name,
+                uploaded_fact_to_source(fact),
+                marker_to_source(marker, report_date),
+            )
+        )
+        if len(results) >= 8:
+            break
+    return results
+
+
+def render_multi_comparison(results: list[ComparisonResult]) -> str:
+    if not results:
+        return "I couldn't find matching values to compare between the uploaded report and SuperShyft."
+    if len(results) == 1:
+        return render_comparison(results[0])
+    lines = ["Compared with your latest SuperShyft report:", ""]
+    for result in results:
+        a, b = result.source_a, result.source_b
+        unit_a = f" {a.unit}" if a.unit else ""
+        unit_b = f" {b.unit}" if b.unit else ""
+        val_a = f"{a.value}{unit_a}" if a.value is not None else "not found"
+        val_b = f"{b.value}{unit_b}" if b.value is not None else "not found"
+        page = f" · page {a.page}" if a.page else ""
+        diff = ""
+        if result.difference is not None and result.direction and result.direction != "unchanged":
+            abs_diff = abs(result.difference)
+            unit = f" {result.unit}" if result.unit else ""
+            diff = f" (SuperShyft is {abs_diff}{unit} {result.direction})"
+        elif result.direction == "unchanged":
+            diff = " (values match)"
+        lines.append(f"{result.name}: uploaded {val_a}{page} · SuperShyft {val_b}{diff}")
+    lines.extend(
+        [
+            "",
+            "These are results from different reports. The difference alone does not establish why the values changed.",
+            "Source: Uploaded report · SuperShyft blood report",
+        ]
+    )
     return "\n".join(lines)
 
 

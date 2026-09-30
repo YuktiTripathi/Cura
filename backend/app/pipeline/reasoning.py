@@ -1,0 +1,257 @@
+"""ReasoningService: LOOKUP-only stays deterministic; multi-entity/multi-op uses the LLM."""
+
+from __future__ import annotations
+
+import logging
+import time
+from dataclasses import dataclass, field
+
+from app.contracts.common import AnswerModelTier, IntentType, KnowledgeScope
+from app.contracts.health_context import HealthContext
+from app.contracts.query import QueryPlan
+from app.core.config import settings
+from app.core.copy import general_knowledge_unavailable
+from app.core.errors import LLMUnavailableError
+from app.llm.factory import get_llm_client
+from app.llm.models import LLMStructuredOutput
+from app.llm.registry import fallback_tiers, uses_answer_llm
+from app.pipeline.planner import plan_needs_reasoning
+from app.pipeline.quality_gate import review_answer, should_escalate_to_deep
+from app.pipeline.prompt_builder import PromptBuilder
+from app.pipeline.renderer import (
+    DeterministicRenderer,
+    render_bio_ai_ambiguity,
+    render_bio_ai_score_list,
+    render_diagnosis_restraint,
+    render_missing_blood_marker,
+    render_provenance,
+)
+from app.retrieval.medical import render_medical_evidence_answer
+
+logger = logging.getLogger("cura.reasoning")
+
+
+@dataclass
+class ReasoningResult:
+    answer: str
+    llm_result: LLMStructuredOutput | None = None
+    llm_called: bool = False
+    llm_mode: str = "deterministic"
+    answer_client: object | None = None
+    model_fallback_used: bool = False
+    latency_ms: int | None = None
+    flags: list[str] = field(default_factory=list)
+    model_escalated: bool = False
+    escalation_reason: str | None = None
+
+
+class ReasoningService:
+    def __init__(self, prompts: PromptBuilder | None = None, renderer: DeterministicRenderer | None = None):
+        self.prompts = prompts or PromptBuilder()
+        self.renderer = renderer or DeterministicRenderer()
+
+    def run(
+        self,
+        *,
+        message: str,
+        plan: QueryPlan,
+        context: HealthContext,
+        conversation_summary: str = "",
+        response_lang=None,
+        routing_note: str | None = None,
+        medical_hits: list | None = None,
+        general_only: bool = False,
+        diagnosis_restraint: bool = False,
+        budget=None,
+        complete_answer=None,
+    ) -> ReasoningResult:
+        started = time.perf_counter()
+        medical_hits = medical_hits or []
+        if diagnosis_restraint:
+            return ReasoningResult(
+                answer=render_diagnosis_restraint(context),
+                llm_mode="structured_safety",
+            )
+        if (plan.operation or "").upper() == "PROVENANCE":
+            return ReasoningResult(answer=render_provenance(context), llm_mode="structured_provenance")
+        lookup = self._lookup_only(plan, context)
+        structured_bio_ai = (
+            lookup
+            and plan.intent == IntentType.bio_ai_score
+            and bool(context.bio_ai_risks)
+            and context.status != "ambiguous"
+            and not plan.needs_user_uploaded
+        )
+        if structured_bio_ai:
+            return ReasoningResult(
+                answer=render_bio_ai_score_list(context.bio_ai_risks),
+                llm_mode="structured_bio_ai",
+            )
+        if (
+            lookup
+            and plan.intent == IntentType.bio_ai_score
+            and context.status == "ambiguous"
+            and not plan.needs_user_uploaded
+        ):
+            return ReasoningResult(answer=render_bio_ai_ambiguity(context), llm_mode="structured_bio_ai")
+        if (
+            lookup
+            and plan.intent == IntentType.bio_ai_score
+            and context.status != "ambiguous"
+            and not context.bio_ai_risks
+            and not plan.needs_user_uploaded
+            and any(getattr(item, "reason", None) == "score_not_available" for item in context.missing)
+        ):
+            return ReasoningResult(answer="Score not available in this report.", llm_mode="structured_bio_ai")
+        if (
+            lookup
+            and plan.intent in {IntentType.latest_result, IntentType.previous_result}
+            and plan.needs_blood
+            and context.markers
+            and context.status != "ambiguous"
+            and not plan.needs_user_uploaded
+            and not plan.needs_cross_source
+        ):
+            return ReasoningResult(
+                answer=self.renderer.render(message, context),
+                llm_mode="structured_blood",
+            )
+        if (
+            lookup
+            and plan.intent in {
+                IntentType.latest_result,
+                IntentType.previous_result,
+                IntentType.blood_marker_explanation,
+            }
+            and plan.needs_blood
+            and not context.markers
+            and any(getattr(item, "reason", None) in {"no_reports", "not_in_reports"} for item in context.missing)
+        ):
+            return ReasoningResult(answer=render_missing_blood_marker(context), llm_mode="structured_blood")
+
+        completer = complete_answer or self._complete_answer
+        if general_only:
+            corpus_answer = render_medical_evidence_answer(plan.topic, medical_hits)
+            messages = self.prompts.build(
+                context, conversation_summary, message, response_lang, routing_note=routing_note
+            )
+            try:
+                llm_result, answer_client, _tier, fallback = completer(messages, plan, budget=budget)
+                return ReasoningResult(
+                    answer=llm_result.answer,
+                    llm_result=llm_result,
+                    llm_called=True,
+                    llm_mode=settings.resolved_llm_provider() if settings.enable_llm else "deterministic_mock",
+                    answer_client=answer_client,
+                    model_fallback_used=fallback,
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                )
+            except LLMUnavailableError:
+                if corpus_answer:
+                    return ReasoningResult(
+                        answer=corpus_answer,
+                        llm_called=True,
+                        llm_mode="medical_corpus",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                return ReasoningResult(
+                    answer=general_knowledge_unavailable(response_lang),
+                    llm_called=True,
+                    llm_mode="unavailable",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                )
+        if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (plan_needs_reasoning(plan) or not lookup):
+            messages = self.prompts.build(
+                context, conversation_summary, message, response_lang, routing_note=routing_note
+            )
+            try:
+                llm_result, answer_client, used_tier, fallback = completer(messages, plan, budget=budget)
+                answer = llm_result.answer
+                escalated = False
+                escalation_reason = None
+                if used_tier == AnswerModelTier.standard_medical:
+                    gate = review_answer(answer, plan, context)
+                    if should_escalate_to_deep(gate.flags, plan, context, answer, llm_result):
+                        deep_plan = plan.model_copy(update={
+                            "answer_model_tier": AnswerModelTier.deep_medical_reasoning,
+                            "model_tier": AnswerModelTier.deep_medical_reasoning,
+                        })
+                        try:
+                            llm_result, answer_client, used_tier, _deep_fallback = completer(
+                                messages, deep_plan, budget=budget
+                            )
+                            answer = llm_result.answer
+                            escalated = True
+                            escalation_reason = ", ".join(gate.flags[:4]) or "quality_gate"
+                            fallback = True
+                        except LLMUnavailableError:
+                            logger.warning("deep_medical_escalation_unavailable")
+                if llm_result.parse_error and not answer:
+                    answer = self.renderer.render(message, context)
+                return ReasoningResult(
+                    answer=answer,
+                    llm_result=llm_result,
+                    llm_called=True,
+                    llm_mode=settings.resolved_llm_provider() if settings.enable_llm else "deterministic_mock",
+                    answer_client=answer_client,
+                    model_fallback_used=fallback,
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                    model_escalated=escalated,
+                    escalation_reason=escalation_reason,
+                )
+            except LLMUnavailableError:
+                logger.warning("llm_unavailable")
+                return ReasoningResult(
+                    answer=self.renderer.render(message, context),
+                    llm_called=True,
+                    llm_mode="deterministic_fallback",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                )
+        return ReasoningResult(
+            answer=self.renderer.render(message, context),
+            llm_mode=settings.resolved_llm_provider() if settings.enable_llm else "deterministic_mock",
+        )
+
+    def _lookup_only(self, plan: QueryPlan, context: HealthContext) -> bool:
+        if plan_needs_reasoning(plan):
+            return False
+        if context.status == "ambiguous":
+            return True
+        return True
+
+    def _complete_answer(self, messages, plan, budget=None):
+        if (
+            plan.needs_personal_data
+            and settings.require_zdr_for_personal_health
+            and not settings.openrouter_zero_data_retention
+        ):
+            raise LLMUnavailableError("Personal health LLM requires a ZDR-capable endpoint")
+        last_error = None
+        remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
+        for index, tier in enumerate(fallback_tiers(plan.answer_model_tier)):
+            tier_cap = {
+                AnswerModelTier.standard_medical.value: 18.0,
+                AnswerModelTier.deep_medical_reasoning.value: 28.0,
+                AnswerModelTier.fast_reasoning.value: 12.0,
+            }.get(tier.value, 20.0)
+            timeout = min(float(settings.llm_timeout_seconds), remaining, tier_cap)
+            if budget is not None:
+                timeout = budget.timeout_for(timeout)
+            if timeout < 0.5:
+                break
+            client = get_llm_client(model_tier=tier.value, timeout=timeout)
+            started = time.perf_counter()
+            try:
+                result = client.complete_structured(messages)
+                logger.info(
+                    "answer_llm tier=%s model=%s fallback=%s latency_ms=%s",
+                    tier.value,
+                    client.model,
+                    index > 0,
+                    int((time.perf_counter() - started) * 1000),
+                )
+                return result, client, tier, index > 0
+            except LLMUnavailableError as exc:
+                last_error = exc
+                remaining = budget.remaining() if budget is not None else remaining
+        raise last_error or LLMUnavailableError("LLM request failed")

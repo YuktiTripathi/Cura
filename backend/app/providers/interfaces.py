@@ -5,6 +5,7 @@ from app.contracts.bio_ai import BioAIReport
 from app.contracts.blood import BloodReport
 from app.contracts.lifestyle import LifestyleContext
 from app.contracts.query import QueryPlan
+from app.contracts.questionnaire import QuestionnaireInstance
 from app.contracts.user import UserProfile
 from app.contracts.scenario import ScenarioContext
 
@@ -26,6 +27,11 @@ class BioAIProvider(Protocol):
 
 class LifestyleProvider(Protocol):
     def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> LifestyleContext | None:
+        ...
+
+
+class QuestionnaireProvider(Protocol):
+    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[QuestionnaireInstance]:
         ...
 
 

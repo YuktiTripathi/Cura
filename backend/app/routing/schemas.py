@@ -3,6 +3,8 @@ from typing import Annotated, Literal
 
 from pydantic import BaseModel, Field
 
+from app.contracts.common import AnswerComplexity, AnswerModelTier, ReasoningDepth
+
 
 class JevIntent(str, Enum):
     casual_conversation = "casual_conversation"
@@ -76,6 +78,13 @@ class JevRoutingState(BaseModel):
     selected_document_count: int = 0
     uploaded_document_available: bool = False
     supported_capabilities: list[str] = Field(default_factory=list)
+    turn_type: str | None = None
+    active_entities: list[str] = Field(default_factory=list)
+    expected_reply_type: str | None = None
+    previous_assistant_follow_up: str | None = None
+    resolved_references: dict[str, str] = Field(default_factory=dict)
+    new_context: list[str] = Field(default_factory=list)
+    operations_hint: list[str] = Field(default_factory=list)
 
 
 class JevNoulAnswer(BaseModel):
@@ -121,6 +130,11 @@ class JevDecision(BaseModel):
     confidence: float | None = None
     field_confidences: dict[str, float] = Field(default_factory=dict)
     clarification_question: str | None = None
+    complexity: AnswerComplexity | None = None
+    answer_model_tier: AnswerModelTier | None = None
+    reasoning_depth: ReasoningDepth | None = None
+    reasoning_required: bool = False
+    pdf_analysis_required: bool = False
 
     @property
     def requires_retrieval(self) -> bool:

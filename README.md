@@ -7,7 +7,7 @@ conversation meaning, safety, evidence, recommendations, and presentation.
 The local development profile uses mock providers and SQLite. The production
 profile supports SuperShyft read-only canonical adapters, JWT authentication,
 Cura-owned PostgreSQL persistence, Redis request controls, SSE chat, and an
-OpenAI-compatible LLM provider (including local Ollama/Qwen).
+OpenRouter only. There is no Qwen/Ollama/local fallback.
 
 ## Layout
 
@@ -125,7 +125,7 @@ Composer: 📎 PDF attach (upload is separate from sending a chat message), then
 - Run Cura-owned PostgreSQL migrations with `alembic -c alembic.ini upgrade head`
   from `backend/`. Never use the SuperShyft database URL as `DATABASE_URL`.
 
-See [docs/production.md](docs/production.md) and [docs/architecture.md](docs/architecture.md).
+See [docs/production.md](docs/production.md), [docs/architecture.md](docs/architecture.md), and [docs/diagnostics.md](docs/diagnostics.md).
 
 ## SuperShyft read-only database
 

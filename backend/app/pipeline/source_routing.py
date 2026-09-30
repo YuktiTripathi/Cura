@@ -5,6 +5,8 @@ import re
 
 from app.contracts.common import KnowledgeScope, QuerySource
 from app.contracts.query import QueryPlan
+from app.pipeline.health_sources import mixed_personal_cues, sync_plan_sources
+from app.routing.model_tier import apply_answer_model_routing
 from app.pipeline.intent import (
     is_educational_utterance,
     is_medical_advice_request,
@@ -14,7 +16,11 @@ from app.pipeline.intent import (
 
 logger = logging.getLogger("cura.pipeline")
 
-_UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|this document|the document|this report)\b", re.I)
+_UPLOAD = re.compile(
+    r"\b(upload(?:ed)?|pdf|this (?:whole |entire )?document|the document|"
+    r"this (?:whole |entire )?report|the report)\b",
+    re.I,
+)
 _SS = re.compile(r"\bsupershyft\b", re.I)
 _COMPARE = re.compile(
     r"\b(compare|comparison|difference|differ(?:ent)?|between (?:these|the|my)|"
@@ -36,6 +42,8 @@ def apply_source_routing(
     upload_cue = bool(_UPLOAD.search(text))
     ss_cue = bool(_SS.search(text))
     compare_cue = bool(_COMPARE.search(text))
+    cues = mixed_personal_cues(text)
+    mixed_personal = any(cues.values())
     educational = is_educational_utterance(text) and not requires_personal_record(text) and not compare_cue and not upload_cue
 
     needs_general = plan.knowledge_scope == KnowledgeScope.general
@@ -43,7 +51,7 @@ def apply_source_routing(
     needs_user_uploaded = False
     needs_cross = False
 
-    if educational and not compare_cue and not upload_cue and not plan.explicit_source_ref:
+    if educational and not compare_cue and not upload_cue and not plan.explicit_source_ref and not ids:
         plan.needs_general = True
         plan.needs_supershyft = False
         plan.needs_user_uploaded = False
@@ -70,7 +78,18 @@ def apply_source_routing(
 
     if ids and not compare_cue and not ss_cue:
         needs_user_uploaded = True
-        if not needs_cross:
+        if mixed_personal:
+            needs_supershyft = True
+            needs_general = False
+            plan.knowledge_scope = KnowledgeScope.personal
+            plan.source = QuerySource.mixed
+            if cues["bio_ai"]:
+                plan.needs_bio_ai = True
+            if cues["questionnaire"]:
+                plan.needs_questionnaire = True
+            if cues["lifestyle"]:
+                plan.needs_lifestyle = True
+        elif not needs_cross:
             needs_supershyft = False
             plan.needs_blood = False
             plan.needs_bio_ai = False
@@ -78,9 +97,21 @@ def apply_source_routing(
 
     if upload_cue and not ss_cue and not compare_cue:
         needs_user_uploaded = True
-        needs_supershyft = False
-        plan.needs_blood = False
-        plan.source = QuerySource.user_uploaded
+        if mixed_personal:
+            needs_supershyft = True
+            needs_general = False
+            plan.knowledge_scope = KnowledgeScope.personal
+            plan.source = QuerySource.mixed
+            if cues["bio_ai"]:
+                plan.needs_bio_ai = True
+            if cues["questionnaire"]:
+                plan.needs_questionnaire = True
+            if cues["lifestyle"]:
+                plan.needs_lifestyle = True
+        else:
+            needs_supershyft = False
+            plan.needs_blood = False
+            plan.source = QuerySource.user_uploaded
 
     if ss_cue and not upload_cue and not compare_cue:
         needs_supershyft = True
@@ -142,6 +173,10 @@ def annotate_plan(plan: QueryPlan) -> QueryPlan:
         sources.append("bio_ai_report")
     if plan.needs_lifestyle or plan.needs_profile:
         sources.append("lifestyle")
+    if plan.needs_questionnaire:
+        sources.append("questionnaire")
+    if plan.needs_goals:
+        sources.append("health_goals")
     plan.data_sources = list(dict.fromkeys(sources))
     guidance = bool(getattr(plan, "needs_guidance", False) or is_medical_advice_request(message))
     if guidance and plan.needs_personal_data:
@@ -151,4 +186,4 @@ def annotate_plan(plan: QueryPlan) -> QueryPlan:
         (plan.needs_general and plan.intent.value != "casual_conversation")
         or (plan.needs_personal_data and guidance)
     )
-    return plan
+    return apply_answer_model_routing(sync_plan_sources(plan))

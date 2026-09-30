@@ -12,14 +12,23 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
+from app.api.routes.voice import compat_router as voice_compat_router
 from app.core.config import settings
 from app.core.errors import CuraError, cura_error_handler, http_error_handler
+from app.core.invariants import assert_safe_auth_health_pairing
 from app.core.logging import configure_logging
 from app.db.session import init_db
 from fastapi import HTTPException
 
 configure_logging()
+assert_safe_auth_health_pairing(settings)
 init_db()
+try:
+    from app.documents.jobs import drain_pending_document_jobs
+
+    drain_pending_document_jobs()
+except Exception:
+    logging.getLogger("cura").warning("pending_document_job_drain_failed")
 
 app = FastAPI(title="Cura", version="0.1.0")
 app.add_middleware(
@@ -30,6 +39,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_router)
+app.include_router(voice_compat_router)
 app.add_exception_handler(CuraError, cura_error_handler)
 app.add_exception_handler(HTTPException, http_error_handler)
 
@@ -86,14 +96,29 @@ def health():
     ss = probe_supershyft()
     return {
         "status": "ok",
-        "env": settings.app_env,
-        "health_provider": settings.health_provider,
-        "llm_enabled": settings.enable_llm,
-        "llm_provider": settings.resolved_llm_provider() if settings.enable_llm else "off",
-        "llm_model": settings.active_llm_model() if settings.enable_llm else None,
-        "jev_enabled": settings.jev_enabled,
-        "jev_model": settings.jev_model if settings.jev_enabled else None,
         "supershyft_db_configured": ss.configured,
         "supershyft": ss.public_dict(),
         "cura_db": "sqlite" if settings.cura_database_is_sqlite() else "external",
     }
+
+
+@app.get("/health/live")
+def health_live():
+    return {"status": "ok"}
+
+
+@app.get("/health/ready")
+def health_ready():
+    from integrations.supershyft.db import probe_supershyft
+
+    ss = probe_supershyft()
+    body = {
+        "status": "ok",
+        "health_provider": settings.health_provider,
+        "llm_enabled": settings.enable_llm,
+        "jev_enabled": settings.jev_enabled,
+        "supershyft_db_configured": ss.configured,
+        "supershyft": ss.public_dict(),
+        "cura_db": "sqlite" if settings.cura_database_is_sqlite() else "external",
+    }
+    return body

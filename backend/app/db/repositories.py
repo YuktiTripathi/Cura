@@ -90,6 +90,11 @@ class ConversationRepository:
         conversation.updated_at = datetime.now(timezone.utc)
         self.db.commit()
 
+    def update_conversation_state(self, conversation: Conversation, payload: str | None) -> None:
+        conversation.conversation_state_json = payload
+        conversation.updated_at = datetime.now(timezone.utc)
+        self.db.commit()
+
     def delete_for_subject(self, conversation_id: str, subject_id: str) -> None:
         conv = self.get_for_subject(conversation_id, subject_id)
         self.db.delete(conv)

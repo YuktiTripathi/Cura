@@ -8,7 +8,7 @@ function authHeaders(): HeadersInit {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
   const token = window.localStorage.getItem("supershyft_access_token") || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
   if (token) headers.Authorization = `Bearer ${token}`;
-  else if (USER) headers["X-Cura-User-Id"] = USER;
+  else if (import.meta.env.DEV && USER) headers["X-Cura-User-Id"] = USER;
   return headers;
 }
 
@@ -62,7 +62,7 @@ export async function getCurrentUser(language?: string): Promise<MeResponse> {
 export async function transcribeVoice(
   blob: Blob,
   language: string = "auto"
-): Promise<{ transcript: string; detected_language: string | null; confidence: number | null }> {
+): Promise<{ transcript: string; text?: string; detected_language: string | null; language?: string | null; confidence: number | null }> {
   const language_mode = language === "auto" ? "auto" : "manual";
   const form = new FormData();
   form.append("audio", blob, "recording.webm");
@@ -71,7 +71,7 @@ export async function transcribeVoice(
   const headers: Record<string, string> = {};
   const token = window.localStorage.getItem("supershyft_access_token") || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
   if (token) headers.Authorization = `Bearer ${token}`;
-  else if (USER) headers["X-Cura-User-Id"] = USER;
+  else if (import.meta.env.DEV && USER) headers["X-Cura-User-Id"] = USER;
   let res: Response;
   try {
     res = await fetch(`${API}/api/v1/voice/transcribe`, { method: "POST", headers, body: form });
@@ -83,7 +83,13 @@ export async function transcribeVoice(
     const err = data.error as { message?: string } | undefined;
     throw new Error(err?.message || "Voice transcription failed.");
   }
-  return data as { transcript: string; detected_language: string | null; confidence: number | null };
+  return {
+    transcript: String(data.transcript || data.text || ""),
+    text: String(data.text || data.transcript || ""),
+    detected_language: (data.detected_language as string | null) || (data.language as string | null) || null,
+    language: (data.language as string | null) || (data.detected_language as string | null) || null,
+    confidence: (data.confidence as number | null) ?? null,
+  };
 }
 
 export async function sendChat(
@@ -107,6 +113,7 @@ export async function sendChat(
     res = await fetch(`${API}/api/v1/chat`, {
       method: "POST",
       headers: authHeaders(),
+      credentials: "include",
       body: JSON.stringify(payload),
     });
   } catch {
@@ -129,7 +136,8 @@ export async function streamChat(
   language: string,
   documentIds: string[],
   contextRef: ContextRef | undefined,
-  onToken: (text: string) => void
+  onToken: (text: string) => void,
+  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void
 ): Promise<ChatResponse> {
   const payload: Record<string, unknown> = {
     message,
@@ -147,6 +155,7 @@ export async function streamChat(
     res = await fetch(`${API}/api/v1/chat/stream`, {
       method: "POST",
       headers,
+      credentials: "include",
       body: JSON.stringify(payload),
     });
   } catch {
@@ -175,7 +184,9 @@ export async function streamChat(
       if (!event || !raw) continue;
       const data = JSON.parse(raw);
       if (event === "token") onToken(data.text || "");
-      if (event === "complete") completed = data as ChatResponse;
+      if (event === "progress" && onProgress) onProgress(data);
+      if (event === "error") throw new Error(data.message || "Streaming request failed");
+      if (event === "complete" || event === "answer") completed = data as ChatResponse;
     }
   }
   if (!completed) throw new Error("The response stream ended unexpectedly.");
@@ -192,13 +203,19 @@ export type UploadedDocument = {
   extraction_status: string;
   extraction_error?: string | null;
   created_at: string;
+  processing_status?: string | null;
+  pageindex_status?: string | null;
+  document_kind?: string | null;
+  document_type?: string | null;
+  structured_facts_ready?: boolean;
+  narrative_ready?: boolean;
 };
 
 function authHeadersMultipart(): HeadersInit {
   const headers: Record<string, string> = {};
   const token = window.localStorage.getItem("supershyft_access_token") || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
   if (token) headers.Authorization = `Bearer ${token}`;
-  else if (USER) headers["X-Cura-User-Id"] = USER;
+  else if (import.meta.env.DEV && USER) headers["X-Cura-User-Id"] = USER;
   return headers;
 }
 

@@ -34,7 +34,7 @@ class Settings(BaseSettings):
     openrouter_app_title: str = "Cura"
     llm_base_url: str = "https://openrouter.ai/api/v1"
     llm_model: str = ""
-    medical_llm_model: str = "openai/gpt-4o-mini"
+    medical_llm_model: str = "google/gemini-3.8-flash"
     jev_model: str = "typesafe/jev-1.13"
     jev_enabled: bool = True
     jev_timeout_seconds: int = 10
@@ -42,6 +42,52 @@ class Settings(BaseSettings):
     llm_max_retries: int = 1
     llm_max_output_tokens: int = 800
     enable_llm: bool = False
+    allow_mock_auth_with_real_health: bool = False
+    mock_user_id: str = ""
+    allow_mock_header_override: bool = False
+    answer_model_fast_reasoning: str = "openai/gpt-5.6-luna"
+    answer_model_standard_medical: str = "google/gemini-3.8-flash"
+    answer_model_deep_medical: str = "anthropic/claude-sonnet-5"
+    answer_model_nano: str = "openai/gpt-5.6-luna"
+    answer_model_standard: str = "google/gemini-3.8-flash"
+    answer_model_advanced: str = "anthropic/claude-sonnet-5"
+    llm_allowed_providers: str = "openrouter"
+    llm_allowed_models: str = (
+        "openai/gpt-5.6-luna,google/gemini-3.8-flash,anthropic/claude-sonnet-5,"
+        "openai/gpt-4o-mini,typesafe/jev-1.13,anthropic/claude-sonnet-4.6"
+    )
+    assistant_quality_v2: bool = True
+    llm_json_schema_output: bool = True
+    eval_candidate_model: str = "anthropic/claude-sonnet-4.6"
+    # Request OpenRouter not to use prompts for training. This is not proof of ZDR.
+    openrouter_data_collection_deny: bool = True
+    # Route via OpenRouter ZDR-eligible endpoints when true. CURA cannot independently
+    # verify retention; confirm gateway policy before production personal-health LLM.
+    openrouter_zero_data_retention: bool = False
+    require_zdr_for_personal_health: bool = False
+    # Do not set true unless every answer model is known to support JSON Schema.
+    openrouter_require_parameters: bool = False
+    request_timeout_seconds: float = 60
+    chat_streaming_mode: str = "complete_only"
+    crisis_helpline_text: str = ""
+    crisis_helpline_region: str = ""
+    document_encryption_key: str = ""
+    document_retention_days: int = 90
+    supershyft_pool_size: int = 5
+    supershyft_max_overflow: int = 2
+    store_health_fact_values: bool = False
+    model_price_nano_input_per_1m: float = 0.25
+    model_price_nano_output_per_1m: float = 2.00
+    model_price_standard_input_per_1m: float = 0.75
+    model_price_standard_output_per_1m: float = 3.75
+    model_price_advanced_input_per_1m: float = 3.00
+    model_price_advanced_output_per_1m: float = 15.00
+    model_price_fast_reasoning_input_per_1m: float = 0.25
+    model_price_fast_reasoning_output_per_1m: float = 2.00
+    model_price_standard_medical_input_per_1m: float = 0.75
+    model_price_standard_medical_output_per_1m: float = 3.75
+    model_price_deep_medical_input_per_1m: float = 3.00
+    model_price_deep_medical_output_per_1m: float = 15.00
 
     # SuperShyft read-only Postgres (never used for Cura conversation tables)
     supershyft_database_url: str = ""
@@ -65,7 +111,7 @@ class Settings(BaseSettings):
     stt_provider: str = "none"
     stt_api_key: str = ""
     stt_base_url: str = "http://127.0.0.1:8001/v1"
-    stt_model: str = "whisper-1"
+    stt_model: str = "gpt-transcribe"
     stt_timeout_seconds: int = 60
     stt_max_audio_bytes: int = 10_000_000
 
@@ -81,10 +127,13 @@ class Settings(BaseSettings):
         return (self.openrouter_base_url or self.llm_base_url or self.stt_base_url).rstrip("/")
 
     def resolved_stt_model(self) -> str:
-        model = (self.stt_model or "").strip()
-        if (self.stt_provider or "").strip().lower() == "openrouter" and model in {"", "whisper-1"}:
-            return "openai/whisper-1"
-        return model or "whisper-1"
+        model = (self.stt_model or "").strip() or "gpt-transcribe"
+        provider = (self.stt_provider or "").strip().lower()
+        if provider == "openrouter":
+            if model in {"gpt-transcribe", "whisper-1"} or "/" not in model:
+                return model if "/" in model else f"openai/{model}"
+            return model
+        return model
 
     # User-uploaded medical documents (Phase 7). Files live outside SuperShyft.
     document_storage_backend: str = "local"
@@ -114,9 +163,13 @@ class Settings(BaseSettings):
                 "Do not use postgresql+asyncpg here. For local development use sqlite:///./cura.db. "
                 "Put SuperShyft Postgres in SUPERSHYFT_DATABASE_URL."
             )
-        if not self.is_development and self.auth_provider == "mock":
-            # Startup remains possible for health checks, but protected routes reject mock auth.
-            self.dev_auth_header = False
+        if not self.is_development:
+            if self.auth_provider == "mock":
+                # Startup remains possible for health checks, but protected routes reject mock auth.
+                self.dev_auth_header = False
+            self.allow_mock_header_override = False
+            self.allow_mock_auth_with_real_health = False
+            self.mock_user_id = ""
         return self
 
     @property
@@ -135,7 +188,7 @@ class Settings(BaseSettings):
         return (self.openrouter_base_url or self.llm_base_url or "https://openrouter.ai/api/v1").rstrip("/")
 
     def active_llm_model(self) -> str:
-        return (self.medical_llm_model or self.llm_model or "openai/gpt-4o-mini").strip()
+        return (self.medical_llm_model or self.llm_model or self.answer_model_standard_medical).strip()
 
     def active_llm_api_key(self) -> str:
         return (self.openrouter_api_key or self.llm_api_key).strip()

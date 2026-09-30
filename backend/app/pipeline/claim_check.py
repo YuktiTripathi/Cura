@@ -22,6 +22,7 @@ _CONTEXT = re.compile(
     re.I,
 )
 _ABSOLUTE = re.compile(r"\b(always|never|must|cure[sd]?|prevents|guaranteed)\b", re.I)
+_NEGATION = re.compile(r"\b(not|never|cannot|can't|do not|don't|no longer|must not|should not)\b", re.I)
 _STOP = {
     "the",
     "a",
@@ -63,6 +64,10 @@ def _tokens(text: str) -> set[str]:
     }
 
 
+def claim_polarity(claim: str) -> str:
+    return "negated" if _NEGATION.search(claim or "") else "affirmed"
+
+
 def classify_claim(claim: str, evidence_text: str) -> ClaimVerdict:
     if _ABSOLUTE.search(claim) and evidence_text:
         if _CONTEXT.search(evidence_text) or "not a single universal" in evidence_text.lower():
@@ -79,6 +84,8 @@ def classify_claim(claim: str, evidence_text: str) -> ClaimVerdict:
         return ClaimVerdict.UNSUPPORTED
     overlap = claim_tokens & evidence_tokens
     ratio = len(overlap) / max(1, len(claim_tokens))
+    if claim_polarity(claim) == "negated" and claim_polarity(evidence_text) == "affirmed" and ratio >= 0.3:
+        return ClaimVerdict.CONTRADICTED
     if ratio >= 0.45:
         return ClaimVerdict.SUPPORTED
     if ratio >= 0.2:

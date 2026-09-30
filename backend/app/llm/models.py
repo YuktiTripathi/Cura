@@ -21,3 +21,8 @@ class LLMStructuredOutput(BaseModel):
     follow_up_questions: list[str] = Field(default_factory=list)
     safety_flags: list[str] = Field(default_factory=list)
     escalation: str | None = None
+    parse_error: str | None = None
+    finish_reason: str | None = None
+    truncated: bool = False
+    overall_summary: str | None = None
+    themes: list[dict] = Field(default_factory=list)

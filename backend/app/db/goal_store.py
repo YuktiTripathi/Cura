@@ -6,7 +6,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.contracts.facts import FactKind, ProvenancedFact
-from app.contracts.goals import ALLOWED_GOAL_CODES, GOAL_LABELS, HealthGoal
+from app.contracts.goals import ALLOWED_GOAL_CODES, GOAL_LABELS, GOAL_METRICS, HealthGoal
 from app.core.errors import ValidationAppError
 from app.db.models import UserHealthGoal, UserProfileFact
 
@@ -29,6 +29,8 @@ class GoalStore:
                 label=row.label,
                 status=row.status,
                 created_at=row.created_at,
+                source="user_goal",
+                target_metrics=list(GOAL_METRICS.get(row.goal_code, ())),
             )
             for row in rows
         ]

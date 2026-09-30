@@ -1,7 +1,7 @@
 from app.contracts.bio_ai import BioAIRisk
 from app.contracts.common import AnswerDepth, IntentType, KnowledgeScope
 from app.contracts.health_context import HealthContext
-from app.pipeline.renderer import DeterministicRenderer, format_bio_ai_risk_line, render_bio_ai_score_list
+from app.pipeline.renderer import DeterministicRenderer, format_bio_ai_risk_line, render_bio_ai_ambiguity, render_bio_ai_score_list
 
 
 def test_bio_ai_line_uses_parentheses_not_dash():

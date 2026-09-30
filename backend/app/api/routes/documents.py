@@ -5,7 +5,7 @@ from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.db.session import get_db
 from app.documents.contracts import DocumentListOut, DocumentOut
-from app.documents.processor import process_document_job
+from app.documents.jobs import enqueue_document_job, run_document_job
 from app.documents.service import DocumentService
 
 router = APIRouter()
@@ -27,7 +27,8 @@ async def upload_document(
         data=data,
         conversation_id=conversation_id,
     )
-    background_tasks.add_task(process_document_job, out.document_id, principal.subject_id)
+    enqueue_document_job(db, out.document_id, principal.subject_id)
+    background_tasks.add_task(run_document_job, out.document_id, principal.subject_id)
     return out
 
 

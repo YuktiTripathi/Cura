@@ -79,7 +79,7 @@ def test_t3_then_kidney_two_turn_does_not_repeat_t3():
     assert "t3" not in answer
     assert "t4" not in answer
     assert "creatinine" in answer or "kidney" in answer
-    assert second["provenance"]["sources"][0]["name"] == "Blood Report"
+    assert "blood report" in second["provenance"]["sources"][0]["name"].lower()
 
 
 def test_is_that_high_keeps_t3():

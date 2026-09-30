@@ -5,6 +5,7 @@ from app.contracts.facts import FactKind, ProvenancedFact
 from app.contracts.goals import HealthGoal
 from app.contracts.lifestyle import LifestyleContext
 from app.contracts.profile import PersonalHealthProfile
+from app.contracts.questionnaire import QuestionnaireAnswer
 from app.contracts.user import UserProfile
 from app.pipeline.fact_envelope import lifestyle_facts, profile_identity_facts
 
@@ -16,6 +17,7 @@ def build_personal_profile(
     bio_risks: list[BioAIRisk] | None = None,
     goals: list[HealthGoal] | None = None,
     user_facts: list[ProvenancedFact] | None = None,
+    questionnaire_answers: list[QuestionnaireAnswer] | None = None,
 ) -> PersonalHealthProfile:
     subject_id = user.subject_id
     profile = PersonalHealthProfile(
@@ -75,6 +77,12 @@ def build_personal_profile(
         )
     if not profile.dietary_preferences:
         profile.missing.append("dietary_preferences")
+    seen_q: set[str] = set()
+    for answer in questionnaire_answers or []:
+        if answer.question_key in seen_q:
+            continue
+        seen_q.add(answer.question_key)
+        profile.questionnaire.append(answer.as_fact())
     if not profile.allergies:
         profile.missing.append("allergies")
     if not profile.medications:

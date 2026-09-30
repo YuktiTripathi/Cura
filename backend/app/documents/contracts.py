@@ -16,6 +16,12 @@ class DocumentOut(BaseModel):
     created_at: str
     sha256: str | None = None
     extraction_error: str | None = None
+    processing_status: str | None = None
+    pageindex_status: str | None = None
+    document_kind: str | None = None
+    document_type: str | None = None
+    structured_facts_ready: bool = False
+    narrative_ready: bool = False
 
 
 class DocumentListOut(BaseModel):

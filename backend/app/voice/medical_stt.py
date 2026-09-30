@@ -3,6 +3,10 @@ from __future__ import annotations
 import re
 
 # Deterministic spoken-form repairs only. Never rewrite numeric values.
+STT_PROMPT = (
+    "CURA SuperShyft MetSights Bio-AI HbA1c hs-CRP LDL HDL eGFR ALT AST "
+    "Ferritin Transferrin Vitamin D Vitamin B12 NAFLD TSH T3 T4"
+)
 _REPLACEMENTS = [
     (re.compile(r"\bh\s*b\s*a\s*(?:one|1)\s*c\b", re.I), "HbA1c"),
     (re.compile(r"\bhb\s*a\s*1\s*c\b", re.I), "HbA1c"),

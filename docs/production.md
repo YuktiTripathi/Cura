@@ -11,15 +11,15 @@
 | Ask Cura | Missing | COMPLETE | Validated identifier-only `context_ref` and context endpoint |
 | Pre/post safety | Partial | COMPLETE for defined policy | Pre-gate, post-review, critical-status escalation |
 | Numeric grounding | Dead code | COMPLETE | Personal LLM output validated with deterministic fallback |
-| Structured LLM output | Missing | PARTIAL | JSON contract is validated; free-text answers degrade safely with no candidate recommendations |
+| Structured LLM output | Missing | COMPLETE | JSON Schema when supported; parse failures are internal; one repair retry; deterministic fallback |
 | Jev orchestration | Chat-completion JSON prompt | COMPLETE | OpenRouter typed Decisions API + CURA validation + deterministic fallback |
 | Conversation meaning | Topic only | PARTIAL | Semantic state/report/topic persistence; no fact caching |
 | Production auth | Missing | COMPLETE for shared-secret JWT | JWT provider; OIDC/JWKS remains deployment-specific |
 | Redis controls | Missing | COMPLETE when configured | Rate limit/idempotency; bounded dev fallback |
-| SSE | Missing | COMPLETE | `/api/v1/chat/stream` status/token/complete events |
+| SSE | Missing | COMPLETE | `/api/v1/chat/stream` emits `progress` stages then `complete`/`answer` |
 | Cura PostgreSQL | Models only | COMPLETE, not live-verified | Alembic baseline; separate DB guard |
 | SuperShyft canonical API | DB bridge | DEFERRED | Awaiting canonical upstream API contract |
-| Native provider token streaming | Missing | PARTIAL | SSE chunks complete output; provider-native stream hook exists |
+| Native provider token streaming | Missing | DISABLED | `/chat/stream` emits status+complete after the full pipeline; not token streaming |
 | Clinical validation | Not in scope | DEFERRED | Requires clinical governance outside software tests |
 
 ## Production environment
@@ -83,10 +83,40 @@ npm run dev
 ## Verification
 
 ```bash
-cd /Users/yuks/Desktop/Cura
-./backend/.venv/bin/python -m pytest backend/tests -q
-cd frontend && npm run build
+cd backend
+./.venv/bin/python -m pytest tests -q
+cd ../frontend && npm run build
 ```
+
+## Manual credential rotation (operators)
+
+Do this outside the application. Cura cannot rotate provider secrets from code.
+
+1. Rotate the OpenRouter API key.
+2. Rotate the SuperShyft read-only database password.
+3. Revoke the previous credentials.
+4. Replace production secret-manager values (`OPENROUTER_API_KEY`, `SUPERSHYFT_DATABASE_URL`, `AUTH_JWT_SECRET`, `DOCUMENT_ENCRYPTION_KEY`).
+
+## SuperShyft database role
+
+Application-level `SELECT`-only checks are defense in depth. Production credentials must be a database role with:
+
+- SELECT only
+- no INSERT / UPDATE / DELETE
+- no DDL (`CREATE` / `ALTER` / `DROP`)
+- no schema modification
+
+## Document retention
+
+Uploaded PDFs are owner-scoped. `DOCUMENT_RETENTION_DAYS` (default 90) is the intended retention window. Production local storage requires `DOCUMENT_ENCRYPTION_KEY`. Durable extraction jobs are stored in `processing_jobs` and drained on startup.
+
+## Streaming
+
+`POST /api/v1/chat/stream` emits `status` then `complete` after the full safety/grounding pipeline. It is not native token streaming.
+
+## Auth pairing
+
+Startup always refuses `AUTH_PROVIDER=mock` with `HEALTH_PROVIDER=supershyft` when `APP_ENV=production`, even if `ALLOW_MOCK_AUTH_WITH_REAL_HEALTH=true`. Development/test may opt in with that flag plus `MOCK_USER_ID`.
 
 ## Security invariants
 
@@ -98,3 +128,16 @@ cd frontend && npm run build
 - The LLM has no provider, SQL, filesystem, credential, or identity access.
 - Recommendations are not visible until deterministic policy approval.
 - Current health facts are never sourced from conversation memory.
+
+## Assistant quality flag
+
+`ASSISTANT_QUALITY_V2` (default true) enables operation metadata, diagnosis-restraint
+retrieval, JSON Schema structured output, and the answer-quality gate. Set
+`ASSISTANT_QUALITY_V2=false` to roll back those paths without reverting Jev,
+safety, or SuperShyft isolation. `LLM_JSON_SCHEMA_OUTPUT=false` keeps JSON-object
+mode without a strict schema.
+
+`OPENROUTER_DATA_COLLECTION_DENY` is not zero retention. Production personal-health
+LLM should set `OPENROUTER_ZERO_DATA_RETENTION=true` only after confirming the
+gateway's ZDR-eligible providers, and `REQUIRE_ZDR_FOR_PERSONAL_HEALTH=true` to
+fail closed when that policy is missing.

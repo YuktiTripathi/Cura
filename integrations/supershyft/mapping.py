@@ -54,6 +54,19 @@ def _flag(
     return MarkerFlag.normal
 
 
+def _skip_derived_lab_name(name: str) -> bool:
+    """Skip ratios and calculated-from-lipid extras that alias onto LDL/HDL keys."""
+    raw = name or ""
+    lowered = re.sub(r"[\s_]+", " ", raw.lower())
+    if "ratio" in lowered:
+        return True
+    if "non-hdl" in lowered or "non hdl" in lowered:
+        return True
+    if "/" in raw and any(token in lowered for token in ("ldl", "hdl", "chol")):
+        return True
+    return False
+
+
 def _key(name: str) -> str:
     lab = canonicalize_marker_name(name)
     if is_lab_key(lab):
@@ -120,6 +133,8 @@ def _from_grouped(groups: list[Any]) -> list[BloodMarker]:
             if not isinstance(test, dict):
                 continue
             name = str(test.get("test_name") or test.get("parameter_key") or "marker")
+            if _skip_derived_lab_name(name) or _skip_derived_lab_name(str(test.get("parameter_key") or "")):
+                continue
             key = _key(str(test.get("parameter_key") or name))
             value = _float(test.get("value"))
             if value is None:
@@ -210,6 +225,10 @@ def markers_from_digital_data(blob: Any) -> list[BloodMarker]:
             continue
         name = str(item.get("test_name") or item.get("parameter_key") or item.get("name") or "")
         if not name:
+            continue
+        if _skip_derived_lab_name(name) or _skip_derived_lab_name(str(item.get("parameter_key") or "")):
+            continue
+        if str(item.get("unit") or "").strip().lower() == "ratio":
             continue
         key = _key(name)
         if "ratio" in key:
@@ -303,13 +322,43 @@ def _row_provenance(row: Any) -> dict[str, str | None]:
     }
 
 
-def _row_report_date(row: Any) -> date:
-    raw = getattr(row, "created_at", None)
-    if raw:
-        return _as_date(raw)
+def _parse_completed_at(value: Any) -> date | datetime | None:
+    if value is None or value == "":
+        return None
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, date):
+        return value
+    if not isinstance(value, str):
+        return None
+    text = value.strip()
+    if not text:
+        return None
+    if "T" in text or len(text) > 10:
+        try:
+            return datetime.fromisoformat(text.replace("Z", "+00:00"))
+        except ValueError:
+            pass
+    try:
+        return date.fromisoformat(text[:10])
+    except ValueError:
+        return None
+
+
+def _row_completed_at(row: Any) -> date | datetime | None:
+    parsed = _parse_completed_at(getattr(row, "created_at", None))
+    if parsed is not None:
+        return parsed
     reports = _unwrap_reports(getattr(row, "reports", None))
-    if reports.get("created_at"):
-        return _as_date(reports.get("created_at"))
+    return _parse_completed_at(reports.get("created_at"))
+
+
+def _row_report_date(row: Any) -> date:
+    completed = _row_completed_at(row)
+    if isinstance(completed, datetime):
+        return completed.date()
+    if isinstance(completed, date):
+        return completed
     return date.today()
 
 
@@ -368,6 +417,70 @@ def blood_report_from_row(row: Any) -> BloodReport | None:
     )
 
 
+def _row_attr(row: Any, key: str, default: Any = None) -> Any:
+    if isinstance(row, dict):
+        return row.get(key, default)
+    return getattr(row, key, default)
+
+
+def markers_from_booking_payload(blood_parameters: Any, blood_report_raw: Any) -> list[BloodMarker]:
+    """Map participant_blood_bookings JSON. Prefer digital_data values over empty parameters."""
+    markers: list[BloodMarker] = []
+    markers = _merge_markers(markers, markers_from_blood_parameters(blood_parameters))
+    raw = blood_report_raw
+    if isinstance(raw, str) and raw.strip():
+        try:
+            raw = json.loads(raw)
+        except (TypeError, ValueError):
+            raw = None
+    if isinstance(raw, dict):
+        markers = _merge_markers(markers, markers_from_digital_data(raw))
+    return markers
+
+
+def _booking_report_date(row: Any) -> date:
+    for key in ("collection_date", "collected_at", "created_at"):
+        parsed = _parse_completed_at(_row_attr(row, key))
+        if isinstance(parsed, datetime):
+            return parsed.date()
+        if isinstance(parsed, date):
+            return parsed
+    return date.today()
+
+
+def blood_report_from_booking_row(row: Any) -> BloodReport | None:
+    markers = markers_from_booking_payload(
+        _row_attr(row, "blood_parameters"),
+        _row_attr(row, "blood_report_raw"),
+    )
+    if not markers:
+        return None
+    booking_id = _row_attr(row, "id")
+    if booking_id is None or booking_id == "":
+        return None
+    report_id = f"blood-{booking_id}"
+    measured_at = _booking_report_date(row)
+    markers = [
+        marker.model_copy(
+            update={
+                "source": "supershyft",
+                "report_id": report_id,
+                "measured_at": measured_at,
+            }
+        )
+        for marker in markers
+    ]
+    return BloodReport(
+        report_id=report_id,
+        report_date=measured_at,
+        source="blood_report",
+        markers=markers,
+        assessment_instance_id=_optional_id(_row_attr(row, "assessment_instance_id")),
+        engagement_id=_optional_id(_row_attr(row, "engagement_id")),
+        report_url=_optional_id(_row_attr(row, "diagnostic_report_url")),
+    )
+
+
 def bio_ai_from_row(row: Any) -> BioAIReport | None:
     reports = _unwrap_reports(getattr(row, "reports", None))
     if not reports:
@@ -376,6 +489,8 @@ def bio_ai_from_row(row: Any) -> BioAIReport | None:
     if not isinstance(diseases, list):
         diseases = []
     risks: list[BioAIRisk] = []
+    provenance = _row_provenance(row)
+    measured_at = _row_completed_at(row) or _row_report_date(row)
     for item in diseases:
         if not isinstance(item, dict):
             continue
@@ -384,7 +499,6 @@ def bio_ai_from_row(row: Any) -> BioAIReport | None:
             continue
         name = str(item.get("name") or item.get("display_name") or code)
         score = _float(item.get("risk_score_scaled") or item.get("score") or item.get("risk_score"))
-        measured_at = _row_report_date(row)
         risks.append(
             BioAIRisk(
                 code=_key(code),
@@ -400,6 +514,7 @@ def bio_ai_from_row(row: Any) -> BioAIReport | None:
                 ],
                 report_id=f"bioai-{row.report_id}",
                 measured_at=measured_at,
+                assessment_instance_id=provenance.get("assessment_instance_id"),
             )
         )
     metabolic_age = _float(reports.get("metabolic_age"))

@@ -9,6 +9,7 @@ from app.providers.interfaces import (
     BloodReportProvider,
     HealthScenarioProvider,
     LifestyleProvider,
+    QuestionnaireProvider,
     UserProfileProvider,
 )
 from app.providers.scenario import CompositeHealthScenarioProvider
@@ -21,6 +22,7 @@ class ProviderRegistry:
     blood: BloodReportProvider
     bio_ai: BioAIProvider
     lifestyle: LifestyleProvider
+    questionnaires: QuestionnaireProvider
     scenarios: HealthScenarioProvider
 
 
@@ -40,6 +42,9 @@ def set_registry(registry: ProviderRegistry | None) -> None:
 
 
 def build_registry() -> ProviderRegistry:
+    from app.core.invariants import assert_safe_auth_health_pairing
+
+    assert_safe_auth_health_pairing(settings)
     health = (settings.health_provider or "mock").strip().lower()
     auth_name = (settings.auth_provider or "mock").strip().lower()
     if auth_name == "mock":
@@ -63,12 +68,16 @@ def build_registry() -> ProviderRegistry:
         blood = SuperShyftBloodProvider()
         bio_ai = SuperShyftBioAIProvider()
         lifestyle = SuperShyftLifestyleProvider()
+        from integrations.supershyft.questionnaire import SuperShyftQuestionnaireProvider
+
+        questionnaires = SuperShyftQuestionnaireProvider()
         return ProviderRegistry(
             auth=auth,
             users=users,
             blood=blood,
             bio_ai=bio_ai,
             lifestyle=lifestyle,
+            questionnaires=questionnaires,
             scenarios=CompositeHealthScenarioProvider(blood, bio_ai, lifestyle),
         )
 
@@ -78,17 +87,20 @@ def build_registry() -> ProviderRegistry:
     from integrations.mock.bio_ai_provider import MockBioAIProvider
     from integrations.mock.blood_provider import MockBloodProvider
     from integrations.mock.lifestyle_provider import MockLifestyleProvider
+    from integrations.mock.questionnaire_provider import MockQuestionnaireProvider
     from integrations.mock.user_provider import MockUserProvider
 
     users = MockUserProvider()
     blood = MockBloodProvider()
     bio_ai = MockBioAIProvider()
     lifestyle = MockLifestyleProvider()
+    questionnaires = MockQuestionnaireProvider()
     return ProviderRegistry(
         auth=auth,
         users=users,
         blood=blood,
         bio_ai=bio_ai,
         lifestyle=lifestyle,
+        questionnaires=questionnaires,
         scenarios=CompositeHealthScenarioProvider(blood, bio_ai, lifestyle),
     )

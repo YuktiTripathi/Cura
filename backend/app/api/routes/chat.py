@@ -1,4 +1,6 @@
 import json
+import queue
+import threading
 
 from fastapi import APIRouter, Depends, Header, Request
 from fastapi.responses import StreamingResponse
@@ -7,10 +9,13 @@ from sqlalchemy.orm import Session
 from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.chat import ChatRequest, ChatResponse
-from app.db.session import get_db
+from app.core.config import settings
+from app.core.errors import CuraError
+from app.core.request_controls import request_controls
+from app.db.session import SessionLocal, get_db
+from app.pipeline.observability import ProgressEmitter
 from app.pipeline.service import ChatService
 from app.providers.registry import get_registry
-from app.core.request_controls import request_controls
 
 router = APIRouter()
 
@@ -25,7 +30,7 @@ def chat(
 ) -> ChatResponse:
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
     request_controls.check_rate_limit(principal.subject_id)
-    cached = request_controls.idempotency_lookup(principal.subject_id, idempotency_key, payload)
+    cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
         return cached
@@ -41,27 +46,70 @@ def chat_stream(
     payload: ChatRequest,
     request: Request,
     principal: AuthenticatedPrincipal = Depends(get_principal),
-    db: Session = Depends(get_db),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> StreamingResponse:
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
     request_controls.check_rate_limit(principal.subject_id)
-    cached = request_controls.idempotency_lookup(principal.subject_id, idempotency_key, payload)
-    response = cached or ChatService(db, get_registry()).chat(principal, payload, request_id)
-    if not cached:
-        request_controls.idempotency_store(
-            principal.subject_id, idempotency_key, payload, response
+    cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
+    if cached:
+        cached.meta.cache_hit = True
+
+        def cached_events():
+            yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
+            yield _event("progress", {"stage": "COMPLETE", "message_key": "complete", "family": "personal", "follow_up": False})
+            yield _event("complete", cached.model_dump(mode="json"))
+            yield _event("answer", cached.model_dump(mode="json"))
+
+        return StreamingResponse(
+            cached_events(),
+            media_type="text/event-stream",
+            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
-    else:
-        response.meta.cache_hit = True
+
+    events_q: queue.Queue = queue.Queue()
+
+    def on_progress(event) -> None:
+        events_q.put(("progress", event.model_dump(mode="json")))
+
+    def worker() -> None:
+        session = SessionLocal()
+        try:
+            emitter = ProgressEmitter(callback=on_progress)
+            response = ChatService(session, get_registry()).chat(
+                principal, payload, request_id, progress=emitter
+            )
+            request_controls.idempotency_store(
+                principal.subject_id, idempotency_key, payload, response
+            )
+            events_q.put(("complete", response.model_dump(mode="json")))
+        except CuraError as exc:
+            events_q.put(("error", {"code": exc.code, "message": exc.message}))
+        except Exception:
+            events_q.put(("error", {"code": "INTERNAL_ERROR", "message": "Something went wrong. Please try again."}))
+        finally:
+            session.close()
+
+    thread = threading.Thread(target=worker, daemon=True)
+    thread.start()
 
     def events():
-        yield _event("status", {"state": "started", "request_id": request_id})
-        # Chunking keeps the API truly incremental even when a provider lacks native token streaming.
-        words = response.answer.split(" ")
-        for start in range(0, len(words), 12):
-            yield _event("token", {"text": " ".join(words[start : start + 12]) + " "})
-        yield _event("complete", response.model_dump(mode="json"))
+        yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
+        timeout = max(float(settings.request_timeout_seconds) + 10.0, 30.0)
+        while True:
+            try:
+                kind, payload_data = events_q.get(timeout=timeout)
+            except queue.Empty:
+                yield _event("error", {"code": "TIMEOUT", "message": "The request timed out. Please try again."})
+                break
+            if kind == "progress":
+                yield _event("progress", payload_data)
+            elif kind == "complete":
+                yield _event("complete", payload_data)
+                yield _event("answer", payload_data)
+                break
+            elif kind == "error":
+                yield _event("error", payload_data)
+                break
 
     return StreamingResponse(
         events(),

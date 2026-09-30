@@ -21,7 +21,7 @@ def _capabilities_from_snapshot(snap, *, has_health_goals: bool = False) -> MeCa
     return MeCapabilities(
         has_blood_report=snap.has_blood,
         has_bio_ai_report=snap.has_bio,
-        has_questionnaire=False,
+        has_questionnaire=bool(getattr(snap, "has_questionnaire", False)),
         has_nutrition=snap.has_nutrition,
         has_health_scenario=bool(snap.has_blood or snap.has_bio),
         has_health_goals=has_health_goals,

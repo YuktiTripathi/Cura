@@ -11,7 +11,10 @@ _SKIP = re.compile(
     r"\b(recommended|target|goal|below|above|less than|greater than|previous|prior|last time)\b",
     re.I,
 )
-_NUMBER = re.compile(r"([0-9]+(?:\.[0-9]+)?)\s*(%|mg/dl|ng/ml|pg/ml|µiu/ml|uiu/ml|mmol/l)?", re.I)
+_NUMBER = re.compile(
+    r"([0-9]+(?:\.[0-9]+)?)\s*(%|mg/dl|mg/dL|g/dl|g/dL|u/l|U/L|miu/l|mIU/L|ng/ml|pg/ml|µiu/ml|uiu/ml|mmol/l)?",
+    re.I,
+)
 _DATE = re.compile(
     r"\b(?:collection date|test date|report date|date)[:\s]+(\d{1,2}\s+[A-Za-z]{3,9}\s+\d{4}|\d{4}-\d{2}-\d{2})",
     re.I,

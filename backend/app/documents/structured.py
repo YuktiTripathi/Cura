@@ -30,6 +30,7 @@ class ExtractedBiomarker(BaseModel):
     source_page: int | None = None
     excerpt: str | None = None
     confidence: str = "low"
+    extraction_method: str = "text"
 
 
 class ExtractedRisk(BaseModel):
@@ -55,7 +56,6 @@ def extract_structured_from_chunks(
     chunks: list[Any],
 ) -> ExtractedHealthDocument:
     biomarkers: list[ExtractedBiomarker] = []
-    seen: set[str] = set()
     report_date: date | None = None
     for chunk in chunks:
         text = chunk.text or ""
@@ -67,13 +67,22 @@ def extract_structured_from_chunks(
             extracted = extract_marker_from_text(text, param.key, page=chunk.page_start)
             if not extracted or extracted.value is None:
                 continue
-            existing = next((b for b in biomarkers if b.normalized_name == param.key), None)
+            existing = next(
+                (
+                    item
+                    for item in biomarkers
+                    if item.normalized_name == param.key
+                    and item.value is not None
+                    and extracted.value is not None
+                    and abs(float(item.value) - float(extracted.value)) < 0.0001
+                ),
+                None,
+            )
             if existing:
                 if existing.reference_low is None and extracted.reference_low is not None:
                     existing.reference_low = extracted.reference_low
                     existing.reference_high = extracted.reference_high
                 continue
-            seen.add(param.key)
             biomarkers.append(
                 ExtractedBiomarker(
                     name=extracted.name or display_name_for(param.key),
@@ -97,8 +106,10 @@ def extract_structured_from_chunks(
     )
 
 
-def extract_health_document(document_id: str, chunks: list[Any]) -> ExtractedHealthDocument:
+def extract_health_document(document_id: str, chunks: list[Any], *, use_llm: bool = False) -> ExtractedHealthDocument:
     deterministic = extract_structured_from_chunks(document_id, chunks)
+    if not use_llm:
+        return deterministic
     try:
         from app.documents.llm_extract import extract_structured_with_llm
 

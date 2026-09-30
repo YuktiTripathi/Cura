@@ -40,6 +40,8 @@ def _state(row: dict) -> JevRoutingState:
             "health_metrics",
             "uploaded_documents",
             "nutrition_preferences",
+            "health_goals",
+            "questionnaires",
         ],
     )
 

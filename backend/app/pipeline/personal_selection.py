@@ -9,14 +9,32 @@ from __future__ import annotations
 from app.contracts.bio_ai import BioAIReport, BioAIRisk
 from app.contracts.blood import BloodMarker, BloodReport
 from app.contracts.query import QueryPlan
-from app.pipeline.lab_parameters import display_name_for, expand_requested_keys
+from app.pipeline.lab_parameters import DERIVED_ENTITY_KEYS, FAMILY_QUERY_KEYS, display_name_for, expand_requested_keys, is_lab_key
 
 
 def wanted_metric_keys(plan: QueryPlan) -> list[str]:
     keys = list(plan.requested_metrics or [])
-    if not keys and plan.topic:
+    if not keys and plan.topic and (is_lab_key(plan.topic) or plan.topic in FAMILY_QUERY_KEYS):
         keys = [plan.topic]
-    return expand_requested_keys(keys)
+    skip = {item.lower() for item in (plan.reasoning_context or [])} | {
+        item.lower() for item in (plan.optional_entities or [])
+    }
+    return [
+        key
+        for key in expand_requested_keys(keys)
+        if key not in DERIVED_ENTITY_KEYS
+        and (is_lab_key(key) or key in FAMILY_QUERY_KEYS)
+        and key.lower() not in skip
+    ]
+
+
+def retain_blood_reports(reports: list[BloodReport], wanted: set[str]) -> list[BloodReport]:
+    """Keep report identity when requested markers are absent. Do not drop the report."""
+    out: list[BloodReport] = []
+    for report in reports:
+        markers = [item for item in report.markers if item.key in wanted]
+        out.append(report.model_copy(update={"markers": markers}))
+    return out
 
 
 def _ordered_reports(reports: list[BloodReport]) -> list[BloodReport]:

@@ -235,6 +235,8 @@ def test_openrouter_stt_uses_json_audio(monkeypatch):
     assert captured["url"] == "https://openrouter.ai/api/v1/audio/transcriptions"
     assert captured["files"] is None
     assert captured["json"]["model"] == "openai/whisper-1"
+    assert captured["json"]["prompt"]
+    assert "HbA1c" in captured["json"]["prompt"]
     assert captured["json"]["input_audio"]["format"] == "webm"
     assert "Authorization" in captured["headers"]
 
@@ -252,3 +254,20 @@ def test_too_large_rejected(monkeypatch):
         assert res.status_code == 400
     finally:
         monkeypatch.setattr(cfg.settings, "stt_max_audio_bytes", 10_000_000)
+
+
+def test_compat_transcribe_alias_and_text_field():
+    from app.voice.providers import set_stt_provider
+
+    set_stt_provider(FakeSTT(text="Can you explain why my Vitamin D is low?", language="en"))
+    res = client.post(
+        "/cura/transcribe",
+        headers={"X-Cura-User-Id": "demo-user-001"},
+        files={"audio": ("a.wav", BytesIO(_wav_bytes()), "audio/wav")},
+        data={"language_mode": "auto"},
+    )
+    assert res.status_code == 200
+    body = res.json()
+    assert body["text"] == "Can you explain why my Vitamin D is low?"
+    assert body["transcript"] == body["text"]
+    assert body["language"] == "en"

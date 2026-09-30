@@ -25,6 +25,10 @@ class RecommendationCandidate(BaseModel):
 
 class ApprovedRecommendation(RecommendationCandidate):
     policy_status: Literal["approved"] = "approved"
+    reason: str | None = None
+    supporting_fact_ids: list[str] = Field(default_factory=list)
+    urgency: str = "routine"
+    personal_relevance: str | None = None
 
 
 class RecommendationResult(BaseModel):

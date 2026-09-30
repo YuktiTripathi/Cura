@@ -137,8 +137,8 @@ def get_supershyft_engine() -> Engine:
     _engine = create_engine(
         url,
         pool_pre_ping=True,
-        pool_size=2,
-        max_overflow=0,
+        pool_size=max(1, int(settings.supershyft_pool_size)),
+        max_overflow=max(0, int(settings.supershyft_max_overflow)),
         connect_args={"connect_timeout": timeout},
     )
     return _engine

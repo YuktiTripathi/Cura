@@ -3,9 +3,11 @@ from __future__ import annotations
 from sqlalchemy.orm import Session
 
 from app.auth.models import AuthenticatedPrincipal
-from app.contracts.common import IntentType, KnowledgeScope, MarkerFlag
+from app.contracts.common import IntentType, KnowledgeScope, MarkerFlag, AnswerDepth
+from app.contracts.health_context import HealthContext
 from app.contracts.query import QueryPlan
 from app.contracts.snapshot import PersonalHealthSnapshot, SnapshotReport
+from app.contracts.questionnaire import LifestyleSummary
 from app.core.errors import ProviderUnavailableError
 from app.db.goal_store import GoalStore
 from app.documents.service import DocumentService
@@ -71,6 +73,22 @@ def build_personal_health_snapshot(
 
         user = UserProfile(subject_id=principal.subject_id, display_name="")
 
+    q_plan = QueryPlan(
+        intent=IntentType.questionnaire_lookup,
+        needs_questionnaire=True,
+        history=True,
+        knowledge_scope=KnowledgeScope.personal,
+    )
+    questionnaire_instances = []
+    try:
+        provider = getattr(registry, "questionnaires", None)
+        if provider is not None:
+            questionnaire_instances = provider.query(principal, q_plan) or []
+    except Exception:
+        questionnaire_instances = []
+    q_answers = [answer for item in questionnaire_instances for answer in item.answers]
+    latest_answers = list(questionnaire_instances[-1].answers) if questionnaire_instances else []
+
     ordered = sorted(reports, key=lambda r: (r.report_date, r.report_id))
     if ordered:
         latest = ordered[-1]
@@ -133,23 +151,73 @@ def build_personal_health_snapshot(
             documents = []
     snap.health_goals = goals
     snap.goal_progress = compute_goal_progress(goals, ordered)
+    summary_answers = [
+        answer
+        for answer in q_answers
+        if answer.question_key
+        in {"sleeping_hours", "physical_activity_frequency", "diet_preference", "exercise_level"}
+    ]
     snap.profile = build_personal_profile(
         user=user,
         lifestyle=life,
         bio_risks=snap.bio_ai_scores,
         goals=goals,
         user_facts=user_facts,
+        questionnaire_answers=summary_answers,
     )
     snap.timeline = build_health_timeline(
         subject_id=principal.subject_id,
         blood_reports=ordered,
         bio_reports=bio,
         documents=documents,
+        questionnaire_instances=questionnaire_instances,
     )
+    snap.lifestyle_summary = _lifestyle_summary(latest_answers)
     snap.insight_candidates = build_insight_candidates(
         changes=snap.recent_changes,
         missing=snap.profile.missing,
     )
+    from app.pipeline.personalization_layer import attach_personalization_layer
+
+    overlay = HealthContext(
+        intent=IntentType.broad_health_summary,
+        answer_depth=AnswerDepth.broad,
+        knowledge_scope=KnowledgeScope.personal,
+        markers=snap.latest_biomarkers,
+        bio_ai_risks=snap.bio_ai_scores,
+        comparisons=snap.recent_changes,
+        goals=goals,
+        goal_progress=snap.goal_progress,
+        profile=snap.profile,
+        lifestyle=life,
+        questionnaire=latest_answers,
+    )
+    attach_personalization_layer(overlay, blood_reports=ordered)
+    snap.health_journey = overlay.health_journey
+    snap.personalization = overlay.personalization
+    if overlay.proactive_insights:
+        from app.pipeline.proactive_insights import as_insight_candidates
+
+        snap.insight_candidates = as_insight_candidates(overlay.proactive_insights) or snap.insight_candidates
     if not ordered and not bio:
         snap.missing.append("personal_records")
     return snap
+
+
+def _lifestyle_summary(answers) -> LifestyleSummary | None:
+    from app.pipeline.questionnaire_topics import lifestyle_summary_key
+
+    if not answers:
+        return None
+    summary = LifestyleSummary()
+    filled = False
+    for answer in answers:
+        slot = lifestyle_summary_key(answer.question_key)
+        if not slot:
+            continue
+        current = getattr(summary, slot)
+        if current is not None:
+            continue
+        setattr(summary, slot, answer.as_fact())
+        filled = True
+    return summary if filled else None

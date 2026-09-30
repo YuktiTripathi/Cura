@@ -6,6 +6,13 @@ from app.contracts.common import AnswerDepth, IntentType, KnowledgeScope
 from app.pipeline.lab_parameters import match_lab_keys, parameter_alias_map
 from app.pipeline.language import normalize_for_intent
 from app.pipeline.medical_terms import MARKER_ALIASES_I18N
+from app.pipeline.operations import is_provenance_request
+from app.pipeline.questionnaire_intent import (
+    explicit_questionnaire_request,
+    is_questionnaire_topic,
+    questionnaire_follow_up_topic,
+)
+from app.pipeline.questionnaire_topics import questionnaire_topic
 
 MARKER_ALIASES = {
     "vitamin d": "vitamin_d",
@@ -76,6 +83,11 @@ NAMES = {
     "fasting_blood_glucose": "Fasting Blood Sugar Glucose",
     "cholesterol": "Cholesterol",
     "hemoglobin": "Hemoglobin",
+    "fasting_insulin": "Fasting insulin",
+    "magnesium": "Magnesium",
+    "mcv": "MCV",
+    "mch": "MCH",
+    "iron": "Iron",
     "urea": "Urea",
     "uric_acid": "Uric Acid",
     "esr": "ESR",
@@ -96,6 +108,15 @@ NAMES = {
     "type_2_diabetes": "diabetes",
     "pcos": "PCOS",
     "pcod": "PCOD",
+    "sleep": "sleep",
+    "sleeping_hours": "sleep",
+    "alcohol": "alcohol",
+    "alcohol_frequency": "alcohol",
+    "diet": "diet",
+    "diet_preference": "diet",
+    "activity": "physical activity",
+    "physical_activity_frequency": "physical activity",
+    "lifestyle": "lifestyle",
 }
 
 BLOOD_KEYS = set(MARKER_ALIASES.values())
@@ -118,7 +139,8 @@ _EDUCATIONAL = re.compile(
     r"learn about|common reasons|causes of|symptoms of|"
     r"difference between|why (?:is|are|can|does|do)|"
     r"would you like to learn|important|"
-    r"lifestyle(?: changes)?|what foods|which foods|how can|how to|ways to"
+    r"lifestyle(?: changes)?|what foods|which foods|how can|how to|ways to|"
+    r"measure|stand for"
     r")\b",
     re.I,
 )
@@ -157,7 +179,8 @@ _PERSONAL_RECORD = re.compile(
 _NUMERIC_OWN_VALUE = re.compile(r"\bmy .{0,24} of \d", re.I)
 _WHAT_ABOUT = re.compile(r"^\s*what about\b", re.I)
 _PRONOUN = re.compile(
-    r"\b(it|that|this|these|those|the above|that score|that result|is that|the previous one|previous one)\b",
+    r"\b(it|that|this|these|those|they|them|the above|that score|that result|is that|"
+    r"the previous one|previous one|the latest one|latest one)\b",
     re.I,
 )
 _MINE = re.compile(r"\bmine\b", re.I)
@@ -167,12 +190,22 @@ _SHORT = re.compile(
     re.I,
 )
 _PREVIOUS = re.compile(r"\b(previous|previously|last time|before that)\b", re.I)
-_TREND = re.compile(r"\b(changed|improve|improved|trend|compare)\b", re.I)
+_TREND = re.compile(
+    r"\b(changed|improve|improved|trend|compare|increased|increase|decreased|decrease|"
+    r"went up|went down|risen|rose|fallen|fell)\b",
+    re.I,
+)
 _LATEST = re.compile(r"\b(latest|current|most recent|recent|now)\b", re.I)
 _BIO_REPORT = re.compile(r"\b(bio-?ai|bio ai)\b", re.I)
 _BLOOD_REPORT = re.compile(r"\b(blood report|blood result|blood test|lab report)\b", re.I)
 _SCENARIO = re.compile(
-    r"\b(health scenario|overall health|what (?:areas )?should i focus|important findings)\b",
+    r"\b(health scenario|overall health|what (?:areas )?should i focus|"
+    r"important findings|how am i doing|what matters most|"
+    r"summarize my health|complete health|biggest health concerns)\b",
+    re.I,
+)
+_VIEW_ALL_RESULTS = re.compile(
+    r"\b(view all results|show all (?:my )?(?:results|values|markers)|full (?:report|table))\b",
     re.I,
 )
 _EAT = re.compile(r"\b(eat|nutrition|diet|food)\b", re.I)
@@ -203,7 +236,7 @@ _CASUAL = re.compile(
     r")[\s!?.]*$",
     re.I,
 )
-_BIO_CUE = re.compile(r"\b(score|bio-?ai|assessment|risk)\b", re.I)
+_BIO_CUE = re.compile(r"\b(scores?|bio-?ai|assessment|risks?)\b", re.I)
 _SCORE_FOR = re.compile(
     r"\b(?:risk\s+score|score|risk)\s+(?:for|of)\s+([a-z][a-z0-9]+(?:[\s-][a-z][a-z0-9]+){0,3})",
     re.I,
@@ -257,7 +290,13 @@ def requires_personal_record(
     text = normalize_for_intent(message).lower().strip()
     if _NUMERIC_OWN_VALUE.search(text) or _PERSONAL_RECORD.search(text) or _YOUR_PERSONAL.search(text):
         return True
+    if _SCENARIO.search(text) and not _HYPOTHETICAL.search(text):
+        return True
+    if _VIEW_ALL_RESULTS.search(text) and not _HYPOTHETICAL.search(text):
+        return True
     if _BIO_REPORT.search(text) and is_personal_utterance(message) and not _HYPOTHETICAL.search(text):
+        return True
+    if explicit_questionnaire_request(message):
         return True
     if _MINE.search(text):
         return True
@@ -310,7 +349,7 @@ def is_contextual_follow_up(message: str) -> bool:
         or _PRONOUN.search(text)
         or _MINE.search(text)
         or _WHAT_ABOUT.match(text)
-        or re.match(r"^\s*and\s+\S+", text, re.I)
+        or re.search(r"\b(are they consistent|is that concerning|the latest one)\b", text, re.I)
     )
 
 
@@ -336,9 +375,14 @@ def _extract_topics(text: str) -> tuple[str | None, str | None]:
         ),
         None,
     )
+    if bio == "thyroid" and not _BIO_CUE.search(text):
+        marker = marker or "thyroid_function"
+        bio = None
     if bio == "thyroid" and marker in {"thyroid_function", "tsh", "t3", "t4"} and not _BIO_CUE.search(text):
         bio = None
     if bio == "hypertension" and marker in {"blood_pressure", "systolic", "diastolic"} and not _BIO_CUE.search(text):
+        bio = None
+    if bio == "cardiac_health" and not _BIO_CUE.search(text):
         bio = None
     return marker, bio
 
@@ -411,6 +455,22 @@ def classify_intent(
     if educational and not personal_turn:
         return IntentType.general_health_question, topic, name, depth
 
+    if personal_turn and explicit_questionnaire_request(message) and not marker and not bio:
+        q_topic = questionnaire_topic(message)
+        if not q_topic and is_questionnaire_topic(follow_up_topic):
+            q_topic = follow_up_topic
+        return (
+            IntentType.questionnaire_lookup,
+            q_topic,
+            _name(q_topic) if q_topic else "questionnaire",
+            depth,
+        )
+
+    if contextual and not marker and not bio:
+        q_topic = questionnaire_follow_up_topic(message, follow_up_topic)
+        if q_topic:
+            return IntentType.follow_up, q_topic, _name(q_topic), depth
+
     if contextual and _MINE.search(text) and follow_up_topic:
         if follow_up_topic in BIO_KEYS:
             return IntentType.bio_ai_score, follow_up_topic, _name(follow_up_topic), depth
@@ -448,6 +508,9 @@ def classify_intent(
         return IntentType.previous_result, marker, _name(marker), depth
     if marker and personal_turn and _TREND.search(text):
         return IntentType.trend, marker, _name(marker), depth
+    if is_provenance_request(message):
+        topic = marker or follow_up_topic
+        return IntentType.latest_result, topic, _name(topic) if topic else "result", AnswerDepth.simple
     if marker and not personal_turn:
         return IntentType.general_health_question, marker, _name(marker), depth
     if marker and (_contains(text, "why", "what does", "mean", "normal", "ok", "okay") or (contextual and educational and prior_personal)):

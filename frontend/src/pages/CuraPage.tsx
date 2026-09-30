@@ -5,6 +5,7 @@ import { AppShell } from "../components/AppShell";
 import { Composer } from "../components/Composer";
 import { CuraHeader } from "../components/CuraHeader";
 import { DocumentPanel } from "../components/DocumentPanel";
+import { CuraProcessingState } from "../components/CuraProcessingState";
 import { MessageList } from "../components/MessageList";
 import { ConversationSidebar } from "../components/ConversationSidebar";
 import { WelcomeExperience } from "../components/WelcomeExperience";
@@ -15,6 +16,7 @@ export function CuraPage() {
   const {
     messages,
     loading,
+    processing,
     error,
     send,
     editAndResend,
@@ -81,7 +83,7 @@ export function CuraPage() {
           }}
           editingDisabled={loading}
         />
-        {loading && <p className="muted">Cura is thinking…</p>}
+        {loading && <CuraProcessingState event={processing} />}
         {error && <p className="error">{error}</p>}
       </div>
       <div className="composer-dock">

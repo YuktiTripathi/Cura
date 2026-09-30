@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from typing import Any
 
 from app.contracts.recommendation import RecommendationCandidate
 from app.llm.models import LLMClaim, LLMStructuredOutput
+
+logger = logging.getLogger("cura.llm.structured")
 
 _FENCE = re.compile(r"^```(?:json)?\s*|\s*```$", re.I)
 _ANSWER_STRING = re.compile(r'"answer"\s*:\s*"((?:\\.|[^"\\])*)"', re.I)
@@ -35,19 +38,44 @@ def public_answer_text(value: Any) -> str:
 
 def parse_llm_structured(payload: Any) -> LLMStructuredOutput:
     obj, leftover_text = _to_object(payload)
+    parse_error = None
     if obj is None:
         text = leftover_text.strip()
         if looks_like_structured_json(text):
             extracted = _regex_answer(text)
-            return LLMStructuredOutput(answer=extracted or _unreadable_fallback())
+            if not extracted:
+                parse_error = "unreadable_structured_payload"
+                logger.error(
+                    "llm_structured_output_contract_violation parse_error=%s payload_type=%s",
+                    parse_error,
+                    type(payload).__name__,
+                )
+            return LLMStructuredOutput(answer=extracted or _unreadable_fallback(), parse_error=parse_error)
         return LLMStructuredOutput(answer=text)
 
-    answer = _unwrap_answer(obj.get("answer"))
+    answer, parse_error = _unwrap_answer(obj.get("answer"))
+    if parse_error:
+        logger.error(
+            "llm_structured_output_contract_violation parse_error=%s answer_type=%s",
+            parse_error,
+            type(obj.get("answer")).__name__,
+        )
     if not answer:
         if leftover_text and not looks_like_structured_json(leftover_text):
             answer = leftover_text.strip()
         else:
-            answer = _regex_answer(str(payload)) or _unreadable_fallback()
+            extracted = _regex_answer(str(payload))
+            if extracted:
+                answer = extracted
+            else:
+                if not parse_error:
+                    parse_error = "empty_or_non_string_answer"
+                    logger.error(
+                        "llm_structured_output_contract_violation parse_error=%s payload_type=%s",
+                        parse_error,
+                        type(payload).__name__,
+                    )
+                answer = _unreadable_fallback()
 
     return LLMStructuredOutput(
         answer=answer,
@@ -56,11 +84,14 @@ def parse_llm_structured(payload: Any) -> LLMStructuredOutput:
         follow_up_questions=_parse_strings(obj.get("follow_up_questions")),
         safety_flags=_parse_strings(obj.get("safety_flags")),
         escalation=_parse_escalation(obj.get("escalation")),
+        parse_error=parse_error,
+        overall_summary=_parse_optional_text(obj.get("overall_summary")),
+        themes=_parse_themes(obj.get("themes")),
     )
 
 
 def _unreadable_fallback() -> str:
-    return "I had trouble formatting that answer. Please try asking again."
+    return ""
 
 
 def _to_object(payload: Any) -> tuple[dict[str, Any] | None, str]:
@@ -103,24 +134,28 @@ def _to_object(payload: Any) -> tuple[dict[str, Any] | None, str]:
     return None, text
 
 
-def _unwrap_answer(value: Any, depth: int = 0) -> str:
-    if depth > 3 or value is None:
-        return ""
+def _unwrap_answer(value: Any, depth: int = 0) -> tuple[str, str | None]:
+    if depth > 3:
+        return "", "unwrap_depth_exceeded"
+    if value is None:
+        return "", None
     if isinstance(value, dict):
         if "answer" in value:
             return _unwrap_answer(value.get("answer"), depth + 1)
-        return ""
+        return "", f"non_string_answer:{type(value).__name__}"
     if isinstance(value, str):
         stripped = value.strip()
         if stripped.startswith("{") and "answer" in stripped:
             obj, leftover = _to_object(stripped)
             if obj and "answer" in obj:
                 return _unwrap_answer(obj.get("answer"), depth + 1)
-            return leftover if leftover and not looks_like_structured_json(leftover) else ""
-        return stripped
-    if isinstance(value, (list, tuple)):
-        return ""
-    return str(value).strip()
+            if leftover and not looks_like_structured_json(leftover):
+                return leftover, None
+            return "", "nested_non_string_answer"
+        return stripped, None
+    if isinstance(value, (list, tuple, dict)):
+        return "", f"non_string_answer:{type(value).__name__}"
+    return "", f"non_string_answer:{type(value).__name__}"
 
 
 def _regex_answer(text: str) -> str:
@@ -175,6 +210,44 @@ def _parse_strings(raw: Any) -> list[str]:
     if not isinstance(raw, list):
         return []
     return [str(item).strip() for item in raw if str(item).strip()]
+
+
+def _parse_optional_text(raw: Any) -> str | None:
+    if raw is None:
+        return None
+    text = str(raw).strip()
+    return text or None
+
+
+def _parse_themes(raw: Any) -> list[dict]:
+    if not isinstance(raw, list):
+        return []
+    out: list[dict] = []
+    for item in raw:
+        if not isinstance(item, dict):
+            continue
+        title = str(item.get("title") or "").strip()
+        interpretation = str(item.get("interpretation") or "").strip()
+        if not title or not interpretation:
+            continue
+        ids = item.get("supporting_fact_ids") or []
+        if not isinstance(ids, list):
+            ids = []
+        missing = item.get("missing_information") or []
+        if not isinstance(missing, list):
+            missing = []
+        out.append(
+            {
+                "title": title,
+                "priority": str(item.get("priority") or "medium"),
+                "status": str(item.get("status") or "monitor"),
+                "supporting_fact_ids": [str(code) for code in ids if str(code).strip()],
+                "interpretation": interpretation,
+                "missing_information": [str(row).strip() for row in missing if str(row).strip()],
+                "next_step": str(item.get("next_step") or "").strip(),
+            }
+        )
+    return out[:5]
 
 
 def _parse_escalation(raw: Any) -> str | None:

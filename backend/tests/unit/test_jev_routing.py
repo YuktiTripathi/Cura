@@ -65,7 +65,7 @@ def test_typed_decisions_response_is_normalized(monkeypatch):
     transport = MagicMock()
     transport.__enter__.return_value = transport
     transport.post.return_value = response
-    monkeypatch.setattr("app.routing.jev_client.httpx.Client", lambda **_: transport)
+    monkeypatch.setattr("app.routing.jev_client.get_http_client", lambda: transport)
     decision, parsed = JevDecisionsClient(api_key="test").decide(
         JevRoutingState(current_message="What is my HbA1c?")
     )
@@ -94,7 +94,7 @@ def test_parallel_clarification_noul_cannot_override_clear_lookup(monkeypatch):
     transport = MagicMock()
     transport.__enter__.return_value = transport
     transport.post.return_value = response
-    monkeypatch.setattr("app.routing.jev_client.httpx.Client", lambda **_: transport)
+    monkeypatch.setattr("app.routing.jev_client.get_http_client", lambda: transport)
     decision, _ = JevDecisionsClient(api_key="test").decide(
         JevRoutingState(current_message="What is my LDL?")
     )
@@ -111,7 +111,7 @@ def test_malformed_decisions_response_fails_closed(monkeypatch):
     transport = MagicMock()
     transport.__enter__.return_value = transport
     transport.post.return_value = response
-    monkeypatch.setattr("app.routing.jev_client.httpx.Client", lambda **_: transport)
+    monkeypatch.setattr("app.routing.jev_client.get_http_client", lambda: transport)
     with pytest.raises(LLMUnavailableError):
         JevDecisionsClient(api_key="test").decide(
             JevRoutingState(current_message="What is insulin resistance?")
@@ -281,7 +281,7 @@ def test_route_confidence_is_not_minimum_of_auxiliary_fields(monkeypatch):
     transport = MagicMock()
     transport.__enter__.return_value = transport
     transport.post.return_value = response
-    monkeypatch.setattr("app.routing.jev_client.httpx.Client", lambda **_: transport)
+    monkeypatch.setattr("app.routing.jev_client.get_http_client", lambda: transport)
 
     decision, _ = JevDecisionsClient(api_key="test").decide(
         JevRoutingState(current_message="What is my LDL?")

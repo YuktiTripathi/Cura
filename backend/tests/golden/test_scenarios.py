@@ -15,9 +15,10 @@ def test_latest_vitamin_d():
     assert res.status_code == 200
     body = res.json()
     assert "12.6" in body["answer"]
-    assert "2026-08-18" in body["answer"]
+    assert "18 Aug 2026" in body["answer"] or "2026-08-18" in str(body.get("presentation") or {})
     assert body["evidence"]
     assert body["evidence"][0]["report_id"] == "blood-002"
+    assert "blood-002" not in body["answer"]
     assert "42.0" not in body["answer"]
 
 
@@ -26,8 +27,9 @@ def test_previous_vitamin_d():
     body = res.json()
     assert res.status_code == 200
     assert "18.0" in body["answer"]
-    assert "2026-07-09" in body["answer"]
+    assert "9 Jul 2026" in body["answer"] or "2026-07-09" in str(body.get("presentation") or {})
     assert body["evidence"][0]["report_id"] == "blood-001"
+    assert "blood-001" not in body["answer"]
 
 
 def test_vitamin_d_changed():
@@ -44,10 +46,14 @@ def test_cardiac_score_ambiguous_and_retrieved():
     body = res.json()
     assert res.status_code == 200
     assert body["meta"]["status"] == "ambiguous"
-    assert "bioai-a" in body["answer"]
-    assert "bioai-b" in body["answer"]
+    assert "bioai-a" not in body["answer"]
+    assert "bioai-b" not in body["answer"]
+    assert "which report" in body["answer"].lower()
     assert body["evidence"]
     assert any(e["risk_code"] == "cardiac_health" for e in body["evidence"])
+    assert {e["report_id"] for e in body["evidence"]} >= {"bioai-a", "bioai-b"} or any(
+        s.get("source_id") in {"bioai-a", "bioai-b"} for s in body["provenance"]["sources"]
+    )
 
 
 def test_cardiac_why_increased():
@@ -70,8 +76,9 @@ def test_compare_cardiac_scores():
     res = chat("Compare my cardiac scores.")
     body = res.json()
     assert body["meta"]["status"] != "ambiguous"
-    assert "bioai-a" in body["answer"] and "bioai-b" in body["answer"]
     assert "30" in body["answer"] and "48" in body["answer"]
+    assert "bioai-a" not in body["answer"]
+    assert "bioai-b" not in body["answer"]
 
 
 def test_same_date_ambiguity():
@@ -79,6 +86,20 @@ def test_same_date_ambiguity():
     body = res.json()
     assert body["meta"]["status"] == "ambiguous"
     assert "not pick" in body["answer"].lower() or "which report" in body["answer"].lower()
+
+
+def test_risk_scores_same_date_clarifies_without_llm_fallback():
+    res = chat("What are my risk scores?")
+    body = res.json()
+    assert res.status_code == 200
+    assert body["meta"]["status"] == "ambiguous"
+    assert body["meta"]["llm_called"] is False
+    assert "which report" in body["answer"].lower()
+    assert "bioai-a" not in body["answer"]
+    assert "bioai-b" not in body["answer"]
+    assert "I had trouble formatting that answer." not in body["answer"]
+    assert "30" not in body["answer"]
+    assert "48" not in body["answer"]
 
 
 def test_follow_up_that():

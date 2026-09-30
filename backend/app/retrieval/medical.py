@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import Protocol
 
 
 @dataclass(frozen=True)
@@ -17,6 +18,9 @@ class MedicalEvidenceDoc:
     title: str = ""
     publication_date: str | None = None
     provenance: str = "curated_source_index"
+    review_status: str = "unreviewed_index"
+    version: str = "cura-kb-v1"
+    retrieved_at: str | None = None
 
     @property
     def evidence_text(self) -> str:
@@ -229,7 +233,51 @@ CORPUS: tuple[MedicalEvidenceDoc, ...] = (
         ),
         title="TSH test",
     ),
+    MedicalEvidenceDoc(
+        name="NIH ODS",
+        url="https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+        source_type="guideline",
+        tier=1,
+        topics=("vitamin_d",),
+        keywords=("vitamin d", "vit d", "25 oh", "bone", "calcium", "sunlight"),
+        excerpt=(
+            "NIH ODS describes vitamin D as a nutrient that helps the body absorb calcium and maintain "
+            "bone health. The body can make vitamin D from sunlight, and it is also found in some foods "
+            "and supplements. Low levels can have several causes, including limited sun exposure and diet. "
+            "This is a source pointer, not a quotation."
+        ),
+        title="Vitamin D fact sheet for consumers",
+    ),
+    MedicalEvidenceDoc(
+        name="MedlinePlus",
+        url="https://medlineplus.gov/vitamind.html",
+        source_type="guideline",
+        tier=1,
+        topics=("vitamin_d",),
+        keywords=("vitamin d", "vit d", "deficiency", "low", "bone"),
+        excerpt=(
+            "MedlinePlus notes that vitamin D helps the body use calcium and phosphorus. Too little "
+            "vitamin D can weaken bones. Causes of low vitamin D include limited sunlight, diet, and "
+            "some medical conditions. Interpretation of a specific result belongs with a clinician. "
+            "This is a source pointer, not a quotation."
+        ),
+        title="Vitamin D",
+    ),
 )
+
+
+class MedicalKnowledgeProvider(Protocol):
+    """General medical knowledge only. Never a source of personal lab values."""
+
+    def query(self, message: str, topic: str | None = None, limit: int = 2) -> list[MedicalEvidenceDoc]:
+        ...
+
+
+class CuratedMedicalKnowledgeProvider:
+    """Curated guideline index. Not a vector store and not a source of personal values."""
+
+    def query(self, message: str, topic: str | None = None, limit: int = 2) -> list[MedicalEvidenceDoc]:
+        return retrieve_medical_evidence(message, topic, limit=limit)
 
 
 def retrieve_medical_evidence(message: str, topic: str | None = None, limit: int = 2) -> list[MedicalEvidenceDoc]:

@@ -10,3 +10,5 @@ class FollowUpSuggestion(BaseModel):
     requires_personal_context: bool = False
     source: str | None = "supershyft"
     knowledge_scope: str = "personal"
+    expected_reply_type: str | None = None
+    handling_path: str | None = None

@@ -15,6 +15,7 @@ class BioAIRisk(BaseModel):
     source: str = "supershyft"
     report_id: str | None = None
     measured_at: date | datetime | None = None
+    assessment_instance_id: str | None = None
 
 
 class BioAIReport(BaseModel):
@@ -27,3 +28,4 @@ class BioAIReport(BaseModel):
     assessment_instance_id: str | None = None
     engagement_id: str | None = None
     report_url: str | None = None
+    completed_at: date | datetime | None = None

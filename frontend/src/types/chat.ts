@@ -53,17 +53,117 @@ export type ChatMeta = {
   grounding_flags?: string[];
   escalation?: string | null;
   request_id?: string;
+  response_mode?: string;
 };
 
 export type ProvenanceSource = {
   name: string;
   url?: string | null;
   source_type: string;
+  source_id?: string | null;
+  occurred_at?: string | null;
 };
 
 export type UserProvenance = {
   type: string;
   sources: ProvenanceSource[];
+};
+
+export type PresentedFinding = {
+  label: string;
+  value?: string | null;
+  unit?: string | null;
+  status?: string | null;
+  source_type?: string | null;
+  source_date?: string | null;
+  source_id?: string | null;
+  source_label?: string | null;
+  canonical_key?: string | null;
+};
+
+export type HealthTheme = {
+  title: string;
+  priority: "high" | "medium" | "low";
+  status: "needs_attention" | "monitor" | "reassuring" | "uncertain";
+  supporting_fact_ids: string[];
+  interpretation?: string | null;
+  missing_information: string[];
+  next_step?: string | null;
+  related_findings: PresentedFinding[];
+};
+
+export type PackageAction = {
+  type: "OPEN_PACKAGE" | "COMPARE_WITH_EXISTING_RESULTS";
+  label: string;
+  package_id?: string | null;
+  catalog_kind?: "package" | "test_group" | null;
+};
+
+export type ExistingResult = {
+  key: string;
+  label: string;
+  measured_on?: string | null;
+};
+
+export type PackageComparison = {
+  included: string[];
+  already_have: ExistingResult[];
+  adds_information: string[];
+  timing_note?: string | null;
+  recently_available?: string[];
+  missing?: string[];
+  stale?: string[];
+  new_information?: string[];
+};
+
+export type TestingOption = {
+  type?: "package_recommendation";
+  relevance?: "HIGH_RELEVANCE" | "MODERATE_RELEVANCE" | "OPTIONAL" | "NOT_RECOMMENDED_NOW";
+  headline?: string;
+  package?: { id: string; name: string; kind?: "package" | "test_group" };
+  reason?: string;
+  helps_answer?: string;
+  relevant_tests?: string[];
+  already_recent?: string[];
+  primary_action?: PackageAction;
+  secondary_action?: PackageAction | null;
+  comparison?: PackageComparison;
+  catalog_id: string;
+  kind: "package" | "test_group";
+  display_name: string;
+  provider?: string | null;
+  included_matched_tests: string[];
+  included_matched_labels: string[];
+  price?: number | null;
+  currency?: string;
+  medical_rationale?: string;
+  match_reason?: string;
+  cta_label?: string;
+  invitation?: string;
+};
+
+export type StructuredResponse = {
+  mode: string;
+  headline?: string | null;
+  summary?: string | null;
+  findings: PresentedFinding[];
+  interpretation?: string | null;
+  uncertainties: string[];
+  next_steps: string[];
+  follow_up?: string | null;
+  display_entities?: string[];
+  reasoning_context?: string[];
+  summary_style?: "RAW_HEALTH_SNAPSHOT" | "NARRATIVE_HEALTH_SUMMARY" | null;
+  overall_summary?: string | null;
+  themes?: HealthTheme[];
+  raw_findings?: PresentedFinding[];
+  testing_option?: TestingOption | null;
+  personal_relevance?: string | null;
+  clinician_handoff?: Record<string, unknown> | null;
+  quiet_mode?: boolean;
+  proactive_insights?: Array<Record<string, unknown>>;
+  structured_next_steps?: Array<Record<string, unknown>>;
+  health_journey?: Record<string, unknown> | null;
 };
 
 export type ChatResponse = {
@@ -74,6 +174,8 @@ export type ChatResponse = {
   recommendations?: Recommendation[];
   meta: ChatMeta;
   provenance?: UserProvenance;
+  presentation?: StructuredResponse | null;
+  testing_option?: TestingOption | null;
 };
 
 export function followUpText(item: FollowUp | string): string {
@@ -119,7 +221,7 @@ export function extractStructuredAnswer(content: string, depth = 0): string | nu
         return answer.answer;
       }
       if (STRUCTURED_KEYS.some((key) => key in parsed)) {
-        return "I had trouble formatting that answer. Please try asking again.";
+        return null;
       }
     }
   } catch {

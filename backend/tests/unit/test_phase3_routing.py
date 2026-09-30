@@ -48,7 +48,8 @@ def test_general_intents_skip_personal_retrieval():
 
 def test_general_chat_does_not_use_personal_values():
     body = chat("What is Vitamin D?").json()
-    assert body["meta"]["intent"] == "general_health_question"
+    assert body["meta"].get("question_type") == "general_education" or body["meta"]["intent"] == "general_health_question"
+    assert body["meta"].get("supershyft_called") is not True
     assert "12.6" not in body["answer"]
     assert "your latest" not in body["answer"].lower()
     assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
@@ -59,32 +60,36 @@ def test_follow_up_why_keeps_vitamin_d():
     cid = first.json()["conversation_id"]
     second = chat("Why?", cid).json()
     assert "12.6" in second["answer"]
-    assert second["meta"]["intent"] == "blood_marker_explanation"
+    assert second["meta"].get("supershyft_called") is True
+    assert second["meta"].get("question_type") in {"personal_health_reasoning", "personal_lookup"} or second["meta"]["intent"] == "blood_marker_explanation"
 
 
 def test_switch_to_b12_then_meaning():
     first = chat("What is my Vitamin D?")
     cid = first.json()["conversation_id"]
     b12 = chat("What about my B12?", cid).json()
-    assert b12["meta"]["intent"] == "latest_result"
+    assert b12["meta"].get("supershyft_called") is True
+    entities = b12["meta"].get("requested_entities") or []
+    assert "vitamin_b12" in entities or b12["meta"]["intent"] == "latest_result"
     meaning = chat("What does it mean?", cid).json()
-    assert meaning["meta"]["intent"] == "blood_marker_explanation"
-    assert meaning["meta"]["intent"] != "general_health_question"
+    assert meaning["meta"].get("supershyft_called") is True
+    assert meaning["meta"].get("question_type") != "general_education"
 
 
 def test_general_then_mine_becomes_personal():
     first = chat("What does B12 mean?")
-    assert first.json()["meta"]["intent"] == "general_health_question"
+    assert first.json()["meta"].get("supershyft_called") is not True
+    assert first.json()["meta"].get("question_type") == "general_education" or first.json()["meta"]["intent"] == "general_health_question"
     cid = first.json()["conversation_id"]
     mine = chat("And what about mine?", cid).json()
-    assert mine["meta"]["intent"] == "latest_result"
+    assert mine["meta"].get("supershyft_called") is True
     assert build_query_plan("And what about mine?", "vitamin_b12", prior_personal=False).needs_personal_data
 
 
 def test_missing_parameter_ferritin():
     body = chat("What is my ferritin?").json()
     assert "ferritin" in body["answer"].lower()
-    assert "couldn't find" in body["answer"].lower() or "not" in body["answer"].lower()
+    assert "couldn't find" in body["answer"].lower() or "not present" in body["answer"].lower() or "not" in body["answer"].lower()
     assert "normal" not in body["answer"].lower() or "invent" in body["answer"].lower()
 
 

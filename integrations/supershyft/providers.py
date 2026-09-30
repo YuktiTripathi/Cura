@@ -9,12 +9,8 @@ from app.contracts.lifestyle import LifestyleContext
 from app.contracts.common import IntentType
 from app.contracts.query import QueryPlan
 from app.contracts.user import UserProfile
-from app.core.errors import ProviderUnavailableError
-from app.pipeline.lab_parameters import related_keys
-from app.pipeline.ontology import retrieval_metric_keys
 from integrations.supershyft.db import run_readonly
-from integrations.supershyft.ihr import _Row, _user_id, fetch_ihr_rows
-from integrations.supershyft.mapping import bio_ai_from_row, blood_report_from_row
+from integrations.supershyft.ihr import IhrRepository, _user_id
 
 
 class SuperShyftUserProvider:
@@ -57,61 +53,14 @@ class SuperShyftUserProvider:
 
 class SuperShyftBloodProvider:
     def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BloodReport]:
-        _user_id(principal)
-        rows = fetch_ihr_rows(principal)
-        reports: list[BloodReport] = []
-        for raw in rows:
-            mapped = blood_report_from_row(_Row(raw))
-            if mapped:
-                reports.append(mapped)
-        if plan.report_id:
-            reports = [report for report in reports if report.report_id == plan.report_id]
-        wanted_keys = retrieval_metric_keys(plan)
-        if wanted_keys:
-            wanted = set(wanted_keys)
-            for key in wanted_keys:
-                wanted |= related_keys(key)
-            filtered = []
-            for report in reports:
-                markers = [m for m in report.markers if m.key in wanted]
-                if markers:
-                    if "fasting_blood_glucose" in {m.key for m in markers} and (
-                        plan.topic in {"glucose", "fasting_blood_glucose"}
-                        or "fasting_blood_glucose" in wanted_keys
-                        or "glucose" in wanted_keys
-                    ):
-                        markers = sorted(
-                            markers,
-                            key=lambda m: 0 if m.key == "fasting_blood_glucose" else 1,
-                        )
-                    filtered.append(report.model_copy(update={"markers": markers}))
-            reports = filtered
-        if plan.time_operation == "latest_report" and reports:
-            return reports[-1:]
-        if plan.history or plan.time_operation in {"latest_marker", "trend", "previous", "compare"}:
-            return reports
-        if reports:
-            return reports[-1:]
-        return reports
+        blood_plan = plan if plan.needs_blood else plan.model_copy(update={"needs_blood": True})
+        return IhrRepository().get_ihr_data_for_query(principal, blood_plan).blood_reports
 
 
 class SuperShyftBioAIProvider:
     def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BioAIReport]:
-        _user_id(principal)
-        rows = fetch_ihr_rows(principal)
-        reports: list[BioAIReport] = []
-        for raw in rows:
-            mapped = bio_ai_from_row(_Row(raw))
-            if mapped:
-                reports.append(mapped)
-        if plan.report_id:
-            reports = [
-                report
-                for report in reports
-                if report.report_id == plan.report_id
-                or report.report_id == f"bioai-{plan.report_id}"
-            ]
-        return reports
+        bio_plan = plan if plan.needs_bio_ai else plan.model_copy(update={"needs_bio_ai": True})
+        return IhrRepository().get_ihr_data_for_query(principal, bio_plan).bio_ai_reports
 
 
 class SuperShyftLifestyleProvider:
@@ -122,6 +71,12 @@ class SuperShyftLifestyleProvider:
             {"uid": uid},
             fetch="one",
         )
+        prefs = self._from_preferences(uid, row)
+        if prefs and (prefs.dietary_preference or prefs.allergies or prefs.notes):
+            return prefs
+        return self._from_questionnaire(principal, uid) or prefs
+
+    def _from_preferences(self, uid: int, row: dict | None) -> LifestyleContext | None:
         if not row:
             return None
         notes = []
@@ -134,9 +89,50 @@ class SuperShyftLifestyleProvider:
             allergy_names = [str(item) for item in allergies if item]
             if allergy_names:
                 notes.append("Allergies recorded in SuperShyft preferences")
+        if not notes and not allergy_names:
+            return None
         return LifestyleContext(
             subject_id=str(uid),
             notes=notes,
             dietary_preference=str(diet) if diet else None,
             allergies=allergy_names,
+        )
+
+    def _from_questionnaire(self, principal: AuthenticatedPrincipal, uid: int) -> LifestyleContext | None:
+        from integrations.supershyft.questionnaire import fetch_questionnaire_instances
+
+        instances = fetch_questionnaire_instances(
+            principal,
+            QueryPlan(
+                intent=IntentType.questionnaire_lookup,
+                needs_questionnaire=True,
+                topic="lifestyle",
+            ),
+        )
+        by_key: dict[str, str | float] = {}
+        for instance in instances:
+            for answer in instance.answers:
+                if answer.question_key in by_key:
+                    continue
+                if answer.value in (None, ""):
+                    continue
+                by_key[answer.question_key] = answer.value
+        if not by_key:
+            return None
+        diet = by_key.get("diet_preference")
+        activity = by_key.get("physical_activity_frequency") or by_key.get("exercise_level")
+        sleep = by_key.get("sleeping_hours")
+        notes = []
+        if diet:
+            notes.append(f"Diet preference: {diet}")
+        if activity:
+            notes.append(f"Activity: {activity}")
+        if sleep:
+            notes.append(f"Sleep: {sleep}")
+        return LifestyleContext(
+            subject_id=str(uid),
+            activity_level=str(activity) if activity is not None else None,
+            sleep_quality=str(sleep) if sleep is not None else None,
+            notes=notes,
+            dietary_preference=str(diet) if diet is not None else None,
         )

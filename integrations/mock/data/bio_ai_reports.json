@@ -46,5 +46,29 @@
       {"code": "cardiac_health", "name": "Cardiac health", "score": 11, "status": "low", "percentile": 15, "lifestyle_contribution": 10},
       {"code": "nafld", "name": "NAFLD", "score": 9, "status": "low", "percentile": 12, "lifestyle_contribution": 8}
     ]
+  },
+  {
+    "subject_id": "demo-user-q1",
+    "report_id": "bioai-q1",
+    "report_date": "2026-09-15",
+    "source_line": "bio_ai",
+    "metabolic_age": 38,
+    "metabolic_score": 61,
+    "risks": [
+      {"code": "dyslipidemia", "name": "Dyslipidemia", "score": 44, "status": "moderate", "percentile": 64, "lifestyle_contribution": 47}
+    ]
+  },
+  {
+    "subject_id": "eval-user-iron",
+    "report_id": "eval-bio-1",
+    "report_date": "2026-08-24",
+    "source_line": "bio_ai",
+    "metabolic_age": 32,
+    "metabolic_score": 58,
+    "risks": [
+      {"code": "type_2_diabetes", "name": "Type 2 diabetes", "score": 14, "status": "low", "percentile": 22, "lifestyle_contribution": 20},
+      {"code": "dyslipidemia", "name": "Dyslipidemia", "score": 12, "status": "low", "percentile": 18, "lifestyle_contribution": 15},
+      {"code": "cardiac_health", "name": "Cardiac health", "score": 16, "status": "low", "percentile": 24, "lifestyle_contribution": 18}
+    ]
   }
 ]

@@ -257,7 +257,9 @@ def test_chat_missing_ldl_does_not_invent_or_claim_unavailable(monkeypatch):
         ).json()
         assert "118" not in body["answer"]
         assert "personal SuperShyft health data" not in body["answer"]
-        assert "couldn't find" in body["answer"].lower() or "not" in body["answer"].lower()
+        assert "no matching blood result" in body["answer"].lower() or "not present" in body["answer"].lower()
+        names = [item["name"] for item in (body.get("provenance") or {}).get("sources") or []]
+        assert "Blood Report" not in names
     finally:
         set_registry(None)
 
@@ -281,7 +283,7 @@ def test_chat_missing_bio_ai_score_is_honest(monkeypatch):
             headers={"X-Cura-User-Id": "2"},
             json={"message": "What is my Dyslipidemia score?"},
         ).json()
-        assert body["answer"] == "Score not available in this report."
+        assert "score not available" in body["answer"].lower()
         assert "3" not in body["answer"]
     finally:
         set_registry(None)
@@ -360,4 +362,36 @@ def test_live_user_2_dyslipidemia_is_read_from_reports_diseases(monkeypatch):
     assert stored is not None
     assert selected[0].score == float(stored["risk_score_scaled"])
     assert selected[0].status == stored["risk_status"]
+    reset_engine()
+
+
+@pytest.mark.skipif(not _live_db_url(), reason="live SuperShyft URL not in environment")
+def test_live_user_2_ldl_and_hba1c_come_from_blood_bookings(monkeypatch):
+    from app.core.config import settings
+    from app.pipeline.personal_selection import select_latest_markers
+    from integrations.supershyft.db import reset_engine
+    from integrations.supershyft.blood import reset_blood_cache
+
+    monkeypatch.setattr(settings, "supershyft_database_url", _live_db_url())
+    monkeypatch.setattr(settings, "health_provider", "supershyft")
+    reset_engine()
+    reset_ihr_cache()
+    reset_blood_cache()
+    principal = AuthenticatedPrincipal(subject_id="2")
+    bundle = IhrRepository().get_ihr_data_for_query(
+        principal,
+        QueryPlan(
+            intent=IntentType.latest_result,
+            needs_blood=True,
+            topic="ldl",
+            requested_metrics=["ldl", "hba1c"],
+            time_operation="latest_marker",
+        ),
+    )
+    selected, missing = select_latest_markers(bundle.blood_reports, ["ldl", "hba1c"])
+    assert missing == []
+    by_key = {marker.key: marker for marker in selected}
+    assert by_key["ldl"].value == 94.92
+    assert by_key["hba1c"].value == 5.3
+    assert all(str(marker.report_id or "").startswith("blood-") for marker in selected)
     reset_engine()

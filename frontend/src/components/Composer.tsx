@@ -73,10 +73,16 @@ export function Composer({
       await new Promise((r) => setTimeout(r, 1000));
       try {
         const doc = await getDocument(documentId);
-        if (doc.extraction_status === "completed" || doc.extraction_status === "failed") {
+        if (doc.extraction_status === "failed") {
           setChip({ localName: name, status: "uploaded", document: doc });
           onUploaded?.();
           return;
+        }
+        if (doc.structured_facts_ready || doc.extraction_status === "completed") {
+          setChip({ localName: name, status: "uploaded", document: doc });
+          onUploaded?.();
+          const idx = doc.pageindex_status;
+          if (!idx || (idx !== "BUILDING" && idx !== "NOT_STARTED")) return;
         }
       } catch {
         return;
@@ -89,6 +95,9 @@ export function Composer({
     if (chip.status === "uploading") return "Uploading…";
     if (chip.status === "failed") return "Upload failed — ";
     if (ex === "processing" || ex === "not_started") return "Processing…";
+    if (chip.document?.structured_facts_ready && chip.document.pageindex_status === "BUILDING") {
+      return "Measurements ready";
+    }
     if (ex === "completed") return "Ready";
     if (ex === "failed") return "Could not read";
     return "Uploaded";
@@ -131,20 +140,24 @@ export function Composer({
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || mimeType || "audio/webm" });
         if (!blob.size) {
-          setVoiceError("I couldn't hear a question. Please try again or type your message.");
+          setVoiceError("I couldn't clearly transcribe that. Please try again or type your message.");
           return;
         }
         setTranscribing(true);
         try {
           const result = await transcribeVoice(blob, language);
-          const text = (result.transcript || "").trim();
+          const text = (result.transcript || result.text || "").trim();
           if (!text) {
-            setVoiceError("I couldn't hear a question. Please try again or type your message.");
+            setVoiceError("I couldn't clearly transcribe that. Please try again or type your message.");
             return;
           }
           setValue(text);
         } catch (err) {
-          setVoiceError(err instanceof Error ? err.message : "Voice transcription failed.");
+          setVoiceError(
+            err instanceof Error && /microphone|permission/i.test(err.message)
+              ? err.message
+              : "I couldn't clearly transcribe that. Please try again or type your message."
+          );
         } finally {
           setTranscribing(false);
         }
@@ -153,15 +166,21 @@ export function Composer({
       recorder.start(250);
       setRecording(true);
       setElapsed(0);
-      timerRef.current = window.setInterval(() => setElapsed((s) => s + 1), 1000);
+      timerRef.current = window.setInterval(() => {
+        setElapsed((s) => {
+          if (s + 1 >= 60) {
+            window.setTimeout(() => mediaRef.current?.stop(), 0);
+            return 60;
+          }
+          return s + 1;
+        });
+      }, 1000);
     } catch (err) {
       const name = err instanceof DOMException ? err.name : "";
       if (name === "NotAllowedError" || name === "PermissionDeniedError") {
-        setVoiceError(
-          "Microphone access is blocked. You can allow microphone access in your browser settings or continue typing."
-        );
+        setVoiceError("I couldn't access your microphone. Check your browser permission and try again.");
       } else {
-        setVoiceError("Microphone isn't available. You can continue typing.");
+        setVoiceError("Voice input isn't available in this browser. You can continue by typing your message.");
       }
     }
   }
@@ -197,7 +216,9 @@ export function Composer({
         ref={inputRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
-        placeholder={transcribing ? "Transcribing…" : "Ask Cura about your health"}
+        placeholder={
+          transcribing ? "Turning your voice into text…" : recording ? "Listening…" : "Ask Cura about your health"
+        }
         disabled={disabled || transcribing}
       />
       <button
@@ -208,7 +229,7 @@ export function Composer({
         aria-label={recording ? "Stop recording" : "Start voice input"}
         data-voice-engine="record-transcribe"
       >
-        {recording ? `■ ${elapsed}s` : transcribing ? "…" : "🎙"}
+        {recording ? `Stop ${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}` : transcribing ? "…" : "🎙"}
       </button>
       <button type="submit" disabled={disabled || transcribing}>
         Send

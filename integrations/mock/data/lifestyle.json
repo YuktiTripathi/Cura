@@ -10,5 +10,11 @@
     "activity_level": "high",
     "sleep_quality": "good",
     "notes": ["Regular training"]
+  },
+  {
+    "subject_id": "eval-user-iron",
+    "activity_level": "light",
+    "sleep_quality": "fair",
+    "notes": ["Mostly vegetarian meals"]
   }
 ]

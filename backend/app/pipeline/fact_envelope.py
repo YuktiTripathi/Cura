@@ -10,16 +10,20 @@ from app.contracts.user import UserProfile
 
 
 def marker_fact(marker: BloodMarker, subject_id: str | None = None) -> ProvenancedFact:
+    uploaded = (marker.source or "").lower() in {"user_uploaded", "uploaded_document"}
     return ProvenancedFact(
         fact=marker.key or marker.name,
         value=marker.value,
         unit=marker.unit,
         source=marker.source or "SuperShyft",
         report_id=marker.report_id,
+        document_id=marker.report_id if uploaded else None,
         measured_at=marker.measured_at,
         fact_type=FactKind.measured_data,
         subject_id=subject_id,
         status=marker.flag.value if marker.flag else None,
+        source_type="uploaded_document" if uploaded else "supershyft_blood",
+        source_id=marker.report_id,
     )
 
 
@@ -30,10 +34,17 @@ def bio_risk_fact(risk: BioAIRisk, subject_id: str | None = None) -> Provenanced
         source=risk.source or "SuperShyft",
         report_id=risk.report_id,
         measured_at=risk.measured_at,
-        fact_type=FactKind.measured_data,
+        fact_type=FactKind.bio_ai_assessment,
         subject_id=subject_id,
         status=risk.status,
-        notes=["Bio-AI assessment, not a diagnosis"],
+        notes=["Bio-AI assessment, not a diagnosis"]
+        + (
+            [f"assessment_instance_id={risk.assessment_instance_id}"]
+            if risk.assessment_instance_id
+            else []
+        ),
+        source_type="supershyft_bio_ai",
+        source_id=risk.report_id,
     )
 
 
@@ -80,6 +91,7 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
                 source="SuperShyft",
                 fact_type=FactKind.user_preference,
                 subject_id=subject_id,
+                source_type="supershyft_lifestyle",
             )
         )
     if life.activity_level:
@@ -90,6 +102,7 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
                 source="SuperShyft",
                 fact_type=FactKind.user_preference,
                 subject_id=subject_id,
+                source_type="supershyft_lifestyle",
             )
         )
     if life.sleep_quality:
@@ -100,6 +113,7 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
                 source="SuperShyft",
                 fact_type=FactKind.user_preference,
                 subject_id=subject_id,
+                source_type="supershyft_lifestyle",
             )
         )
     for allergy in life.allergies or []:
@@ -110,6 +124,7 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
                 source="SuperShyft",
                 fact_type=FactKind.user_provided_data,
                 subject_id=subject_id,
+                source_type="supershyft_lifestyle",
             )
         )
     for goal in life.goals or []:
@@ -120,6 +135,7 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
                 source="SuperShyft",
                 fact_type=FactKind.user_provided_data,
                 subject_id=subject_id,
+                source_type="supershyft_lifestyle",
             )
         )
     return out

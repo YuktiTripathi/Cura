@@ -3,6 +3,7 @@ from app.contracts.blood import BloodReport
 from app.contracts.query import QueryPlan
 from app.pipeline.lab_parameters import related_keys
 from app.pipeline.ontology import retrieval_metric_keys
+from app.pipeline.personal_selection import retain_blood_reports
 from integrations.mock.loader import load_json
 
 
@@ -21,12 +22,7 @@ class MockBloodProvider:
             wanted = set(wanted_keys)
             for key in wanted_keys:
                 wanted |= related_keys(key)
-            filtered = []
-            for report in reports:
-                markers = [m for m in report.markers if m.key in wanted]
-                if markers:
-                    filtered.append(report.model_copy(update={"markers": markers}))
-            reports = filtered
+            reports = retain_blood_reports(reports, wanted)
         if plan.time_operation == "latest_report" and reports:
             return reports[-1:]
         if plan.history or plan.time_operation in {"latest_marker", "trend", "previous", "compare"}:

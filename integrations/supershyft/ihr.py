@@ -17,6 +17,7 @@ from app.contracts.query import QueryPlan
 from app.core.errors import ProviderUnavailableError
 from app.pipeline.lab_parameters import related_keys
 from app.pipeline.ontology import retrieval_metric_keys
+from app.pipeline.personal_selection import retain_blood_reports
 from integrations.supershyft.db import DB_QUERY_FAILED, run_readonly
 from integrations.supershyft.mapping import _as_date, bio_ai_from_row, blood_report_from_row
 
@@ -60,6 +61,9 @@ def fetch_ihr_rows(principal: AuthenticatedPrincipal) -> list[dict]:
 
 def reset_ihr_cache() -> None:
     _cache.clear()
+    from integrations.supershyft.blood import reset_blood_cache
+
+    reset_blood_cache()
 
 
 @dataclass
@@ -105,6 +109,11 @@ class IhrRepository:
             mapped_bio = bio_ai_from_row(_Row(raw))
             if mapped_bio:
                 bio.append(mapped_bio)
+        from integrations.supershyft.blood import mapped_booking_reports
+
+        booking_blood = mapped_booking_reports(principal) if plan.needs_blood else []
+        blood = _merge_blood_reports(blood, booking_blood)
+        ids.extend(report.report_id for report in booking_blood if report.report_id)
         if plan.report_id:
             blood = [r for r in blood if r.report_id == plan.report_id]
             bio = [
@@ -121,12 +130,7 @@ class IhrRepository:
                 key in {"ldl", "hdl", "cholesterol", "triglycerides"} for key in wanted_keys
             ):
                 wanted |= {"ldl", "hdl", "cholesterol", "triglycerides"}
-            filtered = []
-            for report in blood:
-                markers = [m for m in report.markers if m.key in wanted]
-                if markers:
-                    filtered.append(report.model_copy(update={"markers": markers}))
-            blood = filtered
+            blood = retain_blood_reports(blood, wanted)
         keep_blood_history = bool(
             plan.history
             or plan.time_operation in {"latest_marker", "trend", "previous", "compare"}
@@ -143,6 +147,14 @@ class IhrRepository:
             elif bio:
                 bio = bio[-1:]
         return IhrBundle(user_id=uid, blood_reports=blood, bio_ai_reports=bio, report_ids=ids)
+
+
+def _merge_blood_reports(ihr_blood: list[BloodReport], booking_blood: list[BloodReport]) -> list[BloodReport]:
+    by_id: dict[str, BloodReport] = {}
+    for report in ihr_blood + booking_blood:
+        if report.report_id not in by_id:
+            by_id[report.report_id] = report
+    return sorted(by_id.values(), key=lambda report: (report.report_date, report.report_id))
 
 
 def _sorted_ihr_rows(rows: list[dict]) -> list[dict]:

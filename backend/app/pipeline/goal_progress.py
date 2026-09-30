@@ -50,6 +50,7 @@ def compute_goal_progress(
                     status=goal.status,
                     summary=summary,
                     sufficient_history=False,
+                    missing_metrics=list(metrics),
                 )
             )
             continue
@@ -62,23 +63,37 @@ def compute_goal_progress(
                     status=goal.status,
                     summary=summary,
                     sufficient_history=False,
+                    missing_metrics=list(metrics),
                 )
             )
             continue
         better = 0
         worse = 0
+        improving: list[str] = []
+        worsening: list[str] = []
+        stable: list[str] = []
         for fact in facts:
             direction = next((n.split("=", 1)[-1] for n in fact.notes if n.startswith("direction=")), None)
             if fact.fact == "hdl":
                 if direction == "increased":
                     better += 1
+                    improving.append(fact.fact)
                 elif direction == "decreased":
                     worse += 1
+                    worsening.append(fact.fact)
+                else:
+                    stable.append(fact.fact)
             else:
                 if direction == "decreased":
                     better += 1
+                    improving.append(fact.fact)
                 elif direction == "increased":
                     worse += 1
+                    worsening.append(fact.fact)
+                else:
+                    stable.append(fact.fact)
+        present = {fact.fact for fact in facts}
+        missing = [key for key in metrics if key not in present]
         if better and not worse:
             overall = "improved"
         elif worse and not better:
@@ -99,6 +114,10 @@ def compute_goal_progress(
                 summary=summary,
                 metrics=facts,
                 sufficient_history=True,
+                improving=improving,
+                stable=stable,
+                worsening=worsening,
+                missing_metrics=missing,
             )
         )
     return out

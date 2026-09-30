@@ -6,13 +6,19 @@ from sqlalchemy.orm import Session
 
 from app.core.config import settings
 from app.core.errors import NotFoundError
+from app.contracts.uploaded_document import PageIndexStatus, ProcessingStatus
 from app.db.models import Document, DocumentChunk
 from app.documents.chunking import chunk_pages
 from app.documents.extraction import ExtractedPage, extract_pdf_pages
+from app.documents.facts import extract_facts_from_pages
+from app.documents.metadata import update_meta
 from app.documents.normalization import normalize_extracted_text
 from app.documents.ocr import OCRProvider, get_ocr_provider
+from app.documents.pageindex import build_pageindex
 from app.documents.service import SOURCE_USER_UPLOADED
 from app.documents.storage import get_document_store
+from app.documents.structured import store_structured
+from app.documents.type_detect import detect_document_kind, detect_document_subtype
 
 logger = logging.getLogger("cura.documents")
 
@@ -42,6 +48,11 @@ class DocumentProcessor:
             raise NotFoundError("Document not found.")
         row.extraction_status = "processing"
         row.extraction_error = None
+        update_meta(
+            row,
+            processing_status=ProcessingStatus.parsing.value,
+            pageindex_status=PageIndexStatus.not_started.value,
+        )
         self.db.commit()
         try:
             data = self.store.read(row.storage_key)
@@ -78,21 +89,52 @@ class DocumentProcessor:
                         source=SOURCE_USER_UPLOADED,
                     )
                 )
+            kind = detect_document_kind(pages)
+            subtype = detect_document_subtype(pages)
+            extracted = extract_facts_from_pages(row.id, pages)
+            extracted = extracted.model_copy(update={"document_type": subtype.value})
+            store_structured(row, extracted)
             row.extraction_status = "completed"
             row.extraction_error = None
             row.page_count = len(pages)
             row.extracted_chars = total
-            from app.documents.structured import extract_health_document, store_structured
-
-            store_structured(row, extract_health_document(row.id, drafts))
+            update_meta(
+                row,
+                document_kind=kind.value,
+                document_subtype=subtype.value,
+                structured_facts_ready=True,
+                processing_status=ProcessingStatus.structured_facts_ready.value,
+                pageindex_status=PageIndexStatus.building.value,
+            )
             self.db.commit()
             logger.info(
-                "document_extracted document_id=%s pages=%s chunks=%s chars=%s",
+                "document_structured_ready document_id=%s pages=%s facts=%s kind=%s subtype=%s",
                 row.id,
                 len(pages),
-                len(drafts),
-                total,
+                len(extracted.biomarkers),
+                kind.value,
+                subtype.value,
             )
+            try:
+                tree = build_pageindex(row.id, pages)
+                update_meta(
+                    row,
+                    pageindex=tree.model_dump(mode="json"),
+                    pageindex_status=PageIndexStatus.ready.value,
+                    processing_status=ProcessingStatus.ready.value,
+                    narrative_ready=True,
+                )
+                self.db.commit()
+                logger.info("document_pageindex_ready document_id=%s nodes=%s", row.id, len(tree.nodes))
+            except Exception:
+                logger.warning("document_pageindex_failed document_id=%s", document_id)
+                update_meta(
+                    row,
+                    pageindex_status=PageIndexStatus.failed.value,
+                    processing_status=ProcessingStatus.partial_failure.value,
+                )
+                self.db.commit()
+            return
         except Exception:
             logger.warning("document_extract_failed document_id=%s", document_id)
             self.db.rollback()
@@ -132,6 +174,12 @@ class DocumentProcessor:
     def _fail(self, row: Document, code: str) -> None:
         row.extraction_status = "failed"
         row.extraction_error = SAFE_ERRORS.get(code, SAFE_ERRORS["extract_failed"])
+        update_meta(
+            row,
+            processing_status=ProcessingStatus.failed.value,
+            pageindex_status=PageIndexStatus.failed.value,
+            structured_facts_ready=False,
+        )
         self.db.commit()
 
 

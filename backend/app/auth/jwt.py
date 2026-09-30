@@ -12,9 +12,11 @@ class SuperShyftJWTAuthProvider:
 
     def authenticate(self, request: Request) -> AuthenticatedPrincipal:
         header = request.headers.get("Authorization", "")
-        if not header.lower().startswith("bearer "):
-            raise UnauthorizedError("Bearer authentication required")
-        token = header.split(" ", 1)[1].strip()
+        token = ""
+        if header.lower().startswith("bearer "):
+            token = header.split(" ", 1)[1].strip()
+        if not token:
+            token = (request.cookies.get("cura_session") or "").strip()
         if not token:
             raise UnauthorizedError("Bearer authentication required")
         if not settings.auth_jwt_secret:

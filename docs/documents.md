@@ -1,20 +1,45 @@
 # User-uploaded medical documents
 
-Phase 8 enables Cura to extract and retrieve information from user-uploaded PDFs. Phase 9 can **compare** those extracts with SuperShyft structured data when the user asks, without merging sources.
+Cura can extract facts from a user-uploaded PDF (typically up to 50 pages) and answer questions about it. SuperShyft blood reports remain a separate source. Uploaded values are never written into SuperShyft.
 
-**SuperShyft remains the source of truth for SuperShyft-originated data. User-uploaded documents remain independent sources.**
+**Do not use a vector database.** Retrieval is structured facts plus a stored document tree (PageIndex-style section navigation).
 
 ## Flow
 
-Uploaded PDF → validate → extract selectable text (pypdf) → OCR fallback if text is insufficient → normalize → page-aware chunks → lexical retrieval.
+```text
+PDF upload
+  → validate
+  → text/layout extraction (OCR only if needed)
+  → structured health-fact extraction   ← first questions allowed here
+  → PageIndex tree (async, same job after facts are stored)
+  → CURA answers
+```
 
-## OCR
+States (internal): `UPLOADED` → `PARSING` → `STRUCTURED_FACTS_READY` / `PAGEINDEX_BUILDING` → `READY` (or `PARTIAL_FAILURE` / `FAILED`).
 
-`DOCUMENT_OCR_PROVIDER=none` (default) or `local`.
+The UI may say “Measurements ready” while narrative indexing finishes. It does not mention PageIndex.
 
-OCR runs only when total extracted characters are below `DOCUMENT_MIN_TEXT_CHARS` **or** most pages are nearly empty. A single short page does not trigger OCR if the rest of the document has usable text.
+## Query policy
 
-If OCR is not configured and the PDF is image-only, extraction fails with a truthful message. No fabricated text.
+| Question | Path |
+| --- | --- |
+| “What is my Vitamin D / LDL / HbA1c?” | Deterministic `DocumentHealthFacts` lookup |
+| High / low / abnormal lists | Structured lookup |
+| “What did the radiologist say?” | PageIndex section retrieval, then explanation |
+| Mixed | Structured + PageIndex |
+| “Explain this whole report” | Structured summary (not a dump of every value) |
+| “View all extracted results” | Progressive list of extracted measurements |
+| Compare with SuperShyft | Normalize entities, compare values in app code, then reason |
+
+PageIndex is not invoked for obvious lab lookups unless structured extraction missed the value.
+
+## Provenance
+
+User-facing source style: `Uploaded report · page 17` or `Uploaded report · Impression · page 8`.
+
+Report wording stays report wording. Cura interpretation is labeled separately.
+
+Task-plan operations: `DOCUMENT_STRUCTURED_LOOKUP`, `DOCUMENT_NARRATIVE_RETRIEVAL`, `DOCUMENT_SUMMARY`, `DOCUMENT_CROSS_SOURCE_COMPARE`.
 
 ## Configuration
 
@@ -34,18 +59,4 @@ DOCUMENT_CHUNK_OVERLAP=100
 DOCUMENT_RETRIEVE_LIMIT=5
 ```
 
-## Chunking and retrieval
-
-Chunks keep `source=user_uploaded`, `document_id`, `user_id`, and page range. Retrieval is in-process TF-IDF (no vector database). Queries with explicit `document_ids` search only those documents. Ownership is always `user_id`.
-
-## Chat
-
-With `document_ids` only, Cura retrieves uploaded-document evidence.
-
-With an explicit comparison request, Cura builds a source-separated comparison (uploaded vs SuperShyft). It does not pick a winner, invent dates, or apply SuperShyft reference ranges to an external lab.
-
-General questions such as "What is HbA1c?" stay on the general-knowledge path.
-
-## Provenance
-
-Extracted chunks are never labeled SuperShyft and are never written to SuperShyft PostgreSQL.
+Chunks remain a lexical fallback only. Ownership is always `user_id`.

@@ -1,9 +1,15 @@
 import pytest
 from pydantic import ValidationError
 
+from app.core.circuit_breaker import openrouter_breaker
 from app.core.config import Settings, settings
 from app.core.errors import LLMUnavailableError
-from app.llm.openai_compatible import OpenAICompatibleLLMClient, strip_reasoning
+from app.llm.openai_compatible import (
+    OpenAICompatibleLLMClient,
+    message_text,
+    strip_reasoning,
+    uses_reasoning_tokens,
+)
 from integrations.supershyft.db import normalize_sync_url
 from integrations.supershyft.mapping import bio_ai_from_row, markers_from_blood_parameters
 
@@ -11,6 +17,13 @@ from integrations.supershyft.mapping import bio_ai_from_row, markers_from_blood_
 def test_strip_qwen_think_tags():
     raw = "<think>internal</think>\nYour HbA1c is in range."
     assert strip_reasoning(raw) == "Your HbA1c is in range."
+
+
+def test_message_text_skips_reasoning_parts():
+    assert message_text({"content": [{"type": "reasoning", "text": "hidden"}, {"type": "text", "text": "visible"}]}) == "visible"
+    assert uses_reasoning_tokens("openai/gpt-5-nano")
+    assert uses_reasoning_tokens("openai/gpt-5-mini")
+    assert not uses_reasoning_tokens("google/gemini-3.8-flash")
 
 
 def test_normalize_asyncpg_url():
@@ -109,7 +122,8 @@ def test_llm_retries_transient_failure(monkeypatch):
         def post(self, *args, **kwargs):
             return responses.pop(0)
 
-    monkeypatch.setattr("app.llm.openai_compatible.httpx.Client", Client)
+    instance = Client()
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: instance)
     monkeypatch.setattr(settings, "llm_max_retries", 1)
     client = OpenAICompatibleLLMClient(
         provider="openai_compatible", base_url="http://local", model="qwen", api_key="test"
@@ -132,12 +146,152 @@ def test_llm_invalid_json_is_typed_failure(monkeypatch):
         def post(self, *args, **kwargs):
             return _Response(200, ValueError("bad json"))
 
-    monkeypatch.setattr("app.llm.openai_compatible.httpx.Client", Client)
+    instance = Client()
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: instance)
     client = OpenAICompatibleLLMClient(
         provider="openai_compatible", base_url="http://local", model="qwen", api_key="test"
     )
     with pytest.raises(LLMUnavailableError):
         client._real_complete([{"role": "user", "content": "hello"}])
+
+
+def test_gpt5_payload_sets_low_reasoning_effort(monkeypatch):
+    captured = {}
+
+    class Client:
+        def post(self, *args, **kwargs):
+            captured["payload"] = kwargs["json"]
+            captured["timeout"] = kwargs.get("timeout")
+            return _Response(
+                200,
+                {"choices": [{"message": {"content": "ok"}}], "usage": {"prompt_tokens": 1, "completion_tokens": 2}},
+            )
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    monkeypatch.setattr(settings, "llm_max_output_tokens", 800)
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter",
+        base_url="http://local",
+        model="openai/gpt-5-nano",
+        api_key="test",
+        timeout=12,
+    )
+    assert client._real_complete([{"role": "user", "content": "hello"}]) == "ok"
+    assert captured["payload"]["reasoning"] == {"effort": "low"}
+    assert captured["payload"]["max_tokens"] >= 1200
+    assert captured["timeout"] == 12
+
+
+def test_empty_content_does_not_open_circuit(monkeypatch):
+    openrouter_breaker.reset()
+
+    class Client:
+        def post(self, *args, **kwargs):
+            return _Response(
+                200,
+                {
+                    "choices": [{"message": {"content": "", "reasoning": "spent the budget thinking"}}],
+                    "usage": {"prompt_tokens": 10, "completion_tokens": 400},
+                },
+            )
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter", base_url="http://local", model="openai/gpt-5-mini", api_key="test"
+    )
+    with pytest.raises(LLMUnavailableError, match="empty answer"):
+        client._real_complete([{"role": "user", "content": "hello"}])
+    openrouter_breaker.allow()
+    assert openrouter_breaker._state.open is False
+    assert openrouter_breaker._state.failures == 0
+
+
+def test_content_parts_are_used_as_visible_text(monkeypatch):
+    class Client:
+        def post(self, *args, **kwargs):
+            return _Response(
+                200,
+                {
+                    "choices": [
+                        {
+                            "message": {
+                                "content": [
+                                    {"type": "reasoning", "text": "internal"},
+                                    {"type": "output_text", "text": "Your LDL is in range."},
+                                ]
+                            }
+                        }
+                    ],
+                    "usage": {},
+                },
+            )
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter", base_url="http://local", model="openai/gpt-5-nano", api_key="test"
+    )
+    assert client._real_complete([{"role": "user", "content": "hello"}]) == "Your LDL is in range."
+
+
+def test_truncated_finish_reason_is_internal_failure(monkeypatch):
+    class Client:
+        def post(self, *args, **kwargs):
+            return _Response(
+                200,
+                {
+                    "choices": [{"message": {"content": "partial"}, "finish_reason": "length"}],
+                    "usage": {},
+                },
+            )
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter", base_url="http://local", model="openai/gpt-5-mini", api_key="test"
+    )
+    with pytest.raises(LLMUnavailableError, match="truncated"):
+        client._real_complete([{"role": "user", "content": "hello"}])
+
+
+def test_json_schema_400_falls_back_without_opening_circuit(monkeypatch):
+    openrouter_breaker.reset()
+    posts = []
+
+    class Client:
+        def post(self, *args, **kwargs):
+            payload = kwargs["json"]
+            posts.append(payload)
+            fmt = (payload.get("response_format") or {}).get("type")
+            if fmt == "json_schema":
+                return _Response(
+                    400,
+                    {"error": {"message": "No endpoints found that support the requested parameters"}},
+                )
+            return _Response(
+                200,
+                {"choices": [{"message": {"content": '{"answer":"Vitamin D helps the body absorb calcium."}'}}]},
+            )
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    monkeypatch.setattr(settings, "llm_json_schema_output", True)
+    monkeypatch.setattr(settings, "openrouter_require_parameters", False)
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "complete", OpenAICompatibleLLMClient._real_complete)
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter", base_url="http://local", model="openai/gpt-5-mini", api_key="test"
+    )
+    parsed = client.complete_structured([{"role": "user", "content": "What does Vitamin D do?"}])
+    assert "absorb calcium" in parsed.answer
+    assert posts[0]["response_format"]["type"] == "json_schema"
+    assert "require_parameters" not in (posts[0].get("provider") or {})
+    assert any((row.get("response_format") or {}).get("type") != "json_schema" for row in posts[1:])
+    openrouter_breaker.allow()
+    assert openrouter_breaker._state.open is False
+
+
+def test_privacy_flags_are_configured():
+    loaded = Settings()
+    assert hasattr(loaded, "openrouter_zero_data_retention")
+    assert hasattr(loaded, "openrouter_data_collection_deny")
+    assert hasattr(loaded, "require_zdr_for_personal_health")
 
 
 class _Response:

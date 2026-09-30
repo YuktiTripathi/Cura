@@ -1,3 +1,5 @@
+import logging
+
 from fastapi import Depends, Request
 
 from app.auth.interface import AuthProvider
@@ -5,6 +7,8 @@ from app.auth.models import AuthenticatedPrincipal
 from app.core.config import settings
 from app.core.errors import ForbiddenError
 from app.providers.registry import get_registry
+
+logger = logging.getLogger("cura.auth")
 
 
 def get_auth_provider() -> AuthProvider:
@@ -17,6 +21,22 @@ def get_principal(
 ) -> AuthenticatedPrincipal:
     if settings.auth_provider == "mock" and not settings.is_development:
         raise ForbiddenError("Mock auth is development-only")
-    if settings.auth_provider == "mock" and not settings.dev_auth_header:
+    if (
+        settings.auth_provider == "mock"
+        and not settings.dev_auth_header
+        and not (settings.mock_user_id or "").strip()
+    ):
         raise ForbiddenError("Development header auth is disabled")
-    return provider.authenticate(request)
+    header_identity = request.headers.get("X-Cura-User-Id") or request.headers.get("x-cura-user-id")
+    if header_identity and (settings.auth_provider or "").strip().lower() != "mock":
+        header_identity = None
+    if header_identity and not settings.is_development:
+        raise ForbiddenError("X-Cura-User-Id is not allowed outside development")
+    principal = provider.authenticate(request)
+    if settings.is_development:
+        logger.info(
+            "auth_ok provider=%s subject_id=%s",
+            (settings.auth_provider or "mock").strip().lower(),
+            principal.subject_id,
+        )
+    return principal

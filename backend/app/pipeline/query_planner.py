@@ -4,7 +4,16 @@ from app.pipeline.intent import BIO_KEYS, classify_intent, knowledge_scope_for
 from app.pipeline.ontology import attach_ontology
 from app.pipeline.source_routing import apply_source_routing
 from app.contracts.context_ref import ContextRef
-from app.pipeline.lab_parameters import primary_lab_key
+from app.pipeline.operations import apply_operation_metadata, named_personal_sources
+from app.pipeline.planner import attach_task_plan
+from app.pipeline.conversation_state import apply_to_query_plan
+from app.contracts.conversation_state import ConversationState
+from app.pipeline.lab_parameters import match_lab_keys, primary_lab_key
+from app.pipeline.questionnaire_intent import (
+    explicit_questionnaire_request,
+    is_questionnaire_topic,
+)
+from app.pipeline.questionnaire_topics import questionnaire_topic
 
 
 def build_query_plan(
@@ -16,11 +25,14 @@ def build_query_plan(
     uploaded_document_count: int = 0,
     prior_source_mode: str | None = None,
     context_ref: ContextRef | None = None,
+    conversation_state: ConversationState | None = None,
 ) -> QueryPlan:
     intent, topic, name, depth = classify_intent(message, follow_up_topic, prior_personal=prior_personal)
     if intent == IntentType.follow_up and topic:
         if topic in BIO_KEYS:
             intent = IntentType.bio_ai_score
+        elif is_questionnaire_topic(topic):
+            pass
         else:
             intent = IntentType.latest_result
 
@@ -60,7 +72,8 @@ def build_query_plan(
 
     needs_lifestyle = personal and (
         intent == IntentType.bio_ai_explanation
-        or intent in {
+        or intent
+        in {
             IntentType.health_scenario,
             IntentType.nutrition_guidance,
             IntentType.personal_profile,
@@ -83,12 +96,46 @@ def build_query_plan(
         IntentType.health_goal_progress,
         IntentType.report_explanation,
     }
+    wants_questionnaire = personal and (
+        intent == IntentType.questionnaire_lookup
+        or explicit_questionnaire_request(message)
+        or (intent == IntentType.follow_up and is_questionnaire_topic(topic))
+        or is_questionnaire_topic(follow_up_topic)
+    )
+    if wants_questionnaire and intent == IntentType.questionnaire_lookup and not topic:
+        topic = questionnaire_topic(message)
+        name = name or (topic.replace("_", " ") if topic else "questionnaire")
+    if wants_questionnaire and intent == IntentType.questionnaire_lookup and not named_personal_sources(message) - {"questionnaire"}:
+        needs_blood = False
+        needs_bio_ai = False
+        needs_lifestyle = False
+        needs_profile = False
+    named = named_personal_sources(message)
+    if personal and len(named) >= 2:
+        if "blood" in named:
+            needs_blood = True
+        if "bio_ai" in named:
+            needs_bio_ai = True
+        if "goals" in named:
+            needs_goals = True
+            needs_profile = True
+        if intent == IntentType.questionnaire_lookup:
+            intent = IntentType.report_explanation
+            history = True
+    if personal and match_lab_keys(message) and intent != IntentType.questionnaire_lookup:
+        needs_blood = True
     lowered_msg = message.lower()
     if personal and any(token in lowered_msg for token in ("last year", "previous year", "histor")):
         history = True
+    if wants_questionnaire and any(
+        token in lowered_msg for token in ("changed", "previous", "compare", "latest questionnaire")
+    ):
+        history = True
     source = QuerySource.general if not personal else QuerySource.none
     if personal:
-        if needs_blood and needs_bio_ai:
+        if wants_questionnaire and not needs_blood and not needs_bio_ai:
+            source = QuerySource.questionnaire
+        elif needs_blood and needs_bio_ai:
             source = QuerySource.mixed
         elif needs_blood:
             source = QuerySource.blood
@@ -113,7 +160,9 @@ def build_query_plan(
         needs_lifestyle=needs_lifestyle,
         needs_profile=needs_profile,
         needs_goals=needs_goals,
-        compare=intent in {IntentType.trend, IntentType.bio_ai_comparison, IntentType.health_goal_progress},
+        needs_questionnaire=wants_questionnaire,
+        compare=intent in {IntentType.trend, IntentType.bio_ai_comparison, IntentType.health_goal_progress}
+        or (wants_questionnaire and history),
         follow_up=intent == IntentType.follow_up,
         raw_message=message,
         needs_supershyft=personal,
@@ -132,6 +181,8 @@ def build_query_plan(
         plan.medical_evidence_required = True
     if plan.needs_guidance and personal and (needs_blood or needs_bio_ai):
         plan.needs_general = True
+    if wants_questionnaire and (needs_blood or needs_bio_ai):
+        plan.medical_evidence_required = True
     if intent == IntentType.casual_conversation:
         plan.needs_supershyft = False
         plan.needs_general = True
@@ -155,6 +206,19 @@ def build_query_plan(
         plan.medical_evidence_required = True
     if intent == IntentType.report_explanation:
         plan.time_operation = "latest_report"
+    if plan.needs_questionnaire and (plan.needs_blood or plan.needs_bio_ai):
+        plan.medical_evidence_required = True
+    if document_ids:
+        plan.document_ids = list(document_ids)
+        plan.active_document_id = plan.document_ids[0] if len(plan.document_ids) == 1 else None
+    plan = apply_operation_metadata(plan)
+    plan = apply_to_query_plan(plan, conversation_state)
+    plan = attach_task_plan(plan, message)
+    if plan.needs_questionnaire and (plan.needs_blood or plan.needs_bio_ai or plan.needs_goals):
+        plan.medical_evidence_required = True
+        if plan.needs_blood or plan.needs_bio_ai:
+            plan.source = QuerySource.mixed
+            plan.needs_supershyft = True
     return plan
 
 
