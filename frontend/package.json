@@ -7,7 +7,10 @@
     "dev": "vite",
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
-    "test": "vitest run"
+    "test": "vitest run",
+    "gen:openapi": "python3 scripts/export_openapi.py",
+    "gen:api": "openapi-typescript openapi/cura.json -o src/types/api.generated.ts",
+    "check:api": "npm run gen:api && git diff --exit-code -- src/types/api.generated.ts"
   },
   "dependencies": {
     "@tanstack/react-query": "^5.104.0",
@@ -21,6 +24,7 @@
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.3",
     "jsdom": "^29.1.1",
+    "openapi-typescript": "^7.13.0",
     "typescript": "^5.6.3",
     "vite": "^5.4.10",
     "vitest": "^4.1.11"
