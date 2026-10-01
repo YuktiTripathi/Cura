@@ -3120,6 +3120,11 @@
             "default": false,
             "title": "Has Questionnaire",
             "type": "boolean"
+          },
+          "voice_input": {
+            "default": false,
+            "title": "Voice Input",
+            "type": "boolean"
           }
         },
         "title": "MeCapabilities",

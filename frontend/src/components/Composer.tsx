@@ -1,6 +1,7 @@
 import { FormEvent, useEffect, useRef, useState, type ChangeEvent, type RefObject } from "react";
 import { transcribeVoice } from "../lib/api";
 import { useDocumentUpload, type DocumentUploader, type UploadChip } from "../hooks/useDocumentUpload";
+import { useAudioLevels } from "../hooks/useAudioLevels";
 
 type Props = {
   disabled: boolean;
@@ -13,6 +14,8 @@ type Props = {
   uploader?: DocumentUploader;
   /** Opens the extracted-values review for an uploaded document. */
   onReview?: (documentId: string) => void;
+  /** False when the server has no speech-to-text configured: the microphone is not offered. */
+  voiceEnabled?: boolean;
 };
 
 export function Composer({
@@ -24,6 +27,7 @@ export function Composer({
   onUploaded,
   uploader: sharedUploader,
   onReview,
+  voiceEnabled = true,
 }: Props) {
   const ownUploader = useDocumentUpload(conversationId, onUploaded);
   const uploader = sharedUploader ?? ownUploader;
@@ -33,6 +37,8 @@ export function Composer({
   const [transcribing, setTranscribing] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [voiceError, setVoiceError] = useState<string | null>(null);
+  const [liveStream, setLiveStream] = useState<MediaStream | null>(null);
+  const levels = useAudioLevels(liveStream);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -101,6 +107,7 @@ export function Composer({
         if (ev.data.size) chunksRef.current.push(ev.data);
       };
       recorder.onstop = async () => {
+        setLiveStream(null);
         stream.getTracks().forEach((t) => t.stop());
         const blob = new Blob(chunksRef.current, { type: recorder.mimeType || mimeType || "audio/webm" });
         if (!blob.size) {
@@ -127,6 +134,7 @@ export function Composer({
         }
       };
       mediaRef.current = recorder;
+      setLiveStream(stream);
       recorder.start(250);
       setRecording(true);
       setElapsed(0);
@@ -185,6 +193,19 @@ export function Composer({
         }
         disabled={disabled || transcribing}
       />
+      {recording && levels.length > 0 ? (
+        <span className="waveform" aria-hidden="true" data-testid="waveform">
+          {levels.map((level, index) => (
+            <span key={index} style={{ height: `${Math.max(12, level * 100)}%` }} />
+          ))}
+        </span>
+      ) : null}
+      {recording ? (
+        <span className="visually-hidden" role="status">
+          Recording. Press Stop when you're done.
+        </span>
+      ) : null}
+      {voiceEnabled || recording ? (
       <button
         type="button"
         className={recording ? "mic recording" : "mic"}
@@ -195,6 +216,7 @@ export function Composer({
       >
         {recording ? `Stop ${String(Math.floor(elapsed / 60)).padStart(2, "0")}:${String(elapsed % 60).padStart(2, "0")}` : transcribing ? "…" : "🎙"}
       </button>
+      ) : null}
       <button type="submit" disabled={disabled || transcribing}>
         Send
       </button>

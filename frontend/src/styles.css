@@ -577,3 +577,7 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .review-row .range-dot { box-shadow: 0 0 0 2px var(--surface-subtle); }
 .review-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; bottom: -18px; padding: 10px 0 2px; background: var(--surface); }
 .review-actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.waveform { display: inline-flex; align-items: center; gap: 2px; height: 28px; padding: 0 4px; }
+.waveform span { width: 3px; border-radius: 2px; background: var(--recording-border); transition: height 60ms linear; }
+.visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }

@@ -10,6 +10,8 @@ class MeCapabilities(BaseModel):
     has_nutrition: bool = False
     has_health_scenario: bool = False
     has_health_goals: bool = False
+    # Speech-to-text is configured on this deployment (VOICE_ENABLED + STT_PROVIDER).
+    voice_input: bool = False
 
 
 class MeResponse(BaseModel):

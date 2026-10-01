@@ -152,6 +152,7 @@ export function CuraPage() {
           onUploaded={refreshDocuments}
           uploader={uploader}
           onReview={setReviewId}
+          voiceEnabled={me?.capabilities?.voice_input !== false}
         />
         <footer>
           Cura provides educational information, not diagnosis or medication advice.

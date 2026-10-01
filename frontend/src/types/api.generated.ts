@@ -1420,6 +1420,11 @@ export interface components {
              * @default false
              */
             has_questionnaire: boolean;
+            /**
+             * Voice Input
+             * @default false
+             */
+            voice_input: boolean;
         };
         /** MeResponse */
         MeResponse: {

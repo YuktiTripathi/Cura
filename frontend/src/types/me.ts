@@ -5,6 +5,7 @@ export type MeCapabilities = {
   has_nutrition: boolean;
   has_health_scenario: boolean;
   has_health_goals?: boolean;
+  voice_input?: boolean;
 };
 
 export type StarterQuestion = {

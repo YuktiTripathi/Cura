@@ -70,3 +70,12 @@ def test_comparing_a_whole_report_compares_every_shared_marker(storage_dir):
         assert label in answer
     assert "not found in the selected SuperShyft data" not in answer
     assert "SuperShyft 138" in answer  # demo user's latest SuperShyft LDL
+
+
+def test_me_reports_whether_voice_input_is_configured(monkeypatch):
+    headers = {"X-Cura-User-Id": "demo-user-001"}
+    monkeypatch.setattr(settings, "voice_enabled", False)
+    assert client.get("/api/v1/me", headers=headers).json()["capabilities"]["voice_input"] is False
+    monkeypatch.setattr(settings, "voice_enabled", True)
+    monkeypatch.setattr(settings, "stt_provider", "local")
+    assert client.get("/api/v1/me", headers=headers).json()["capabilities"]["voice_input"] is True
