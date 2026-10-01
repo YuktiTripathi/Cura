@@ -1,3 +1,5 @@
+import { ThemeToggle } from "./ThemeToggle";
+
 export function CuraHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
   return (
     <header className="cura-header">
@@ -6,7 +8,7 @@ export function CuraHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           ☰
         </button>
         <h1>Cura ✨</h1>
-        <span className="header-spacer" aria-hidden="true" />
+        <ThemeToggle />
       </div>
     </header>
   );
