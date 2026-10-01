@@ -28,16 +28,6 @@ export function EscalationNote({ escalation }: { escalation: string }) {
   );
 }
 
-export function FeedbackActions({ onFeedback }: { onFeedback: (rating: "up" | "down") => void }) {
-  return (
-    <div className="feedback-actions">
-      <span className="muted">Was this helpful?</span>
-      <button type="button" className="text-button" onClick={() => onFeedback("up")}>👍</button>
-      <button type="button" className="text-button" onClick={() => onFeedback("down")}>👎</button>
-    </div>
-  );
-}
-
 export function FollowUpChips({
   items,
   onPick,

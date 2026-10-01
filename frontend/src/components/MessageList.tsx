@@ -2,7 +2,11 @@ import { useState } from "react";
 import type { ContextRef } from "../types/chat";
 import type { ChatMessage } from "../hooks/useCuraChat";
 import { AssistantBody } from "./messages/AssistantBody";
-import { EscalationNote, FeedbackActions, FollowUpChips, Recommendations } from "./messages/MessageExtras";
+import { EscalationNote, FollowUpChips, Recommendations } from "./messages/MessageExtras";
+import { MessageActions, type FeedbackRating } from "./messages/MessageActions";
+import { SourceViewer } from "./SourceViewer";
+import { groupEvidence } from "../lib/sources";
+import { displayAssistantText } from "../types/chat";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
 import { PreviewAnswer } from "./messages/PreviewAnswer";
 import { ProvenanceLine } from "./messages/ProvenanceLine";
@@ -15,17 +19,23 @@ export function MessageList({
   onAskContext: _onAskContext,
   onFeedback,
   onEditQuestion,
+  onRegenerate,
   editingDisabled = false,
 }: {
   messages: ChatMessage[];
   onFollowUp: (value: string) => void;
   onAskContext: (value: string, contextRef: ContextRef) => void;
-  onFeedback: (rating: "up" | "down") => void;
+  onFeedback: (rating: FeedbackRating, comment?: string) => void;
   onEditQuestion?: (index: number, text: string) => void;
+  /** Re-ask the question behind the assistant message at this index. Offered on the latest answer. */
+  onRegenerate?: (index: number) => void;
   editingDisabled?: boolean;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
+  const [sourcesIndex, setSourcesIndex] = useState<number | null>(null);
+  const latestAssistant = messages.map((m) => m.role).lastIndexOf("assistant");
+  const sourceGroups = sourcesIndex != null ? groupEvidence(messages[sourcesIndex]?.evidence) : [];
 
   function startEdit(index: number, content: string) {
     setEditingIndex(index);
@@ -87,11 +97,27 @@ export function MessageList({
                 }
               />
             )}
-            {m.role === "assistant" && m.content && <FeedbackActions onFeedback={onFeedback} />}
+            {m.role === "assistant" && m.content && (
+              <MessageActions
+                text={displayAssistantText(m.content)}
+                onFeedback={onFeedback}
+                onRegenerate={onRegenerate && i === latestAssistant ? () => onRegenerate(i) : undefined}
+                disabled={editingDisabled}
+                sourceCount={groupEvidence(m.evidence).length}
+                onViewSources={() => setSourcesIndex(i)}
+              />
+            )}
             {m.followUps && <FollowUpChips items={m.followUps} onPick={onFollowUp} />}
           </article>
         );
       })}
+      <SourceViewer
+        groups={sourceGroups}
+        open={sourcesIndex != null && sourceGroups.length > 0}
+        onOpenChange={(open) => {
+          if (!open) setSourcesIndex(null);
+        }}
+      />
     </div>
   );
 }

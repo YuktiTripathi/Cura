@@ -82,8 +82,12 @@ export function CuraPage() {
           messages={messages}
           onFollowUp={(text) => sendWithContext(text)}
           onAskContext={(text, ref) => sendWithContext(text, [], ref)}
-          onFeedback={(rating) => {
-            if (conversationId) void sendFeedback(conversationId, rating);
+          onFeedback={(rating, comment) => {
+            if (conversationId) void sendFeedback(conversationId, rating, comment).catch(() => undefined);
+          }}
+          onRegenerate={(index) => {
+            const questionIndex = messages.slice(0, index).map((m) => m.role).lastIndexOf("user");
+            if (!loading && questionIndex >= 0) void editAndResend(questionIndex, messages[questionIndex].content);
           }}
           onEditQuestion={(index, text) => {
             if (!loading) void editAndResend(index, text);

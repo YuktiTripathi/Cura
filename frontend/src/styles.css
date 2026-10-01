@@ -35,6 +35,7 @@
   --status-out: #d9622b;
   --range-track: #e8eef5;
   --range-band: #cfe0f5;
+  --highlight: #ffe9a8;
   color-scheme: light;
 }
 
@@ -73,6 +74,7 @@
   --status-out: #ec835a;
   --range-track: #243345;
   --range-band: #2f4b6e;
+  --highlight: #4d3d10;
   color-scheme: dark;
 }
 
@@ -350,7 +352,8 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 .testing-option-details ul { margin: 0; padding-left: 18px; }
 .testing-option-not_recommended_now { background: var(--surface-muted); border-color: var(--border-divider); }
 .escalation { border-left: 4px solid var(--warning); background: var(--warning-bg); padding: 8px 10px; margin-top: 10px; }
-.feedback-actions, .user-actions { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
+.feedback-actions { display: inline-flex; align-items: center; gap: 6px; }
+.user-actions { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
 .edit-question { display: grid; gap: 8px; }
 .edit-question textarea {
   width: 100%;
@@ -406,6 +409,7 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 .voice-error { flex-basis: 100%; margin: 0; }
 .attach-chip { flex-basis: 100%; display: flex; gap: 8px; align-items: center; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 6px 10px; font-size: 14px; }
 .doc-panel { margin: 16px 0; max-width: 880px; }
+.doc-panel h2 { font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); margin: 0 0 4px; }
 .doc-panel ul { list-style: none; padding: 0; margin: 8px 0; }
 .doc-panel li { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 6px 0; font-size: 14px; }
 .muted { color: var(--text-muted); }
@@ -436,4 +440,38 @@ footer { color: var(--text-muted); font-size: 12px; margin-top: 10px; max-width:
   }
   .menu-button { display: inline-flex; align-items: center; justify-content: center; }
   .cura-header, .main-scroll, .composer-dock { padding-left: 16px; padding-right: 16px; }
+}
+
+.message-actions { margin-top: 8px; display: grid; gap: 6px; font-size: 12px; }
+.message-actions-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+.message-actions-spacer { flex: 1; }
+.feedback-reason { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.feedback-reason input { flex: 1; min-width: 180px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); font: inherit; }
+.feedback-reason button[type="submit"] { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; padding: 5px 10px; cursor: pointer; }
+
+.dialog-overlay { position: fixed; inset: 0; background: var(--backdrop); z-index: 40; }
+.dialog-content {
+  position: fixed; z-index: 41; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  width: min(720px, calc(100vw - 32px)); max-height: calc(100vh - 64px); overflow-y: auto;
+  background: var(--surface); color: var(--text); border: 1px solid var(--border-divider);
+  border-radius: 14px; padding: 18px 20px; box-sizing: border-box; display: grid; gap: 12px;
+}
+.dialog-header { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+.dialog-header h2 { margin: 0; font-size: 18px; }
+.dialog-close { border: 1px solid var(--border); background: var(--surface); border-radius: 8px; width: 32px; height: 32px; cursor: pointer; font-size: 18px; line-height: 1; color: inherit; }
+.source-viewer > p { margin: 0; }
+.source-group { display: grid; gap: 8px; border-top: 1px solid var(--border-divider); padding-top: 12px; }
+.source-group h3 { margin: 0; font-size: 15px; }
+.source-items { margin: 0; padding-left: 18px; }
+.page-view { margin: 0; display: grid; gap: 6px; }
+.page-view figcaption { font-size: 12px; }
+.page-text {
+  display: grid; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12.5px; line-height: 1.6;
+  background: var(--surface-muted); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px;
+  max-height: 320px; overflow: auto; white-space: pre-wrap;
+}
+.page-line { display: block; padding: 0 4px; border-radius: 4px; }
+mark.page-line { background: var(--highlight); color: var(--text); box-shadow: inset 3px 0 0 var(--warning); }
+@media (max-width: 768px) {
+  .dialog-content { top: auto; bottom: 0; left: 0; transform: none; width: 100vw; max-height: 85vh; border-radius: 14px 14px 0 0; }
 }

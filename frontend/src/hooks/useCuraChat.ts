@@ -16,6 +16,9 @@ export type ChatMessage = {
   testingOption?: TestingOption | null;
   /** Values shown while the answer is still being written (SSE `preview`). */
   preview?: PresentedFinding[];
+  /** User messages: what was attached when asked, so edit/regenerate ask the same thing. */
+  documentIds?: string[];
+  contextRef?: ContextRef;
 };
 
 export function useCuraChat(language = "auto") {
@@ -36,7 +39,7 @@ export function useCuraChat(language = "auto") {
     const initial: ProcessingEvent = { stage: "PLANNING", message_key: "planning", family: "personal" };
     setProcessing(initial);
     setProcessingSteps([initial]);
-    setMessages((m) => [...m, { role: "user", content: text }]);
+    setMessages((m) => [...m, { role: "user", content: text, documentIds, contextRef }]);
     let lastShown = 0;
     let pending: ProcessingEvent | null = null;
     let timer: number | null = null;
@@ -161,7 +164,7 @@ export function useCuraChat(language = "auto") {
       }
     }
     setMessages((current) => current.slice(0, index));
-    await send(next);
+    await send(next, target.documentIds || [], target.contextRef);
   }
 
   function resumeConversation(detail: ConversationDetail) {
