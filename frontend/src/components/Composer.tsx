@@ -1,5 +1,6 @@
 import { FormEvent, useEffect, useRef, useState, type ChangeEvent, type RefObject } from "react";
-import { transcribeVoice, getDocument, uploadDocument, type UploadedDocument } from "../lib/api";
+import { transcribeVoice } from "../lib/api";
+import { useDocumentUpload, type DocumentUploader, type UploadChip } from "../hooks/useDocumentUpload";
 
 type Props = {
   disabled: boolean;
@@ -8,12 +9,10 @@ type Props = {
   language?: string;
   conversationId?: string | null;
   onUploaded?: () => void;
-};
-
-type Chip = {
-  localName: string;
-  status: "uploading" | "uploaded" | "failed";
-  document?: UploadedDocument;
+  /** Shared uploader (e.g. with a page-wide drop zone). The composer uses its own when absent. */
+  uploader?: DocumentUploader;
+  /** Opens the extracted-values review for an uploaded document. */
+  onReview?: (documentId: string) => void;
 };
 
 export function Composer({
@@ -23,14 +22,17 @@ export function Composer({
   language = "auto",
   conversationId = null,
   onUploaded,
+  uploader: sharedUploader,
+  onReview,
 }: Props) {
+  const ownUploader = useDocumentUpload(conversationId, onUploaded);
+  const uploader = sharedUploader ?? ownUploader;
+  const chip = uploader.chip;
   const [value, setValue] = useState("");
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [voiceError, setVoiceError] = useState<string | null>(null);
-  const [chip, setChip] = useState<Chip | null>(null);
-  const [pendingFile, setPendingFile] = useState<File | null>(null);
   const fileRef = useRef<HTMLInputElement | null>(null);
   const mediaRef = useRef<MediaRecorder | null>(null);
   const chunksRef = useRef<Blob[]>([]);
@@ -52,48 +54,10 @@ export function Composer({
     setValue("");
   }
 
-  async function runUpload(file: File) {
-    setChip({ localName: file.name, status: "uploading" });
-    setPendingFile(file);
-    try {
-      const doc = await uploadDocument(file, conversationId);
-      setChip({ localName: file.name, status: "uploaded", document: doc });
-      setPendingFile(null);
-      onUploaded?.();
-      if (doc.extraction_status === "processing" || doc.extraction_status === "not_started") {
-        void pollExtraction(doc.document_id, file.name);
-      }
-    } catch {
-      setChip({ localName: file.name, status: "failed" });
-    }
-  }
-
-  async function pollExtraction(documentId: string, name: string) {
-    for (let i = 0; i < 30; i += 1) {
-      await new Promise((r) => setTimeout(r, 1000));
-      try {
-        const doc = await getDocument(documentId);
-        if (doc.extraction_status === "failed") {
-          setChip({ localName: name, status: "uploaded", document: doc });
-          onUploaded?.();
-          return;
-        }
-        if (doc.structured_facts_ready || doc.extraction_status === "completed") {
-          setChip({ localName: name, status: "uploaded", document: doc });
-          onUploaded?.();
-          const idx = doc.pageindex_status;
-          if (!idx || (idx !== "BUILDING" && idx !== "NOT_STARTED")) return;
-        }
-      } catch {
-        return;
-      }
-    }
-  }
-
-  function chipSub(chip: Chip): string {
+  function chipSub(chip: UploadChip): string {
     const ex = chip.document?.extraction_status;
     if (chip.status === "uploading") return "Uploading…";
-    if (chip.status === "failed") return "Upload failed — ";
+    if (chip.status === "failed") return chip.error ? `${chip.error} ` : "Upload failed — ";
     if (ex === "processing" || ex === "not_started") return "Processing…";
     if (chip.document?.structured_facts_ready && chip.document.pageindex_status === "BUILDING") {
       return "Measurements ready";
@@ -107,7 +71,7 @@ export function Composer({
     const file = event.target.files?.[0];
     event.target.value = "";
     if (!file) return;
-    void runUpload(file);
+    void uploader.upload(file);
   }
 
   function pickMimeType(): string {
@@ -240,12 +204,17 @@ export function Composer({
           <span className="muted">
             {chipSub(chip)}
           </span>
-          {chip.status === "failed" && pendingFile && (
-            <button type="button" onClick={() => pendingFile && void runUpload(pendingFile)}>
+          {chip.status === "failed" && !chip.error && (
+            <button type="button" onClick={uploader.retry}>
               Retry
             </button>
           )}
-          <button type="button" onClick={() => { setChip(null); setPendingFile(null); }} aria-label="Remove attachment">
+          {onReview && chip.document && (chip.document.structured_facts_ready || chip.document.extraction_status === "completed") ? (
+            <button type="button" onClick={() => onReview(chip.document!.document_id)}>
+              Review values
+            </button>
+          ) : null}
+          <button type="button" onClick={uploader.clear} aria-label="Remove attachment">
             ×
           </button>
         </div>

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { useStickToBottom } from "../hooks/useStickToBottom";
 import { useCuraChat } from "../hooks/useCuraChat";
 import { useMe } from "../hooks/useMe";
@@ -14,6 +14,9 @@ import type { ContextRef } from "../types/chat";
 import { useOverview } from "../hooks/useOverview";
 import { MarkerPanel } from "../components/marker/MarkerPanel";
 import { MarkerPanelProvider } from "../components/marker/MarkerPanelContext";
+import { useDocumentUpload } from "../hooks/useDocumentUpload";
+import { PageDropZone } from "../components/documents/PageDropZone";
+import { ReviewValues } from "../components/documents/ReviewValues";
 import { sendFeedback } from "../lib/api";
 
 export function CuraPage() {
@@ -62,6 +65,21 @@ export function CuraPage() {
     void sendWithContext(text, [], contextRef);
   }
 
+  const refreshDocuments = useCallback(() => setDocTick((n) => n + 1), []);
+  const uploader = useDocumentUpload(conversationId, refreshDocuments);
+  const [reviewId, setReviewId] = useState<string | null>(null);
+
+  function compareDocument(documentId: string) {
+    setReviewId(null);
+    void sendWithContext("Compare my uploaded report with my SuperShyft results", [documentId]);
+  }
+
+  function askAboutDocument(documentId: string) {
+    setReviewId(null);
+    setSelectedDocumentIds((ids) => Array.from(new Set([...ids, documentId])));
+    window.setTimeout(() => inputRef.current?.focus(), 0);
+  }
+
   function startNew() {
     newConversation();
     setSelectedDocumentIds([]);
@@ -104,6 +122,7 @@ export function CuraPage() {
           refreshKey={docTick}
           selected={selectedDocumentIds}
           onSelectedChange={setSelectedDocumentIds}
+          onReview={setReviewId}
         />
         <MessageList
           messages={messages}
@@ -130,12 +149,23 @@ export function CuraPage() {
           onSend={sendWithContext}
           inputRef={inputRef}
           conversationId={conversationId}
-          onUploaded={() => setDocTick((n) => n + 1)}
+          onUploaded={refreshDocuments}
+          uploader={uploader}
+          onReview={setReviewId}
         />
         <footer>
           Cura provides educational information, not diagnosis or medication advice.
         </footer>
       </div>
+      <PageDropZone onFile={(file) => void uploader.upload(file)} />
+      <ReviewValues
+        documentId={reviewId}
+        onOpenChange={(open) => {
+          if (!open) setReviewId(null);
+        }}
+        onCompare={compareDocument}
+        onAsk={askAboutDocument}
+      />
     </AppShell>
     </MarkerPanelProvider>
   );

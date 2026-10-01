@@ -25,7 +25,7 @@ import type {
   UserProvenance,
 } from "./chat";
 import type { MeCapabilities, MeResponse, StarterQuestion, StarterQuestionSet } from "./me";
-import type { ConversationDetail, ConversationSummary, DocumentPage, UploadedDocument } from "../lib/api";
+import type { ConversationDetail, ConversationSummary, DocumentFact, DocumentFacts, DocumentPage, UploadedDocument } from "../lib/api";
 
 type Schemas = components["schemas"];
 
@@ -60,4 +60,6 @@ export type ApiContractChecks = [
   Expect<KeysExistOn<ConversationSummary, Schemas["ConversationSummary"]>>,
   Expect<KeysExistOn<ConversationDetail, Schemas["ConversationDetail"]>>,
   Expect<KeysExistOn<DocumentPage, Schemas["DocumentPageOut"]>>,
+  Expect<KeysExistOn<DocumentFacts, Schemas["DocumentFactsOut"]>>,
+  Expect<KeysExistOn<DocumentFact, Schemas["DocumentFactOut"]>>,
 ];

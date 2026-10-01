@@ -64,3 +64,22 @@ describe("DocumentPanel polling", () => {
     expect(isStillProcessing({ ...base, extraction_status: "failed" })).toBe(false);
   });
 });
+
+describe("DocumentPanel review", () => {
+  afterEach(() => cleanup());
+
+  it("offers Review values only once measurements are ready", async () => {
+    const base = { content_type: "application/pdf", file_size: 12, source: "user_uploaded", upload_status: "uploaded", created_at: "2026-09-30T00:00:00Z" };
+    listDocuments.mockResolvedValue([
+      { ...base, document_id: "ready", filename: "ready.pdf", extraction_status: "completed", structured_facts_ready: true },
+      { ...base, document_id: "busy", filename: "busy.pdf", extraction_status: "processing" },
+    ]);
+    const onReview = vi.fn();
+    render(<DocumentPanel refreshKey={1} selected={[]} onSelectedChange={vi.fn()} onReview={onReview} />);
+    await waitFor(() => expect(screen.getByText(/ready\.pdf/)).toBeTruthy());
+    const buttons = screen.getAllByRole("button", { name: "Review values" });
+    expect(buttons).toHaveLength(1);
+    buttons[0].click();
+    expect(onReview).toHaveBeenCalledWith("ready");
+  });
+});

@@ -560,3 +560,20 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
   .doctor-summary .muted, .doctor-summary h3 { color: #333 !important; }
   .no-print { display: none !important; }
 }
+
+/* Upload: page-wide drop target and extracted values review */
+.drop-overlay { position: fixed; inset: 0; z-index: 50; background: var(--backdrop); display: grid; place-items: center; padding: 16px; pointer-events: none; }
+.drop-target {
+  display: grid; gap: 6px; text-align: center; max-width: 420px; padding: 32px 28px; border-radius: 16px;
+  border: 2px dashed var(--accent); background: var(--surface); color: var(--text);
+}
+.drop-target span { color: var(--text-muted); font-size: 14px; }
+.review-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.review-row { display: grid; gap: 6px; border: 1px solid var(--border-subtle); border-radius: 12px; padding: 10px 12px; background: var(--surface-subtle); }
+.review-row-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.review-row-value { font-weight: 650; font-variant-numeric: tabular-nums; }
+.review-row-norange { font-size: 12px; }
+.review-row-quote { margin: 0; font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 12px; overflow-wrap: anywhere; }
+.review-row .range-dot { box-shadow: 0 0 0 2px var(--surface-subtle); }
+.review-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; position: sticky; bottom: -18px; padding: 10px 0 2px; background: var(--surface); }
+.review-actions button:disabled { opacity: 0.5; cursor: not-allowed; }

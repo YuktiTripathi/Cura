@@ -269,6 +269,28 @@ export async function getDocumentPage(documentId: string, page: number): Promise
   return (await res.json()) as DocumentPage;
 }
 
+export type DocumentFact = {
+  key: string;
+  label: string;
+  value?: number | null;
+  unit?: string | null;
+  reference_low?: number | null;
+  reference_high?: number | null;
+  reference_text?: string | null;
+  status?: string | null;
+  page?: number | null;
+  line?: number | null;
+  excerpt?: string | null;
+};
+
+export type DocumentFacts = { document_id: string; filename: string; ready: boolean; facts: DocumentFact[] };
+
+export async function getDocumentFacts(documentId: string): Promise<DocumentFacts> {
+  const res = await fetch(`${API}/api/v1/documents/${documentId}/facts`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("Those values aren't available.");
+  return (await res.json()) as DocumentFacts;
+}
+
 export async function listDocuments(): Promise<UploadedDocument[]> {
   const res = await fetch(`${API}/api/v1/documents`, { headers: authHeaders() });
   const data = await parseJson(res);

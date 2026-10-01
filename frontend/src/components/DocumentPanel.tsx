@@ -9,6 +9,8 @@ type Props = {
   refreshKey: number;
   selected: string[];
   onSelectedChange: (ids: string[]) => void;
+  /** Opens the extracted-values review for a ready document. */
+  onReview?: (documentId: string) => void;
 };
 
 function statusLabel(doc: UploadedDocument): string {
@@ -27,7 +29,7 @@ export function isStillProcessing(doc: UploadedDocument): boolean {
   );
 }
 
-export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props) {
+export function DocumentPanel({ refreshKey, selected, onSelectedChange, onReview }: Props) {
   const client = useQueryClient();
   const { data: docs = [] } = useQuery({
     queryKey: queryKeys.documents,
@@ -69,6 +71,14 @@ export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props)
                 year: "numeric",
               })}
               {" · "}
+              {onReview && (d.structured_facts_ready || d.extraction_status === "completed") ? (
+                <>
+                  <button type="button" className="text-button" onClick={() => onReview(d.document_id)}>
+                    Review values
+                  </button>
+                  {" · "}
+                </>
+              ) : null}
               <button
                 type="button"
                 className="text-button"
