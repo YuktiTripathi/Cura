@@ -36,6 +36,29 @@ class DocumentPageOut(BaseModel):
     approximate: bool = False
 
 
+class DocumentFactOut(BaseModel):
+    """One measurement Cura extracted from an uploaded document, with where it was found."""
+
+    key: str
+    label: str
+    value: float | None = None
+    unit: str | None = None
+    reference_low: float | None = None
+    reference_high: float | None = None
+    reference_text: str | None = None
+    status: str | None = None
+    page: int | None = None
+    line: int | None = None
+    excerpt: str | None = None
+
+
+class DocumentFactsOut(BaseModel):
+    document_id: str
+    filename: str
+    ready: bool
+    facts: list[DocumentFactOut] = Field(default_factory=list)
+
+
 class DocumentListOut(BaseModel):
     documents: list[DocumentOut] = Field(default_factory=list)
 

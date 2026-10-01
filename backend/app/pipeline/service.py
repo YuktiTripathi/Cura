@@ -1359,6 +1359,10 @@ class ChatService:
                     "knowledge_scope": KnowledgeScope.personal,
                 }
             )
+            if not topic and uploaded_keys and not ss_plan.requested_metrics:
+                # "Compare my report with SuperShyft": fetch the markers the uploaded report has,
+                # otherwise the SuperShyft side is empty and every marker reads as "not found".
+                ss_plan = ss_plan.model_copy(update={"requested_metrics": sorted(uploaded_keys)})
             context = self.builder.build(
                 principal, ss_plan, db=self.db, document_ids=payload.document_ids
             )
@@ -1422,10 +1426,11 @@ class ChatService:
                 )
                 doc_id = up_sv.document_id or doc_id
                 lower = payload.message.lower()
+                why = "why" in lower and "different" in lower
                 answer = (
-                    render_comparison(result, why="why" in lower and "different" in lower, newer="newer" in lower)
+                    render_comparison(result, why=why, newer="newer" in lower)
                     if len(structured_results) == 1
-                    else render_multi_comparison(structured_results)
+                    else render_multi_comparison(structured_results, why=why, newer="newer" in lower)
                 )
             elif structured_results:
                 result = structured_results[0]

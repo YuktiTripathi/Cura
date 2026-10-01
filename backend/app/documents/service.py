@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 
 from app.core.errors import DocumentUploadError, DocumentValidationError, NotFoundError
 from app.db.models import Document, DocumentChunk
-from app.documents.contracts import DocumentOut, DocumentPageOut
+from app.documents.contracts import DocumentFactOut, DocumentFactsOut, DocumentOut, DocumentPageOut
 from app.documents.extraction import extract_pdf_pages
 from app.documents.normalization import normalize_extracted_text
 from app.documents.storage import LocalDocumentStore, get_document_store
@@ -125,6 +125,35 @@ class DocumentService:
 
     def get(self, user_id: str, document_id: str) -> DocumentOut:
         return to_out(self.get_owned(user_id, document_id))
+
+    def facts(self, user_id: str, document_id: str) -> DocumentFactsOut:
+        """Measurements extracted from an owned document, in report order."""
+        from app.documents.facts import infer_status
+        from app.documents.structured import load_structured
+        from app.pipeline.lab_parameters import display_name_for
+
+        row = self.get_owned(user_id, document_id)
+        extracted = load_structured(row)
+        facts: list[DocumentFactOut] = []
+        for item in (extracted.biomarkers if extracted else []):
+            value = item.value if isinstance(item.value, (int, float)) and not isinstance(item.value, bool) else None
+            facts.append(
+                DocumentFactOut(
+                    key=item.normalized_name,
+                    label=display_name_for(item.normalized_name) or item.name,
+                    value=value,
+                    unit=item.unit,
+                    reference_low=item.reference_low,
+                    reference_high=item.reference_high,
+                    reference_text=item.reference_range,
+                    status=item.flag or infer_status(value, item.reference_low, item.reference_high, None),
+                    page=item.source_page,
+                    line=item.source_line,
+                    excerpt=item.excerpt,
+                )
+            )
+        facts.sort(key=lambda f: (f.page or 0, f.line or 0, f.label))
+        return DocumentFactsOut(document_id=row.id, filename=row.original_filename, ready=extracted is not None, facts=facts)
 
     def page(self, user_id: str, document_id: str, page: int) -> DocumentPageOut:
         """Page text normalized exactly as at extraction time, so excerpts and line numbers match."""

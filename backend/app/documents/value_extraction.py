@@ -121,7 +121,7 @@ def _row_start(text: str, mention: _Mention, mentions: list[_Mention], line_star
 def _reference(row_after_value: str) -> tuple[float | None, float | None, str | None]:
     labelled = _RANGE_LABELLED.search(row_after_value)
     if labelled:
-        return float(labelled.group(1)), float(labelled.group(2)), labelled.group(0).strip()
+        return float(labelled.group(1)), float(labelled.group(2)), f"{labelled.group(1)}-{labelled.group(2)}"
     bare = _RANGE_BARE.search(row_after_value)
     if bare:
         return float(bare.group(1)), float(bare.group(2)), bare.group(0).strip()

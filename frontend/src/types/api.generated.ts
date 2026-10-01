@@ -180,6 +180,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documents/{document_id}/facts": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document Facts */
+        get: operations["get_document_facts_api_v1_documents__document_id__facts_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/documents/{document_id}/pages/{page}": {
         parameters: {
             query?: never;
@@ -888,6 +905,45 @@ export interface components {
             title?: string | null;
             /** Updated At */
             updated_at: string;
+        };
+        /**
+         * DocumentFactOut
+         * @description One measurement Cura extracted from an uploaded document, with where it was found.
+         */
+        DocumentFactOut: {
+            /** Excerpt */
+            excerpt?: string | null;
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Line */
+            line?: number | null;
+            /** Page */
+            page?: number | null;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
+            /** Reference Text */
+            reference_text?: string | null;
+            /** Status */
+            status?: string | null;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value?: number | null;
+        };
+        /** DocumentFactsOut */
+        DocumentFactsOut: {
+            /** Document Id */
+            document_id: string;
+            /** Facts */
+            facts?: components["schemas"]["DocumentFactOut"][];
+            /** Filename */
+            filename: string;
+            /** Ready */
+            ready: boolean;
         };
         /** DocumentListOut */
         DocumentListOut: {
@@ -2384,6 +2440,37 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_facts_api_v1_documents__document_id__facts_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentFactsOut"];
+                };
             };
             /** @description Validation Error */
             422: {

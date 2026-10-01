@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.db.session import get_db
-from app.documents.contracts import DocumentListOut, DocumentOut, DocumentPageOut
+from app.documents.contracts import DocumentFactsOut, DocumentListOut, DocumentOut, DocumentPageOut
 from app.documents.jobs import enqueue_document_job, run_document_job
 from app.documents.service import DocumentService
 
@@ -48,6 +48,15 @@ def get_document(
     db: Session = Depends(get_db),
 ) -> DocumentOut:
     return DocumentService(db).get(principal.subject_id, document_id)
+
+
+@router.get("/documents/{document_id}/facts", response_model=DocumentFactsOut)
+def get_document_facts(
+    document_id: str,
+    principal: AuthenticatedPrincipal = Depends(get_principal),
+    db: Session = Depends(get_db),
+) -> DocumentFactsOut:
+    return DocumentService(db).facts(principal.subject_id, document_id)
 
 
 @router.get("/documents/{document_id}/pages/{page}", response_model=DocumentPageOut)
