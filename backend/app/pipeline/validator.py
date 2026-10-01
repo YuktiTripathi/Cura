@@ -7,7 +7,9 @@ import re
 from app.contracts.health_context import HealthContext
 from app.contracts.operations import QualityGateResult
 from app.contracts.query import QueryPlan
+from app.core.config import settings
 from app.pipeline.claim_check import ClaimVerdict, check_claims, revise_unsupported_answer
+from app.pipeline.clinical_postcheck import review_clinical_output
 from app.pipeline.grounding import GroundingChecker
 from app.pipeline.lab_parameters import DERIVED_ENTITY_KEYS, aliases_for, display_name_for
 from app.pipeline.quality_gate import review_answer
@@ -57,6 +59,9 @@ class ResponseValidator:
                     grounding_flags.extend(claim_flags)
         answer, safety_flags = self.safety.review(answer, message)
         flags.extend(safety_flags)
+        if settings.cura_clinical_safety_enabled:
+            answer, clinical_flags = review_clinical_output(answer, plan=plan, context=context)
+            flags.extend(clinical_flags)
         if getattr(pre_safety, "flags", None):
             flags.extend(pre_safety.flags)
         gate = review_answer(answer, plan, context)
@@ -89,11 +94,13 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
         "weight",
         "height",
     }
-    coverage_codes = list(plan.display_entities or []) or [
+    named = [
         item
         for item in (plan.requested_metrics or context.requested_entity_codes or [])
         if str(item).lower() not in skip
     ]
+    coverage_codes = list(dict.fromkeys([*(plan.display_entities or []), *named]))
+    coverage_codes = [item for item in coverage_codes if str(item).lower() not in skip]
     for code in coverage_codes:
         name = (display_name_for(code) or code).lower()
         slug = code.replace("_", " ").lower()

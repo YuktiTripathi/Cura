@@ -50,7 +50,12 @@ def extract_marker_from_text(text: str, marker_key: str, page: int | None = None
     aliases.append(display_name_for(marker_key).lower())
     aliases = sorted({a.lower() for a in aliases if a}, key=len, reverse=True)
     lowered = text.lower()
-    hit_alias = next((a for a in sorted(aliases, key=len, reverse=True) if a in lowered), None)
+    from app.pipeline.lab_parameters import _alias_span
+
+    hit_alias = next(
+        (alias for alias in aliases if _alias_span(alias, lowered) is not None),
+        None,
+    )
     if not hit_alias:
         return None
     idx = lowered.find(hit_alias)

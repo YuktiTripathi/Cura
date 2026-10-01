@@ -52,3 +52,9 @@ class ConversationState(BaseModel):
     recent_context_notes: list[str] = Field(default_factory=list)
     dismissed_insight_keys: list[str] = Field(default_factory=list)
     session_goal_code: str | None = None
+    current_concern: str | None = None
+    response_depth: str | None = None
+    conversation_goal: str | None = None
+    topic_turn_count: int = 0
+    explained_entities: list[str] = Field(default_factory=list)
+    topic_summary: str | None = None

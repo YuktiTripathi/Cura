@@ -199,7 +199,9 @@ def test_no_match_truthful(client):
         headers={"X-Cura-User-Id": "user-a"},
         json={"message": "ferritin zebra unrelated token xyzabc123", "document_ids": [did]},
     )
-    assert DOCUMENT_NO_MATCH in res.json()["answer"]
+    answer = res.json()["answer"].lower()
+    assert "couldn't find" in answer
+    assert "ferritin" in answer or DOCUMENT_NO_MATCH.lower() in answer
 
 
 def test_extraction_does_not_log_medical_values(client, caplog):

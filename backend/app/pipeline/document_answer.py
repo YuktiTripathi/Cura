@@ -19,7 +19,7 @@ from app.contracts.uploaded_document import (
 from app.contracts.followup import FollowUpSuggestion
 from app.core.copy import DOCUMENT_NO_MATCH
 from app.db.models import Document
-from app.documents.lookup import format_fact, format_fact_list, lookup_facts
+from app.documents.lookup import cover_requested_entities, format_coverage, format_fact, format_fact_list, lookup_facts
 from app.documents.pageindex import PageIndexTree, retrieve_pageindex
 from app.documents.query_policy import (
     mixed_document_query,
@@ -29,7 +29,8 @@ from app.documents.query_policy import (
     wants_document_summary,
 )
 from app.documents.uploaded_context import context_from_row
-from app.pipeline.lab_parameters import match_lab_keys, primary_lab_key
+from app.pipeline.dev_trace import trace
+from app.pipeline.lab_parameters import display_name_for, match_lab_keys, primary_lab_key
 
 NARRATIVE_PENDING = (
     "I've extracted the key measurements. I'm still processing the report's detailed narrative sections."
@@ -82,8 +83,21 @@ def answer_uploaded_document(
     narrative = wants_document_narrative(message, plan)
     mixed = mixed_document_query(message, plan)
     selectors = {str(item).upper() for item in (plan.selectors or [])}
-    keys = list(dict.fromkeys([*(plan.requested_metrics or []), *match_lab_keys(message), *([plan.topic] if plan.topic else [])]))
+    keys = list(
+        dict.fromkeys(
+            [
+                *(plan.requested_metrics or []),
+                *match_lab_keys(message),
+                *([plan.topic] if plan.topic else []),
+            ]
+        )
+    )
     keys = [key for key in keys if key]
+    trace("USER QUERY", message=message)
+    trace(
+        "REQUESTED ENTITIES",
+        rows=[f"{display_name_for(key)} → {key}" for key in keys],
+    )
     if not keys:
         primary = primary_lab_key(message)
         if primary:
@@ -91,8 +105,10 @@ def answer_uploaded_document(
 
     if structured and not narrative:
         facts = _select_facts(contexts, keys, selectors)
+        if keys:
+            return _structured_answer(facts, keys, selectors, contexts)
         if facts:
-            return _structured_answer(facts, keys, selectors)
+            return _structured_answer(facts, keys, selectors, contexts)
         return DocumentAnswer(answer=DOCUMENT_NO_MATCH, status="document_no_match", used_structured=True)
 
     hits: list[PageIndexHit] = []
@@ -120,24 +136,27 @@ def answer_uploaded_document(
         if hits:
             structured_bits = []
             if mixed or keys:
-                facts = _select_facts(contexts, keys, selectors)
-                if facts:
-                    structured_bits.append(format_fact(facts[0]))
+                if keys:
+                    structured_bits.append(format_coverage(cover_requested_entities(contexts, keys)))
+                else:
+                    facts = _select_facts(contexts, keys, selectors)
+                    if facts:
+                        structured_bits.append(format_fact(facts[0]))
             return DocumentAnswer(
                 answer=_narrative_answer(hits, structured_bits),
                 evidence=[_hit_evidence(rows[0], hit) for hit in hits[:3]],
                 used_structured=bool(structured_bits),
                 used_pageindex=True,
             )
-        if structured:
+        if structured or keys:
             facts = _select_facts(contexts, keys, selectors)
-            if facts:
-                return _structured_answer(facts, keys, selectors)
+            if keys or facts:
+                return _structured_answer(facts, keys, selectors, contexts)
         return DocumentAnswer(answer=DOCUMENT_NO_MATCH, status="document_no_match")
 
     facts = _select_facts(contexts, keys, selectors)
-    if facts:
-        return _structured_answer(facts, keys, selectors)
+    if keys or facts:
+        return _structured_answer(facts, keys, selectors, contexts)
     return None
 
 
@@ -163,8 +182,19 @@ def _structured_answer(
     facts: list[DocumentHealthFact],
     keys: list[str],
     selectors: set[str],
+    contexts: list[UploadedDocumentContext] | None = None,
 ) -> DocumentAnswer:
-    if selectors & {"HIGH", "LOW", "ABNORMAL", "ALL", "NORMAL"} or len(facts) > 1 and not keys:
+    if keys:
+        coverage = cover_requested_entities(contexts or [], keys)
+        if any(row.status != "MISSING" for row in coverage) or coverage:
+            evidence_facts = [item for row in coverage for item in row.facts][:8]
+            return DocumentAnswer(
+                answer=format_coverage(coverage),
+                evidence=[_fact_evidence(item) for item in evidence_facts],
+                used_structured=True,
+                status="document_retrieved" if evidence_facts else "document_no_match",
+            )
+    if selectors & {"HIGH", "LOW", "ABNORMAL", "ALL", "NORMAL"} or len(facts) > 1:
         headline = "These are the extracted values from your uploaded report:"
         if "HIGH" in selectors:
             headline = "High values in the uploaded report:"

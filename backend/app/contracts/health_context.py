@@ -66,6 +66,11 @@ class DisambiguationCandidate(BaseModel):
     completed_at: str | None = None
 
 
+class SourceAvailability(BaseModel):
+    status: str = "not_requested"
+    records: int = 0
+
+
 class ContextMeta(BaseModel):
     sources: list[str] = Field(default_factory=list)
     report_ids: list[str] = Field(default_factory=list)
@@ -156,3 +161,7 @@ class HealthContext(BaseModel):
     clinician_handoff: ClinicianHandoff | None = None
     proactive_insights: list[ProactiveInsight] = Field(default_factory=list)
     uploaded_documents: list[UploadedDocumentContext] = Field(default_factory=list)
+    source_status: dict[str, SourceAvailability] = Field(default_factory=dict)
+    conversation_goal: str | None = None
+    response_depth: str | None = None
+    explained_entities: list[str] = Field(default_factory=list)

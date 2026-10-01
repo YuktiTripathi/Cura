@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.contracts.diagnostics import TestingOption
 from app.contracts.evidence import EvidenceRecord
@@ -10,12 +10,21 @@ from app.contracts.recommendation import ApprovedRecommendation
 
 
 class ChatRequest(BaseModel):
+    model_config = ConfigDict(extra="ignore")
+
     message: str
     conversation_id: str | None = None
     language: str | None = None
     language_mode: str = "auto"
     document_ids: list[str] = Field(default_factory=list)
     context_ref: ContextRef | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def ignore_client_identity(cls, data):
+        from app.auth.identity import drop_client_identity
+
+        return drop_client_identity(data)
 
 
 class FollowUp(FollowUpSuggestion):
@@ -40,6 +49,7 @@ class ChatMeta(BaseModel):
     db_status: str | None = None
     supershyft_record_count: int | None = None
     safety_flags: list[str] = Field(default_factory=list)
+    safety_mode: str | None = None
     recommendation_flags: list[str] = Field(default_factory=list)
     grounding_flags: list[str] = Field(default_factory=list)
     escalation: str | None = None
@@ -87,6 +97,9 @@ class ChatMeta(BaseModel):
     operations: list[str] = Field(default_factory=list)
     requested_entities: list[str] = Field(default_factory=list)
     response_mode: str | None = None
+    conversation_goal: str | None = None
+    response_depth: str | None = None
+    next_conversation_action: str | None = None
     timing: dict | None = None
     debug: dict | None = None
 

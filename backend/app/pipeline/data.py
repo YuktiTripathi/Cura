@@ -8,18 +8,19 @@ from __future__ import annotations
 
 from sqlalchemy.orm import Session
 
+from app.auth.identity import authenticated_user_id
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.query import QueryPlan
+from app.pipeline.retrieval_executor import RetrievalExecutor
 from app.providers.registry import ProviderRegistry
 from app.retrieval.result import HealthRetrievalResult
-from app.retrieval.router import HealthRetrievalRouter
 
 
 class PersonalDataService:
     """One retrieval entry point per CURA request. Reuse the result; do not re-fetch."""
 
     def __init__(self, registry: ProviderRegistry):
-        self._router = HealthRetrievalRouter(registry)
+        self._executor = RetrievalExecutor(registry)
 
     def retrieve(
         self,
@@ -29,4 +30,10 @@ class PersonalDataService:
         db: Session | None = None,
         document_ids: list[str] | None = None,
     ) -> HealthRetrievalResult:
-        return self._router.retrieve(principal, plan, db=db, document_ids=document_ids)
+        return self._executor.execute(
+            user_id=authenticated_user_id(principal),
+            task_plan=plan,
+            db=db,
+            document_ids=document_ids,
+            principal=principal,
+        )

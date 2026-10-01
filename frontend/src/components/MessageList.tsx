@@ -160,6 +160,11 @@ function PresentedAnswer({
   const useCards = findings.length > 0 && findings.length <= 3 && presentation.mode !== "SINGLE_VALUE";
   return (
     <div className="answer-block">
+      {presentation.topic_summary?.text ? (
+        <p className="topic-summary" data-testid="topic-summary">
+          {presentation.topic_summary.text}
+        </p>
+      ) : null}
       {showHeadline ? <h3 className="answer-headline">{presentation.headline}</h3> : null}
       {presentation.overall_summary || presentation.summary ? (
         <p className="answer-summary">{presentation.overall_summary || presentation.summary}</p>
@@ -219,6 +224,9 @@ function PresentedAnswer({
         <p>
           <AssistantBody content={fallback} />
         </p>
+      ) : null}
+      {(presentation.related_findings || []).length > 0 ? (
+        <RelatedResults findings={presentation.related_findings || []} />
       ) : null}
       {(testingOption || presentation.testing_option) ? (
         <TestingOptionCard option={(testingOption || presentation.testing_option)!} />
@@ -379,6 +387,19 @@ function ThemeCard({ theme }: { theme: HealthTheme }) {
         </div>
       ) : null}
     </article>
+  );
+}
+
+function RelatedResults({ findings }: { findings: PresentedFinding[] }) {
+  const [open, setOpen] = useState(false);
+  if (!findings.length) return null;
+  return (
+    <div className="related-results">
+      <button type="button" className="text-button" onClick={() => setOpen((value) => !value)}>
+        {open ? "Hide related results" : "View related results"}
+      </button>
+      {open ? <FindingsTable findings={findings} /> : null}
+    </div>
   );
 }
 

@@ -3,6 +3,8 @@ import type { MeResponse } from "../types/me";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
 const USER = import.meta.env.VITE_CURA_USER_ID || "";
+// SuperShyft apps send Authorization: Bearer <existing access token> only.
+// Never put user_id in the chat body. X-Cura-User-Id is development-only.
 
 function authHeaders(): HeadersInit {
   const headers: Record<string, string> = { "Content-Type": "application/json" };

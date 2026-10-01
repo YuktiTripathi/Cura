@@ -24,7 +24,7 @@ class SuperShyftJWTAuthProvider:
         try:
             import jwt
 
-            options = {"require": ["exp", "sub"]}
+            options = {"require": ["exp"]}
             kwargs = {
                 "algorithms": [settings.auth_jwt_algorithm],
                 "options": options,
@@ -38,8 +38,18 @@ class SuperShyftJWTAuthProvider:
             claims = jwt.decode(token, settings.auth_jwt_secret, **kwargs)
         except Exception as exc:
             raise UnauthorizedError("Invalid or expired authentication token") from exc
-        subject = str(claims.get(settings.auth_subject_claim) or claims.get("sub") or "").strip()
+        subject = _subject_from_claims(claims)
         if not subject:
             raise UnauthorizedError("Authentication token has no subject")
         display = str(claims.get("given_name") or claims.get("name") or "").strip() or None
         return AuthenticatedPrincipal(subject_id=subject, display_name=display)
+
+
+def _subject_from_claims(claims: dict) -> str:
+    """Internal SuperShyft user id only. Phone/email claims are never used as identity."""
+    for key in (settings.auth_subject_claim, "sub", "user_id", "userId"):
+        raw = claims.get(key)
+        if raw is None or raw == "":
+            continue
+        return str(raw).strip()
+    return ""

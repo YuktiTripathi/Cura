@@ -220,12 +220,10 @@ class ReasoningService:
         return True
 
     def _complete_answer(self, messages, plan, budget=None):
-        if (
-            plan.needs_personal_data
-            and settings.require_zdr_for_personal_health
-            and not settings.openrouter_zero_data_retention
-        ):
-            raise LLMUnavailableError("Personal health LLM requires a ZDR-capable endpoint")
+        from app.llm.openrouter_policy import openrouter_policy
+        from app.pipeline.dlp import SecurityBlockedError
+
+        openrouter_policy().assert_privacy_for_health(personal_health=bool(plan.needs_personal_data))
         last_error = None
         remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
         for index, tier in enumerate(fallback_tiers(plan.answer_model_tier)):
@@ -239,7 +237,11 @@ class ReasoningService:
                 timeout = budget.timeout_for(timeout)
             if timeout < 0.5:
                 break
-            client = get_llm_client(model_tier=tier.value, timeout=timeout)
+            client = get_llm_client(
+                model_tier=tier.value,
+                timeout=timeout,
+                personal_health=bool(plan.needs_personal_data),
+            )
             started = time.perf_counter()
             try:
                 result = client.complete_structured(messages)
@@ -251,6 +253,8 @@ class ReasoningService:
                     int((time.perf_counter() - started) * 1000),
                 )
                 return result, client, tier, index > 0
+            except SecurityBlockedError as exc:
+                raise LLMUnavailableError("LLM request blocked by privacy policy") from exc
             except LLMUnavailableError as exc:
                 last_error = exc
                 remaining = budget.remaining() if budget is not None else remaining

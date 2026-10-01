@@ -2,6 +2,9 @@
 
 - Mock header auth is development-only (`APP_ENV=development`, `DEV_AUTH_HEADER=true`).
 - Production uses `AUTH_PROVIDER=supershyft_jwt`; client-supplied user IDs are ignored.
+- Chat identity comes only from `Depends(get_current_user)`. Body fields `user_id`, phone, email, and OTP are dropped.
+- See [auth-integration.md](auth-integration.md) for the SuperShyft token → UserId → health-data map.
+- Clinical and OpenRouter privacy layers are documented in [cura-safety.md](cura-safety.md).
 - Mock auth cannot start with a real SuperShyft health provider.
 - Frontend `X-Cura-User-Id` is development-only. Production should call `POST /api/v1/auth/session` so the JWT is stored in an httpOnly `cura_session` cookie. Bearer tokens in `localStorage` remain a known development limitation.
 - Conversation rows are scoped by `AuthenticatedPrincipal.subject_id`.

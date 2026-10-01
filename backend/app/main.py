@@ -12,6 +12,7 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.router import api_router
+from app.api.routes.chat import compat_router as chat_compat_router
 from app.api.routes.voice import compat_router as voice_compat_router
 from app.core.config import settings
 from app.core.errors import CuraError, cura_error_handler, http_error_handler
@@ -39,6 +40,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 app.include_router(api_router)
+app.include_router(chat_compat_router)
 app.include_router(voice_compat_router)
 app.add_exception_handler(CuraError, cura_error_handler)
 app.add_exception_handler(HTTPException, http_error_handler)

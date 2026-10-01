@@ -97,7 +97,9 @@ def test_chat_structured_lookup_uses_page_provenance(storage_dir):
     ).json()
     answer = chat["answer"].lower()
     assert "140" in chat["answer"]
-    assert "page" in answer
+    assert "ldl" in answer
+    evidence = chat.get("evidence") or []
+    assert any(item.get("page_start") for item in evidence)
     assert "chunk" not in answer
     assert chat["meta"]["llm_mode"] == "none"
 

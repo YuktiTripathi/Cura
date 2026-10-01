@@ -181,7 +181,8 @@ body { margin: 0; }
 .theme-reassuring { border-color: #d6e2d6; background: #f6fbf6; }
 .theme-uncertain { border-color: #e4e0d4; background: #fbfaf6; }
 .theme-missing { margin: 0; padding-left: 18px; font-size: 13px; color: #5b6d82; }
-.raw-results { display: grid; gap: 8px; }
+.topic-summary { margin: 0; font-size: 13px; color: #5b6d82; }
+.related-results { display: grid; gap: 8px; }
 .source-details { margin-top: 10px; }
 .source-details summary { cursor: pointer; list-style: none; }
 .source-debug { font-size: 12px; color: #7a8796; margin-top: 6px; }

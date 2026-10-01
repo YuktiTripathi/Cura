@@ -67,6 +67,14 @@ class Settings(BaseSettings):
     require_zdr_for_personal_health: bool = False
     # Do not set true unless every answer model is known to support JSON Schema.
     openrouter_require_parameters: bool = False
+    cura_openrouter_require_zdr: bool = False
+    cura_openrouter_deny_data_collection: bool = True
+    cura_openrouter_allowed_models: str = ""
+    cura_openrouter_allowed_providers: str = "openai,google,anthropic,typesafe"
+    cura_openrouter_prompt_injection_protection: bool = True
+    cura_openrouter_dlp_enabled: bool = True
+    cura_clinical_safety_enabled: bool = True
+    cura_package_safety_enabled: bool = True
     request_timeout_seconds: float = 60
     chat_streaming_mode: str = "complete_only"
     crisis_helpline_text: str = ""

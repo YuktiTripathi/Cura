@@ -90,3 +90,10 @@ class StructuredResponse(BaseModel):
     proactive_insights: list[dict] = Field(default_factory=list)
     structured_next_steps: list[dict] = Field(default_factory=list)
     health_journey: dict | None = None
+    conversation_goal: str | None = None
+    response_depth: str | None = None
+    next_conversation_action: str | None = None
+    blocks: list[dict] = Field(default_factory=list)
+    topic_summary: dict | None = None
+    related_findings: list[PresentedFinding] = Field(default_factory=list)
+    suggestion_chips: list[str] = Field(default_factory=list)

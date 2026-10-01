@@ -20,6 +20,18 @@ class FactKind(str, Enum):
     model_recommendation = "MODEL_RECOMMENDATION"
 
 
+class CanonicalHealthFact(BaseModel):
+    canonical_code: str
+    display_name: str
+    value: float | str | None = None
+    unit: str | None = None
+    status: str | None = None
+    source_type: str
+    source_date: date | datetime | str | None = None
+    assessment_instance_id: str | None = None
+    provenance: dict = Field(default_factory=dict)
+
+
 class ProvenancedFact(BaseModel):
     fact: str
     value: float | str | None = None

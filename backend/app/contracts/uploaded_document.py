@@ -70,6 +70,10 @@ class DocumentHealthFact(BaseModel):
     extraction_confidence: float | None = None
     provenance_text: str | None = None
     conflict_group: str | None = None
+    mapping_confidence: float | None = None
+    original_value: float | str | None = None
+    original_unit: str | None = None
+    specimen: str | None = None
 
 
 class DocumentNarrativeFact(BaseModel):

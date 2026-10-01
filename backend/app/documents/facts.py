@@ -9,7 +9,7 @@ from app.documents.extraction import ExtractedPage
 from app.documents.structured import ExtractedBiomarker, ExtractedHealthDocument
 from app.documents.value_extraction import extract_marker_from_text, find_report_date
 from app.pipeline.health_domains import domain_for_entity
-from app.pipeline.lab_parameters import PARAMETERS, canonicalize_marker_name, display_name_for
+from app.pipeline.lab_parameters import PARAMETERS, canonicalize_marker_name, display_name_for, resolve_biomarker
 
 
 def confidence_score(raw: str | None) -> float | None:
@@ -40,15 +40,20 @@ def infer_status(value: float | None, low: float | None, high: float | None, fla
 def facts_from_extracted(extracted: ExtractedHealthDocument) -> list[DocumentHealthFact]:
     facts: list[DocumentHealthFact] = []
     for marker in extracted.biomarkers:
-        code = canonicalize_marker_name(marker.normalized_name or marker.name or "") or marker.normalized_name
+        matched = resolve_biomarker(marker.normalized_name or marker.name or marker.original_field or "")
+        code = (matched.canonical_code if matched else None) or canonicalize_marker_name(
+            marker.normalized_name or marker.name or ""
+        ) or marker.normalized_name
         domain = domain_for_entity(code) if code else None
         facts.append(
             DocumentHealthFact(
                 canonical_code=code,
-                display_name=marker.name or display_name_for(code or ""),
+                display_name=display_name_for(code or "") or marker.name,
                 raw_name=marker.original_field or marker.name,
                 value=marker.value,
                 unit=marker.unit,
+                original_value=marker.value,
+                original_unit=marker.unit,
                 reference_low=marker.reference_low,
                 reference_high=marker.reference_high,
                 reference_text=marker.reference_range,
@@ -59,10 +64,11 @@ def facts_from_extracted(extracted: ExtractedHealthDocument) -> list[DocumentHea
                 source_document_id=extracted.document_id,
                 extraction_method=marker.extraction_method or "text",
                 extraction_confidence=confidence_score(marker.confidence),
+                mapping_confidence=matched.confidence if matched else confidence_score(marker.confidence),
                 provenance_text=marker.excerpt,
             )
         )
-    return attach_conflicts(facts)
+    return attach_conflicts(dedupe_identical(facts))
 
 
 def extract_facts_from_pages(document_id: str, pages: list[ExtractedPage]) -> ExtractedHealthDocument:
@@ -115,6 +121,32 @@ def extract_facts_from_pages(document_id: str, pages: list[ExtractedPage]) -> Ex
     )
 
 
+def _unit_sig(unit: str | None) -> str:
+    return re.sub(r"\s+", "", (unit or "").lower())
+
+
+def observation_key(fact: DocumentHealthFact) -> tuple:
+    return (
+        (fact.canonical_code or fact.display_name or "").lower(),
+        _sig(fact.value),
+        _unit_sig(fact.unit),
+        str(fact.report_date or ""),
+        (fact.specimen or "").lower(),
+    )
+
+
+def dedupe_identical(facts: list[DocumentHealthFact]) -> list[DocumentHealthFact]:
+    """Merge repeated summary/detail copies of the same observation."""
+    grouped: dict[tuple, list[DocumentHealthFact]] = {}
+    for fact in facts:
+        grouped.setdefault(observation_key(fact), []).append(fact)
+    out: list[DocumentHealthFact] = []
+    for group in grouped.values():
+        keep = min(group, key=lambda item: (item.page_number or 10**6, item.display_name or ""))
+        out.append(keep)
+    return out
+
+
 def attach_conflicts(facts: list[DocumentHealthFact]) -> list[DocumentHealthFact]:
     by_code: dict[str, list[DocumentHealthFact]] = {}
     for fact in facts:
@@ -125,7 +157,14 @@ def attach_conflicts(facts: list[DocumentHealthFact]) -> list[DocumentHealthFact
         values = { _sig(item.value) for item in group if item.value is not None }
         if len(values) > 1:
             for item in group:
-                out.append(item.model_copy(update={"conflict_group": key}))
+                out.append(
+                    item.model_copy(
+                        update={
+                            "conflict_group": key,
+                            "status": item.status or "CONFLICTING_OBSERVATIONS",
+                        }
+                    )
+                )
         else:
             out.extend(group)
     return out

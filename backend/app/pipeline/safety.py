@@ -43,7 +43,8 @@ EMERGENCY_PATTERNS = (
     re.compile(
         r"\b(chest pain|difficulty breathing|shortness of breath|can't breathe|cannot breathe|"
         r"unconscious|loss of consciousness|severe bleeding|stroke symptoms|"
-        r"anaphyla(?:xis|ctic)|severe allergic reaction|overdose)\b",
+        r"anaphyla(?:xis|ctic)|severe allergic reaction|overdose|"
+        r"seizure|severe dehydration|major bleeding|rapidly worsening)\b",
         re.I,
     ),
     re.compile(r"(छाती|chest)\s*(में|mein|me)?\s*(बहुत\s*|bahut\s*)?(दर्द|dard|pain)", re.I),
@@ -260,6 +261,17 @@ class SafetyLayer:
                 language=language,
             )
         return PreSafetyDecision(flags=[], category="none", language=language)
+
+    @staticmethod
+    def request_safety_mode(decision: PreSafetyDecision | None) -> str:
+        category = getattr(decision, "category", None)
+        if category in {"emergency", "self_harm"}:
+            return "EMERGENCY"
+        if category == "medication_misuse":
+            return "MEDICATION_BOUNDARY"
+        if category == "diagnosis_request":
+            return "DIAGNOSIS_RESTRAINT"
+        return "STANDARD"
 
     def scan_critical_context(self, context: HealthContext) -> tuple[list[str], str | None]:
         critical = [m.name for m in context.markers if m.flag == MarkerFlag.critical]

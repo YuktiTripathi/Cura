@@ -10,6 +10,7 @@ from app.contracts.health_context import (
     HealthContext,
     InRangeSummary,
     MissingItem,
+    SourceAvailability,
 )
 from app.contracts.query import QueryPlan
 from app.contracts.user import UserProfile
@@ -45,6 +46,44 @@ from app.pipeline.context_merger import ContextMerger
 from app.providers.registry import ProviderRegistry
 from app.retrieval.result import HealthRetrievalResult
 from app.pipeline.data import PersonalDataService
+from app.pipeline.dev_trace import trace
+
+
+def _availability(requested: bool, records: int, unavailable: bool = False) -> SourceAvailability:
+    if not requested:
+        return SourceAvailability(status="not_requested", records=0)
+    if unavailable:
+        return SourceAvailability(status="unavailable", records=0)
+    if records:
+        return SourceAvailability(status="available", records=records)
+    return SourceAvailability(status="not_available", records=0)
+
+
+def attach_source_status(
+    ctx: HealthContext,
+    plan: QueryPlan,
+    retrieval: HealthRetrievalResult | None,
+) -> None:
+    blood_n = len(retrieval.blood_reports) if retrieval else len(ctx.markers)
+    bio_n = len(retrieval.bio_ai_reports) if retrieval else len(ctx.bio_ai_risks)
+    q_n = len(retrieval.questionnaire_instances) if retrieval else len(ctx.questionnaire_instances or ctx.questionnaire)
+    doc_n = len(retrieval.documents) if retrieval else len(ctx.uploaded_documents)
+    profile_n = 1 if ctx.profile else 0
+    goal_n = len(ctx.goals or [])
+    unavailable = bool(retrieval and retrieval.status == "provider_unavailable")
+    ctx.source_status = {
+        "blood": _availability(plan.needs_blood, blood_n, unavailable and plan.needs_blood),
+        "bio_ai": _availability(plan.needs_bio_ai, bio_n, unavailable and plan.needs_bio_ai),
+        "questionnaire": _availability(plan.needs_questionnaire, q_n, unavailable and plan.needs_questionnaire),
+        "profile": _availability(plan.needs_profile or plan.needs_lifestyle, profile_n),
+        "goals": _availability(plan.needs_goals, goal_n),
+        "documents": _availability(plan.needs_user_uploaded, doc_n),
+    }
+    trace(
+        "CONTEXT",
+        personal_sources=[name for name, row in ctx.source_status.items() if row.status == "available"],
+        missing_sources=[name for name, row in ctx.source_status.items() if row.status == "not_available"],
+    )
 
 
 def _selector_marker_flags(selectors: set[str]) -> set[MarkerFlag] | None:
@@ -162,6 +201,7 @@ class ContextBuilder:
             )
             attach_user_stated(ctx, plan)
             attach_derived_facts(ctx, plan)
+            attach_source_status(ctx, plan, retrieval)
             return ctx
 
         if retrieval and retrieval.ihr_called:
@@ -248,6 +288,7 @@ class ContextBuilder:
             message=message,
             conversation_state=conversation_state,
         )
+        attach_source_status(ctx, plan, retrieval)
         return ctx
 
     def _fill_blood(self, ctx, plan, reports, evidence):
@@ -798,6 +839,20 @@ class ContextBuilder:
             conversation_state=conversation_state,
             blood_reports=blood_reports or [],
         )
+        from app.pipeline.conversation_experience import infer_conversation_goal, infer_response_depth
+        from app.pipeline.relevant_context import RelevantContextSelector
+
+        goal = infer_conversation_goal(message or plan.raw_message or "", plan, conversation_state)
+        depth = infer_response_depth(message or plan.raw_message or "", plan, goal, conversation_state)
+        selector = RelevantContextSelector()
+        relevant = selector.select(
+            ctx, plan, reports=blood_reports or [], goal=goal, depth=depth
+        )
+        selector.apply(ctx, relevant, reports=blood_reports or [], depth=depth)
+        ctx.conversation_goal = goal.value
+        ctx.response_depth = depth.value
+        if conversation_state and conversation_state.explained_entities:
+            ctx.explained_entities = list(conversation_state.explained_entities)
 
     def _fill_trends_if_needed(self, ctx, plan, reports, evidence) -> None:
         ops = {str(item).upper() for item in (plan.operations or [])}

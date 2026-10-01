@@ -6,7 +6,7 @@ from fastapi import APIRouter, Depends, Header, Request
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
-from app.auth.deps import get_principal
+from app.auth.deps import get_current_user
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.chat import ChatRequest, ChatResponse
 from app.core.config import settings
@@ -24,7 +24,7 @@ router = APIRouter()
 def chat(
     payload: ChatRequest,
     request: Request,
-    principal: AuthenticatedPrincipal = Depends(get_principal),
+    principal: AuthenticatedPrincipal = Depends(get_current_user),
     db: Session = Depends(get_db),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> ChatResponse:
@@ -45,7 +45,7 @@ def chat(
 def chat_stream(
     payload: ChatRequest,
     request: Request,
-    principal: AuthenticatedPrincipal = Depends(get_principal),
+    principal: AuthenticatedPrincipal = Depends(get_current_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> StreamingResponse:
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
@@ -120,3 +120,27 @@ def chat_stream(
 
 def _event(name: str, payload: dict) -> str:
     return f"event: {name}\ndata: {json.dumps(payload, separators=(',', ':'))}\n\n"
+
+
+compat_router = APIRouter()
+
+
+@compat_router.post("/cura/chat", response_model=ChatResponse)
+def cura_chat(
+    payload: ChatRequest,
+    request: Request,
+    principal: AuthenticatedPrincipal = Depends(get_current_user),
+    db: Session = Depends(get_db),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> ChatResponse:
+    return chat(payload, request, principal, db, idempotency_key)
+
+
+@compat_router.post("/cura/chat/stream")
+def cura_chat_stream(
+    payload: ChatRequest,
+    request: Request,
+    principal: AuthenticatedPrincipal = Depends(get_current_user),
+    idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
+) -> StreamingResponse:
+    return chat_stream(payload, request, principal, idempotency_key)

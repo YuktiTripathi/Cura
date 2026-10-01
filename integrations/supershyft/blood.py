@@ -44,7 +44,7 @@ def _user_id(principal: AuthenticatedPrincipal) -> int:
         return int(str(principal.subject_id).strip())
     except (TypeError, ValueError) as exc:
         raise ProviderUnavailableError(
-            "SuperShyft health reads require X-Cura-User-Id to be the numeric SuperShyft user_id",
+            "SuperShyft health reads require the authenticated token subject to be the numeric SuperShyft user_id",
             reason=DB_QUERY_FAILED,
         ) from exc
 

@@ -9,6 +9,7 @@ Request
 → SafetyStage (pre-safety; emergency/medication/injection blocks)
 → TaskPlanner (Jev decision → TaskPlan; EntityResolver keeps every entity)
 → QueryPlan compatibility view (primary operation + needs_* flags)
+→ RetrievalExecutor(user_id=authenticated subject only) → HealthDataGateway
 → HealthRetrievalRouter (independent sources; one empty source does not abort others)
 → HealthContextBuilder (all requested entities, derived Mentzer/BMI, user-stated facts)
 → ReasoningService (LOOKUP-only single entity is deterministic; multi-entity/multi-op uses the model)

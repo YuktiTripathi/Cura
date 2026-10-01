@@ -17,10 +17,10 @@ Set `HEALTH_PROVIDER=supershyft` to read (all queries are `SELECT` scoped to the
 | Questionnaire | `questionnaire_responses` → `assessment_instances` → `questionnaire_definitions` / `questionnaire_options` / `assessment_packages` |
 | Lifestyle | `user_preferences` when present; otherwise diet / sleep / activity answers from the questionnaire tables |
 
-Identity for health rows is SuperShyft `users.user_id`. In mock auth, send:
+Identity for health rows is SuperShyft `users.user_id` from the authenticated JWT `sub` / `user_id` claim. In mock auth, send:
 
 `X-Cura-User-Id: 123`
 
-where `123` is that numeric id.
+where `123` is that numeric id. Production SuperShyft apps send `Authorization: Bearer <access token>` and must not send `user_id` in the body.
 
 If Postgres is unreachable, chat will fail for health queries — switch `HEALTH_PROVIDER=mock` to demo offline.

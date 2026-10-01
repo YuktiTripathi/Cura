@@ -2,6 +2,7 @@ from app.contracts.common import KnowledgeScope, LanguageCode
 from app.contracts.facts import FactKind
 from app.contracts.health_context import HealthContext
 from app.pipeline.language import LANGUAGE_NAMES
+from app.pipeline.model_safe_context import to_model_safe_payload, wrap_untrusted_document_text
 import re
 
 
@@ -40,7 +41,9 @@ Never say “normal is a diagnosis”. Prefer:
 “Your report flags this value within range.”
 “This falls within the reference range reported by your laboratory.”
 For complex answers, structure naturally around what the data shows, how findings fit together, what remains uncertain, and what may be worth discussing or monitoring. Do not use those headings for simple questions.
-End with at most two useful follow-ups.
+End with at most one useful follow-up question, and only if it has a clear purpose.
+Do not ask several generic questions.
+Do not repeat an explanation already given for the same measurement in this conversation.
 
 You are not simply explaining laboratory values. You are helping the user understand their evolving personal health story.
 Use current data, history when available, active goals, and lifestyle/context where relevant.
@@ -94,7 +97,10 @@ PERSONAL HEALTH CONTEXT:
 - Recommendations are candidates only; the application will validate them.
 - Return a JSON object with: answer, claims, recommendation_candidates,
   follow_up_questions, safety_flags, escalation. Use [] or null when empty.
-  Follow-up questions: at most two.
+  Follow-up questions: at most one, or [] if none is needed.
+For questions like “should I worry” or “am I healthy”, do not label the person healthy or unhealthy.
+Balance what is reassuring, what deserves attention, and what remains uncertain.
+Answer first, then guide. Use only the supplied personal context; do not dump unrelated domains.
 For whole-health summaries (how the person is doing, what to focus on, health scenario),
 also return overall_summary and themes (3–5 objects). Each theme:
 {"title","priority":"high|medium|low","status":"needs_attention|monitor|reassuring|uncertain",
@@ -132,6 +138,7 @@ class PromptBuilder:
                 f"User question: {user_message}\n"
                 f"Answer depth: {context.answer_depth.value}\n"
                 f"{depth}\n"
+                f"{_experience_instruction(context)}"
                 "Conversation focus (topic and follow-up only; never a source of current lab values): "
                 f"{conversation_summary}\n"
                 f"Data source: {context.data_source}\n"
@@ -246,6 +253,35 @@ def _topic_key(value: str | None) -> str:
     return re.sub(r"[^a-z0-9]+", "", (value or "").lower())
 
 
+def _experience_instruction(context: HealthContext) -> str:
+    goal = context.conversation_goal or ""
+    depth = context.response_depth or ""
+    explained = ", ".join(context.explained_entities or [])
+    style = ""
+    if context.personalization and context.personalization.communication_preference:
+        style = context.personalization.communication_preference.value
+    lines = ["Conversation experience (not medical truth):"]
+    if goal:
+        lines.append(f"Goal: {goal}.")
+    if depth:
+        lines.append(f"Response depth: {depth}.")
+    if style:
+        lines.append(f"User preference: {style}.")
+    if depth == "SHORT" or style in {"QUICK", "ACTION_FOCUSED"}:
+        lines.append("Keep the answer compact. One short paragraph plus the requested result.")
+    if goal == "REASSURANCE":
+        lines.append(
+            "Lead with a balanced view: what is reassuring, what deserves attention, what is still uncertain. "
+            "Do not say the user is healthy or unhealthy."
+        )
+    if goal == "HEALTH_REVIEW":
+        lines.append("Group findings into a few themes. Do not list every biomarker.")
+    if explained:
+        lines.append(f"Already explained in this conversation: {explained}. Do not repeat the same explanation.")
+    lines.append("Use only requested facts plus at most a few directly related personal facts.")
+    return " ".join(lines) + "\n"
+
+
 def _depth_instruction(context: HealthContext) -> str:
     ops = {str(item).upper() for item in (context.operations or [])}
     if ops & {"CORRELATE", "IDENTIFY_PATTERN", "SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"}:
@@ -341,6 +377,8 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
         "requested_entities": list(context.requested_entity_codes or []),
         "display_entities": list(context.display_entity_codes or []),
         "reasoning_context": list(context.reasoning_context_codes or [])[:8],
+        "conversation_goal": context.conversation_goal,
+        "response_depth": context.response_depth,
         "topic": context.resolved_topic,
         "topic_name": context.resolved_topic_name,
         "markers": marker_payload,
@@ -390,7 +428,11 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
                     for row in item.structured_facts[: (12 if compact else 24)]
                 ],
                 "narrative": [
-                    {"heading": row.heading, "page_start": row.page_start, "text": row.text[:400]}
+                    {
+                        "heading": row.heading,
+                        "page_start": row.page_start,
+                        "text": wrap_untrusted_document_text(row.text[:400]),
+                    }
                     for row in item.narrative_sections[:6]
                 ],
                 "source_type": "uploaded_document",
@@ -406,6 +448,10 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
         profile = context.profile.model_dump(mode="json", exclude_none=True)
         profile.pop("subject_id", None)
         payload["profile"] = profile
+    if context.source_status:
+        payload["source_status"] = {
+            key: row.model_dump(mode="json") for key, row in context.source_status.items()
+        }
     if context.evidence:
         payload["evidence"] = [
             {
@@ -424,5 +470,11 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
             row.model_dump(mode="json", exclude_none=True) for row in (context.source_conflicts or [])[:6]
         ]
         if context.lifestyle:
-            payload["lifestyle"] = context.lifestyle.model_dump(mode="json", exclude_none=True)
-    return payload
+            life = context.lifestyle.model_dump(mode="json", exclude_none=True)
+            life.pop("subject_id", None)
+            payload["lifestyle"] = life
+    from app.pipeline.dev_trace import trace
+
+    cleaned = to_model_safe_payload(payload)
+    trace("MODEL PAYLOAD", fields=sorted(cleaned.keys()) if isinstance(cleaned, dict) else [])
+    return cleaned

@@ -54,6 +54,9 @@ export type ChatMeta = {
   escalation?: string | null;
   request_id?: string;
   response_mode?: string;
+  conversation_goal?: string;
+  response_depth?: string;
+  next_conversation_action?: string;
 };
 
 export type ProvenanceSource = {
@@ -164,6 +167,13 @@ export type StructuredResponse = {
   proactive_insights?: Array<Record<string, unknown>>;
   structured_next_steps?: Array<Record<string, unknown>>;
   health_journey?: Record<string, unknown> | null;
+  conversation_goal?: string | null;
+  response_depth?: string | null;
+  next_conversation_action?: string | null;
+  blocks?: Array<{ kind: string; title?: string | null; text?: string | null; expandable?: boolean }>;
+  topic_summary?: { main_facts?: string[]; user_told_cura?: string[]; remaining_question?: string | null; text?: string | null } | null;
+  related_findings?: PresentedFinding[];
+  suggestion_chips?: string[];
 };
 
 export type ChatResponse = {

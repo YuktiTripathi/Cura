@@ -103,6 +103,11 @@ _CONCERN = re.compile(r"\b(is that (?:concerning|normal|ok|okay|bad)|should i (?
 _CONSISTENT = re.compile(r"\b(consistent|fit together|connected|in common|pattern)\b", re.I)
 _WHY_CHANGE = re.compile(r"\bwhy (?:did|has|have) (?:that|it|they|this) chang", re.I)
 _CONFIRM = re.compile(r"^\s*(yes|yeah|yep|ok|okay|sure|correct|that'?s right|please)\s*[.!]?\s*$", re.I)
+_SHORT_REPLY = re.compile(
+    r"^\s*(yes|yeah|yep|no|nope|not really|not yet|sometimes)(\s*,?\s+.{0,80})?\s*[.!]?\s*$",
+    re.I,
+)
+_DAILY_HABIT = re.compile(r"\b(i take|taking|take one|once (?:a|per) day|every day|daily)\b", re.I)
 _CORRECTION = re.compile(r"\b(actually|i meant|not that|correction|wait,? no)\b", re.I)
 _NEW_QUESTION = re.compile(
     r"\b(what is my|what are my|show me|list |how is my|how are my|tell me my)\b",
@@ -216,6 +221,18 @@ class ConversationStateResolver:
             operations_hint=ops,
             prior_personal=prior.prior_personal or turn != TurnType.new_question,
             resolved_time_scope=time_scope,
+            communication_style=prior.communication_style,
+            recent_context_notes=list(prior.recent_context_notes or [])[:8],
+            dismissed_insight_keys=list(prior.dismissed_insight_keys or [])[:12],
+            session_goal_code=prior.session_goal_code,
+            current_concern=prior.current_concern,
+            response_depth=prior.response_depth,
+            conversation_goal=prior.conversation_goal,
+            topic_turn_count=prior.topic_turn_count,
+            explained_entities=list(prior.explained_entities or [])[:12],
+            topic_summary=prior.topic_summary,
+            last_surfaced_catalog_id=prior.last_surfaced_catalog_id,
+            last_surfaced_catalog_name=prior.last_surfaced_catalog_name,
         )
 
 
@@ -238,11 +255,26 @@ def persistable_state(
     communication_style: str | None = None,
     recent_context_notes: list[str] | None = None,
     session_goal_code: str | None = None,
+    current_concern: str | None = None,
+    response_depth: str | None = None,
+    conversation_goal: str | None = None,
+    explained_entities: list[str] | None = None,
+    topic_summary: str | None = None,
 ) -> ConversationState:
     entities = list(dict.fromkeys([*(plan_entities or []), *resolved.active_entities]))
     domain = (plan_domains[0] if plan_domains else None) or resolved.active_domain
     if plan_topic and plan_topic not in entities and is_lab_key(plan_topic):
         entities.insert(0, plan_topic)
+    same_topic = bool(resolved.active_domain and domain == resolved.active_domain) or (
+        resolved.active_entities and set(entities) & set(resolved.active_entities)
+    )
+    switched = resolved.turn_type == TurnType.topic_switch or (
+        resolved.turn_type == TurnType.new_question and resolved.active_entities and not same_topic
+    )
+    turns = 1 if switched or resolved.turn_type == TurnType.new_question and not resolved.prior_personal else (
+        (resolved.topic_turn_count or 0) + 1
+    )
+    explained = list(dict.fromkeys([*(resolved.explained_entities or []), *(explained_entities or []), *entities]))[:12]
     return ConversationState(
         turn_type=resolved.turn_type,
         active_domain=domain,
@@ -268,6 +300,12 @@ def persistable_state(
         recent_context_notes=list(recent_context_notes or resolved.recent_context_notes or [])[:8],
         dismissed_insight_keys=list(resolved.dismissed_insight_keys or [])[:12],
         session_goal_code=session_goal_code or resolved.session_goal_code,
+        current_concern=current_concern or resolved.current_concern,
+        response_depth=response_depth or resolved.response_depth,
+        conversation_goal=conversation_goal or resolved.conversation_goal,
+        topic_turn_count=turns,
+        explained_entities=explained,
+        topic_summary=topic_summary or resolved.topic_summary,
     )
 
 
@@ -298,9 +336,13 @@ def _classify(
         return TurnType.new_question
     if _CORRECTION.search(text):
         return TurnType.correction
-    if prior.expected_reply_type == ExpectedReplyType.clinical_context and _looks_like_clinical_answer(text):
+    if prior.expected_reply_type == ExpectedReplyType.clinical_context and (
+        _looks_like_clinical_answer(text) or _DAILY_HABIT.search(text) or _SHORT_REPLY.match(text)
+    ) and not _NEW_QUESTION.search(text):
         return TurnType.answer_to_assistant
-    if prior.expected_handling_path == "CONTINUE_INTERPRETATION" and _looks_like_clinical_answer(text) and not _NEW_QUESTION.search(text):
+    if prior.expected_handling_path == "CONTINUE_INTERPRETATION" and (
+        _looks_like_clinical_answer(text) or _DAILY_HABIT.search(text) or _SHORT_REPLY.match(text)
+    ) and not _NEW_QUESTION.search(text):
         return TurnType.answer_to_assistant
     if prior.expected_reply_type in {ExpectedReplyType.confirmation, ExpectedReplyType.yes_no} and _CONFIRM.match(text):
         return TurnType.confirmation
@@ -327,7 +369,14 @@ def _classify(
 def _looks_like_clinical_answer(text: str) -> bool:
     if _NEW_QUESTION.search(text) and not _ANSWERISH.search(text):
         return False
-    return bool(_ANSWERISH.search(text) or _SUPPLEMENT.search(text) or _NO_SYMPTOMS.search(text) or _MEDS.search(text))
+    return bool(
+        _ANSWERISH.search(text)
+        or _SUPPLEMENT.search(text)
+        or _DAILY_HABIT.search(text)
+        or _NO_SYMPTOMS.search(text)
+        or _MEDS.search(text)
+        or _SHORT_REPLY.match(text)
+    )
 
 
 def _clinical_question(text: str) -> bool:
@@ -338,7 +387,7 @@ def _new_context(text: str) -> list[str]:
     found: list[str] = []
     if _NO_SYMPTOMS.search(text):
         found.append("no_symptoms")
-    if _SUPPLEMENT.search(text):
+    if _SUPPLEMENT.search(text) or _DAILY_HABIT.search(text):
         found.append("supplement_use")
     if _MEDS.search(text):
         found.append("medication_change")

@@ -12,6 +12,8 @@ class LabParameter:
     display_name: str
     aliases: tuple[str, ...]
     family: str
+    units: tuple[str, ...] = ()
+    domains: tuple[str, ...] = ()
 
 
 # Longer aliases must be listed first within each parameter.
@@ -52,7 +54,17 @@ PARAMETERS: tuple[LabParameter, ...] = (
     LabParameter(
         "hemoglobin",
         "Hemoglobin",
-        ("haemoglobin (hb)", "haemoglobin", "hemoglobin", "hgb", "hb"),
+        (
+            "haemoglobin (hb)",
+            "haemoglobin hb",
+            "hemoglobin hb",
+            "hemoglobin blood",
+            "haemoglobin blood",
+            "haemoglobin",
+            "hemoglobin",
+            "hgb",
+            "hb",
+        ),
         "hemoglobin",
     ),
     LabParameter(
@@ -93,8 +105,40 @@ PARAMETERS: tuple[LabParameter, ...] = (
         ("total cholesterol", "serum cholesterol", "cholesterol"),
         "cholesterol",
     ),
-    LabParameter("ldl", "LDL", ("ldl cholesterol", "ldl-c", "ldl"), "lipid"),
-    LabParameter("hdl", "HDL", ("hdl cholesterol", "hdl-c", "hdl"), "lipid"),
+    LabParameter(
+        "ldl",
+        "LDL cholesterol",
+        (
+            "low density lipoprotein cholesterol",
+            "low density lipoprotein",
+            "serum ldl cholesterol",
+            "ldl cholesterol calculated",
+            "ldl cholesterol - direct",
+            "ldl cholesterol direct",
+            "ldl cholesterol",
+            "serum ldl",
+            "ldl-c",
+            "ldl",
+        ),
+        "lipid",
+    ),
+    LabParameter(
+        "hdl",
+        "HDL cholesterol",
+        (
+            "high density lipoprotein cholesterol",
+            "high density lipoprotein",
+            "serum hdl cholesterol",
+            "hdl cholesterol - direct",
+            "hdl cholesterol direct",
+            "hdl cholesterol",
+            "serum hdl-c",
+            "serum hdl",
+            "hdl-c",
+            "hdl",
+        ),
+        "lipid",
+    ),
     LabParameter("triglycerides", "Triglycerides", ("triglycerides", "triglyceride", "tg"), "lipid"),
     LabParameter(
         "kidney_function",
@@ -222,6 +266,41 @@ FAMILY_MEMBERS = {
 }
 
 FAMILY_QUERY_KEYS = {"kidney_function", "thyroid_function", "liver_function", "blood_pressure"}
+FAMILY_UNITS = {
+    "glucose": ("mg/dL", "mmol/L"),
+    "hba1c": ("%",),
+    "hemoglobin": ("g/dL", "g/L"),
+    "insulin": ("µIU/mL", "mIU/L"),
+    "mineral": ("mg/dL", "mmol/L"),
+    "cbc": ("10^3/µL", "10^6/µL", "%", "fL", "pg"),
+    "iron": ("µg/dL", "ng/mL", "%"),
+    "cholesterol": ("mg/dL", "mmol/L"),
+    "lipid": ("mg/dL", "mmol/L"),
+    "kidney": ("mg/dL", "mL/min/1.73m2"),
+    "thyroid_labs": ("µIU/mL", "pg/mL", "ng/dL", "ng/mL"),
+    "vitamin": ("ng/mL", "pg/mL", "nmol/L"),
+    "inflammation": ("mm/hr", "mg/L"),
+    "liver": ("U/L", "mg/dL", "g/dL"),
+    "blood_pressure": ("mmHg",),
+    "derived": (),
+}
+FAMILY_DOMAINS = {
+    "glucose": ("glycemic_health",),
+    "hba1c": ("glycemic_health",),
+    "hemoglobin": ("hematology",),
+    "insulin": ("glycemic_health",),
+    "mineral": ("metabolic_health",),
+    "cbc": ("hematology",),
+    "iron": ("iron_health",),
+    "cholesterol": ("lipid_health",),
+    "lipid": ("lipid_health",),
+    "kidney": ("kidney_health",),
+    "thyroid_labs": ("thyroid_health",),
+    "vitamin": ("micronutrient_health",),
+    "inflammation": ("inflammation",),
+    "liver": ("liver_health",),
+    "blood_pressure": ("blood_pressure_health",),
+}
 _SLUG_ALIASES = {
     "serum_creatinine": "creatinine",
     "creatinine": "creatinine",
@@ -303,6 +382,35 @@ _SLUG_ALIASES = {
     "serum_triglycerides": "triglycerides",
 }
 
+def _vendor_variants(alias: str) -> list[str]:
+    raw = (alias or "").strip().lower()
+    if not raw:
+        return []
+    variants = {raw, raw.replace("-", " "), raw.replace("–", " "), re.sub(r"\s+", " ", raw)}
+    if len(raw) > 3:
+        for prefix in ("serum ", "plasma "):
+            if not raw.startswith(prefix.strip()):
+                variants.add(f"{prefix}{raw}".strip())
+        for suffix in (" direct", " - direct", " blood"):
+            variants.add(f"{raw}{suffix}")
+    return [item for item in variants if item]
+
+
+def _augment_parameter(param: LabParameter) -> LabParameter:
+    aliases = list(param.aliases)
+    for alias in list(param.aliases):
+        aliases.extend(_vendor_variants(alias))
+    return LabParameter(
+        param.key,
+        param.display_name,
+        tuple(dict.fromkeys(aliases)),
+        param.family,
+        param.units or FAMILY_UNITS.get(param.family, ()),
+        param.domains or FAMILY_DOMAINS.get(param.family, ()),
+    )
+
+
+PARAMETERS = tuple(_augment_parameter(param) for param in PARAMETERS)
 _BY_KEY = {p.key: p for p in PARAMETERS}
 
 
@@ -325,9 +433,67 @@ def _alias_span(alias: str, text: str):
     return match.start(), match.end()
 
 
+def prepare_entity_query(text: str) -> str:
+    lowered = (text or "").lower().replace("&", " and ")
+    lowered = re.sub(r"[,/;|]+", " ", lowered)
+    return re.sub(r"\s+", " ", lowered).strip()
+
+
+def normalize_label(name: str) -> str:
+    text = (name or "").lower().replace("cholestrol", "cholesterol")
+    text = text.replace("&", " ")
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
+
+
+@dataclass(frozen=True)
+class BiomarkerMatch:
+    canonical_code: str
+    display_name: str
+    confidence: float
+    method: str
+
+
+def resolve_biomarker(raw: str) -> BiomarkerMatch | None:
+    """Layered ontology match. Never invents a biomarker outside PARAMETERS."""
+    if not (raw or "").strip():
+        return None
+    normalized = normalize_label(raw)
+    slug = normalized.replace(" ", "_")
+    if slug in _BY_KEY:
+        param = _BY_KEY[slug]
+        return BiomarkerMatch(param.key, param.display_name, 1.0, "exact_canonical")
+    if slug in _SLUG_ALIASES and _SLUG_ALIASES[slug] in _BY_KEY:
+        param = _BY_KEY[_SLUG_ALIASES[slug]]
+        return BiomarkerMatch(param.key, param.display_name, 0.99, "provider_alias")
+    alias_map = {normalize_label(alias): param for param in PARAMETERS for alias in param.aliases}
+    if normalized in alias_map:
+        param = alias_map[normalized]
+        return BiomarkerMatch(param.key, param.display_name, 0.99, "exact_alias")
+    from difflib import SequenceMatcher
+
+    best: tuple[float, LabParameter] | None = None
+    tied = False
+    for param in PARAMETERS:
+        if param.key in FAMILY_QUERY_KEYS:
+            continue
+        for alias in param.aliases:
+            ratio = SequenceMatcher(None, normalized, normalize_label(alias)).ratio()
+            if ratio < 0.92:
+                continue
+            if best is None or ratio > best[0]:
+                best = (ratio, param)
+                tied = False
+            elif best and abs(ratio - best[0]) < 0.001 and param.key != best[1].key:
+                tied = True
+    if best and not tied:
+        return BiomarkerMatch(best[1].key, best[1].display_name, round(best[0], 3), "fuzzy")
+    return None
+
+
 def match_lab_keys(text: str) -> list[str]:
     """Return canonical lab keys using word boundaries and longest non-overlapping aliases."""
-    lowered = (text or "").lower()
+    lowered = prepare_entity_query(text)
     found: list[tuple[int, int, str]] = []
     for param in PARAMETERS:
         best = None
@@ -368,6 +534,9 @@ def primary_lab_key(text: str) -> str | None:
 
 def canonicalize_marker_name(name: str) -> str:
     """Map a SuperShyft / lab display name onto a CURA canonical biomarker key."""
+    matched = resolve_biomarker(name)
+    if matched:
+        return matched.canonical_code
     slug = re.sub(r"[^a-z0-9]+", "_", (name or "").lower()).strip("_")
     slug = slug.replace("cholestrol", "cholesterol")
     if slug in _SLUG_ALIASES:

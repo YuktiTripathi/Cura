@@ -281,5 +281,35 @@ describe("MessageList narrative summary", () => {
     expect(screen.getByRole("button", { name: "View Iron Studies with Ferritin" })).toBeTruthy();
     window.removeEventListener("cura:open_package", onOpen);
   });
+
+  it("shows a so-far summary and related results disclosure", () => {
+    render(
+      <MessageList
+        messages={[
+          {
+            role: "assistant",
+            content: "Your B12 is 154 pg/mL.",
+            presentation: {
+              mode: "INTERPRETATION",
+              headline: "Vitamin B12",
+              summary: "Your B12 is 154 pg/mL.",
+              findings: [],
+              interpretation: "This sits below the reported range.",
+              uncertainties: [],
+              next_steps: [],
+              topic_summary: { text: "So far: we have been looking at B12." },
+              related_findings: [{ label: "MCV", value: "72", unit: "fL", status: "low" }],
+            },
+          },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId("topic-summary").textContent).toContain("So far");
+    fireEvent.click(screen.getByRole("button", { name: "View related results" }));
+    expect(screen.getByText("MCV")).toBeTruthy();
+  });
 });
 

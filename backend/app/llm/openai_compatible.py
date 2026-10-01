@@ -88,18 +88,29 @@ class OpenAICompatibleLLMClient:
         api_key: str | None = None,
         provider: str | None = None,
         timeout: float | int | None = None,
+        personal_health: bool = False,
     ) -> None:
         self.provider = provider or settings.resolved_llm_provider()
         self.base_url = (base_url or settings.active_llm_base_url()).rstrip("/")
         self.model = model or settings.active_llm_model()
         self.api_key = api_key if api_key is not None else settings.active_llm_api_key()
         self.timeout = timeout if timeout is not None else settings.llm_timeout_seconds
+        self.personal_health = personal_health
         self.last_usage: dict[str, int] = {}
         self.last_finish_reason: str = ""
 
     def complete(self, messages: list[dict[str, str]], json_mode: bool = False) -> str:
         if not self.api_key:
             raise LLMUnavailableError("OPENROUTER_API_KEY is not configured")
+        from app.llm.openrouter_policy import openrouter_policy
+        from app.pipeline.model_safe_context import guard_outgoing_messages
+
+        policy = openrouter_policy()
+        if self.personal_health:
+            policy.assert_model(self.model)
+            policy.assert_privacy_for_health(personal_health=True)
+        if policy.dlp_enabled:
+            messages = guard_outgoing_messages(messages)
         try:
             openrouter_breaker.allow()
         except CircuitOpenError as exc:
@@ -141,10 +152,18 @@ class OpenAICompatibleLLMClient:
         if uses_reasoning_tokens(self.model):
             payload["reasoning"] = {"effort": "low"}
             payload["max_tokens"] = max(int(settings.llm_max_output_tokens), 1200)
-        provider_prefs: dict = {}
-        if settings.openrouter_data_collection_deny or settings.openrouter_zero_data_retention:
+        from app.llm.openrouter_policy import openrouter_policy
+
+        policy = openrouter_policy()
+        provider_prefs: dict = {"allow_fallbacks": False}
+        only = policy.upstream_only(self.model)
+        if only:
+            provider_prefs["only"] = only
+        if policy.deny_data_collection or settings.openrouter_data_collection_deny:
             provider_prefs["data_collection"] = "deny"
-        if settings.openrouter_zero_data_retention:
+        if self.personal_health and policy.require_zdr and policy.zdr_configured:
+            provider_prefs["zdr"] = True
+        elif settings.openrouter_zero_data_retention:
             provider_prefs["zdr"] = True
         if fmt == "json_schema":
             payload["temperature"] = 0

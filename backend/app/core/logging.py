@@ -30,5 +30,15 @@ def configure_logging() -> None:
         force=True,
     )
     filt = CuraLogFilter()
-    for name in ("cura", "cura.pipeline", "cura.documents", "cura.supershyft", "cura.voice", "cura.routing"):
+    for name in (
+        "cura",
+        "cura.pipeline",
+        "cura.documents",
+        "cura.supershyft",
+        "cura.voice",
+        "cura.routing",
+        "cura.auth",
+        "cura.retrieval",
+        "cura.trace",
+    ):
         logging.getLogger(name).addFilter(filt)

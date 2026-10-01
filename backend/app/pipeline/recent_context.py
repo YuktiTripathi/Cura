@@ -9,6 +9,7 @@ from app.contracts.personalization import RecentContext
 
 _FEVER = re.compile(r"\b(fever|feverish|infection|flu|covid|was sick|felt ill|recent illness)\b", re.I)
 _SUPPLEMENT = re.compile(r"\b(started|taking|take)\b.{0,24}\b(b12|vitamin d|iron|supplement|injection)s?\b", re.I)
+_DAILY = re.compile(r"\b(i take|take one|once (?:a|per) day|every day|daily)\b", re.I)
 _MED = re.compile(r"\b(started|changed|new|stopped)\b.{0,20}\b(medication|medicine|tablet|drug)s?\b", re.I)
 _TRAVEL = re.compile(r"\b(travel|flew|flight|jet lag)\b", re.I)
 _PREGNANCY = re.compile(r"\b(pregnant|pregnancy)\b", re.I)
@@ -23,7 +24,9 @@ def extract_recent_context(message: str, state: ConversationState | None = None)
     if _FEVER.search(text):
         ctx.illness.append("recent_illness")
         ctx.notes.append("User reported recent illness or fever.")
-    if _SUPPLEMENT.search(text):
+    if _SUPPLEMENT.search(text) or (
+        _DAILY.search(text) and state and (state.expected_reply_type.value == "CLINICAL_CONTEXT" or "supplement" in (state.previous_assistant_follow_up or "").lower())
+    ):
         ctx.supplements.append("recent_supplement")
         ctx.notes.append("User reported a recent supplement or injection change.")
     if _MED.search(text):

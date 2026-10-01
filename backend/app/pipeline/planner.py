@@ -487,13 +487,12 @@ def build_task_plan(
         dimensions.append("lifestyle")
     if expansion.profile:
         dimensions.append("body_composition")
-    display = expansion.blood_entities()
-    if not display:
-        display = [
-            item.code
-            for item in entities
-            if item.kind in {EntityKind.biomarker, EntityKind.profile_attribute} and not item.optional
-        ]
+    mentioned = [
+        item.code
+        for item in entities
+        if item.kind in {EntityKind.biomarker, EntityKind.profile_attribute} and not item.optional
+    ]
+    display = mentioned or expansion.blood_entities()
     if continuing:
         display = list(
             dict.fromkeys(

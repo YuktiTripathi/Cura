@@ -11,6 +11,7 @@ class CommunicationStyle(str, Enum):
     quick = "QUICK"
     standard = "STANDARD"
     deep = "DEEP"
+    action_focused = "ACTION_FOCUSED"
 
 
 class LanguageRegister(str, Enum):

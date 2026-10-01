@@ -63,6 +63,7 @@ from app.pipeline.prompt_builder import PromptBuilder
 from app.pipeline.reasoning import ReasoningService
 from app.pipeline.validator import ResponseValidator
 from app.pipeline.composer import ResponseComposer
+from app.pipeline.conversation_experience import build_experience_plan
 from app.pipeline.conversation_title import conversation_title
 from app.pipeline.health_sources import has_supershyft_sources, is_lab_source_compare
 from app.pipeline.document_context import resolve_attached_documents
@@ -108,12 +109,11 @@ class ChatService:
         self._progress = ProgressEmitter()
 
     def _complete_answer(self, messages, plan, budget=None):
-        if (
-            plan.needs_personal_data
-            and settings.require_zdr_for_personal_health
-            and not settings.openrouter_zero_data_retention
-        ):
-            raise LLMUnavailableError("Personal health LLM requires a ZDR-capable endpoint")
+        from app.llm.openrouter_policy import openrouter_policy
+        from app.pipeline.dlp import SecurityBlockedError
+
+        policy = openrouter_policy()
+        policy.assert_privacy_for_health(personal_health=bool(plan.needs_personal_data))
         last_error = None
         remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
         for index, tier in enumerate(fallback_tiers(plan.answer_model_tier)):
@@ -127,7 +127,15 @@ class ChatService:
                 timeout = budget.timeout_for(timeout)
             if timeout < 0.5:
                 break
-            client = get_llm_client(model_tier=tier.value, timeout=timeout)
+            try:
+                client = get_llm_client(
+                    model_tier=tier.value,
+                    timeout=timeout,
+                    personal_health=bool(plan.needs_personal_data),
+                )
+            except LLMUnavailableError:
+                last_error = LLMUnavailableError("LLM model is not on the approved allowlist")
+                break
             started = time.perf_counter()
             try:
                 result = client.complete_structured(messages)
@@ -140,6 +148,9 @@ class ChatService:
                     int((time.perf_counter() - started) * 1000),
                 )
                 return result, client, tier, index > 0
+            except SecurityBlockedError as exc:
+                logger.warning("answer_llm_blocked_secret_scan")
+                raise LLMUnavailableError("LLM request blocked by privacy policy") from exc
             except LLMUnavailableError as exc:
                 last_error = exc
                 remaining = budget.remaining() if budget is not None else remaining
@@ -196,9 +207,19 @@ class ChatService:
         budget = TimeBudget(settings.request_timeout_seconds)
         eval_turn["budget"] = budget
         self._progress.emit(ProcessingStage.request_received)
+        from app.pipeline.dev_trace import trace
+
+        trace("AUTH", authenticated_user_resolved=True, user_id=principal.subject_id)
         # Local safety gate: no Jev, SuperShyft, documents, or LLM until this passes.
         pre_safety = SafetyStage().run(payload.message)
         eval_turn["pre_safety"] = pre_safety
+        from app.pipeline.dev_trace import trace
+
+        trace(
+            "SAFETY PRECHECK",
+            emergency=getattr(pre_safety, "category", None) in {"emergency", "self_harm"},
+            medication_risk=getattr(pre_safety, "category", None) == "medication_misuse",
+        )
         if pre_safety.blocked:
             if payload.conversation_id:
                 conv = self.repo.get_for_subject(payload.conversation_id, principal.subject_id)
@@ -223,6 +244,7 @@ class ChatService:
                     document_retrieval_called=False,
                     jev_called=False,
                     safety_flags=pre_safety.flags or [],
+                    safety_mode=SafetyLayer.request_safety_mode(pre_safety),
                     escalation=pre_safety.escalation,
                     db_status=DB_PROVIDER_NOT_CALLED,
                 ),
@@ -287,6 +309,14 @@ class ChatService:
             conversation_state=conv_state,
         )
         plan, jev_trace = routed.plan, routed.jev_trace
+        from app.pipeline.dev_trace import trace
+
+        trace(
+            "PLAN",
+            sources=list(plan.data_sources or []),
+            entities=list(plan.requested_metrics or [])[:12],
+            time_scope=plan.time_scope,
+        )
         self._progress.measure("planning")
         self._progress.set_context(plan, follow_up=follow_up)
         self._emit_plan_stages(plan, follow_up=follow_up)
@@ -882,7 +912,12 @@ class ChatService:
             payload.message,
             previous_user_question=getattr(conv_state, "previous_user_question", None),
         )
-        if getattr(pre_safety, "category", None) in {"emergency", "self_harm"}:
+        if getattr(pre_safety, "category", None) in {
+            "emergency",
+            "self_harm",
+            "medication_misuse",
+            "diagnosis_request",
+        }:
             allowed_packages = False
         testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
             message=payload.message,
@@ -898,6 +933,12 @@ class ChatService:
             self.followups.generate(plan, answer, context, inventory),
             response_lang,
             context.resolved_topic_name or plan.topic_name,
+        )
+        experience = build_experience_plan(
+            payload.message,
+            plan,
+            context,
+            conv_state,
         )
         llm_follow = []
         if llm_result and llm_result.follow_up_questions:
@@ -921,6 +962,8 @@ class ChatService:
             llm_follow_ups=llm_follow,
             llm_result=llm_result,
             testing_option=testing_option,
+            experience=experience,
+            conversation_turn=conv_state.turn_type.value,
         )
         self._progress.measure("compose")
         if looks_like_structured_json(answer):
@@ -976,6 +1019,11 @@ class ChatService:
                 and context.personalization.goal_source.value == "conversation"
                 else None
             ),
+            current_concern=experience.current_concern,
+            response_depth=experience.depth.value,
+            conversation_goal=experience.goal.value,
+            explained_entities=list(experience.relevant.requested_keys),
+            topic_summary=experience.topic_summary.text if experience.topic_summary else None,
         )
         self.repo.update_conversation_state(conv, next_state.model_dump_json())
         self.repo.update_context_state(
@@ -991,6 +1039,16 @@ class ChatService:
 
         latency = int((time.perf_counter() - started) * 1000)
         subject_hash = hashlib.sha256(principal.subject_id.encode()).hexdigest()[:12]
+        from app.pipeline.retrieval_executor import audit_request
+
+        audit_request(
+            principal=principal,
+            conversation_id=conv.id,
+            sources=list(plan.data_sources or context.meta.sources or []),
+            records=len(context.markers) + len(context.bio_ai_risks) + len(context.questionnaire),
+            model_tier=plan.answer_model_tier.value if plan.answer_model_tier else None,
+            success=True,
+        )
         if settings.is_development:
             logger.info(
                 "chat_dev auth_provider=%s subject_id=%s model_tier=%s model=%s jev_intent=%s "
@@ -1112,6 +1170,7 @@ class ChatService:
                 db_status=db_status,
                 supershyft_record_count=len(evidence) if plan.needs_personal_data else 0,
                 safety_flags=flags,
+                safety_mode=SafetyLayer.request_safety_mode(pre_safety),
                 recommendation_flags=recommendation_flags,
                 grounding_flags=grounding_flags,
                 escalation=escalation,
@@ -1149,6 +1208,9 @@ class ChatService:
                 ihr_queried=bool(plan.needs_personal_data),
                 documents_queried=bool(plan.needs_user_uploaded),
                 source_outcomes=list(context.source_outcomes or []),
+                conversation_goal=experience.goal.value,
+                response_depth=experience.depth.value,
+                next_conversation_action=experience.next_action.value,
             ),
         )
 

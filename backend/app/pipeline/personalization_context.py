@@ -14,10 +14,11 @@ from app.contracts.personalization import (
 )
 from app.pipeline.recent_context import extract_recent_context
 
-_QUICK = r"\b(briefly|in short|quick|just the headline|tl;dr)\b"
-_DEEP = r"\b(in detail|deep dive|explain fully|walk me through|technical)\b"
-_SIMPLE = r"\b(in simple (?:terms|language)|like i('m| am) five)\b"
+_QUICK = r"\b(briefly|in short|quick|just the headline|tl;dr|keep it short|be (?:brief|concise)|short answer)\b"
+_DEEP = r"\b(in detail|in more detail|deep dive|explain fully|walk me through|technical|detailed)\b"
+_SIMPLE = r"\b(in simple (?:terms|language)|like i('m| am) five|plain (?:english|language))\b"
 _TECHNICAL = r"\b(technical|use (?:lab|medical) terms)\b"
+_ACTION = r"\b(action[- ]focused|just (?:the )?next steps?|what should i do)\b"
 
 import re
 
@@ -38,7 +39,12 @@ def goal_code_from_message(message: str) -> str | None:
     return None
 
 
+_ACTION_RE = re.compile(_ACTION, re.I)
+
+
 def communication_style_from_message(message: str, state: ConversationState | None = None) -> CommunicationStyle:
+    if _ACTION_RE.search(message or ""):
+        return CommunicationStyle.action_focused
     if _DEEP_RE.search(message or ""):
         return CommunicationStyle.deep
     if _QUICK_RE.search(message or ""):
@@ -47,7 +53,10 @@ def communication_style_from_message(message: str, state: ConversationState | No
         try:
             return CommunicationStyle(state.communication_style)
         except ValueError:
-            pass
+            if state.communication_style in {"CONCISE", "SHORT"}:
+                return CommunicationStyle.quick
+            if state.communication_style in {"DETAILED"}:
+                return CommunicationStyle.deep
     return CommunicationStyle.standard
 
 
