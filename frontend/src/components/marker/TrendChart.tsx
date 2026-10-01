@@ -30,9 +30,9 @@ export function TrendChart({
   return (
     <figure className="trend" data-testid="trend-chart">
       <div className="trend-plot">
-        <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={summary} onMouseLeave={() => setActive(null)}>
+        <svg viewBox={`0 0 ${width} ${height}`} role="group" aria-label={summary} onMouseLeave={() => setActive(null)}>
           {layout.yTicks.map((tick) => (
-            <g key={tick.value} className="trend-grid">
+            <g key={tick.value} className="trend-grid" aria-hidden="true">
               <line x1={plot.left} x2={width - plot.right} y1={tick.y} y2={tick.y} />
               <text x={plot.left - 6} y={tick.y} dy="0.32em" textAnchor="end">
                 {niceNumber(tick.value)}
@@ -66,6 +66,7 @@ export function TrendChart({
                 width={32}
                 height={height - plot.top - plot.bottom}
                 tabIndex={0}
+                role="img"
                 aria-label={`${shortDate(p.date)}: ${niceNumber(p.value)}${unit ? ` ${unit}` : ""}${p.outOfRange ? ", outside range" : ""}`}
                 onMouseEnter={() => setActive(i)}
                 onFocus={() => setActive(i)}
@@ -73,10 +74,10 @@ export function TrendChart({
               />
             </g>
           ))}
-          <text className="trend-axis" x={first.x} y={height - 6} textAnchor="start">
+          <text className="trend-axis" x={first.x} y={height - 6} textAnchor="start" aria-hidden="true">
             {shortDate(first.date)}
           </text>
-          <text className="trend-axis" x={last.x} y={height - 6} textAnchor="end">
+          <text className="trend-axis" x={last.x} y={height - 6} textAnchor="end" aria-hidden="true">
             {shortDate(last.date)}
           </text>
         </svg>

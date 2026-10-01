@@ -185,6 +185,8 @@ export function Composer({
         📎
       </button>
       <input
+        id="cura-message-input"
+        aria-label="Message Cura"
         ref={inputRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}

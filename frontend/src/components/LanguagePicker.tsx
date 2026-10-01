@@ -14,7 +14,7 @@ export function LanguagePicker({ value, onChange }: { value: LanguageCode; onCha
       >
         {LANGUAGES.map((item) => (
           <option key={item.code} value={item.code} lang={item.htmlLang}>
-            {item.code === "auto" ? "Auto language" : item.label}
+            {item.code === "auto" ? "🌐 Auto" : item.label}
           </option>
         ))}
       </select>

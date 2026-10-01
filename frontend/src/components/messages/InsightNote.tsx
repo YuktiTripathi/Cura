@@ -6,7 +6,7 @@ export function InsightNote({ insights }: { insights: AnswerInsight[] }) {
   const panel = useMarkerPanel();
   if (!insights.length) return null;
   return (
-    <aside className="insight-note" aria-label="Worth a look" data-testid="insight-note">
+    <div className="insight-note" data-testid="insight-note">
       <p className="insight-note-label">Worth a look</p>
       <ul>
         {insights.map((insight, index) => (
@@ -22,6 +22,6 @@ export function InsightNote({ insights }: { insights: AnswerInsight[] }) {
           </li>
         ))}
       </ul>
-    </aside>
+    </div>
   );
 }
