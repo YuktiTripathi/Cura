@@ -28,11 +28,12 @@ def confidence_score(raw: str | None) -> float | None:
 def infer_status(value: float | None, low: float | None, high: float | None, flag: str | None) -> str | None:
     if flag:
         return str(flag).lower()
-    if value is None or low is None or high is None:
+    if value is None or (low is None and high is None):
         return None
-    if value < low:
+    # One-sided ranges ("< 100", "> 40") are common on lipid and inflammation panels.
+    if low is not None and value < low:
         return "low"
-    if value > high:
+    if high is not None and value > high:
         return "high"
     return "normal"
 
@@ -79,9 +80,6 @@ def extract_facts_from_pages(document_id: str, pages: list[ExtractedPage]) -> Ex
         report_date = report_date or find_report_date(text)
         method = page.method or "text"
         for param in PARAMETERS:
-            if param.key == "cholesterol" and re.search(r"\b(ldl|hdl)\s+cholesterol\b", text, re.I):
-                if not re.search(r"\btotal cholesterol\b", text, re.I):
-                    continue
             extracted = extract_marker_from_text(text, param.key, page=page.page_number)
             if not extracted or extracted.value is None:
                 continue
@@ -100,10 +98,12 @@ def extract_facts_from_pages(document_id: str, pages: list[ExtractedPage]) -> Ex
                     original_field=extracted.name,
                     value=extracted.value,
                     unit=extracted.unit,
+                    reference_range=extracted.reference_text,
                     reference_low=extracted.reference_low,
                     reference_high=extracted.reference_high,
                     flag=infer_status(extracted.value, extracted.reference_low, extracted.reference_high, None),
                     source_page=extracted.page or page.page_number,
+                    source_line=extracted.line,
                     excerpt=(extracted.source_text or "")[:200],
                     confidence="low" if method in {"ocr", "vision"} else extracted.confidence,
                     extraction_method=method if method in {"text", "table", "vision", "ocr"} else "text",

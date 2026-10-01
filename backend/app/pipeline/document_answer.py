@@ -324,6 +324,8 @@ def _fact_evidence(fact: DocumentHealthFact) -> EvidenceItem:
     rng = None
     if fact.reference_low is not None and fact.reference_high is not None:
         rng = f"{fact.reference_low:g}–{fact.reference_high:g} {fact.unit or ''}".strip()
+    elif fact.reference_text:
+        rng = f"{fact.reference_text} {fact.unit or ''}".strip()
     return EvidenceItem(
         evidence_id=f"ev-{uuid4().hex[:8]}",
         report_id=fact.source_document_id,

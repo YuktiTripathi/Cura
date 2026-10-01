@@ -68,6 +68,8 @@ def render_lab_answer(values: list[ExtractedValue], query: str) -> str | None:
         parts.append(
             f"The reference range shown on your report is {preferred.reference_low:g}–{preferred.reference_high:g} {unit}."
         )
+    elif preferred.reference_text:
+        parts.append(f"The reference range shown on your report is {preferred.reference_text} {unit}.")
     return " ".join(parts)
 
 
@@ -79,6 +81,8 @@ def evidence_from_value(hit: DocumentEvidence, value: ExtractedValue):
     rng = None
     if value.reference_low is not None and value.reference_high is not None:
         rng = f"{value.reference_low:g}–{value.reference_high:g} {value.unit or 'mg/dL'}"
+    elif value.reference_text:
+        rng = f"{value.reference_text} {value.unit or ''}".strip()
     return EvidenceItem(
         evidence_id=hit.chunk_id,
         report_id=hit.document_id,
