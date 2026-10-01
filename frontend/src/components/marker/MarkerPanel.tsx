@@ -31,7 +31,10 @@ export function MarkerPanel({
   }, [marker.key]);
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key !== "Escape" || event.defaultPrevented) return;
+      // Escape inside a dialog (sources, doctor summary) closes that dialog, not this panel.
+      if (event.target instanceof Element && event.target.closest("[role='dialog']")) return;
+      onClose();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);

@@ -100,6 +100,19 @@ describe("MarkerPanel", () => {
     expect(onClose).toHaveBeenCalled();
   });
 
+  it("ignores Escape pressed inside a dialog", () => {
+    const onClose = vi.fn();
+    render(<MarkerPanel marker={overview.markers![0]} onClose={onClose} onAsk={vi.fn()} />);
+    const dialog = document.createElement("div");
+    dialog.setAttribute("role", "dialog");
+    const inner = document.createElement("button");
+    dialog.appendChild(inner);
+    document.body.appendChild(dialog);
+    fireEvent.keyDown(inner, { key: "Escape" });
+    expect(onClose).not.toHaveBeenCalled();
+    dialog.remove();
+  });
+
   it("explains when there is only one result", () => {
     render(<MarkerPanel marker={overview.markers![2]} onClose={vi.fn()} onAsk={vi.fn()} />);
     expect(screen.queryByTestId("trend-chart")).toBeNull();
