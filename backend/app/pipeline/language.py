@@ -50,6 +50,23 @@ _INTENT_REPLACEMENTS = [
     ("क्या है", "what is"),
     ("क्यों", "why"),
     ("लेटेस्ट", "latest"),
+    # "since my previous report" / "changed" in each supported language
+    ("पिछली रिपोर्ट से", "since my previous report"),
+    ("पिछली रिपोर्ट", "previous report"),
+    ("पिछले रिपोर्ट", "previous report"),
+    ("मागील रिपोर्ट", "previous report"),
+    ("मागच्या रिपोर्ट", "previous report"),
+    ("ਪਿਛਲੀ ਰਿਪੋਰਟ", "previous report"),
+    ("પાછલા રિપોર્ટ", "previous report"),
+    ("પાછલી રિપોર્ટ", "previous report"),
+    ("আগের রিপোর্ট", "previous report"),
+    ("बदलाव", "change"),
+    ("बदल गया", "changed"),
+    ("बदला", "changed"),
+    ("बदलला", "changed"),
+    ("ਬਦਲਿਆ", "changed"),
+    ("બદલાયું", "changed"),
+    ("বদলেছে", "changed"),
     ("रिपोर्ट", "report"),
     ("मेरी", "my"),
     ("मेरा", "my"),
@@ -57,8 +74,12 @@ _INTENT_REPLACEMENTS = [
     ("माझ्या", "my"),
     ("माझा", "my"),
     ("माझी", "my"),
+    ("माझे", "my"),
     ("ਮੇਰੀ", "my"),
     ("ਮੇਰਾ", "my"),
+    ("ਮੇਰੇ", "my"),
+    ("મારું", "my"),
+    ("મારો", "my"),
     ("મારા", "my"),
     ("મારી", "my"),
     ("আমার", "my"),
@@ -158,11 +179,16 @@ def set_language_detector(detector: LanguageDetector) -> None:
 
 
 def normalize_for_intent(message: str) -> str:
-    text = message or ""
-    lowered = text
+    from app.pipeline.indic_terms import (
+        canonicalize_biomarker_terms,
+        follow_up_as_english,
+        status_question_as_english,
+    )
+
+    lowered = follow_up_as_english(canonicalize_biomarker_terms(message or ""))
     for src, dest in _INTENT_REPLACEMENTS:
         lowered = re.sub(re.escape(src), dest, lowered, flags=re.I)
-    return lowered
+    return status_question_as_english(lowered)
 
 
 _EXPLICIT = [

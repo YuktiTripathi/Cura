@@ -5,14 +5,20 @@ export function AppShell({
   children,
   drawerOpen,
   onCloseDrawer,
+  panel,
 }: {
   sidebar: ReactNode;
   children: ReactNode;
+  /** Optional detail panel beside the chat column. */
+  panel?: ReactNode;
   drawerOpen: boolean;
   onCloseDrawer: () => void;
 }) {
   return (
     <div className="app-shell">
+      <a className="skip-link" href="#cura-message-input">
+        Skip to message box
+      </a>
       {sidebar}
       {drawerOpen && (
         <button
@@ -22,7 +28,8 @@ export function AppShell({
           onClick={onCloseDrawer}
         />
       )}
-      <div className="main-column">{children}</div>
+      <main className="main-column">{children}</main>
+      {panel}
     </div>
   );
 }

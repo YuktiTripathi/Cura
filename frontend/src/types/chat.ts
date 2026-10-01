@@ -82,6 +82,14 @@ export type PresentedFinding = {
   source_id?: string | null;
   source_label?: string | null;
   canonical_key?: string | null;
+  numeric_value?: number | null;
+  reference_low?: number | null;
+  reference_high?: number | null;
+};
+
+/** SSE `preview`: values from the user's records, sent before the explanation is ready. */
+export type AnswerPreview = {
+  findings: PresentedFinding[];
 };
 
 export type HealthTheme = {

@@ -5,7 +5,8 @@ def escape_pdf_text(text: str) -> str:
     return text.replace("\\", "\\\\").replace("(", "\\(").replace(")", "\\)")
 
 
-def make_text_pdf(pages: list[str]) -> bytes:
+def make_text_pdf(pages: list[str] | list[list[str]]) -> bytes:
+    """Each page is a single string (one text run) or a list of lines (one PDF line each)."""
     n = len(pages)
     font_id = 3
     page_ids = list(range(4, 4 + n))
@@ -30,7 +31,12 @@ def make_text_pdf(pages: list[str]) -> bytes:
     for i, text in enumerate(pages):
         pid = page_ids[i]
         cid = content_ids[i]
-        stream = f"BT /F1 12 Tf 50 720 Td ({escape_pdf_text(text)}) Tj ET\n"
+        if isinstance(text, (list, tuple)):
+            # One PDF text line per entry, like a real lab table row.
+            shown = " ".join(f"({escape_pdf_text(line)}) Tj T*" for line in text)
+            stream = f"BT /F1 10 Tf 50 750 Td 14 TL {shown} ET\n"
+        else:
+            stream = f"BT /F1 12 Tf 50 720 Td ({escape_pdf_text(text)}) Tj ET\n"
         raw = stream.encode("latin-1")
         emit(
             obj_bytes(

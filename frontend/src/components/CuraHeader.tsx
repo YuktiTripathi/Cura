@@ -1,4 +1,16 @@
-export function CuraHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
+import { ThemeToggle } from "./ThemeToggle";
+import { LanguagePicker } from "./LanguagePicker";
+import type { LanguageCode } from "../lib/language";
+
+export function CuraHeader({
+  onOpenSidebar,
+  language,
+  onLanguageChange,
+}: {
+  onOpenSidebar: () => void;
+  language?: LanguageCode;
+  onLanguageChange?: (code: LanguageCode) => void;
+}) {
   return (
     <header className="cura-header">
       <div className="title-row">
@@ -6,7 +18,10 @@ export function CuraHeader({ onOpenSidebar }: { onOpenSidebar: () => void }) {
           ☰
         </button>
         <h1>Cura ✨</h1>
-        <span className="header-spacer" aria-hidden="true" />
+        <span className="header-controls">
+          {language && onLanguageChange ? <LanguagePicker value={language} onChange={onLanguageChange} /> : null}
+          <ThemeToggle />
+        </span>
       </div>
     </header>
   );

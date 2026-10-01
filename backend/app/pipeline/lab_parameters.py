@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import re
 from dataclasses import dataclass
+from functools import lru_cache
 
 
 @dataclass(frozen=True)
@@ -423,11 +424,17 @@ def parameter_alias_map() -> dict[str, str]:
     return out
 
 
+@lru_cache(maxsize=None)
+def _alias_pattern(value: str) -> re.Pattern[str]:
+    # Compile once per alias; ~1k aliases overflow re's internal 512-entry cache.
+    return re.compile(rf"(?<!\w){re.escape(value)}(?!\w)", re.I)
+
+
 def _alias_span(alias: str, text: str):
     value = (alias or "").strip().lower()
     if not value:
         return None
-    match = re.search(rf"(?<!\w){re.escape(value)}(?!\w)", text, re.I)
+    match = _alias_pattern(value).search(text)
     if not match:
         return None
     return match.start(), match.end()

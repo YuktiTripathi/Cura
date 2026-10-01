@@ -269,6 +269,9 @@ def _finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
         source_id=marker.report_id,
         source_label=user_source_caption("blood_report", when, latest=latest),
         canonical_key=canonical_marker_key(marker),
+        numeric_value=marker.value,
+        reference_low=marker.reference_low,
+        reference_high=marker.reference_high,
     )
 
 
@@ -323,6 +326,19 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
     if matched:
         return matched
     return [m for m in markers if m.key not in reasoning]
+
+
+def preview_findings(plan: QueryPlan, context: HealthContext, *, limit: int = 6) -> list[PresentedFinding]:
+    """The values the user explicitly asked about, ready to show before the explanation exists.
+
+    Broad questions ("summarize my health") get no preview: a wall of values is not an answer.
+    """
+    explicit = [key for key in (plan.display_entities or []) if key] or [
+        key for key in (plan.requested_metrics or []) if is_lab_key(key) and key not in (plan.reasoning_context or [])
+    ]
+    if not explicit or not context.markers:
+        return []
+    return [_finding_from_marker(marker) for marker in _visible_markers(plan, context)[:limit]]
 
 
 def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:

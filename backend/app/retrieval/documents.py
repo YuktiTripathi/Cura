@@ -73,6 +73,8 @@ def retrieve_structured_documents(
             rng = None
             if marker.reference_low is not None and marker.reference_high is not None:
                 rng = f"{marker.reference_low:g}–{marker.reference_high:g} {marker.unit or ''}".strip()
+            elif marker.reference_range:
+                rng = f"{marker.reference_range} {marker.unit or ''}".strip()
             evidence.append(
                 EvidenceRecord(
                     evidence_id=f"ev-{uuid4().hex[:8]}",

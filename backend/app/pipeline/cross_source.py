@@ -180,29 +180,39 @@ def render_comparison(result: ComparisonResult, *, why: bool = False, newer: boo
     for note in result.notes:
         lines.append(note)
     if why:
-        lines.extend(
-            [
-                "",
-                "### General explanation",
-                "Values can differ because of different collection dates, laboratories, testing methods, "
-                "normal measurement variation, or how results were reported. I do not have enough evidence to say which of those applies here.",
-            ]
-        )
+        lines.extend(_why_different())
     if newer:
-        lines.append("")
-        lines.append("### Which report is newer?")
-        if a.date and b.date:
-            if b.date > a.date:
-                lines.append(f"The SuperShyft report date ({b.date.isoformat()}) is later than the uploaded report date ({a.date.isoformat()}).")
-            elif a.date > b.date:
-                lines.append(f"The uploaded report date ({a.date.isoformat()}) is later than the SuperShyft report date ({b.date.isoformat()}).")
-            else:
-                lines.append("Both dates are the same, based on the dates that are available.")
-        else:
-            lines.append("I can compare the values, but I cannot reliably say which report is newer without clear test dates on both sides.")
+        lines.extend(_which_is_newer(a.date, b.date))
     lines.append("")
     lines.append("If you want, I can explain what this marker measures (general knowledge, not your personal result).")
     return "\n".join(lines)
+
+
+def _why_different() -> list[str]:
+    return [
+        "",
+        "### General explanation",
+        "Values can differ because of different collection dates, laboratories, testing methods, "
+        "normal measurement variation, or how results were reported. I do not have enough evidence to say which of those applies here.",
+    ]
+
+
+def _which_is_newer(uploaded_date, supershyft_date) -> list[str]:
+    lines = ["", "### Which report is newer?"]
+    if uploaded_date and supershyft_date:
+        if supershyft_date > uploaded_date:
+            lines.append(
+                f"The SuperShyft report date ({supershyft_date.isoformat()}) is later than the uploaded report date ({uploaded_date.isoformat()})."
+            )
+        elif uploaded_date > supershyft_date:
+            lines.append(
+                f"The uploaded report date ({uploaded_date.isoformat()}) is later than the SuperShyft report date ({supershyft_date.isoformat()})."
+            )
+        else:
+            lines.append("Both dates are the same, based on the dates that are available.")
+    else:
+        lines.append("I can compare the values, but I cannot reliably say which report is newer without clear test dates on both sides.")
+    return lines
 
 
 def uploaded_fact_to_source(fact: DocumentHealthFact) -> SourceValue:
@@ -260,11 +270,11 @@ def compare_uploaded_with_blood(
     return results
 
 
-def render_multi_comparison(results: list[ComparisonResult]) -> str:
+def render_multi_comparison(results: list[ComparisonResult], *, why: bool = False, newer: bool = False) -> str:
     if not results:
         return "I couldn't find matching values to compare between the uploaded report and SuperShyft."
     if len(results) == 1:
-        return render_comparison(results[0])
+        return render_comparison(results[0], why=why, newer=newer)
     lines = ["Compared with your latest SuperShyft report:", ""]
     for result in results:
         a, b = result.source_a, result.source_b
@@ -288,6 +298,12 @@ def render_multi_comparison(results: list[ComparisonResult]) -> str:
             "Source: Uploaded report · SuperShyft blood report",
         ]
     )
+    if why:
+        lines.extend(_why_different())
+    if newer:
+        # One uploaded report against one SuperShyft report: any result carries both dates.
+        dated = next((r for r in results if r.source_a.date and r.source_b.date), results[0])
+        lines.extend(_which_is_newer(dated.source_a.date, dated.source_b.date))
     return "\n".join(lines)
 
 

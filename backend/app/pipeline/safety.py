@@ -51,12 +51,29 @@ EMERGENCY_PATTERNS = (
     re.compile(r"(सांस|saans|saas)\s*(नही|nahi|nahin).{0,12}(आ|aa)", re.I),
     re.compile(r"(बेहोश|behos[h]?|behosh|unconscious)", re.I),
     re.compile(r"(लकवा|stroke|मुंह टेढ़ा|face droop)", re.I),
+    # Marathi
+    re.compile(r"छाती(?:त|मध्ये)?\s*(?:खूप\s*|फार\s*)?(?:दुख|वेदना|कळ)", re.I),
+    re.compile(r"श्वास\s*(?:घेता\s*येत\s*नाही|घ्यायला\s*त्रास|घेण्यास\s*त्रास)|दम\s*लागत|बेशुद्ध|अर्धांगवायू|खूप\s*रक्तस्त्राव", re.I),
+    # Punjabi (Gurmukhi)
+    re.compile(r"ਛਾਤੀ\s*(?:ਵਿੱਚ|ਵਿਚ)?\s*(?:ਬਹੁਤ\s*|ਤੇਜ਼\s*)?ਦਰਦ", re.I),
+    re.compile(r"ਸਾਹ\s*(?:ਨਹੀਂ|ਨਹੀ)\s*(?:ਆ|ਲੈ)|ਸਾਹ\s*ਲੈਣ\s*(?:ਵਿੱਚ|ਚ)\s*(?:ਤਕਲੀਫ|ਤਕਲੀਫ਼|ਮੁਸ਼ਕਲ)|ਬੇਹੋਸ਼|ਅਧਰੰਗ|ਲਕਵਾ", re.I),
+    # Gujarati
+    re.compile(r"છાતી(?:માં)?\s*(?:ખૂબ\s*|બહુ\s*)?(?:દુખાવો|દુખે|દર્દ)", re.I),
+    re.compile(r"શ્વાસ\s*(?:લેવામાં|લેવા)\s*(?:તકલીફ|મુશ્કેલી)|શ્વાસ\s*(?:નથી\s*આવતો|લઈ\s*શકતો\s*નથી|લઈ\s*શકતી\s*નથી)|બેભાન|બેહોશ|લકવો", re.I),
+    # Bengali
+    re.compile(r"বুকে\s*(?:প্রচণ্ড\s*|খুব\s*|তীব্র\s*)?(?:ব্যথা|ব্যাথা)", re.I),
+    re.compile(r"শ্বাস\s*নিতে\s*(?:পারছি\s*না|কষ্ট)|শ্বাসকষ্ট|দম\s*বন্ধ|অজ্ঞান|জ্ঞান\s*হারা|পক্ষাঘাত|স্ট্রোক", re.I),
 )
 
 SELF_HARM_PATTERNS = (
     re.compile(r"\b(suicid(?:e|al)|kill myself|end my life|don't want to live|do not want to live)\b", re.I),
     re.compile(r"(जीना नहीं|जीना नहि|mujhe jeena nahi|jeena nahi hai|marna chahta)", re.I),
     re.compile(r"(आत्महत्या|aatmahatya|suicide kar)", re.I),
+    # Marathi, Punjabi, Gujarati, Bengali
+    re.compile(r"जगायचं\s*नाही|जगायचे\s*नाही|जीव\s*द्यायचा", re.I),
+    re.compile(r"ਖੁਦਕੁਸ਼ੀ|ਖ਼ੁਦਕੁਸ਼ੀ|ਆਤਮਹੱਤਿਆ|ਜੀਣਾ\s*ਨਹੀਂ|ਮਰਨਾ\s*ਚਾਹੁੰਦ", re.I),
+    re.compile(r"આત્મહત્યા|આપઘાત|જીવવું\s*નથી|મરી\s*જવું\s*છે", re.I),
+    re.compile(r"আত্মহত্যা|বাঁচতে\s*চাই\s*না|মরে\s*যেতে\s*চাই", re.I),
 )
 
 MEDICATION_MISUSE = (

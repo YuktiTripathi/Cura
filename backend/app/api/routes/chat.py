@@ -71,10 +71,13 @@ def chat_stream(
     def on_progress(event) -> None:
         events_q.put(("progress", event.model_dump(mode="json")))
 
+    def on_preview(preview) -> None:
+        events_q.put(("preview", preview.model_dump(mode="json")))
+
     def worker() -> None:
         session = SessionLocal()
         try:
-            emitter = ProgressEmitter(callback=on_progress)
+            emitter = ProgressEmitter(callback=on_progress, preview_callback=on_preview)
             response = ChatService(session, get_registry()).chat(
                 principal, payload, request_id, progress=emitter
             )
@@ -103,6 +106,8 @@ def chat_stream(
                 break
             if kind == "progress":
                 yield _event("progress", payload_data)
+            elif kind == "preview":
+                yield _event("preview", payload_data)
             elif kind == "complete":
                 yield _event("complete", payload_data)
                 yield _event("answer", payload_data)

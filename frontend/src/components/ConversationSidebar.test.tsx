@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { renderWithQuery as render } from "../test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ConversationSidebar } from "../components/ConversationSidebar";
 import { CuraPage } from "../pages/CuraPage";
@@ -30,7 +31,7 @@ vi.mock("../lib/api", async () => {
         personal_unavailable: false,
       },
     })),
-    listConversations: vi.fn(async () => conversations),
+    listConversations: vi.fn(async () => [...conversations]),
     getConversation: vi.fn(async (id: string) => ({
       id,
       title: conversations.find((c) => c.id === id)?.title || "Cura conversation",
@@ -46,6 +47,7 @@ vi.mock("../lib/api", async () => {
     streamChat: vi.fn(),
     sendFeedback: vi.fn(),
     listDocuments: vi.fn(async () => []),
+    getOverview: vi.fn(async () => ({ available: false, markers: [], insights: [], scores: [], reports: [] })),
   };
 });
 
@@ -70,7 +72,7 @@ describe("ConversationSidebar", () => {
     await waitFor(() => {
       expect(screen.getByText("Recent conversations")).toBeTruthy();
     });
-    expect(screen.getByText("No conversations yet.")).toBeTruthy();
+    expect(await screen.findByText("No conversations yet.")).toBeTruthy();
     expect(screen.getByText("Start a conversation with Cura to see it here.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "+ New conversation" })).toBeTruthy();
   });
@@ -129,5 +131,20 @@ describe("CuraPage shell", () => {
     expect(sidebar).toBeTruthy();
     expect(sidebar?.textContent).toContain("Recent conversations");
     expect(document.querySelector(".page")).toBeNull();
+  });
+
+  it("answers in the chosen language and remembers it", async () => {
+    const api = await import("../lib/api");
+    render(<CuraPage />);
+    await waitFor(() => expect(screen.getByText("Hi Yukti 👋")).toBeTruthy());
+    const picker = screen.getByLabelText("Answer language") as HTMLSelectElement;
+    expect(picker.value).toBe("auto");
+    fireEvent.change(picker, { target: { value: "hi" } });
+    await waitFor(() => expect(api.getCurrentUser).toHaveBeenCalledWith("hi"));
+    // The interface stays English; only text in an Indic script is tagged with its language.
+    expect(document.documentElement.lang).not.toBe("hi");
+    expect(window.localStorage.getItem("cura_language")).toBe("hi");
+    fireEvent.change(picker, { target: { value: "auto" } });
+    expect(window.localStorage.getItem("cura_language")).toBeNull();
   });
 });

@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import json
 import logging
-import re
 from datetime import date
 from typing import Any  # chunks may be ORM rows or ChunkDraft
 
@@ -28,9 +27,13 @@ class ExtractedBiomarker(BaseModel):
     reference_high: float | None = None
     flag: str | None = None
     source_page: int | None = None
+    source_line: int | None = None
     excerpt: str | None = None
     confidence: str = "low"
     extraction_method: str = "text"
+
+    def has_reference(self) -> bool:
+        return self.reference_low is not None or self.reference_high is not None or bool(self.reference_range)
 
 
 class ExtractedRisk(BaseModel):
@@ -61,9 +64,6 @@ def extract_structured_from_chunks(
         text = chunk.text or ""
         report_date = report_date or find_report_date(text)
         for param in PARAMETERS:
-            if param.key == "cholesterol" and re.search(r"\b(ldl|hdl)\s+cholesterol\b", text, re.I):
-                if not re.search(r"\btotal cholesterol\b", text, re.I):
-                    continue
             extracted = extract_marker_from_text(text, param.key, page=chunk.page_start)
             if not extracted or extracted.value is None:
                 continue
@@ -79,9 +79,10 @@ def extract_structured_from_chunks(
                 None,
             )
             if existing:
-                if existing.reference_low is None and extracted.reference_low is not None:
+                if not existing.has_reference() and extracted.reference_text:
                     existing.reference_low = extracted.reference_low
                     existing.reference_high = extracted.reference_high
+                    existing.reference_range = extracted.reference_text
                 continue
             biomarkers.append(
                 ExtractedBiomarker(
@@ -89,9 +90,11 @@ def extract_structured_from_chunks(
                     normalized_name=param.key,
                     value=extracted.value,
                     unit=extracted.unit,
+                    reference_range=extracted.reference_text,
                     reference_low=extracted.reference_low,
                     reference_high=extracted.reference_high,
                     source_page=extracted.page or chunk.page_start,
+                    source_line=extracted.line,
                     excerpt=(extracted.source_text or "")[:200],
                     confidence=extracted.confidence,
                 )

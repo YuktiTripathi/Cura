@@ -69,7 +69,10 @@ from app.pipeline.health_sources import has_supershyft_sources, is_lab_source_co
 from app.pipeline.document_context import resolve_attached_documents
 from app.pipeline.stages import RouteStage, SafetyStage
 from app.pipeline.observability import ProgressEmitter
+from app.contracts.presentation import AnswerPreview
 from app.contracts.processing import ProcessingStage
+from app.pipeline.presentation import preview_findings
+from app.pipeline.indic_terms import canonicalize_biomarker_terms
 from app.pipeline.renderer import (
     DeterministicRenderer,
     render_bio_ai_ambiguity,
@@ -263,8 +266,11 @@ class ChatService:
             title = conversation_title(payload.message)
             conv = self.repo.create(principal.subject_id, title=title)
 
-        prior_topic, prior_name = self.memory.resolve_topic(conv, payload.message)
-        conv_state = ConversationStateResolver().resolve(payload.message, conv)
+        # Biomarker names written in an Indic script ("एलडीएल", "विटामिन डी") → the names routing matches.
+        # Only planning sees this; storage, language detection and safety keep the user's own text.
+        routing_message = canonicalize_biomarker_terms(payload.message)
+        prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
+        conv_state = ConversationStateResolver().resolve(routing_message, conv)
         eval_turn["conversation_state"] = conv_state
         if not prior_topic and conv_state.active_entities:
             prior_topic = conv_state.active_entities[0]
@@ -295,7 +301,7 @@ class ChatService:
         self._progress.emit(ProcessingStage.planning)
         self._progress.mark("planning")
         routed = RouteStage().run(
-            payload.message,
+            routing_message,
             conversation_summary="",
             previous_user_message=previous_user_message,
             previous_intent=previous_intent,
@@ -839,6 +845,12 @@ class ChatService:
             self._progress.emit(ProcessingStage.analyzing_trends, plan=plan)
         elif plan.needs_cross_source:
             self._progress.emit(ProcessingStage.comparing_results, plan=plan)
+        if plan.needs_personal_data and not general_only:
+            # Stream clients can show the user's own values while the explanation is written.
+            try:
+                self._progress.preview(AnswerPreview(findings=preview_findings(plan, context)))
+            except Exception:
+                logger.debug("answer_preview_failed request_id=%s", request_id, exc_info=True)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
         reasoned = self.reasoner.run(
@@ -1351,6 +1363,10 @@ class ChatService:
                     "knowledge_scope": KnowledgeScope.personal,
                 }
             )
+            if not topic and uploaded_keys and not ss_plan.requested_metrics:
+                # "Compare my report with SuperShyft": fetch the markers the uploaded report has,
+                # otherwise the SuperShyft side is empty and every marker reads as "not found".
+                ss_plan = ss_plan.model_copy(update={"requested_metrics": sorted(uploaded_keys)})
             context = self.builder.build(
                 principal, ss_plan, db=self.db, document_ids=payload.document_ids
             )
@@ -1414,10 +1430,11 @@ class ChatService:
                 )
                 doc_id = up_sv.document_id or doc_id
                 lower = payload.message.lower()
+                why = "why" in lower and "different" in lower
                 answer = (
-                    render_comparison(result, why="why" in lower and "different" in lower, newer="newer" in lower)
+                    render_comparison(result, why=why, newer="newer" in lower)
                     if len(structured_results) == 1
-                    else render_multi_comparison(structured_results)
+                    else render_multi_comparison(structured_results, why=why, newer="newer" in lower)
                 )
             elif structured_results:
                 result = structured_results[0]

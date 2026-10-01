@@ -1,5 +1,6 @@
-import type { ChatResponse, ContextRef } from "../types/chat";
+import type { AnswerPreview, ChatResponse, ContextRef } from "../types/chat";
 import type { MeResponse } from "../types/me";
+import type { HealthOverview } from "../types/overview";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
 const USER = import.meta.env.VITE_CURA_USER_ID || "";
@@ -59,6 +60,12 @@ export async function getCurrentUser(language?: string): Promise<MeResponse> {
   } catch {
     return fallbackMe();
   }
+}
+
+export async function getOverview(): Promise<HealthOverview> {
+  const res = await fetch(`${API}/api/v1/me/overview`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("Your health overview isn't available right now.");
+  return (await res.json()) as HealthOverview;
 }
 
 export async function transcribeVoice(
@@ -139,7 +146,8 @@ export async function streamChat(
   documentIds: string[],
   contextRef: ContextRef | undefined,
   onToken: (text: string) => void,
-  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void
+  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void,
+  onPreview?: (preview: AnswerPreview) => void
 ): Promise<ChatResponse> {
   const payload: Record<string, unknown> = {
     message,
@@ -187,6 +195,7 @@ export async function streamChat(
       const data = JSON.parse(raw);
       if (event === "token") onToken(data.text || "");
       if (event === "progress" && onProgress) onProgress(data);
+      if (event === "preview" && onPreview) onPreview(data as AnswerPreview);
       if (event === "error") throw new Error(data.message || "Streaming request failed");
       if (event === "complete" || event === "answer") completed = data as ChatResponse;
     }
@@ -243,6 +252,43 @@ export async function getDocument(documentId: string): Promise<UploadedDocument>
   const data = await parseJson(res);
   if (!res.ok) throw new Error("Document not found.");
   return data as unknown as UploadedDocument;
+}
+
+export type DocumentPage = {
+  document_id: string;
+  filename: string;
+  page: number;
+  page_count: number;
+  text: string;
+  approximate: boolean;
+};
+
+export async function getDocumentPage(documentId: string, page: number): Promise<DocumentPage> {
+  const res = await fetch(`${API}/api/v1/documents/${documentId}/pages/${page}`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("That page isn't available.");
+  return (await res.json()) as DocumentPage;
+}
+
+export type DocumentFact = {
+  key: string;
+  label: string;
+  value?: number | null;
+  unit?: string | null;
+  reference_low?: number | null;
+  reference_high?: number | null;
+  reference_text?: string | null;
+  status?: string | null;
+  page?: number | null;
+  line?: number | null;
+  excerpt?: string | null;
+};
+
+export type DocumentFacts = { document_id: string; filename: string; ready: boolean; facts: DocumentFact[] };
+
+export async function getDocumentFacts(documentId: string): Promise<DocumentFacts> {
+  const res = await fetch(`${API}/api/v1/documents/${documentId}/facts`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("Those values aren't available.");
+  return (await res.json()) as DocumentFacts;
 }
 
 export async function listDocuments(): Promise<UploadedDocument[]> {

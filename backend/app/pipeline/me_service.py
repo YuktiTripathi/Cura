@@ -8,6 +8,7 @@ from app.core.copy import greeting_for_first_name
 from app.core.errors import ProviderUnavailableError
 from app.pipeline.starters import build_starters, collect_snapshot
 from app.providers.registry import ProviderRegistry
+from app.voice.providers import voice_input_available
 
 logger = logging.getLogger("cura.me")
 
@@ -25,6 +26,7 @@ def _capabilities_from_snapshot(snap, *, has_health_goals: bool = False) -> MeCa
         has_nutrition=snap.has_nutrition,
         has_health_scenario=bool(snap.has_blood or snap.has_bio),
         has_health_goals=has_health_goals,
+        voice_input=voice_input_available(),
     )
 
 
@@ -50,7 +52,7 @@ def build_me_response(
             display_name=None,
             greeting=greeting_for_first_name(None, language),
             profile_available=False,
-            capabilities=MeCapabilities(),
+            capabilities=MeCapabilities(voice_input=voice_input_available()),
             starters=starters,
         )
 

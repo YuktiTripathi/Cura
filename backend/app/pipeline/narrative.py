@@ -151,6 +151,10 @@ def dedupe_missing(items: list, present_keys: set[str]) -> list:
     return out
 
 
+def _number(value) -> float | None:
+    return float(value) if isinstance(value, (int, float)) and not isinstance(value, bool) else None
+
+
 def finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     when = getattr(marker, "measured_at", None)
     value = None if getattr(marker, "value", None) is None else f"{marker.value}"
@@ -165,6 +169,9 @@ def finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
         source_date=dated,
         source_id=getattr(marker, "report_id", None),
         canonical_key=canonical_marker_key(marker),
+        numeric_value=_number(getattr(marker, "value", None)),
+        reference_low=_number(getattr(marker, "reference_low", None)),
+        reference_high=_number(getattr(marker, "reference_high", None)),
     )
 
 

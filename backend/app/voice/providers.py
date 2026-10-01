@@ -156,3 +156,9 @@ def get_stt_provider() -> SpeechToTextProvider:
     if name in {"openai_compatible", "openai", "api", "groq", "openrouter"}:
         return OpenAICompatibleSTTProvider()
     return UnconfiguredSTTProvider()
+
+
+def voice_input_available() -> bool:
+    """Whether a speech-to-text provider is configured, so clients can offer the microphone."""
+    return not isinstance(get_stt_provider(), UnconfiguredSTTProvider)
+

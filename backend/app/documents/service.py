@@ -8,8 +8,10 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.core.errors import DocumentUploadError, DocumentValidationError, NotFoundError
-from app.db.models import Document
-from app.documents.contracts import DocumentOut
+from app.db.models import Document, DocumentChunk
+from app.documents.contracts import DocumentFactOut, DocumentFactsOut, DocumentOut, DocumentPageOut
+from app.documents.extraction import extract_pdf_pages
+from app.documents.normalization import normalize_extracted_text
 from app.documents.storage import LocalDocumentStore, get_document_store
 from app.documents.validation import validate_pdf_upload
 
@@ -123,6 +125,66 @@ class DocumentService:
 
     def get(self, user_id: str, document_id: str) -> DocumentOut:
         return to_out(self.get_owned(user_id, document_id))
+
+    def facts(self, user_id: str, document_id: str) -> DocumentFactsOut:
+        """Measurements extracted from an owned document, in report order."""
+        from app.documents.facts import infer_status
+        from app.documents.structured import load_structured
+        from app.pipeline.lab_parameters import display_name_for
+
+        row = self.get_owned(user_id, document_id)
+        extracted = load_structured(row)
+        facts: list[DocumentFactOut] = []
+        for item in (extracted.biomarkers if extracted else []):
+            value = item.value if isinstance(item.value, (int, float)) and not isinstance(item.value, bool) else None
+            facts.append(
+                DocumentFactOut(
+                    key=item.normalized_name,
+                    label=display_name_for(item.normalized_name) or item.name,
+                    value=value,
+                    unit=item.unit,
+                    reference_low=item.reference_low,
+                    reference_high=item.reference_high,
+                    reference_text=item.reference_range,
+                    status=item.flag or infer_status(value, item.reference_low, item.reference_high, None),
+                    page=item.source_page,
+                    line=item.source_line,
+                    excerpt=item.excerpt,
+                )
+            )
+        facts.sort(key=lambda f: (f.page or 0, f.line or 0, f.label))
+        return DocumentFactsOut(document_id=row.id, filename=row.original_filename, ready=extracted is not None, facts=facts)
+
+    def page(self, user_id: str, document_id: str, page: int) -> DocumentPageOut:
+        """Page text normalized exactly as at extraction time, so excerpts and line numbers match."""
+        row = self.get_owned(user_id, document_id)
+        pages = extract_pdf_pages(self.store.read(row.storage_key))
+        if page < 1 or page > len(pages):
+            raise NotFoundError("Page not found.")
+        text = normalize_extracted_text(pages[page - 1].text)
+        approximate = False
+        if not text:
+            chunk = (
+                self.db.query(DocumentChunk)
+                .filter(
+                    DocumentChunk.document_id == row.id,
+                    DocumentChunk.user_id == user_id,
+                    DocumentChunk.page_start <= page,
+                    DocumentChunk.page_end >= page,
+                )
+                .order_by(DocumentChunk.page_start)
+                .first()
+            )
+            text = chunk.text if chunk else ""
+            approximate = bool(chunk)
+        return DocumentPageOut(
+            document_id=row.id,
+            filename=row.original_filename,
+            page=page,
+            page_count=len(pages),
+            text=text,
+            approximate=approximate,
+        )
 
     def list_for_user(self, user_id: str) -> list[DocumentOut]:
         rows = (

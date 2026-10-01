@@ -100,3 +100,13 @@ describe("Composer voice input", () => {
     expect(screen.queryByText(/lost its connection/i)).toBeNull();
   });
 });
+
+describe("Composer voice availability", () => {
+  afterEach(() => cleanup());
+
+  it("does not offer the microphone when the server has no speech-to-text", () => {
+    render(<Composer disabled={false} onSend={vi.fn()} voiceEnabled={false} />);
+    expect(screen.queryByLabelText("Start voice input")).toBeNull();
+    expect(screen.getByLabelText("Attach PDF")).toBeTruthy();
+  });
+});
