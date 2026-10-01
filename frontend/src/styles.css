@@ -581,3 +581,9 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .waveform { display: inline-flex; align-items: center; gap: 2px; height: 28px; padding: 0 4px; }
 .waveform span { width: 3px; border-radius: 2px; background: var(--recording-border); transition: height 60ms linear; }
 .visually-hidden { position: absolute !important; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.header-controls { display: inline-flex; align-items: center; gap: 8px; }
+.language-picker select {
+  height: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); color: var(--text);
+  padding: 0 8px; font: inherit; font-size: 14px; max-width: 150px; cursor: pointer;
+}

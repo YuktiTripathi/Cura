@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from "react";
+import { readLanguage, writeLanguage, type LanguageCode } from "../lib/language";
 import { useStickToBottom } from "../hooks/useStickToBottom";
 import { useCuraChat } from "../hooks/useCuraChat";
 import { useMe } from "../hooks/useMe";
@@ -20,6 +21,7 @@ import { ReviewValues } from "../components/documents/ReviewValues";
 import { sendFeedback } from "../lib/api";
 
 export function CuraPage() {
+  const [language, setLanguage] = useState<LanguageCode>(readLanguage);
   const {
     messages,
     loading,
@@ -31,8 +33,8 @@ export function CuraPage() {
     conversationEpoch,
     newConversation,
     resumeConversation,
-  } = useCuraChat();
-  const { me, loading: meLoading } = useMe();
+  } = useCuraChat(language);
+  const { me, loading: meLoading } = useMe(language);
   const [docTick, setDocTick] = useState(0);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -113,7 +115,14 @@ export function CuraPage() {
         />
       }
     >
-      <CuraHeader onOpenSidebar={() => setDrawerOpen(true)} />
+      <CuraHeader
+        onOpenSidebar={() => setDrawerOpen(true)}
+        language={language}
+        onLanguageChange={(code) => {
+          writeLanguage(code);
+          setLanguage(code);
+        }}
+      />
       <div className="main-scroll" ref={scrollRef}>
         {!started && (
           <WelcomeExperience me={me} meLoading={meLoading} onSend={sendWithContext} inputRef={inputRef} />
@@ -153,6 +162,7 @@ export function CuraPage() {
           uploader={uploader}
           onReview={setReviewId}
           voiceEnabled={me?.capabilities?.voice_input !== false}
+          language={language}
         />
         <footer>
           Cura provides educational information, not diagnosis or medication advice.

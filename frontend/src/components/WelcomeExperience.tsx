@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import type { ContextRef } from "../types/chat";
 import type { MeResponse } from "../types/me";
 import { StarterChips } from "./StarterChips";
+import { langForText } from "../lib/language";
 import { HealthOverviewSection } from "./home/HealthOverviewSection";
 
 export function WelcomeExperience({
@@ -23,7 +24,9 @@ export function WelcomeExperience({
 
   return (
     <section className="welcome">
-      <p className="greeting">{greeting}</p>
+      <p className="greeting" lang={langForText(greeting)}>
+        {greeting}
+      </p>
       <p className="welcome-lead">How can I help you understand your health better?</p>
       <p className="muted">
         I can explain your available SuperShyft reports, build your health scenario, explore nutrition,

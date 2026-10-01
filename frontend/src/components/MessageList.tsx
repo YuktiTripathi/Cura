@@ -6,6 +6,7 @@ import { EscalationNote, FollowUpChips, Recommendations } from "./messages/Messa
 import { MessageActions, type FeedbackRating } from "./messages/MessageActions";
 import { SourceViewer } from "./SourceViewer";
 import { groupEvidence } from "../lib/sources";
+import { langForText } from "../lib/language";
 import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
 import { DoctorSummary } from "./DoctorSummary";
 import { InsightNote } from "./messages/InsightNote";
@@ -68,7 +69,7 @@ export function MessageList({
           ) : null;
         }
         return (
-          <article key={i} className={m.role}>
+          <article key={i} className={m.role} lang={langForText(m.content)}>
             {m.role === "user" && editingIndex === i ? (
               <UserQuestionEditor
                 draft={draft}
