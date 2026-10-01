@@ -224,6 +224,15 @@ already supports this (`/api/v1/context/{type}/{id}`).
 - **Phase 3** – done: home dashboard and marker panel with trend chart (`/me/overview`), in-chat insight
   note, doctor summary (print/copy), tickable next steps, merged suggestion chips.
 
+- **Phase 4** – done: drop a PDF anywhere, "Review values" (each extracted value with its page, line and
+  quoted row; `/documents/{id}/facts`), one-click comparison with SuperShyft (which also fixed whole-report
+  comparisons reporting every marker as "not found"), live voice waveform and a `voice_input` capability so
+  the microphone is only offered when speech-to-text is configured, an answer-language picker, and an
+  accessibility pass: axe-core (WCAG 2.2 AA) found 121 violating nodes across all screens and dialogs in
+  both themes, now 0; Lighthouse accessibility and best practices 100 on desktop and mobile; layouts hold
+  at 320 px. The interface text itself is still English only: translating it needs a reviewed string
+  catalogue, which is a content task rather than an engineering one.
+
 #### What happened to each backend `StructuredResponse` field
 
 | Field | UI | Notes |
