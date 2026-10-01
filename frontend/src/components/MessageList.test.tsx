@@ -330,3 +330,31 @@ describe("MessageList pending answer", () => {
     expect(document.querySelectorAll("article.assistant").length).toBe(0);
   });
 });
+
+describe("MessageList answer preview", () => {
+  it("shows previewed values while the explanation is still being written", () => {
+    render(
+      <MessageList
+        messages={[
+          { role: "user", content: "What is my LDL?" },
+          {
+            role: "assistant",
+            content: "",
+            preview: [
+              { label: "LDL cholesterol", value: "138.0", unit: "mg/dL", numeric_value: 138, reference_low: 0, reference_high: 100 },
+            ],
+          },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+    expect(screen.getByTestId("answer-preview")).toBeTruthy();
+    expect(screen.getByText("LDL cholesterol")).toBeTruthy();
+    expect(screen.getByText("Above range")).toBeTruthy();
+    // No feedback or follow-ups on an unfinished answer.
+    expect(screen.queryByText("Was this helpful?")).toBeNull();
+  });
+});
+

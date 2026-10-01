@@ -1,4 +1,5 @@
 import { useRef, useState } from "react";
+import { useStickToBottom } from "../hooks/useStickToBottom";
 import { useCuraChat } from "../hooks/useCuraChat";
 import { useMe } from "../hooks/useMe";
 import { AppShell } from "../components/AppShell";
@@ -31,6 +32,12 @@ export function CuraPage() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const started = messages.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
+  const userTurns = messages.filter((m) => m.role === "user").length;
+  const last = messages[messages.length - 1];
+  // Changes whenever visible chat content grows: a message, a progress step, a preview, the answer.
+  const contentKey = `${messages.length}:${processingSteps.length}:${last?.preview?.length ?? 0}:${last?.content.length ?? 0}`;
+  useStickToBottom(scrollRef, contentKey, userTurns);
 
   function sendWithContext(text: string, documentIds: string[] = [], contextRef?: ContextRef) {
     const ids = Array.from(new Set([...selectedDocumentIds, ...documentIds]));
@@ -62,7 +69,7 @@ export function CuraPage() {
       }
     >
       <CuraHeader onOpenSidebar={() => setDrawerOpen(true)} />
-      <div className="main-scroll">
+      <div className="main-scroll" ref={scrollRef}>
         {!started && (
           <WelcomeExperience me={me} meLoading={meLoading} onSend={sendWithContext} inputRef={inputRef} />
         )}

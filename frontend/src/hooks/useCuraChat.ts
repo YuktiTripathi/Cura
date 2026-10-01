@@ -2,7 +2,7 @@ import { useState } from "react";
 import { rewindConversation, streamChat } from "../lib/api";
 import type { ConversationDetail } from "../lib/api";
 import type { ProcessingEvent } from "../lib/processingMessages";
-import type { ChatMeta, ContextRef, EvidenceItem, FollowUp, Recommendation, StructuredResponse, TestingOption, UserProvenance } from "../types/chat";
+import type { ChatMeta, ContextRef, EvidenceItem, FollowUp, PresentedFinding, Recommendation, StructuredResponse, TestingOption, UserProvenance } from "../types/chat";
 
 export type ChatMessage = {
   role: "user" | "assistant";
@@ -14,6 +14,8 @@ export type ChatMessage = {
   provenance?: UserProvenance;
   presentation?: StructuredResponse | null;
   testingOption?: TestingOption | null;
+  /** Values shown while the answer is still being written (SSE `preview`). */
+  preview?: PresentedFinding[];
 };
 
 export function useCuraChat(language = "auto") {
@@ -86,6 +88,16 @@ export function useCuraChat(language = "auto") {
         (event) => {
           if (event.stage === "COMPLETE") return;
           flush(event);
+        },
+        (preview) => {
+          setMessages((current) => {
+            const next = [...current];
+            const last = next.length - 1;
+            if (last >= 0 && next[last].role === "assistant" && !next[last].content) {
+              next[last] = { ...next[last], preview: preview.findings };
+            }
+            return next;
+          });
         }
       );
       finished = true;

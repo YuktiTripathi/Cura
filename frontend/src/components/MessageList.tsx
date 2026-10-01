@@ -4,6 +4,7 @@ import type { ChatMessage } from "../hooks/useCuraChat";
 import { AssistantBody } from "./messages/AssistantBody";
 import { EscalationNote, FeedbackActions, FollowUpChips, Recommendations } from "./messages/MessageExtras";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
+import { PreviewAnswer } from "./messages/PreviewAnswer";
 import { ProvenanceLine } from "./messages/ProvenanceLine";
 import { TestingOptionCard } from "./messages/TestingOptionCard";
 import { UserQuestionActions, UserQuestionEditor } from "./messages/UserQuestion";
@@ -43,8 +44,15 @@ export function MessageList({
   return (
     <div className="messages">
       {messages.map((m, i) => {
-        // An assistant placeholder stays empty until the answer arrives; the progress stepper covers that wait.
-        if (m.role === "assistant" && !m.content && !m.presentation) return null;
+        // An assistant placeholder stays empty until the answer arrives; the progress stepper covers that
+        // wait. If Cura already sent the values being asked about, show them meanwhile.
+        if (m.role === "assistant" && !m.content && !m.presentation) {
+          return m.preview && m.preview.length > 0 ? (
+            <article key={i} className="assistant pending" aria-busy="true">
+              <PreviewAnswer findings={m.preview} />
+            </article>
+          ) : null;
+        }
         return (
           <article key={i} className={m.role}>
             {m.role === "user" && editingIndex === i ? (
