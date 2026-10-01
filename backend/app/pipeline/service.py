@@ -72,6 +72,7 @@ from app.pipeline.observability import ProgressEmitter
 from app.contracts.presentation import AnswerPreview
 from app.contracts.processing import ProcessingStage
 from app.pipeline.presentation import preview_findings
+from app.pipeline.indic_terms import canonicalize_biomarker_terms
 from app.pipeline.renderer import (
     DeterministicRenderer,
     render_bio_ai_ambiguity,
@@ -265,8 +266,11 @@ class ChatService:
             title = conversation_title(payload.message)
             conv = self.repo.create(principal.subject_id, title=title)
 
-        prior_topic, prior_name = self.memory.resolve_topic(conv, payload.message)
-        conv_state = ConversationStateResolver().resolve(payload.message, conv)
+        # Biomarker names written in an Indic script ("एलडीएल", "विटामिन डी") → the names routing matches.
+        # Only planning sees this; storage, language detection and safety keep the user's own text.
+        routing_message = canonicalize_biomarker_terms(payload.message)
+        prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
+        conv_state = ConversationStateResolver().resolve(routing_message, conv)
         eval_turn["conversation_state"] = conv_state
         if not prior_topic and conv_state.active_entities:
             prior_topic = conv_state.active_entities[0]
@@ -297,7 +301,7 @@ class ChatService:
         self._progress.emit(ProcessingStage.planning)
         self._progress.mark("planning")
         routed = RouteStage().run(
-            payload.message,
+            routing_message,
             conversation_summary="",
             previous_user_message=previous_user_message,
             previous_intent=previous_intent,
