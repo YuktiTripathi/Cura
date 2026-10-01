@@ -6,10 +6,12 @@ from app.auth.models import AuthenticatedPrincipal
 from app.contracts.goals import GoalListRequest, GoalListResponse
 from app.contracts.me import MeResponse
 from app.contracts.capabilities import CapabilitiesResponse
+from app.contracts.overview import HealthOverview
 from app.contracts.snapshot import PersonalHealthSnapshot
 from app.db.goal_store import GoalStore
 from app.db.session import get_db
 from app.pipeline.goal_progress import compute_goal_progress
+from app.pipeline.health_overview import build_health_overview
 from app.pipeline.health_snapshot import build_personal_health_snapshot
 from app.pipeline.me_service import build_me_response
 from app.providers.registry import ProviderRegistry, get_registry
@@ -49,6 +51,16 @@ def health_snapshot(
     db: Session = Depends(get_db),
 ) -> PersonalHealthSnapshot:
     return build_personal_health_snapshot(principal, registry, db=db)
+
+
+@router.get("/me/overview", response_model=HealthOverview)
+def health_overview(
+    principal: AuthenticatedPrincipal = Depends(get_principal),
+    registry: ProviderRegistry = Depends(get_registry),
+    db: Session = Depends(get_db),
+) -> HealthOverview:
+    """Latest values with history, active insights, scores and reports for the home dashboard."""
+    return build_health_overview(build_personal_health_snapshot(principal, registry, db=db))
 
 
 @router.get("/me/goals", response_model=GoalListResponse)

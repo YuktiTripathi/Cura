@@ -2403,6 +2403,56 @@
         "title": "HealthJourney",
         "type": "object"
       },
+      "HealthOverview": {
+        "properties": {
+          "available": {
+            "default": true,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "insights": {
+            "items": {
+              "$ref": "#/components/schemas/InsightOverview"
+            },
+            "title": "Insights",
+            "type": "array"
+          },
+          "latest_report_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Report Date"
+          },
+          "markers": {
+            "items": {
+              "$ref": "#/components/schemas/MarkerOverview"
+            },
+            "title": "Markers",
+            "type": "array"
+          },
+          "reports": {
+            "items": {
+              "$ref": "#/components/schemas/ReportOverview"
+            },
+            "title": "Reports",
+            "type": "array"
+          },
+          "scores": {
+            "items": {
+              "$ref": "#/components/schemas/ScoreOverview"
+            },
+            "title": "Scores",
+            "type": "array"
+          }
+        },
+        "title": "HealthOverview",
+        "type": "object"
+      },
       "HealthTheme": {
         "properties": {
           "interpretation": {
@@ -2544,6 +2594,35 @@
           "summary"
         ],
         "title": "InsightCandidate",
+        "type": "object"
+      },
+      "InsightOverview": {
+        "properties": {
+          "marker_key": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Key"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "summary"
+        ],
+        "title": "InsightOverview",
         "type": "object"
       },
       "KnownLifestyle": {
@@ -2706,6 +2785,161 @@
         ],
         "title": "MarkerFlag",
         "type": "string"
+      },
+      "MarkerOverview": {
+        "properties": {
+          "history": {
+            "items": {
+              "$ref": "#/components/schemas/MarkerPoint"
+            },
+            "title": "History",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "measured_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured On"
+          },
+          "previous_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous On"
+          },
+          "previous_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Value"
+          },
+          "reference_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference High"
+          },
+          "reference_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Low"
+          },
+          "status": {
+            "default": "unknown",
+            "enum": [
+              "low",
+              "high",
+              "critical",
+              "normal",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "trend": {
+            "anyOf": [
+              {
+                "enum": [
+                  "toward_range",
+                  "away_from_range",
+                  "steady",
+                  "in_range"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Trend"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "MarkerOverview",
+        "type": "object"
+      },
+      "MarkerPoint": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "status": {
+            "default": "unknown",
+            "enum": [
+              "low",
+              "high",
+              "critical",
+              "normal",
+              "unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "value": {
+            "title": "Value",
+            "type": "number"
+          }
+        },
+        "required": [
+          "date",
+          "value"
+        ],
+        "title": "MarkerPoint",
+        "type": "object"
       },
       "MeCapabilities": {
         "properties": {
@@ -3959,6 +4193,24 @@
         "title": "RecentContext",
         "type": "object"
       },
+      "ReportOverview": {
+        "properties": {
+          "date": {
+            "title": "Date",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title",
+          "date"
+        ],
+        "title": "ReportOverview",
+        "type": "object"
+      },
       "ResponseMode": {
         "enum": [
           "SINGLE_VALUE",
@@ -3992,6 +4244,41 @@
           "keep"
         ],
         "title": "RewindRequest",
+        "type": "object"
+      },
+      "ScoreOverview": {
+        "properties": {
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          }
+        },
+        "required": [
+          "name"
+        ],
+        "title": "ScoreOverview",
         "type": "object"
       },
       "SnapshotReport": {
@@ -5479,6 +5766,25 @@
           }
         },
         "summary": "Put Goals"
+      }
+    },
+    "/api/v1/me/overview": {
+      "get": {
+        "description": "Latest values with history, active insights, scores and reports for the home dashboard.",
+        "operationId": "health_overview_api_v1_me_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health Overview"
       }
     },
     "/api/v1/voice": {

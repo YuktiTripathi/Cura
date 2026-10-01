@@ -283,6 +283,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Health Overview
+         * @description Latest values with history, active insights, scores and reports for the home dashboard.
+         */
+        get: operations["health_overview_api_v1_me_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/voice": {
         parameters: {
             query?: never;
@@ -1147,6 +1167,24 @@ export interface components {
             /** Stable */
             stable?: string[];
         };
+        /** HealthOverview */
+        HealthOverview: {
+            /**
+             * Available
+             * @default true
+             */
+            available: boolean;
+            /** Insights */
+            insights?: components["schemas"]["InsightOverview"][];
+            /** Latest Report Date */
+            latest_report_date?: string | null;
+            /** Markers */
+            markers?: components["schemas"]["MarkerOverview"][];
+            /** Reports */
+            reports?: components["schemas"]["ReportOverview"][];
+            /** Scores */
+            scores?: components["schemas"]["ScoreOverview"][];
+        };
         /** HealthTheme */
         HealthTheme: {
             /** Interpretation */
@@ -1201,6 +1239,15 @@ export interface components {
             /** Trigger */
             trigger?: string | null;
         };
+        /** InsightOverview */
+        InsightOverview: {
+            /** Marker Key */
+            marker_key?: string | null;
+            /** Summary */
+            summary: string;
+            /** Title */
+            title: string;
+        };
         /** KnownLifestyle */
         KnownLifestyle: {
             /** Activity */
@@ -1241,6 +1288,50 @@ export interface components {
          * @enum {string}
          */
         MarkerFlag: "low" | "high" | "critical" | "normal" | "missing" | "unknown";
+        /** MarkerOverview */
+        MarkerOverview: {
+            /** History */
+            history?: components["schemas"]["MarkerPoint"][];
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Measured On */
+            measured_on?: string | null;
+            /** Previous On */
+            previous_on?: string | null;
+            /** Previous Value */
+            previous_value?: number | null;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
+            /**
+             * Status
+             * @default unknown
+             * @enum {string}
+             */
+            status: "low" | "high" | "critical" | "normal" | "unknown";
+            /** Trend */
+            trend?: ("toward_range" | "away_from_range" | "steady" | "in_range") | null;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value: number;
+        };
+        /** MarkerPoint */
+        MarkerPoint: {
+            /** Date */
+            date: string;
+            /**
+             * Status
+             * @default unknown
+             * @enum {string}
+             */
+            status: "low" | "high" | "critical" | "normal" | "unknown";
+            /** Value */
+            value: number;
+        };
         /** MeCapabilities */
         MeCapabilities: {
             /**
@@ -1605,6 +1696,13 @@ export interface components {
             /** Travel */
             travel?: string[];
         };
+        /** ReportOverview */
+        ReportOverview: {
+            /** Date */
+            date: string;
+            /** Title */
+            title: string;
+        };
         /**
          * ResponseMode
          * @enum {string}
@@ -1614,6 +1712,15 @@ export interface components {
         RewindRequest: {
             /** Keep */
             keep: number;
+        };
+        /** ScoreOverview */
+        ScoreOverview: {
+            /** Name */
+            name: string;
+            /** Score */
+            score?: number | null;
+            /** Status */
+            status?: string | null;
         };
         /** SnapshotReport */
         SnapshotReport: {
@@ -2474,6 +2581,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    health_overview_api_v1_me_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthOverview"];
                 };
             };
         };
