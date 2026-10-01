@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { rewindConversation, streamChat } from "../lib/api";
 import type { ConversationDetail } from "../lib/api";
+import type { ProcessingEvent } from "../lib/processingMessages";
 import type { ChatMeta, ContextRef, EvidenceItem, FollowUp, Recommendation, StructuredResponse, TestingOption, UserProvenance } from "../types/chat";
 
 export type ChatMessage = {
@@ -22,26 +23,36 @@ export function useCuraChat(language = "auto") {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [processing, setProcessing] = useState<import("../lib/processingMessages").ProcessingEvent | null>(null);
+  const [processing, setProcessing] = useState<ProcessingEvent | null>(null);
+  // Every status shown during the current turn, in order, for the progress stepper.
+  const [processingSteps, setProcessingSteps] = useState<ProcessingEvent[]>([]);
   const [conversationEpoch, setConversationEpoch] = useState(0);
 
   async function send(text: string, documentIds: string[] = [], contextRef?: ContextRef) {
     setLoading(true);
     setError(null);
-    setProcessing({ stage: "PLANNING", message_key: "planning", family: "personal" });
+    const initial: ProcessingEvent = { stage: "PLANNING", message_key: "planning", family: "personal" };
+    setProcessing(initial);
+    setProcessingSteps([initial]);
     setMessages((m) => [...m, { role: "user", content: text }]);
     let lastShown = 0;
-    let pending: import("../lib/processingMessages").ProcessingEvent | null = null;
+    let pending: ProcessingEvent | null = null;
     let timer: number | null = null;
-    const flush = (event: import("../lib/processingMessages").ProcessingEvent | null, immediate = false) => {
+    let finished = false;
+    const show = (event: ProcessingEvent) => {
+      if (finished) return;
+      lastShown = Date.now();
+      setProcessing(event);
+      setProcessingSteps((steps) => [...steps, event]);
+    };
+    const flush = (event: ProcessingEvent | null, immediate = false) => {
       if (!event) {
         setProcessing(null);
         return;
       }
       const now = Date.now();
       if (immediate || now - lastShown >= 300) {
-        lastShown = now;
-        setProcessing(event);
+        show(event);
         pending = null;
         return;
       }
@@ -49,8 +60,7 @@ export function useCuraChat(language = "auto") {
       if (timer) window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         if (pending) {
-          lastShown = Date.now();
-          setProcessing(pending);
+          show(pending);
           pending = null;
         }
       }, 300);
@@ -78,6 +88,7 @@ export function useCuraChat(language = "auto") {
           flush(event);
         }
       );
+      finished = true;
       if (timer) window.clearTimeout(timer);
       setProcessing(null);
       setConversationId(res.conversation_id);
@@ -109,7 +120,10 @@ export function useCuraChat(language = "auto") {
       });
       setError(err instanceof Error ? err.message : "Something went wrong");
     } finally {
+      finished = true;
+      if (timer) window.clearTimeout(timer);
       setProcessing(null);
+      setProcessingSteps([]);
       setLoading(false);
     }
   }
@@ -154,6 +168,7 @@ export function useCuraChat(language = "auto") {
     messages,
     loading,
     processing,
+    processingSteps,
     error,
     send,
     editAndResend,

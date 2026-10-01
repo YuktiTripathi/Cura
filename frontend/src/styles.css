@@ -363,6 +363,11 @@ body { margin: 0; background: var(--bg); color: var(--text); }
   background: var(--accent);
   animation: cura-pulse 1s ease-in-out infinite;
 }
+.progress-stepper { max-width: 880px; margin: 8px 0 0; display: grid; gap: 4px; }
+.progress-stepper .cura-processing { margin: 0; }
+.progress-done { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.progress-done li { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-faint); }
+.progress-check { width: 8px; display: inline-flex; justify-content: center; font-size: 11px; color: var(--link); }
 @keyframes cura-pulse {
   0%, 100% { opacity: 0.35; transform: scale(0.85); }
   50% { opacity: 1; transform: scale(1); }

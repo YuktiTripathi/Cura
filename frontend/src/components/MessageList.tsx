@@ -42,44 +42,48 @@ export function MessageList({
 
   return (
     <div className="messages">
-      {messages.map((m, i) => (
-        <article key={i} className={m.role}>
-          {m.role === "user" && editingIndex === i ? (
-            <UserQuestionEditor
-              draft={draft}
-              onDraftChange={setDraft}
-              onSave={saveEdit}
-              onCancel={() => setEditingIndex(null)}
-            />
-          ) : m.role === "assistant" && m.presentation ? (
-            <PresentedAnswer
-              presentation={m.presentation}
-              fallback={m.content}
-              testingOption={m.testingOption || m.presentation.testing_option}
-            />
-          ) : (
-            <p>{m.role === "assistant" ? <AssistantBody content={m.content} /> : m.content}</p>
-          )}
-          {m.role === "user" && editingIndex !== i && onEditQuestion && (
-            <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
-          )}
-          {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
-          {m.recommendations && <Recommendations items={m.recommendations} />}
-          {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} />}
-          {m.role === "assistant" && (
-            <ProvenanceLine
-              provenance={m.provenance}
-              findings={
-                m.presentation?.findings && m.presentation.findings.length > 0
-                  ? m.presentation.findings
-                  : m.presentation?.raw_findings
-              }
-            />
-          )}
-          {m.role === "assistant" && m.content && <FeedbackActions onFeedback={onFeedback} />}
-          {m.followUps && <FollowUpChips items={m.followUps} onPick={onFollowUp} />}
-        </article>
-      ))}
+      {messages.map((m, i) => {
+        // An assistant placeholder stays empty until the answer arrives; the progress stepper covers that wait.
+        if (m.role === "assistant" && !m.content && !m.presentation) return null;
+        return (
+          <article key={i} className={m.role}>
+            {m.role === "user" && editingIndex === i ? (
+              <UserQuestionEditor
+                draft={draft}
+                onDraftChange={setDraft}
+                onSave={saveEdit}
+                onCancel={() => setEditingIndex(null)}
+              />
+            ) : m.role === "assistant" && m.presentation ? (
+              <PresentedAnswer
+                presentation={m.presentation}
+                fallback={m.content}
+                testingOption={m.testingOption || m.presentation.testing_option}
+              />
+            ) : (
+              <p>{m.role === "assistant" ? <AssistantBody content={m.content} /> : m.content}</p>
+            )}
+            {m.role === "user" && editingIndex !== i && onEditQuestion && (
+              <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
+            )}
+            {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
+            {m.recommendations && <Recommendations items={m.recommendations} />}
+            {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} />}
+            {m.role === "assistant" && (
+              <ProvenanceLine
+                provenance={m.provenance}
+                findings={
+                  m.presentation?.findings && m.presentation.findings.length > 0
+                    ? m.presentation.findings
+                    : m.presentation?.raw_findings
+                }
+              />
+            )}
+            {m.role === "assistant" && m.content && <FeedbackActions onFeedback={onFeedback} />}
+            {m.followUps && <FollowUpChips items={m.followUps} onPick={onFollowUp} />}
+          </article>
+        );
+      })}
     </div>
   );
 }

@@ -313,3 +313,20 @@ describe("MessageList narrative summary", () => {
   });
 });
 
+describe("MessageList pending answer", () => {
+  it("does not render an empty bubble for the assistant placeholder", () => {
+    render(
+      <MessageList
+        messages={[
+          { role: "user", content: "What is my LDL?" },
+          { role: "assistant", content: "" },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+    expect(document.querySelectorAll("article.user").length).toBe(1);
+    expect(document.querySelectorAll("article.assistant").length).toBe(0);
+  });
+});
