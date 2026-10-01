@@ -69,7 +69,9 @@ from app.pipeline.health_sources import has_supershyft_sources, is_lab_source_co
 from app.pipeline.document_context import resolve_attached_documents
 from app.pipeline.stages import RouteStage, SafetyStage
 from app.pipeline.observability import ProgressEmitter
+from app.contracts.presentation import AnswerPreview
 from app.contracts.processing import ProcessingStage
+from app.pipeline.presentation import preview_findings
 from app.pipeline.renderer import (
     DeterministicRenderer,
     render_bio_ai_ambiguity,
@@ -839,6 +841,12 @@ class ChatService:
             self._progress.emit(ProcessingStage.analyzing_trends, plan=plan)
         elif plan.needs_cross_source:
             self._progress.emit(ProcessingStage.comparing_results, plan=plan)
+        if plan.needs_personal_data and not general_only:
+            # Stream clients can show the user's own values while the explanation is written.
+            try:
+                self._progress.preview(AnswerPreview(findings=preview_findings(plan, context)))
+            except Exception:
+                logger.debug("answer_preview_failed request_id=%s", request_id, exc_info=True)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
         reasoned = self.reasoner.run(

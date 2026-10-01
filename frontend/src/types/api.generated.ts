@@ -180,6 +180,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/documents/{document_id}/pages/{page}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Document Page */
+        get: operations["get_document_page_api_v1_documents__document_id__pages__page__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/feedback": {
         parameters: {
             query?: never;
@@ -903,6 +920,27 @@ export interface components {
             /** Upload Status */
             upload_status: string;
         };
+        /**
+         * DocumentPageOut
+         * @description One page of an uploaded document, as the text Cura extracted from it.
+         */
+        DocumentPageOut: {
+            /**
+             * Approximate
+             * @default false
+             */
+            approximate: boolean;
+            /** Document Id */
+            document_id: string;
+            /** Filename */
+            filename: string;
+            /** Page */
+            page: number;
+            /** Page Count */
+            page_count: number;
+            /** Text */
+            text: string;
+        };
         /** EvidenceItem */
         EvidenceItem: {
             /** Chunk Id */
@@ -1464,6 +1502,12 @@ export interface components {
             canonical_key?: string | null;
             /** Label */
             label: string;
+            /** Numeric Value */
+            numeric_value?: number | null;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
             /** Source Date */
             source_date?: string | null;
             /** Source Id */
@@ -2233,6 +2277,38 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_document_page_api_v1_documents__document_id__pages__page__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+                page: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentPageOut"];
+                };
             };
             /** @description Validation Error */
             422: {

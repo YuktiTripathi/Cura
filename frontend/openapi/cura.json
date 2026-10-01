@@ -1735,6 +1735,45 @@
         "title": "DocumentOut",
         "type": "object"
       },
+      "DocumentPageOut": {
+        "description": "One page of an uploaded document, as the text Cura extracted from it.",
+        "properties": {
+          "approximate": {
+            "default": false,
+            "title": "Approximate",
+            "type": "boolean"
+          },
+          "document_id": {
+            "title": "Document Id",
+            "type": "string"
+          },
+          "filename": {
+            "title": "Filename",
+            "type": "string"
+          },
+          "page": {
+            "title": "Page",
+            "type": "integer"
+          },
+          "page_count": {
+            "title": "Page Count",
+            "type": "integer"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "document_id",
+          "filename",
+          "page",
+          "page_count",
+          "text"
+        ],
+        "title": "DocumentPageOut",
+        "type": "object"
+      },
       "EvidenceItem": {
         "properties": {
           "chunk_id": {
@@ -3464,6 +3503,39 @@
             "title": "Label",
             "type": "string"
           },
+          "numeric_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Numeric Value"
+          },
+          "reference_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference High"
+          },
+          "reference_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Low"
+          },
           "source_date": {
             "anyOf": [
               {
@@ -5189,6 +5261,54 @@
           }
         },
         "summary": "Get Document"
+      }
+    },
+    "/api/v1/documents/{document_id}/pages/{page}": {
+      "get": {
+        "operationId": "get_document_page_api_v1_documents__document_id__pages__page__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "document_id",
+            "required": true,
+            "schema": {
+              "title": "Document Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "path",
+            "name": "page",
+            "required": true,
+            "schema": {
+              "title": "Page",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/DocumentPageOut"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Document Page"
       }
     },
     "/api/v1/feedback": {

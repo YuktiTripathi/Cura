@@ -5,6 +5,7 @@ from __future__ import annotations
 import time
 from collections.abc import Callable
 
+from app.contracts.presentation import AnswerPreview
 from app.contracts.processing import ProcessingEvent, ProcessingStage, RequestFamily, TimingReport
 from app.contracts.query import QueryPlan
 
@@ -76,8 +77,13 @@ def message_key_for(stage: ProcessingStage, family: RequestFamily, *, follow_up:
 
 
 class ProgressEmitter:
-    def __init__(self, callback: Callable[[ProcessingEvent], None] | None = None):
+    def __init__(
+        self,
+        callback: Callable[[ProcessingEvent], None] | None = None,
+        preview_callback: Callable[[AnswerPreview], None] | None = None,
+    ):
         self._callback = callback
+        self._preview_callback = preview_callback
         self._started = time.perf_counter()
         self._last: ProcessingStage | None = None
         self.events: list[ProcessingEvent] = []
@@ -109,6 +115,11 @@ class ProgressEmitter:
         if self._callback is not None:
             self._callback(event)
         return event
+
+    def preview(self, preview: AnswerPreview) -> None:
+        """Send already-retrieved values to a streaming client before reasoning starts."""
+        if self._preview_callback is not None and preview.findings:
+            self._preview_callback(preview)
 
     def mark(self, name: str) -> None:
         self._marks[name] = time.perf_counter()

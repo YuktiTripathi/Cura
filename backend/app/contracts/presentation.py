@@ -55,6 +55,17 @@ class PresentedFinding(BaseModel):
     source_id: str | None = None
     source_label: str | None = None
     canonical_key: str | None = None
+    # Numeric form of value and the report's own reference interval, for range visuals.
+    # Either bound may be missing for one-sided ranges such as "< 100".
+    numeric_value: float | None = None
+    reference_low: float | None = None
+    reference_high: float | None = None
+
+
+class AnswerPreview(BaseModel):
+    """Values Cura already has from the user's records, sent before the explanation is ready."""
+
+    findings: list[PresentedFinding] = Field(default_factory=list)
 
 
 class HealthTheme(BaseModel):

@@ -8,8 +8,10 @@ from datetime import datetime, timezone
 from sqlalchemy.orm import Session
 
 from app.core.errors import DocumentUploadError, DocumentValidationError, NotFoundError
-from app.db.models import Document
-from app.documents.contracts import DocumentOut
+from app.db.models import Document, DocumentChunk
+from app.documents.contracts import DocumentOut, DocumentPageOut
+from app.documents.extraction import extract_pdf_pages
+from app.documents.normalization import normalize_extracted_text
 from app.documents.storage import LocalDocumentStore, get_document_store
 from app.documents.validation import validate_pdf_upload
 
@@ -123,6 +125,37 @@ class DocumentService:
 
     def get(self, user_id: str, document_id: str) -> DocumentOut:
         return to_out(self.get_owned(user_id, document_id))
+
+    def page(self, user_id: str, document_id: str, page: int) -> DocumentPageOut:
+        """Page text normalized exactly as at extraction time, so excerpts and line numbers match."""
+        row = self.get_owned(user_id, document_id)
+        pages = extract_pdf_pages(self.store.read(row.storage_key))
+        if page < 1 or page > len(pages):
+            raise NotFoundError("Page not found.")
+        text = normalize_extracted_text(pages[page - 1].text)
+        approximate = False
+        if not text:
+            chunk = (
+                self.db.query(DocumentChunk)
+                .filter(
+                    DocumentChunk.document_id == row.id,
+                    DocumentChunk.user_id == user_id,
+                    DocumentChunk.page_start <= page,
+                    DocumentChunk.page_end >= page,
+                )
+                .order_by(DocumentChunk.page_start)
+                .first()
+            )
+            text = chunk.text if chunk else ""
+            approximate = bool(chunk)
+        return DocumentPageOut(
+            document_id=row.id,
+            filename=row.original_filename,
+            page=page,
+            page_count=len(pages),
+            text=text,
+            approximate=approximate,
+        )
 
     def list_for_user(self, user_id: str) -> list[DocumentOut]:
         rows = (

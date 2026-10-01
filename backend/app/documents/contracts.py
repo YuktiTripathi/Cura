@@ -24,6 +24,18 @@ class DocumentOut(BaseModel):
     narrative_ready: bool = False
 
 
+class DocumentPageOut(BaseModel):
+    """One page of an uploaded document, as the text Cura extracted from it."""
+
+    document_id: str
+    filename: str
+    page: int
+    page_count: int
+    text: str
+    # True when the page has no text layer and the text comes from stored (OCR) chunks.
+    approximate: bool = False
+
+
 class DocumentListOut(BaseModel):
     documents: list[DocumentOut] = Field(default_factory=list)
 
