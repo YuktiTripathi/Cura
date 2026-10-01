@@ -1,0 +1,27 @@
+import type { AnswerInsight } from "../../lib/companion";
+import { useMarkerPanel } from "../marker/MarkerPanelContext";
+
+/** Longitudinal notes the backend attached to this answer (never unsolicited: only what came with it). */
+export function InsightNote({ insights }: { insights: AnswerInsight[] }) {
+  const panel = useMarkerPanel();
+  if (!insights.length) return null;
+  return (
+    <aside className="insight-note" aria-label="Worth a look" data-testid="insight-note">
+      <p className="insight-note-label">Worth a look</p>
+      <ul>
+        {insights.map((insight, index) => (
+          <li key={`${insight.summary}-${index}`}>
+            <span>
+              <strong>{insight.title}.</strong> {insight.summary}
+            </span>
+            {insight.entity && panel.has(insight.entity) ? (
+              <button type="button" className="text-button" onClick={() => panel.open(insight.entity!)}>
+                History
+              </button>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </aside>
+  );
+}

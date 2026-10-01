@@ -4,6 +4,7 @@ import { FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsT
 import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
 import { ValueCard } from "./ValueCard";
+import { NextSteps } from "./NextSteps";
 
 function isDisclaimer(text: string): boolean {
   return /not a (medical )?diagnosis/i.test(text);
@@ -76,16 +77,7 @@ export function PresentedAnswer({
           {item}
         </p>
       ))}
-      {presentation.next_steps && presentation.next_steps.length > 0 ? (
-        <section className="answer-section">
-          <h4>Worth considering</h4>
-          <ul>
-            {presentation.next_steps.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
+      <NextSteps items={presentation.next_steps || []} />
       {!presentation.summary && !presentation.overall_summary && !findings.length && !presentation.interpretation && !narrative ? (
         <p>
           <AssistantBody content={fallback} />

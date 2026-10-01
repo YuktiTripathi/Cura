@@ -537,3 +537,26 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .trend-tooltip[data-align="end"] { transform: translate(calc(-100% + 12px), calc(-100% - 12px)); }
 .trend-legend { display: flex; align-items: center; gap: 6px; font-size: 12px; color: var(--text-muted); }
 .trend-legend-band { width: 14px; height: 10px; border-radius: 3px; background: var(--range-band); }
+
+/* In-chat companion pieces */
+.insight-note { margin-top: 12px; border-left: 3px solid var(--link); background: var(--surface-subtle); border-radius: 0 10px 10px 0; padding: 8px 12px; font-size: 14px; }
+.insight-note-label { margin: 0 0 4px; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); font-weight: 600; }
+.insight-note ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.insight-note li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 10px; }
+.next-steps ul { list-style: none; padding-left: 0; display: grid; gap: 6px; }
+.next-steps label { display: flex; gap: 8px; align-items: flex-start; cursor: pointer; }
+.next-steps input { margin-top: 3px; accent-color: var(--accent); }
+.next-steps label.done span { color: var(--text-muted); text-decoration: line-through; }
+.doctor-summary-section { display: grid; gap: 4px; }
+.doctor-summary-section h3 { margin: 0; font-size: 13px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-muted); }
+.doctor-summary-section ul { margin: 0; padding-left: 18px; }
+.doctor-summary-actions { display: flex; gap: 10px; align-items: center; }
+
+@media print {
+  html, body, #root, .app-shell, .main-column { background: #fff !important; }
+  body * { visibility: hidden !important; }
+  .doctor-summary, .doctor-summary * { visibility: visible !important; }
+  .doctor-summary { position: absolute !important; inset: 0 auto auto 0 !important; transform: none !important; width: 100% !important; max-height: none !important; overflow: visible !important; border: 0 !important; color: #000 !important; background: #fff !important; }
+  .doctor-summary .muted, .doctor-summary h3 { color: #333 !important; }
+  .no-print { display: none !important; }
+}

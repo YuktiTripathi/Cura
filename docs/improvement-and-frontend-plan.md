@@ -213,6 +213,33 @@ already supports this (`/api/v1/context/{type}/{id}`).
 | 3. Companion | HealthHome, TrendChart + context panel, NextSteps, InsightBanner, DoctorSummary | All backend structured fields rendered or removed |
 | 4. Polish | Dropzone + compare flow, voice waveform, i18n, a11y audit, mobile bottom sheet | Lighthouse a11y ≥ 95 |
 
+### Status (implemented on `claude/cura-chatbot-frontend-plan-5rlncr`)
+
+- **Phase 1** – done: generated API types with drift checks, TanStack Query, design tokens + dark mode,
+  MessageList split, progress stepper.
+- **Phase 2** – done: early value preview over SSE (`preview` event; first values ~100 ms vs ~4 s for
+  the answer with a simulated LLM delay), value cards with reference-range bars, message actions,
+  sources viewer with highlighted PDF rows (`/documents/{id}/pages/{n}`). Token streaming of the LLM
+  explanation was deliberately not done: safety/claim post-checks run on the finished answer.
+- **Phase 3** – done: home dashboard and marker panel with trend chart (`/me/overview`), in-chat insight
+  note, doctor summary (print/copy), tickable next steps, merged suggestion chips.
+
+#### What happened to each backend `StructuredResponse` field
+
+| Field | UI | Notes |
+|---|---|---|
+| `proactive_insights` | Rendered ("Worth a look" under the answer) | Suppressed items dropped; max 2; only what the backend attached to that answer. |
+| `clinician_handoff` | Rendered ("Doctor summary" dialog, print/copy) | Shown when it has key findings. |
+| `suggestion_chips` | Rendered (merged into follow-up chips) | De-duplicated against `follow_ups`, max 3. |
+| `next_steps` | Rendered (tickable checklist) | Ticks stored per device in `localStorage`. |
+| `topic_summary`, `themes`, `raw_findings`, `related_findings`, `testing_option` | Rendered (already before Phase 3) | |
+| `health_journey` | Not rendered per answer | Mixes display names and internal codes (`iron_status`); the home dashboard computes "improving" from `/me/overview` histories instead. **Recommend removing from the chat response.** |
+| `blocks` | Not rendered | Repeats the summary/headline with mostly empty `text` ("LDL LDL cholesterol …"). **Recommend removing.** |
+| `structured_next_steps` | Not rendered | Always emptied (`pipeline/presentation.py` sets it to `[]`). **Recommend removing.** |
+
+The three "recommend removing" fields were left in the API so this branch stays additive for any other
+client; dropping them is a one-line change per field once confirmed unused elsewhere.
+
 ### How to tell it's working
 
 - Time to first meaningful content (p50/p95).

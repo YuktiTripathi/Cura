@@ -9,6 +9,7 @@ export function MessageActions({
   onRegenerate,
   sourceCount = 0,
   onViewSources,
+  onDoctorSummary,
   disabled = false,
 }: {
   text: string;
@@ -16,6 +17,7 @@ export function MessageActions({
   onRegenerate?: () => void;
   sourceCount?: number;
   onViewSources?: () => void;
+  onDoctorSummary?: () => void;
   disabled?: boolean;
 }) {
   const [copied, setCopied] = useState(false);
@@ -67,6 +69,11 @@ export function MessageActions({
         {sourceCount > 0 && onViewSources ? (
           <button type="button" className="text-button" onClick={onViewSources}>
             View sources ({sourceCount})
+          </button>
+        ) : null}
+        {onDoctorSummary ? (
+          <button type="button" className="text-button" onClick={onDoctorSummary}>
+            Doctor summary
           </button>
         ) : null}
         <span className="message-actions-spacer" />

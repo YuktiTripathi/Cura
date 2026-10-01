@@ -6,6 +6,9 @@ import { EscalationNote, FollowUpChips, Recommendations } from "./messages/Messa
 import { MessageActions, type FeedbackRating } from "./messages/MessageActions";
 import { SourceViewer } from "./SourceViewer";
 import { groupEvidence } from "../lib/sources";
+import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
+import { DoctorSummary } from "./DoctorSummary";
+import { InsightNote } from "./messages/InsightNote";
 import { displayAssistantText } from "../types/chat";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
 import { PreviewAnswer } from "./messages/PreviewAnswer";
@@ -34,6 +37,7 @@ export function MessageList({
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
   const [sourcesIndex, setSourcesIndex] = useState<number | null>(null);
+  const [handoffIndex, setHandoffIndex] = useState<number | null>(null);
   const latestAssistant = messages.map((m) => m.role).lastIndexOf("assistant");
   const sourceGroups = sourcesIndex != null ? groupEvidence(messages[sourcesIndex]?.evidence) : [];
 
@@ -84,6 +88,7 @@ export function MessageList({
             {m.role === "user" && editingIndex !== i && onEditQuestion && (
               <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
             )}
+            {m.role === "assistant" && m.presentation ? <InsightNote insights={readInsights(m.presentation.proactive_insights)} /> : null}
             {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
             {m.recommendations && <Recommendations items={m.recommendations} />}
             {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} />}
@@ -105,12 +110,22 @@ export function MessageList({
                 disabled={editingDisabled}
                 sourceCount={groupEvidence(m.evidence).length}
                 onViewSources={() => setSourcesIndex(i)}
+                onDoctorSummary={readHandoff(m.presentation?.clinician_handoff) ? () => setHandoffIndex(i) : undefined}
               />
             )}
-            {m.followUps && <FollowUpChips items={m.followUps} onPick={onFollowUp} />}
+            {m.role === "assistant" ? (
+              <FollowUpChips items={mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])} onPick={onFollowUp} />
+            ) : null}
           </article>
         );
       })}
+      <DoctorSummary
+        handoff={handoffIndex != null ? readHandoff(messages[handoffIndex]?.presentation?.clinician_handoff) : null}
+        open={handoffIndex != null}
+        onOpenChange={(open) => {
+          if (!open) setHandoffIndex(null);
+        }}
+      />
       <SourceViewer
         groups={sourceGroups}
         open={sourcesIndex != null && sourceGroups.length > 0}
