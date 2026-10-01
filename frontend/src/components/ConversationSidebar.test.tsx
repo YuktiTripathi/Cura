@@ -47,6 +47,7 @@ vi.mock("../lib/api", async () => {
     streamChat: vi.fn(),
     sendFeedback: vi.fn(),
     listDocuments: vi.fn(async () => []),
+    getOverview: vi.fn(async () => ({ available: false, markers: [], insights: [], scores: [], reports: [] })),
   };
 });
 

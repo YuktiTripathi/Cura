@@ -2,6 +2,7 @@ import type { RefObject } from "react";
 import type { ContextRef } from "../types/chat";
 import type { MeResponse } from "../types/me";
 import { StarterChips } from "./StarterChips";
+import { HealthOverviewSection } from "./home/HealthOverviewSection";
 
 export function WelcomeExperience({
   me,
@@ -28,6 +29,7 @@ export function WelcomeExperience({
         I can explain your available SuperShyft reports, build your health scenario, explore nutrition,
         and answer general health questions.
       </p>
+      <HealthOverviewSection onSend={onSend} />
       <div className="capability-grid">
         {capabilities?.has_blood_report && (
           <button type="button" onClick={() => onSend("Show me my latest blood report")}>

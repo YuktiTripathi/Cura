@@ -1,5 +1,6 @@
 import type { AnswerPreview, ChatResponse, ContextRef } from "../types/chat";
 import type { MeResponse } from "../types/me";
+import type { HealthOverview } from "../types/overview";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
 const USER = import.meta.env.VITE_CURA_USER_ID || "";
@@ -59,6 +60,12 @@ export async function getCurrentUser(language?: string): Promise<MeResponse> {
   } catch {
     return fallbackMe();
   }
+}
+
+export async function getOverview(): Promise<HealthOverview> {
+  const res = await fetch(`${API}/api/v1/me/overview`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("Your health overview isn't available right now.");
+  return (await res.json()) as HealthOverview;
 }
 
 export async function transcribeVoice(

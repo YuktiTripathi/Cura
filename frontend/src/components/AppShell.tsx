@@ -5,9 +5,12 @@ export function AppShell({
   children,
   drawerOpen,
   onCloseDrawer,
+  panel,
 }: {
   sidebar: ReactNode;
   children: ReactNode;
+  /** Optional detail panel beside the chat column. */
+  panel?: ReactNode;
   drawerOpen: boolean;
   onCloseDrawer: () => void;
 }) {
@@ -23,6 +26,7 @@ export function AppShell({
         />
       )}
       <div className="main-column">{children}</div>
+      {panel}
     </div>
   );
 }

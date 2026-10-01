@@ -11,6 +11,9 @@ import { MessageList } from "../components/MessageList";
 import { ConversationSidebar } from "../components/ConversationSidebar";
 import { WelcomeExperience } from "../components/WelcomeExperience";
 import type { ContextRef } from "../types/chat";
+import { useOverview } from "../hooks/useOverview";
+import { MarkerPanel } from "../components/marker/MarkerPanel";
+import { MarkerPanelProvider } from "../components/marker/MarkerPanelContext";
 import { sendFeedback } from "../lib/api";
 
 export function CuraPage() {
@@ -44,6 +47,21 @@ export function CuraPage() {
     return send(text, ids, contextRef);
   }
 
+  const overview = useOverview();
+  const [markerKey, setMarkerKey] = useState<string | null>(null);
+  const markers = overview.data?.markers || [];
+  const panelMarker = markers.find((m) => m.key === markerKey) || null;
+  const markerPanel = {
+    has: (key: string | null | undefined) => Boolean(key && markers.some((m) => m.key === key && (m.history?.length ?? 0) > 0)),
+    open: (key: string) => setMarkerKey(key),
+  };
+
+  function askAboutMarker(text: string, contextRef: ContextRef) {
+    // On narrow screens the panel is a sheet over the chat; get it out of the way of the answer.
+    if (typeof window.matchMedia === "function" && window.matchMedia("(max-width: 1100px)").matches) setMarkerKey(null);
+    void sendWithContext(text, [], contextRef);
+  }
+
   function startNew() {
     newConversation();
     setSelectedDocumentIds([]);
@@ -51,9 +69,18 @@ export function CuraPage() {
   }
 
   return (
+    <MarkerPanelProvider value={markerPanel}>
     <AppShell
       drawerOpen={drawerOpen}
       onCloseDrawer={() => setDrawerOpen(false)}
+      panel={
+        panelMarker ? (
+          <>
+            <button type="button" className="marker-panel-backdrop" aria-label="Close marker details" onClick={() => setMarkerKey(null)} />
+            <MarkerPanel marker={panelMarker} onClose={() => setMarkerKey(null)} onAsk={askAboutMarker} />
+          </>
+        ) : null
+      }
       sidebar={
         <ConversationSidebar
           refreshKey={conversationEpoch}
@@ -110,5 +137,6 @@ export function CuraPage() {
         </footer>
       </div>
     </AppShell>
+    </MarkerPanelProvider>
   );
 }

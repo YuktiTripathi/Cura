@@ -4,6 +4,7 @@ export const queryKeys = {
   me: (language: string) => ["me", language] as const,
   conversations: ["conversations"] as const,
   documents: ["documents"] as const,
+  overview: ["overview"] as const,
 };
 
 export function createQueryClient(): QueryClient {

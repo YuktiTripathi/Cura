@@ -1,9 +1,21 @@
 import type { PresentedFinding } from "../../types/chat";
 import { numericValue } from "../../lib/range";
 import { RangeBar } from "./RangeBar";
+import { useMarkerPanel } from "../marker/MarkerPanelContext";
 
 /** One measured value: name, value with unit, where it sits in its reference range, and when. */
-export function ValueCard({ finding, compact = false }: { finding: PresentedFinding; compact?: boolean }) {
+export function ValueCard({
+  finding,
+  compact = false,
+  note,
+}: {
+  finding: PresentedFinding;
+  compact?: boolean;
+  /** Short supporting line, e.g. the change since the previous result. */
+  note?: string | null;
+}) {
+  const panel = useMarkerPanel();
+  const key = finding.canonical_key;
   const value = numericValue(finding);
   const hasRange = finding.reference_low != null || finding.reference_high != null;
   return (
@@ -26,6 +38,16 @@ export function ValueCard({ finding, compact = false }: { finding: PresentedFind
         />
       ) : finding.status ? (
         <span className="value-card-status">{finding.status.replace(/_/g, " ")}</span>
+      ) : null}
+      {note || (key && panel.has(key)) ? (
+        <footer className="value-card-footer">
+          {note ? <span className="muted">{note}</span> : <span />}
+          {key && panel.has(key) ? (
+            <button type="button" className="text-button" onClick={() => panel.open(key)} aria-label={`${finding.label} history`}>
+              History ›
+            </button>
+          ) : null}
+        </footer>
       ) : null}
     </article>
   );
