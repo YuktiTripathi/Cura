@@ -1,4 +1,4 @@
-import type { ChatResponse, ContextRef } from "../types/chat";
+import type { AnswerPreview, ChatResponse, ContextRef } from "../types/chat";
 import type { MeResponse } from "../types/me";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
@@ -139,7 +139,8 @@ export async function streamChat(
   documentIds: string[],
   contextRef: ContextRef | undefined,
   onToken: (text: string) => void,
-  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void
+  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void,
+  onPreview?: (preview: AnswerPreview) => void
 ): Promise<ChatResponse> {
   const payload: Record<string, unknown> = {
     message,
@@ -187,6 +188,7 @@ export async function streamChat(
       const data = JSON.parse(raw);
       if (event === "token") onToken(data.text || "");
       if (event === "progress" && onProgress) onProgress(data);
+      if (event === "preview" && onPreview) onPreview(data as AnswerPreview);
       if (event === "error") throw new Error(data.message || "Streaming request failed");
       if (event === "complete" || event === "answer") completed = data as ChatResponse;
     }
@@ -243,6 +245,21 @@ export async function getDocument(documentId: string): Promise<UploadedDocument>
   const data = await parseJson(res);
   if (!res.ok) throw new Error("Document not found.");
   return data as unknown as UploadedDocument;
+}
+
+export type DocumentPage = {
+  document_id: string;
+  filename: string;
+  page: number;
+  page_count: number;
+  text: string;
+  approximate: boolean;
+};
+
+export async function getDocumentPage(documentId: string, page: number): Promise<DocumentPage> {
+  const res = await fetch(`${API}/api/v1/documents/${documentId}/pages/${page}`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("That page isn't available.");
+  return (await res.json()) as DocumentPage;
 }
 
 export async function listDocuments(): Promise<UploadedDocument[]> {

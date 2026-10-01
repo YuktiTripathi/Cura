@@ -1,5 +1,7 @@
 import { useState } from "react";
 import type { PresentedFinding } from "../../types/chat";
+import { numericValue } from "../../lib/range";
+import { RangeBar } from "./RangeBar";
 
 export function RelatedResults({ findings }: { findings: PresentedFinding[] }) {
   const [open, setOpen] = useState(false);
@@ -28,6 +30,7 @@ export function RawResultsDisclosure({ findings }: { findings: PresentedFinding[
 }
 
 export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
+  const showRange = findings.some((item) => item.reference_low != null || item.reference_high != null);
   return (
     <div className="findings-table-wrap">
       <table className="findings-table">
@@ -36,6 +39,7 @@ export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
             <th>Measurement</th>
             <th>Value</th>
             <th>Status</th>
+            {showRange ? <th>Range</th> : null}
           </tr>
         </thead>
         <tbody>
@@ -47,6 +51,17 @@ export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
                 {item.unit ? ` ${item.unit}` : ""}
               </td>
               <td>{(item.status || "").replace(/_/g, " ")}</td>
+              {showRange ? (
+                <td>
+                  <RangeBar
+                    label={item.label}
+                    value={numericValue(item)}
+                    unit={item.unit}
+                    low={item.reference_low}
+                    high={item.reference_high}
+                  />
+                </td>
+              ) : null}
             </tr>
           ))}
         </tbody>

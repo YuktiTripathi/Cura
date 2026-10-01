@@ -30,6 +30,11 @@
   --recording-bg: #ffe8e8;
   --recording-border: #d97a7a;
   --backdrop: rgba(16, 35, 61, 0.28);
+  /* Status (reserved: never used for anything but in/out of range). Always paired with icon + text. */
+  --status-good: #0ca30c;
+  --status-out: #d9622b;
+  --range-track: #e8eef5;
+  --range-band: #cfe0f5;
   color-scheme: light;
 }
 
@@ -64,6 +69,10 @@
   --recording-bg: #3b1d1d;
   --recording-border: #a35454;
   --backdrop: rgba(0, 0, 0, 0.5);
+  --status-good: #3fbf3f;
+  --status-out: #ec835a;
+  --range-track: #243345;
+  --range-band: #2f4b6e;
   color-scheme: dark;
 }
 
@@ -230,10 +239,30 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 .answer-summary { margin: 0; }
 .answer-note { margin: 0; font-size: 13px; color: var(--text-muted); }
 .answer-section { display: grid; gap: 6px; }
-.findings-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; }
-.finding-card { border: 1px solid var(--border-subtle); background: var(--surface-subtle); border-radius: 12px; padding: 12px; display: grid; gap: 4px; }
-.finding-card p { margin: 0; font-size: 16px; font-weight: 600; }
-.finding-card span { font-size: 12px; color: var(--text-muted); text-transform: capitalize; }
+.value-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; }
+.value-card { border: 1px solid var(--border-subtle); background: var(--surface-subtle); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; }
+.value-card header { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; }
+.value-card header strong { font-size: 14px; }
+.value-card-date { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+.value-card-value { margin: 0; font-size: 22px; font-weight: 650; line-height: 1.2; }
+.value-card-unit { font-size: 13px; font-weight: 500; color: var(--text-muted); }
+.value-card-status { font-size: 12px; color: var(--text-muted); text-transform: capitalize; }
+.value-card.compact { max-width: 320px; }
+.range { display: grid; gap: 4px; }
+.range-track { position: relative; height: 8px; border-radius: 4px; background: var(--range-track); margin: 4px 5px; }
+.range-band { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--range-band); }
+.range-dot {
+  position: absolute; top: 50%; width: 12px; height: 12px; border-radius: 50%;
+  transform: translate(-50%, -50%); background: var(--status-good); box-shadow: 0 0 0 2px var(--surface-subtle);
+}
+.range[data-relation="above"] .range-dot, .range[data-relation="below"] .range-dot { background: var(--status-out); }
+.range-meta { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--text-muted); }
+.range-status { font-weight: 600; color: var(--text); }
+.range[data-relation="within"] .range-status span { color: var(--status-good); }
+.range[data-relation="above"] .range-status span, .range[data-relation="below"] .range-status span { color: var(--status-out); }
+.range-bounds { font-variant-numeric: tabular-nums; }
+.findings-table .range { min-width: 160px; }
+.findings-table .range-dot { box-shadow: 0 0 0 2px var(--surface); }
 .answer-section h4 { margin: 4px 0 0; font-size: 13px; letter-spacing: 0.03em; text-transform: uppercase; color: var(--text-muted); }
 .answer-section p, .answer-section ul { margin: 0; }
 .answer-section ul { padding-left: 18px; }

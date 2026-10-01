@@ -3,6 +3,7 @@ import { AssistantBody } from "./AssistantBody";
 import { FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsTable";
 import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
+import { ValueCard } from "./ValueCard";
 
 function isDisclaimer(text: string): boolean {
   return /not a (medical )?diagnosis/i.test(text);
@@ -23,6 +24,12 @@ export function PresentedAnswer({
   const gaps = (presentation.uncertainties || []).filter((item) => !isDisclaimer(item));
   const notes = (presentation.uncertainties || []).filter(isDisclaimer);
   const useCards = findings.length > 0 && findings.length <= 3 && presentation.mode !== "SINGLE_VALUE";
+  // A single value is stated in the summary sentence; the card adds where it sits in its range.
+  const singleWithRange =
+    !narrative &&
+    presentation.mode === "SINGLE_VALUE" &&
+    findings.length === 1 &&
+    (findings[0].reference_low != null || findings[0].reference_high != null);
   return (
     <div className="answer-block">
       {presentation.topic_summary?.text ? (
@@ -34,20 +41,14 @@ export function PresentedAnswer({
       {presentation.overall_summary || presentation.summary ? (
         <p className="answer-summary">{presentation.overall_summary || presentation.summary}</p>
       ) : null}
+      {singleWithRange ? <ValueCard finding={findings[0]} compact /> : null}
       {narrative ? <ThemeList themes={presentation.themes || []} /> : null}
       {narrative ? <RawResultsDisclosure findings={presentation.raw_findings || []} /> : null}
       {!narrative && findings.length > 0 && presentation.mode !== "SINGLE_VALUE" ? (
         useCards ? (
-          <div className="findings-cards">
+          <div className="value-cards">
             {findings.map((item, index) => (
-              <article className="finding-card" key={`${item.label}-${index}`}>
-                <strong>{item.label}</strong>
-                <p>
-                  {item.value ?? "—"}
-                  {item.unit ? ` ${item.unit}` : ""}
-                </p>
-                {item.status ? <span>{item.status.replace(/_/g, " ")}</span> : null}
-              </article>
+              <ValueCard key={`${item.label}-${index}`} finding={item} />
             ))}
           </div>
         ) : (
