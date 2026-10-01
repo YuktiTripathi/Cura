@@ -1,4 +1,5 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, screen, waitFor } from "@testing-library/react";
+import { renderWithQuery as render } from "../test/render";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { ConversationSidebar } from "../components/ConversationSidebar";
 import { CuraPage } from "../pages/CuraPage";
@@ -30,7 +31,7 @@ vi.mock("../lib/api", async () => {
         personal_unavailable: false,
       },
     })),
-    listConversations: vi.fn(async () => conversations),
+    listConversations: vi.fn(async () => [...conversations]),
     getConversation: vi.fn(async (id: string) => ({
       id,
       title: conversations.find((c) => c.id === id)?.title || "Cura conversation",
@@ -70,7 +71,7 @@ describe("ConversationSidebar", () => {
     await waitFor(() => {
       expect(screen.getByText("Recent conversations")).toBeTruthy();
     });
-    expect(screen.getByText("No conversations yet.")).toBeTruthy();
+    expect(await screen.findByText("No conversations yet.")).toBeTruthy();
     expect(screen.getByText("Start a conversation with Cura to see it here.")).toBeTruthy();
     expect(screen.getByRole("button", { name: "+ New conversation" })).toBeTruthy();
   });

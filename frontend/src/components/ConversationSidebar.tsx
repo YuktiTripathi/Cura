@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   deleteConversation,
   getConversation,
@@ -6,6 +6,8 @@ import {
   type ConversationDetail,
   type ConversationSummary,
 } from "../lib/api";
+import { queryKeys } from "../lib/queryClient";
+import { useRefetchOnChange } from "../hooks/useRefetchOnChange";
 
 export function ConversationSidebar({
   refreshKey,
@@ -24,18 +26,12 @@ export function ConversationSidebar({
   mobileOpen: boolean;
   onCloseMobile: () => void;
 }) {
-  const [items, setItems] = useState<ConversationSummary[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  const load = useCallback(async () => {
-    const next = await listConversations();
-    setItems(next);
-    setLoading(false);
-  }, []);
-
-  useEffect(() => {
-    void load();
-  }, [load, refreshKey]);
+  const client = useQueryClient();
+  const { data: items = [], isPending: loading } = useQuery({
+    queryKey: queryKeys.conversations,
+    queryFn: listConversations,
+  });
+  useRefetchOnChange(queryKeys.conversations, refreshKey);
 
   async function open(id: string) {
     const detail = await getConversation(id);
@@ -45,7 +41,9 @@ export function ConversationSidebar({
 
   async function remove(id: string) {
     await deleteConversation(id);
-    setItems((current) => current.filter((row) => row.id !== id));
+    client.setQueryData<ConversationSummary[]>(queryKeys.conversations, (current = []) =>
+      current.filter((row) => row.id !== id)
+    );
     onDeleted(id);
   }
 

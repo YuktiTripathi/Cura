@@ -1,5 +1,9 @@
-import { useEffect, useState } from "react";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteDocument, listDocuments, type UploadedDocument } from "../lib/api";
+import { queryKeys } from "../lib/queryClient";
+import { useRefetchOnChange } from "../hooks/useRefetchOnChange";
+
+const POLL_MS = 2000;
 
 type Props = {
   refreshKey: number;
@@ -15,24 +19,23 @@ function statusLabel(doc: UploadedDocument): string {
   return "Uploaded";
 }
 
-export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props) {
-  const [docs, setDocs] = useState<UploadedDocument[]>([]);
+export function isStillProcessing(doc: UploadedDocument): boolean {
+  return (
+    doc.extraction_status === "processing" ||
+    doc.extraction_status === "not_started" ||
+    (Boolean(doc.structured_facts_ready) && doc.pageindex_status === "BUILDING")
+  );
+}
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      const next = await listDocuments().catch(() => []);
-      if (!cancelled) setDocs(next);
-    }
-    load();
-    const id = window.setInterval(() => {
-      load();
-    }, 2000);
-    return () => {
-      cancelled = true;
-      window.clearInterval(id);
-    };
-  }, [refreshKey]);
+export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props) {
+  const client = useQueryClient();
+  const { data: docs = [] } = useQuery({
+    queryKey: queryKeys.documents,
+    queryFn: () => listDocuments().catch(() => [] as UploadedDocument[]),
+    // Poll only while a document is still being processed.
+    refetchInterval: (query) => ((query.state.data || []).some(isStillProcessing) ? POLL_MS : false),
+  });
+  useRefetchOnChange(queryKeys.documents, refreshKey);
 
   if (!docs.length) return null;
 
@@ -72,7 +75,9 @@ export function DocumentPanel({ refreshKey, selected, onSelectedChange }: Props)
                 onClick={async () => {
                   await deleteDocument(d.document_id);
                   onSelectedChange(selected.filter((id) => id !== d.document_id));
-                  setDocs((current) => current.filter((row) => row.document_id !== d.document_id));
+                  client.setQueryData<UploadedDocument[]>(queryKeys.documents, (current = []) =>
+                    current.filter((row) => row.document_id !== d.document_id)
+                  );
                 }}
               >
                 Delete
