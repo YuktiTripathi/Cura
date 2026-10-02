@@ -112,7 +112,7 @@ def _trigger(classification: LongitudinalClass) -> InsightTrigger | None:
 def _title(trigger: InsightTrigger) -> str:
     return {
         InsightTrigger.newly_abnormal: "Something changed",
-        InsightTrigger.persistently_abnormal: "One pattern is still present",
+        InsightTrigger.persistently_abnormal: "This has stayed outside range",
         InsightTrigger.improved_but_still_abnormal: "Something changed",
         InsightTrigger.returned_to_range: "Something changed",
         InsightTrigger.significant_change: "Something changed",

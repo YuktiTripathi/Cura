@@ -58,3 +58,11 @@ class ConversationState(BaseModel):
     topic_turn_count: int = 0
     explained_entities: list[str] = Field(default_factory=list)
     topic_summary: str | None = None
+    active_topic: str | None = None
+    current_goal: str | None = None
+    previous_goal: str | None = None
+    user_tone: str = "neutral"
+    facts_already_explained: list[str] = Field(default_factory=list)
+    biomarkers_already_discussed: list[str] = Field(default_factory=list)
+    open_threads: list[str] = Field(default_factory=list)
+    resolved_query: str | None = None

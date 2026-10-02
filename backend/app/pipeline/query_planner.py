@@ -6,6 +6,7 @@ from app.pipeline.source_routing import apply_source_routing
 from app.contracts.context_ref import ContextRef
 from app.pipeline.operations import apply_operation_metadata, named_personal_sources
 from app.pipeline.planner import attach_task_plan
+from app.pipeline.response_planner import repair_report_level_plan
 from app.pipeline.conversation_state import apply_to_query_plan
 from app.contracts.conversation_state import ConversationState
 from app.pipeline.lab_parameters import match_lab_keys, primary_lab_key
@@ -214,6 +215,7 @@ def build_query_plan(
     plan = apply_operation_metadata(plan)
     plan = apply_to_query_plan(plan, conversation_state)
     plan = attach_task_plan(plan, message)
+    plan = repair_report_level_plan(plan, message)
     if plan.needs_questionnaire and (plan.needs_blood or plan.needs_bio_ai or plan.needs_goals):
         plan.medical_evidence_required = True
         if plan.needs_blood or plan.needs_bio_ai:

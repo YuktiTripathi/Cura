@@ -358,3 +358,66 @@ describe("MessageList answer preview", () => {
   });
 });
 
+
+describe("MessageList premium semantic streaming", () => {
+  it("renders validated experience blocks as semantic sections instead of a flat text blob", () => {
+    render(
+      <MessageList
+        messages={[
+          {
+            role: "assistant",
+            content: "Your vitamin D is 24 ng/mL.\n\nThis is below your lab range.",
+            experienceBlocks: [
+              { sequence: 1, kind: "direct_answer", text: "Your vitamin D is 24 ng/mL." },
+              {
+                sequence: 2,
+                kind: "key_facts",
+                findings: [
+                  {
+                    label: "Vitamin D",
+                    value: "24",
+                    unit: "ng/mL",
+                    canonical_key: "vitamin_d",
+                    reference_low: 30,
+                    reference_high: 100,
+                  },
+                ],
+              },
+              { sequence: 3, kind: "interpretation", text: "This is below your lab's reported range." },
+              { sequence: 4, kind: "personal_relevance", text: "This may be relevant to the bone-health goal we were discussing." },
+            ],
+          },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+
+    expect(screen.getByTestId("streaming-experience")).toBeTruthy();
+    expect(screen.getByText("From your records")).toBeTruthy();
+    expect(screen.getByText("What it means")).toBeTruthy();
+    expect(screen.getByText("Why this matters for you")).toBeTruthy();
+    expect(screen.getByText("CURA is completing the picture")).toBeTruthy();
+    expect(screen.getByLabelText(/CURA · Building your answer/)).toBeTruthy();
+  });
+
+  it("shows follow-up suggestions as a continuation area", () => {
+    render(
+      <MessageList
+        messages={[
+          {
+            role: "assistant",
+            content: "Your vitamin D is below the reported range.",
+            followUps: ["What can affect vitamin D?"],
+          },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+    expect(screen.getByText("Continue with CURA")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /What can affect vitamin D/ })).toBeTruthy();
+  });
+});

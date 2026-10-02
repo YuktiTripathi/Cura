@@ -558,7 +558,12 @@ def attach_presentation_personalization(
         if presentation.mode == ResponseMode.clinician_handoff:
             presentation.summary = format_handoff(context.clinician_handoff)
             presentation.headline = "Discussion notes for your clinician"
-    if context.proactive_insights:
+    report_overview_request = bool(re.search(
+        r"\b(?:show|open|view|see|display|give me|pull up|review)\b.{0,36}\b(?:my )?(?:latest|current|most recent|last)?\s*(?:blood|lab)\s+(?:report|results?|tests?)\b",
+        plan.raw_message or "",
+        re.I,
+    ))
+    if context.proactive_insights and not report_overview_request:
         presentation.proactive_insights = [
             item.model_dump(mode="json") for item in context.proactive_insights[:3]
         ]

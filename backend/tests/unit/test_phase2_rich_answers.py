@@ -98,3 +98,16 @@ def test_document_page_is_owner_only_and_bounded(storage_dir):
     assert client.get(f"/api/v1/documents/{did}/pages/1", headers={"X-Cura-User-Id": "someone-else"}).status_code == 404
     assert client.get(f"/api/v1/documents/{did}/pages/2", headers={"X-Cura-User-Id": "user-pages"}).status_code == 404
     assert client.get(f"/api/v1/documents/{did}/pages/0", headers={"X-Cura-User-Id": "user-pages"}).status_code == 404
+
+
+def test_standard_personal_turn_streams_validated_experience_blocks_before_complete():
+    events = _stream("Why is my LDL high?")
+    names = [name for name, _ in events]
+    assert "experience_block" in names
+    assert names.index("experience_block") < names.index("complete")
+    blocks = [payload for name, payload in events if name == "experience_block"]
+    assert blocks[0]["sequence"] == 0
+    assert blocks[0]["kind"] in {"direct_answer", "key_facts"}
+    complete = dict(events)["complete"]
+    assert complete.get("experience") is not None
+    assert complete["experience"]["stream_policy"] == "SEMANTIC_BLOCKS"

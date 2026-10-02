@@ -326,7 +326,7 @@
       "Body_transcribe_api_v1_voice_post": {
         "properties": {
           "audio": {
-            "contentMediaType": "application/octet-stream",
+            "format": "binary",
             "title": "Audio",
             "type": "string"
           },
@@ -356,7 +356,7 @@
       "Body_transcribe_api_v1_voice_transcribe_post": {
         "properties": {
           "audio": {
-            "contentMediaType": "application/octet-stream",
+            "format": "binary",
             "title": "Audio",
             "type": "string"
           },
@@ -386,7 +386,7 @@
       "Body_transcribe_compat_cura_transcribe_post": {
         "properties": {
           "audio": {
-            "contentMediaType": "application/octet-stream",
+            "format": "binary",
             "title": "Audio",
             "type": "string"
           },
@@ -427,7 +427,7 @@
             "title": "Conversation Id"
           },
           "file": {
-            "contentMediaType": "application/octet-stream",
+            "format": "binary",
             "title": "File",
             "type": "string"
           }
@@ -1233,6 +1233,16 @@
             },
             "title": "Evidence",
             "type": "array"
+          },
+          "experience": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TurnExperience"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "follow_ups": {
             "items": {
@@ -2105,6 +2115,54 @@
         ],
         "title": "ExistingResult",
         "type": "object"
+      },
+      "ExperienceBlock": {
+        "properties": {
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/PresentedFinding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/ExperienceBlockKind"
+          },
+          "sequence": {
+            "title": "Sequence",
+            "type": "integer"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          }
+        },
+        "required": [
+          "sequence",
+          "kind"
+        ],
+        "title": "ExperienceBlock",
+        "type": "object"
+      },
+      "ExperienceBlockKind": {
+        "enum": [
+          "direct_answer",
+          "key_facts",
+          "interpretation",
+          "personal_relevance",
+          "uncertainty",
+          "next_step",
+          "continuation"
+        ],
+        "title": "ExperienceBlockKind",
+        "type": "string"
       },
       "FactKind": {
         "enum": [
@@ -4560,6 +4618,14 @@
         "title": "StarterQuestionSet",
         "type": "object"
       },
+      "StreamPolicy": {
+        "enum": [
+          "SEMANTIC_BLOCKS",
+          "COMPLETE_ONLY"
+        ],
+        "title": "StreamPolicy",
+        "type": "string"
+      },
       "StructuredResponse": {
         "properties": {
           "blocks": {
@@ -5118,6 +5184,100 @@
           "transcript"
         ],
         "title": "TranscribeResponse",
+        "type": "object"
+      },
+      "TurnExperience": {
+        "description": "Single response contract consumed by streaming and final presentation.",
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/ExperienceBlock"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "continuation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Continuation"
+          },
+          "direct_answer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direct Answer"
+          },
+          "interpretation": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Interpretation"
+          },
+          "key_facts": {
+            "items": {
+              "$ref": "#/components/schemas/PresentedFinding"
+            },
+            "title": "Key Facts",
+            "type": "array"
+          },
+          "next_steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Next Steps",
+            "type": "array"
+          },
+          "personal_relevance": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Personal Relevance"
+          },
+          "response_mode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Response Mode"
+          },
+          "stream_policy": {
+            "$ref": "#/components/schemas/StreamPolicy",
+            "default": "SEMANTIC_BLOCKS"
+          },
+          "uncertainties": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Uncertainties",
+            "type": "array"
+          }
+        },
+        "title": "TurnExperience",
         "type": "object"
       },
       "UserProvenance": {

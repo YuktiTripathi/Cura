@@ -165,3 +165,8 @@ class HealthContext(BaseModel):
     conversation_goal: str | None = None
     response_depth: str | None = None
     explained_entities: list[str] = Field(default_factory=list)
+    user_tone: str | None = None
+    facts_already_explained: list[str] = Field(default_factory=list)
+    resolved_user_message: str | None = None
+    response_plan_mode: str | None = None
+    open_threads: list[str] = Field(default_factory=list)

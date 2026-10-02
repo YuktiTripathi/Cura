@@ -42,6 +42,12 @@ export function PresentedAnswer({
       {presentation.overall_summary || presentation.summary ? (
         <p className="answer-summary">{presentation.overall_summary || presentation.summary}</p>
       ) : null}
+      {presentation.personal_relevance ? (
+        <aside className="personal-relevance" aria-label="Why this matters for you">
+          <span>Why this matters for you</span>
+          <p>{presentation.personal_relevance}</p>
+        </aside>
+      ) : null}
       {singleWithRange ? <ValueCard finding={findings[0]} compact /> : null}
       {narrative ? <ThemeList themes={presentation.themes || []} /> : null}
       {narrative ? <RawResultsDisclosure findings={presentation.raw_findings || []} /> : null}
@@ -58,13 +64,13 @@ export function PresentedAnswer({
       ) : null}
       {!narrative && presentation.interpretation ? (
         <section className="answer-section">
-          <h4>What this may mean</h4>
+          <h4>How to read this</h4>
           <p>{presentation.interpretation}</p>
         </section>
       ) : null}
       {!narrative && gaps.length > 0 ? (
         <section className="answer-section">
-          <h4>Still uncertain</h4>
+          <h4>What’s still unclear</h4>
           <ul>
             {gaps.map((item) => (
               <li key={item}>{item}</li>

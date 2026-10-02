@@ -2,7 +2,7 @@ import { useState } from "react";
 import { rewindConversation, streamChat } from "../lib/api";
 import type { ConversationDetail } from "../lib/api";
 import type { ProcessingEvent } from "../lib/processingMessages";
-import type { ChatMeta, ContextRef, EvidenceItem, FollowUp, PresentedFinding, Recommendation, StructuredResponse, TestingOption, UserProvenance } from "../types/chat";
+import type { ChatMeta, ContextRef, EvidenceItem, ExperienceBlock, FollowUp, PresentedFinding, Recommendation, StructuredResponse, TestingOption, TurnExperience, UserProvenance } from "../types/chat";
 
 export type ChatMessage = {
   role: "user" | "assistant";
@@ -13,6 +13,8 @@ export type ChatMessage = {
   meta?: ChatMeta;
   provenance?: UserProvenance;
   presentation?: StructuredResponse | null;
+  experience?: TurnExperience | null;
+  experienceBlocks?: ExperienceBlock[];
   testingOption?: TestingOption | null;
   /** Values shown while the answer is still being written (SSE `preview`). */
   preview?: PresentedFinding[];
@@ -21,7 +23,7 @@ export type ChatMessage = {
   contextRef?: ContextRef;
 };
 
-export function useCuraChat(language = "auto") {
+export function useCuraChat() {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [conversationId, setConversationId] = useState<string | null>(
     () => window.sessionStorage.getItem("cura_conversation_id")
@@ -75,7 +77,6 @@ export function useCuraChat(language = "auto") {
       const res = await streamChat(
         text,
         conversationId,
-        language,
         documentIds,
         contextRef,
         (token) => {
@@ -101,6 +102,28 @@ export function useCuraChat(language = "auto") {
             }
             return next;
           });
+        },
+        (block) => {
+          setMessages((current) => {
+            const next = [...current];
+            const last = next.length - 1;
+            if (last < 0 || next[last].role !== "assistant") return current;
+            const existingBlocks = next[last].experienceBlocks || [];
+            if (existingBlocks.some((item) => item.sequence === block.sequence && item.kind === block.kind)) {
+              return current;
+            }
+            const shouldAppendText = Boolean(block.text) && block.kind !== "continuation";
+            const separator = shouldAppendText && next[last].content.trim() ? "\n\n" : "";
+            next[last] = {
+              ...next[last],
+              preview: undefined,
+              experienceBlocks: [...existingBlocks, block],
+              content: shouldAppendText
+                ? `${next[last].content}${separator}${block.text}`
+                : next[last].content,
+            };
+            return next;
+          });
         }
       );
       finished = true;
@@ -121,6 +144,8 @@ export function useCuraChat(language = "auto") {
           meta: res.meta,
           provenance: res.provenance,
           presentation: res.presentation,
+          experience: res.experience || null,
+          experienceBlocks: res.experience?.blocks || next[last].experienceBlocks,
           testingOption: res.testing_option || res.presentation?.testing_option || null,
         };
         return next;

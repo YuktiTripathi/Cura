@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.chat import ChatMeta, ChatRequest, ChatResponse, EvidenceItem
 from app.contracts.followup import FollowUpSuggestion
-from app.contracts.common import IntentType, KnowledgeScope
+from app.contracts.common import IntentType, KnowledgeScope, LanguageCode
 from app.contracts.health_context import CrossSourceFinding, CrossSourceValue, HealthContext
 from app.core.config import settings
 from app.core.copy import (
@@ -45,8 +45,6 @@ from app.pipeline.cross_source import (
 from app.pipeline.intent import NAMES, is_personal_utterance, requires_personal_record
 from app.pipeline.lab_parameters import expand_requested_keys, primary_lab_key, retrieval_keys
 from app.pipeline.claim_check import ClaimVerdict, check_claims
-from app.pipeline.followup_i18n import localize_followups
-from app.pipeline.language import LanguageCode, resolve_response_language
 from integrations.supershyft.db import DB_NO_RECORDS, DB_PROVIDER_NOT_CALLED
 from app.core.errors import LLMUnavailableError, ProviderUnavailableError
 from app.db.repositories import ConversationRepository
@@ -64,6 +62,8 @@ from app.pipeline.reasoning import ReasoningService
 from app.pipeline.validator import ResponseValidator
 from app.pipeline.composer import ResponseComposer
 from app.pipeline.conversation_experience import build_experience_plan
+from app.pipeline.experience_orchestrator import ExperienceOrchestrator
+from app.pipeline.micro_insights import compose_micro_insight
 from app.pipeline.conversation_title import conversation_title
 from app.pipeline.health_sources import has_supershyft_sources, is_lab_source_compare
 from app.pipeline.document_context import resolve_attached_documents
@@ -86,6 +86,7 @@ from app.pipeline.testing_option import TestingOptionService
 from app.pipeline.grounding import GroundingChecker
 from app.pipeline.recommendation_engine import RecommendationEngine
 from app.providers.registry import ProviderRegistry
+from app.routing.model_tier import promote_for_retrieved_complexity
 
 logger = logging.getLogger("cura.pipeline")
 
@@ -108,6 +109,7 @@ class ChatService:
         self.recommendations = RecommendationEngine()
         self.followups = PersonalizedFollowUpEngine()
         self.testing_options = TestingOptionService()
+        self.experience_orchestrator = ExperienceOrchestrator()
         self.llm = get_llm_client()
         self._progress = ProgressEmitter()
 
@@ -288,14 +290,7 @@ class ChatService:
         completed_docs = [
             d for d in listed_docs if d.extraction_status == "completed" or d.structured_facts_ready
         ]
-        detection, response_lang, new_pref = resolve_response_language(
-            message=payload.message,
-            language_mode=payload.language_mode,
-            requested=payload.language,
-            conversation_pref=getattr(conv, "language_preference", None),
-        )
-        if new_pref and new_pref != LanguageCode.auto:
-            self.repo.update_language_preference(conv, new_pref.value)
+        response_lang = LanguageCode.en
         follow_up = conv_state.turn_type.value != "NEW_QUESTION"
         self._progress.follow_up = follow_up
         self._progress.emit(ProcessingStage.planning)
@@ -374,8 +369,8 @@ class ChatService:
                 operations=list(plan.operations or []),
                 requested_entities=list(plan.requested_metrics or []),
                 request_id=request_id,
-                detected_language=detection.language.value,
-                response_language=response_lang.value,
+                detected_language="en",
+                response_language="en",
                 language_mode=payload.language_mode or "auto",
                 jev_called=jev_trace.called,
                 jev_fallback=jev_trace.fallback,
@@ -851,6 +846,11 @@ class ChatService:
                 self._progress.preview(AnswerPreview(findings=preview_findings(plan, context)))
             except Exception:
                 logger.debug("answer_preview_failed request_id=%s", request_id, exc_info=True)
+        # Retrieval can reveal complexity that was not visible to the initial router.
+        # Promote before the first answer-model call so clearly complex turns do not
+        # pay for STANDARD_MEDICAL and then a second DEEP generation.
+        plan = promote_for_retrieved_complexity(plan, context)
+        self._progress.set_context(plan, follow_up=follow_up)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
         reasoned = self.reasoner.run(
@@ -941,11 +941,7 @@ class ChatService:
         eval_turn["diagnostics"] = diagnostics_trace
 
         inventory = build_inventory(principal, self.registry, plan, conv, context)
-        suggestions = localize_followups(
-            self.followups.generate(plan, answer, context, inventory),
-            response_lang,
-            context.resolved_topic_name or plan.topic_name,
-        )
+        suggestions = self.followups.generate(plan, answer, context, inventory)
         experience = build_experience_plan(
             payload.message,
             plan,
@@ -980,6 +976,26 @@ class ChatService:
         self._progress.measure("compose")
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
+
+        micro_insight = compose_micro_insight(
+            plan=plan,
+            context=context,
+            presentation=presentation,
+            llm_called=llm_called,
+        )
+        if micro_insight and not presentation.personal_relevance:
+            presentation.personal_relevance = micro_insight
+
+        turn_experience = self.experience_orchestrator.build(
+            answer=answer,
+            presentation=presentation,
+            follow_ups=suggestions,
+            safety_mode=SafetyLayer.request_safety_mode(pre_safety),
+            escalation=escalation,
+        )
+        if turn_experience.stream_policy.value == "SEMANTIC_BLOCKS":
+            for block in turn_experience.blocks:
+                self._progress.experience_block(block)
 
         self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
         self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
@@ -1169,6 +1185,7 @@ class ChatService:
             follow_ups=suggestions,
             recommendations=approved_recommendations,
             presentation=presentation,
+            experience=turn_experience,
             testing_option=testing_option,
             meta=_meta(
                 status=context.status,
@@ -1587,11 +1604,7 @@ class ChatService:
         inventory = build_inventory(principal, self.registry, plan, conv, context)
         inventory.uploaded_marker_keys = uploaded_keys
         inventory.sources = {"supershyft", "user_uploaded"}
-        suggestions = localize_followups(
-            self.followups.generate(plan, answer, context, inventory),
-            LanguageCode.en,
-            plan.topic_name,
-        )
+        suggestions = self.followups.generate(plan, answer, context, inventory)
         self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
         self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
         self.repo.update_follow_up(conv, plan.topic, plan.topic_name)

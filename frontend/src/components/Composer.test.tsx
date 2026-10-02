@@ -52,7 +52,7 @@ describe("Composer voice input", () => {
   it("records locally and inserts the Whisper transcript", async () => {
     transcribeVoice.mockResolvedValue({ transcript: "मेरा कोलेस्ट्रॉल कितना है?", detected_language: "hi", confidence: 0.9 });
     const onSend = vi.fn();
-    render(<Composer disabled={false} onSend={onSend} language="auto" />);
+    render(<Composer disabled={false} onSend={onSend} />);
     fireEvent.click(screen.getByLabelText("Start voice input"));
     await waitFor(() => expect(screen.getByLabelText("Stop recording")).toBeTruthy());
     fireEvent.click(screen.getByLabelText("Stop recording"));

@@ -13,10 +13,8 @@ from app.core.errors import ProviderUnavailableError
 from app.core.logging import CuraLogFilter
 from app.main import app
 from app.pipeline.cross_source import compact_llm_context, ComparisonResult, SourceValue
-from app.pipeline.language import resolve_response_language
 from app.pipeline.query_planner import build_query_plan
 from app.pipeline.safety import SafetyLayer
-from app.contracts.common import LanguageCode
 from integrations.supershyft.db import _assert_readonly, run_readonly
 from tests.helpers.pdf_fixtures import make_text_pdf
 
@@ -136,21 +134,6 @@ def test_multilingual_personal_vs_general_plans():
     general = build_query_plan("Vitamin D kya hota hai?")
     assert not general.needs_personal_data
     assert general.needs_general
-
-
-def test_language_preference_hindi_persists():
-    first = client.post(
-        "/api/v1/chat",
-        headers=H,
-        json={"message": "Answer in Hindi.", "language_mode": "auto"},
-    ).json()
-    cid = first["conversation_id"]
-    second = client.post(
-        "/api/v1/chat",
-        headers=H,
-        json={"message": "What is my LDL?", "conversation_id": cid},
-    ).json()
-    assert second["meta"]["response_language"] == "hi"
 
 
 def test_medical_terms_preserved_in_general_answers():
@@ -302,17 +285,6 @@ def test_general_question_skips_supershyft_and_documents():
     blood_q.assert_not_called()
     bio_q.assert_not_called()
     retrieve.assert_not_called()
-
-
-def test_explicit_language_priority():
-    det, lang, pref = resolve_response_language(
-        message="Answer in Hindi.",
-        language_mode="manual",
-        requested="en",
-        conversation_pref="en",
-    )
-    assert lang == LanguageCode.hi
-    assert pref == LanguageCode.hi
 
 
 @pytest.mark.skipif(not settings.enable_llm, reason="ENABLE_LLM=false in this environment")

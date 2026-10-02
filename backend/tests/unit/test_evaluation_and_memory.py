@@ -358,3 +358,54 @@ def test_grounding_missing_value_cannot_be_hallucinated():
     )
     flags = GroundingChecker().unsupported_personal_numbers("Your LDL is 118 mg/dL", ctx)
     assert "118" in flags
+
+
+def test_semantic_summary_includes_persisted_conversation_continuity():
+    import json
+
+    memory = FollowUpMemory()
+    conv = Conversation(
+        id="memory-v2",
+        subject_id="demo-user-001",
+        follow_up_topic="vitamin_b12",
+        follow_up_topic_name="Vitamin B12",
+        conversation_summary="Discussing Vitamin B12",
+        conversation_state_json=json.dumps(
+            {
+                "previous_user_question": "Yes, I take one daily.",
+                "previous_assistant_summary": "Your B12 result was low.",
+                "recent_context_notes": ["User reported a recent supplement or injection change."],
+                "explained_entities": ["vitamin_b12"],
+                "current_concern": "understand whether supplementation changes the interpretation",
+                "conversation_goal": "FOLLOW_UP",
+                "communication_style": "QUICK",
+                "previous_assistant_follow_up": "Are you taking a B12 supplement?",
+            }
+        ),
+    )
+    summary = memory.semantic_summary(conv)
+    assert "What CURA already explained: Your B12 result was low." in summary
+    assert "User recently mentioned:" in summary
+    assert "Already discussed: vitamin_b12" in summary
+    assert "Open conversational thread:" in summary
+
+
+def test_updated_summary_preserves_user_context_from_persisted_state():
+    import json
+
+    memory = FollowUpMemory()
+    conv = Conversation(
+        id="memory-v2-update",
+        subject_id="demo-user-001",
+        last_source_mode="supershyft",
+        conversation_state_json=json.dumps(
+            {
+                "previous_assistant_summary": "Your Vitamin D was below the reference range.",
+                "recent_context_notes": ["User reported a recent supplement or injection change."],
+            }
+        ),
+    )
+    summary = memory.updated_summary(conv, "blood_marker_explanation", "Vitamin D")
+    assert "Discussing Vitamin D" in summary
+    assert "already explained Your Vitamin D was below the reference range." in summary
+    assert "user context User reported a recent supplement or injection change." in summary

@@ -18,6 +18,7 @@ from app.llm.registry import fallback_tiers, uses_answer_llm
 from app.pipeline.planner import plan_needs_reasoning
 from app.pipeline.quality_gate import review_answer, should_escalate_to_deep
 from app.pipeline.prompt_builder import PromptBuilder
+from app.pipeline.response_planner import build_response_plan
 from app.pipeline.renderer import (
     DeterministicRenderer,
     render_bio_ai_ambiguity,
@@ -103,6 +104,21 @@ class ReasoningService:
             and any(getattr(item, "reason", None) == "score_not_available" for item in context.missing)
         ):
             return ReasoningResult(answer="Score not available in this report.", llm_mode="structured_bio_ai")
+        response_plan = build_response_plan(message, plan, context)
+        if response_plan.kind == "report_overview" and context.markers:
+            highlights = [
+                m for m in context.markers
+                if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}
+            ]
+            detail = ""
+            if highlights:
+                names = ", ".join(m.name for m in highlights[:3])
+                detail = f" The results worth reviewing first are {names}."
+            return ReasoningResult(
+                answer=f"{response_plan.direct_answer} {response_plan.summary}{detail}".strip(),
+                llm_mode="structured_report_overview",
+            )
+
         if (
             lookup
             and plan.intent in {IntentType.latest_result, IntentType.previous_result}

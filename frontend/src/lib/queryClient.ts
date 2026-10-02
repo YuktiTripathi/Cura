@@ -1,7 +1,7 @@
 import { QueryClient } from "@tanstack/react-query";
 
 export const queryKeys = {
-  me: (language: string) => ["me", language] as const,
+  me: ["me"] as const,
   conversations: ["conversations"] as const,
   documents: ["documents"] as const,
   overview: ["overview"] as const,

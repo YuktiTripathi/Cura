@@ -1,5 +1,3 @@
-import { langForText } from "../lib/language";
-
 type Item = { id: string; label: string; prompt?: string };
 type Props = { items: Item[]; onPick: (prompt: string) => void; onAsk: () => void };
 
@@ -10,7 +8,6 @@ export function StarterChips({ items, onPick, onAsk }: Props) {
         <button
           key={item.id}
           type="button"
-          lang={langForText(item.label)}
           onClick={() => (item.prompt ? onPick(item.prompt) : onAsk())}
         >
           {item.label}

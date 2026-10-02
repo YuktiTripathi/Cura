@@ -92,6 +92,27 @@ export type AnswerPreview = {
   findings: PresentedFinding[];
 };
 
+
+export type ExperienceBlock = {
+  sequence: number;
+  kind: "direct_answer" | "key_facts" | "interpretation" | "personal_relevance" | "uncertainty" | "next_step" | "continuation";
+  text?: string | null;
+  findings?: PresentedFinding[];
+};
+
+export type TurnExperience = {
+  response_mode?: string | null;
+  stream_policy: "SEMANTIC_BLOCKS" | "COMPLETE_ONLY";
+  direct_answer?: string | null;
+  key_facts: PresentedFinding[];
+  interpretation?: string | null;
+  personal_relevance?: string | null;
+  uncertainties: string[];
+  next_steps: string[];
+  continuation?: string | null;
+  blocks: ExperienceBlock[];
+};
+
 export type HealthTheme = {
   title: string;
   priority: "high" | "medium" | "low";
@@ -193,6 +214,7 @@ export type ChatResponse = {
   meta: ChatMeta;
   provenance?: UserProvenance;
   presentation?: StructuredResponse | null;
+  experience?: TurnExperience | null;
   testing_option?: TestingOption | null;
 };
 

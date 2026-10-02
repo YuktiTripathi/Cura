@@ -6,7 +6,6 @@ import { EscalationNote, FollowUpChips, Recommendations } from "./messages/Messa
 import { MessageActions, type FeedbackRating } from "./messages/MessageActions";
 import { SourceViewer } from "./SourceViewer";
 import { groupEvidence } from "../lib/sources";
-import { langForText } from "../lib/language";
 import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
 import { DoctorSummary } from "./DoctorSummary";
 import { InsightNote } from "./messages/InsightNote";
@@ -16,6 +15,25 @@ import { PreviewAnswer } from "./messages/PreviewAnswer";
 import { ProvenanceLine } from "./messages/ProvenanceLine";
 import { TestingOptionCard } from "./messages/TestingOptionCard";
 import { UserQuestionActions, UserQuestionEditor } from "./messages/UserQuestion";
+import { StreamingExperience } from "./messages/StreamingExperience";
+
+function assistantContextLabel(type?: string | null, streaming = false): string {
+  if (streaming) return "Building your answer";
+  if (type === "personal_health") return "Using your health context";
+  if (type === "medical_reference") return "Medical reference";
+  return "Health guidance";
+}
+
+function AssistantIdentity({ label, busy = false }: { label: string; busy?: boolean }) {
+  return (
+    <header className="assistant-identity" aria-label={`CURA · ${label}`}>
+      <span className="assistant-mark" aria-hidden="true">C</span>
+      <span className="assistant-name">CURA</span>
+      <span className="assistant-context">{label}</span>
+      {busy ? <span className="assistant-live-dot" aria-hidden="true" /> : null}
+    </header>
+  );
+}
 
 export function MessageList({
   messages,
@@ -61,15 +79,22 @@ export function MessageList({
       {messages.map((m, i) => {
         // An assistant placeholder stays empty until the answer arrives; the progress stepper covers that
         // wait. If Cura already sent the values being asked about, show them meanwhile.
-        if (m.role === "assistant" && !m.content && !m.presentation) {
+        if (m.role === "assistant" && !m.content && !m.presentation && !(m.experienceBlocks && m.experienceBlocks.length > 0)) {
           return m.preview && m.preview.length > 0 ? (
             <article key={i} className="assistant pending" aria-busy="true">
+              <AssistantIdentity label="Reading your health context" busy />
               <PreviewAnswer findings={m.preview} />
             </article>
           ) : null;
         }
         return (
-          <article key={i} className={m.role} lang={langForText(m.content)}>
+          <article key={i} className={m.role}>
+            {m.role === "assistant" ? (
+              <AssistantIdentity
+                label={assistantContextLabel(m.provenance?.type, Boolean(m.experienceBlocks?.length && !m.presentation))}
+                busy={Boolean(m.experienceBlocks?.length && !m.presentation)}
+              />
+            ) : null}
             {m.role === "user" && editingIndex === i ? (
               <UserQuestionEditor
                 draft={draft}
@@ -83,6 +108,8 @@ export function MessageList({
                 fallback={m.content}
                 testingOption={m.testingOption || m.presentation.testing_option}
               />
+            ) : m.role === "assistant" && m.experienceBlocks?.length ? (
+              <StreamingExperience blocks={m.experienceBlocks} />
             ) : (
               <p>{m.role === "assistant" ? <AssistantBody content={m.content} /> : m.content}</p>
             )}

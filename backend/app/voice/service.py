@@ -6,7 +6,6 @@ from pathlib import Path
 
 from app.core.config import settings
 from app.core.errors import VoiceValidationError
-from app.pipeline.language import get_language_detector
 from app.voice.contracts import TranscriptResult
 from app.voice.medical_stt import normalize_spoken_medical_terms
 from app.voice.providers import get_stt_provider
@@ -59,9 +58,6 @@ class VoiceService:
         if not text:
             raise VoiceValidationError("I couldn't hear a question. Please try speaking again or type your message.")
         detected = result.detected_language
-        if not detected:
-            cura_lang = get_language_detector().detect(text)
-            detected = cura_lang.language.value if cura_lang.confidence >= 0.4 else None
         return TranscriptResult(
             transcript=text,
             detected_language=detected,

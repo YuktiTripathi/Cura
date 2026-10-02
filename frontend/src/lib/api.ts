@@ -1,4 +1,4 @@
-import type { AnswerPreview, ChatResponse, ContextRef } from "../types/chat";
+import type { AnswerPreview, ChatResponse, ContextRef, ExperienceBlock } from "../types/chat";
 import type { MeResponse } from "../types/me";
 import type { HealthOverview } from "../types/overview";
 
@@ -9,7 +9,13 @@ const USER = import.meta.env.VITE_CURA_USER_ID || "";
 
 function authHeaders(): HeadersInit {
   const headers: Record<string, string> = { "Content-Type": "application/json" };
-  const token = window.localStorage.getItem("supershyft_access_token") || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
+  let token = "";
+  try {
+    token = window.localStorage.getItem("supershyft_access_token") || "";
+  } catch {
+    token = "";
+  }
+  token = token || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
   if (token) headers.Authorization = `Bearer ${token}`;
   else if (import.meta.env.DEV && USER) headers["X-Cura-User-Id"] = USER;
   return headers;
@@ -50,10 +56,9 @@ export function fallbackMe(): MeResponse {
   };
 }
 
-export async function getCurrentUser(language?: string): Promise<MeResponse> {
+export async function getCurrentUser(): Promise<MeResponse> {
   try {
-    const q = language && language !== "auto" ? `?language=${encodeURIComponent(language)}` : "";
-    const res = await fetch(`${API}/api/v1/me${q}`, { headers: authHeaders() });
+    const res = await fetch(`${API}/api/v1/me`, { headers: authHeaders() });
     const data = await parseJson(res);
     if (!res.ok) return fallbackMe();
     return data as unknown as MeResponse;
@@ -69,14 +74,10 @@ export async function getOverview(): Promise<HealthOverview> {
 }
 
 export async function transcribeVoice(
-  blob: Blob,
-  language: string = "auto"
+  blob: Blob
 ): Promise<{ transcript: string; text?: string; detected_language: string | null; language?: string | null; confidence: number | null }> {
-  const language_mode = language === "auto" ? "auto" : "manual";
   const form = new FormData();
   form.append("audio", blob, "recording.webm");
-  form.append("language_mode", language_mode);
-  if (language !== "auto") form.append("language", language);
   const headers: Record<string, string> = {};
   const token = window.localStorage.getItem("supershyft_access_token") || import.meta.env.VITE_CURA_ACCESS_TOKEN || "";
   if (token) headers.Authorization = `Bearer ${token}`;
@@ -104,17 +105,13 @@ export async function transcribeVoice(
 export async function sendChat(
   message: string,
   conversationId: string | null,
-  language: string = "auto",
   documentIds: string[] = [],
   contextRef?: ContextRef
 ): Promise<ChatResponse> {
-  const language_mode = language === "auto" ? "auto" : "manual";
   const payload: Record<string, unknown> = {
     message,
     conversation_id: conversationId,
-    language_mode,
   };
-  if (language !== "auto") payload.language = language;
   if (documentIds.length) payload.document_ids = documentIds;
   if (contextRef) payload.context_ref = contextRef;
   let res: Response;
@@ -142,19 +139,17 @@ export async function sendChat(
 export async function streamChat(
   message: string,
   conversationId: string | null,
-  language: string,
   documentIds: string[],
   contextRef: ContextRef | undefined,
   onToken: (text: string) => void,
   onProgress?: (event: import("./processingMessages").ProcessingEvent) => void,
-  onPreview?: (preview: AnswerPreview) => void
+  onPreview?: (preview: AnswerPreview) => void,
+  onExperienceBlock?: (block: ExperienceBlock) => void
 ): Promise<ChatResponse> {
   const payload: Record<string, unknown> = {
     message,
     conversation_id: conversationId,
-    language_mode: language === "auto" ? "auto" : "manual",
   };
-  if (language !== "auto") payload.language = language;
   if (documentIds.length) payload.document_ids = documentIds;
   if (contextRef) payload.context_ref = contextRef;
   const headers = authHeaders() as Record<string, string>;
@@ -196,6 +191,7 @@ export async function streamChat(
       if (event === "token") onToken(data.text || "");
       if (event === "progress" && onProgress) onProgress(data);
       if (event === "preview" && onPreview) onPreview(data as AnswerPreview);
+      if (event === "experience_block" && onExperienceBlock) onExperienceBlock(data as ExperienceBlock);
       if (event === "error") throw new Error(data.message || "Streaming request failed");
       if (event === "complete" || event === "answer") completed = data as ChatResponse;
     }

@@ -7,7 +7,6 @@ type Props = {
   disabled: boolean;
   onSend: (value: string, documentIds?: string[]) => void;
   inputRef?: RefObject<HTMLInputElement>;
-  language?: string;
   conversationId?: string | null;
   onUploaded?: () => void;
   /** Shared uploader (e.g. with a page-wide drop zone). The composer uses its own when absent. */
@@ -22,7 +21,6 @@ export function Composer({
   disabled,
   onSend,
   inputRef,
-  language = "auto",
   conversationId = null,
   onUploaded,
   uploader: sharedUploader,
@@ -116,7 +114,7 @@ export function Composer({
         }
         setTranscribing(true);
         try {
-          const result = await transcribeVoice(blob, language);
+          const result = await transcribeVoice(blob);
           const text = (result.transcript || result.text || "").trim();
           if (!text) {
             setVoiceError("I couldn't clearly transcribe that. Please try again or type your message.");

@@ -6,6 +6,7 @@ import time
 from collections.abc import Callable
 
 from app.contracts.presentation import AnswerPreview
+from app.contracts.turn_experience import ExperienceBlock
 from app.contracts.processing import ProcessingEvent, ProcessingStage, RequestFamily, TimingReport
 from app.contracts.query import QueryPlan
 
@@ -81,9 +82,11 @@ class ProgressEmitter:
         self,
         callback: Callable[[ProcessingEvent], None] | None = None,
         preview_callback: Callable[[AnswerPreview], None] | None = None,
+        experience_callback: Callable[[ExperienceBlock], None] | None = None,
     ):
         self._callback = callback
         self._preview_callback = preview_callback
+        self._experience_callback = experience_callback
         self._started = time.perf_counter()
         self._last: ProcessingStage | None = None
         self.events: list[ProcessingEvent] = []
@@ -120,6 +123,11 @@ class ProgressEmitter:
         """Send already-retrieved values to a streaming client before reasoning starts."""
         if self._preview_callback is not None and preview.findings:
             self._preview_callback(preview)
+
+    def experience_block(self, block: ExperienceBlock) -> None:
+        """Send an already-validated semantic response block to a streaming client."""
+        if self._experience_callback is not None:
+            self._experience_callback(block)
 
     def mark(self, name: str) -> None:
         self._marks[name] = time.perf_counter()

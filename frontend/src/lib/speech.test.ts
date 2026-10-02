@@ -6,11 +6,10 @@ describe("speech helpers", () => {
     vi.unstubAllGlobals();
   });
 
-  it("maps CURA languages to SpeechRecognition tags", () => {
-    expect(speechLanguage("auto", "en-US")).toBe("en-IN");
-    expect(speechLanguage("auto", "hi-IN")).toBe("hi-IN");
-    expect(speechLanguage("hi")).toBe("hi-IN");
-    expect(speechLanguage("en")).toBe("en-IN");
+  it("maps browser locales to SpeechRecognition tags", () => {
+    expect(speechLanguage(undefined, "en-US")).toBe("en-IN");
+    expect(speechLanguage(undefined, "hi-IN")).toBe("hi-IN");
+    expect(speechLanguage(undefined, "en-IN")).toBe("en-IN");
   });
 
   it("detects unsupported browsers", () => {

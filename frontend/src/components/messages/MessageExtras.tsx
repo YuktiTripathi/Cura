@@ -37,15 +37,19 @@ export function FollowUpChips({
 }) {
   if (!items.length) return null;
   return (
-    <div className="chips">
-      {items.map((f) => {
-        const text = followUpText(f);
-        return (
-          <button key={text} type="button" onClick={() => onPick(text)}>
-            {text}
-          </button>
-        );
-      })}
+    <div className="follow-up-group">
+      <span className="follow-up-label">Continue with CURA</span>
+      <div className="chips follow-up-chips">
+        {items.map((f) => {
+          const text = followUpText(f);
+          return (
+            <button key={text} type="button" onClick={() => onPick(text)}>
+              <span>{text}</span>
+              <span className="follow-up-arrow" aria-hidden="true">→</span>
+            </button>
+          );
+        })}
+      </div>
     </div>
   );
 }

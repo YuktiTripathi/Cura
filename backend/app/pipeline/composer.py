@@ -20,6 +20,7 @@ from app.pipeline.conversation_experience import (
 )
 from app.pipeline.lab_parameters import display_name_for
 from app.pipeline.narrative import finding_from_marker
+from app.pipeline.response_planner import build_response_plan
 from app.pipeline.presentation import (
     build_structured_response,
     flatten_structured_response,
@@ -43,6 +44,28 @@ def _llm_handling(text: str) -> tuple[str | None, str | None]:
     if re.search(r"\bwhat does .{0,24} mean\b", text, re.I):
         return None, "CONTINUE_INTERPRETATION"
     return None, None
+
+
+_AMBIGUOUS_DEICTIC = re.compile(
+    r"\b(?:that|this) (?:marker|result|value|finding)\b|^\s*what is (?:that|this)\b|\bwhat does it mean\b",
+    re.I,
+)
+
+def _has_unique_referent(plan: QueryPlan, context: HealthContext) -> bool:
+    candidates = [
+        *(plan.display_entities or []),
+        *(plan.requested_metrics or []),
+        *[m.key for m in (context.markers or []) if m.key],
+    ]
+    return len(set(item for item in candidates if item)) == 1
+
+def _valid_follow_up(item: FollowUpSuggestion, plan: QueryPlan, context: HealthContext) -> bool:
+    text = (item.text or "").strip()
+    if not text:
+        return False
+    if _AMBIGUOUS_DEICTIC.search(text) and not _has_unique_referent(plan, context):
+        return False
+    return True
 
 
 class ResponseComposer:
@@ -80,6 +103,7 @@ class ResponseComposer:
                 )
             )
         seeded = extras + [item for item in (follow_ups or []) if item.handling_path]
+        seeded = [item for item in seeded if _valid_follow_up(item, plan, context)]
         extra_chips = chip_prompts(experience.next_action, context, plan)
         question, chips = discipline_follow_ups(
             seeded,
@@ -92,8 +116,32 @@ class ResponseComposer:
         if is_list_only(plan.raw_message) or experience.depth.value == "SHORT":
             combined = combined[:1]
         if answer_turn:
-            combined = []
+            # A reply to CURA should not trigger another generic clinical question.
+            # When the user has supplied meaningful new context (captured in
+            # reasoning_context), keep one action chip so the conversation can
+            # naturally move forward instead of ending abruptly.
             question = []
+            continuation = chip_prompts(experience.next_action, context, plan) if plan.reasoning_context else []
+            combined = [
+                FollowUpSuggestion(
+                    text=continuation[0],
+                    category="suggested",
+                    handling_path="CONTINUE_INTERPRETATION",
+                )
+            ] if continuation else []
+            chips = list(combined)
+        response_plan = build_response_plan(plan.raw_message or "", plan, context)
+        if response_plan.kind == "report_overview":
+            question = []
+            combined = [
+                FollowUpSuggestion(
+                    text=label,
+                    category="report_action",
+                    handling_path="CONTINUE_INTERPRETATION",
+                )
+                for label in response_plan.next_actions
+            ]
+            chips = list(combined)
         follow_text = question[0].text if question else None
         cleaned = sanitize_internal_ids(answer or "")
         if context.premise_verified is False and context.premise and context.premise.note:
@@ -108,9 +156,25 @@ class ResponseComposer:
             llm_themes=list(llm_result.themes) if llm_result and llm_result.themes else None,
             llm_overall=llm_result.overall_summary if llm_result else None,
         )
-        if presentation.mode in {ResponseMode.single_value, ResponseMode.result_list}:
+        if response_plan.kind == "report_overview":
+            presentation.headline = "Your latest blood report"
+            presentation.summary = response_plan.direct_answer
+            presentation.interpretation = response_plan.summary
+            presentation.uncertainties = []
+            presentation.follow_up = None
+        if presentation.mode in {ResponseMode.single_value, ResponseMode.result_list} and response_plan.kind != "report_overview":
             combined = combined[:1] if not answer_turn else []
         text = flatten_structured_response(presentation, raw_answer=cleaned)
+        if response_plan.kind == "report_overview":
+            abnormal = [
+                m for m in (context.markers or [])
+                if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}
+            ]
+            highlight = ""
+            if abnormal:
+                names = ", ".join(m.name for m in abnormal[:3])
+                highlight = f" The results worth reviewing first are {names}."
+            text = f"{response_plan.direct_answer} {response_plan.summary}{highlight}".strip()
         if not text:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
         if testing_option:

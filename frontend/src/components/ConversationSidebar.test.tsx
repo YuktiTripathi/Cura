@@ -132,19 +132,4 @@ describe("CuraPage shell", () => {
     expect(sidebar?.textContent).toContain("Recent conversations");
     expect(document.querySelector(".page")).toBeNull();
   });
-
-  it("answers in the chosen language and remembers it", async () => {
-    const api = await import("../lib/api");
-    render(<CuraPage />);
-    await waitFor(() => expect(screen.getByText("Hi Yukti 👋")).toBeTruthy());
-    const picker = screen.getByLabelText("Answer language") as HTMLSelectElement;
-    expect(picker.value).toBe("auto");
-    fireEvent.change(picker, { target: { value: "hi" } });
-    await waitFor(() => expect(api.getCurrentUser).toHaveBeenCalledWith("hi"));
-    // The interface stays English; only text in an Indic script is tagged with its language.
-    expect(document.documentElement.lang).not.toBe("hi");
-    expect(window.localStorage.getItem("cura_language")).toBe("hi");
-    fireEvent.change(picker, { target: { value: "auto" } });
-    expect(window.localStorage.getItem("cura_language")).toBeNull();
-  });
 });

@@ -203,7 +203,7 @@ def test_one_handled_follow_up_not_a_list_of_generics():
     assert not any("weather" in item.text.lower() or "recipe" in item.text.lower() for item in combined)
 
 
-def test_composer_skips_follow_ups_on_answer_turn():
+def test_composer_avoids_generic_question_on_answer_turn():
     plan = build_query_plan("What does my B12 result mean?")
     plan.conversation_turn = "ANSWER_TO_ASSISTANT"
     ctx = HealthContext(
@@ -227,7 +227,8 @@ def test_composer_skips_follow_ups_on_answer_turn():
         ],
         conversation_turn="ANSWER_TO_ASSISTANT",
     )
-    assert suggestions == []
+    assert not any(item.expected_reply_type for item in suggestions)
+    assert len(suggestions) <= 1
     assert pres.conversation_goal
 
 
@@ -244,7 +245,7 @@ def test_paraphrased_b12_multi_turn_experience():
     debug = second["meta"].get("debug") or {}
     assert debug.get("turn_type") == "ANSWER_TO_ASSISTANT"
     assert "b12" in second["answer"].lower() or "154" in second["answer"]
-    assert not second.get("follow_ups")
+    assert len(second.get("follow_ups") or []) <= 1
 
     third = chat("Is this something I should be concerned about?", cid)
     debug = third["meta"].get("debug") or {}

@@ -38,7 +38,6 @@ describe("streamChat", () => {
     const res = await streamChat(
       "What is my LDL?",
       null,
-      "auto",
       [],
       undefined,
       () => undefined,
@@ -52,4 +51,40 @@ describe("streamChat", () => {
     expect(previews).toEqual([{ findings: [finding] }]);
     expect(res.answer).toBe("Your LDL is 138 mg/dL.");
   });
+
+  it("delivers validated experience blocks before the final response", async () => {
+    const block = { sequence: 0, kind: "direct_answer", text: "Your LDL is 138 mg/dL.", findings: [] };
+    const final = {
+      conversation_id: "c2",
+      answer: "Your LDL is 138 mg/dL.",
+      evidence: [],
+      follow_ups: [],
+      meta: {},
+      experience: { stream_policy: "SEMANTIC_BLOCKS", key_facts: [], uncertainties: [], next_steps: [], blocks: [block] },
+    };
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () =>
+        sse([
+          ["status", { state: "started" }],
+          ["experience_block", block],
+          ["complete", final],
+        ])
+      )
+    );
+    const blocks: unknown[] = [];
+    const res = await streamChat(
+      "Why is my LDL high?",
+      null,
+      [],
+      undefined,
+      () => undefined,
+      undefined,
+      undefined,
+      (item) => blocks.push(item)
+    );
+    expect(blocks).toEqual([block]);
+    expect(res.experience?.stream_policy).toBe("SEMANTIC_BLOCKS");
+  });
+
 });

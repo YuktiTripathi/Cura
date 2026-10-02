@@ -365,3 +365,45 @@ def _constrain_tier(
         depth = ReasoningDepth.deep if selected == AnswerModelTier.deep_medical_reasoning else ReasoningDepth.standard
         extra.append("interpretation_promoted_from_deterministic")
     return selected, depth, extra
+
+
+def promote_for_retrieved_complexity(plan: QueryPlan, context) -> QueryPlan:
+    """Promote clearly complex personal-health turns before the first answer-model call.
+
+    Initial routing happens before retrieval. Once trusted context is available we can see
+    conflicts, breadth and cross-source density that were impossible to know at route time.
+    Promoting here avoids paying for STANDARD_MEDICAL and then a second DEEP call.
+    """
+    if plan.answer_model_tier != AnswerModelTier.standard_medical:
+        return plan
+
+    ops = {str(item).upper() for item in (plan.operations or [])}
+    if plan.operation:
+        ops.add(plan.operation.upper())
+    marker_count = len(getattr(context, "markers", None) or [])
+    risk_count = len(getattr(context, "bio_ai_risks", None) or [])
+    domain_count = len(plan.domains or [])
+    conflicts = len(getattr(context, "source_conflicts", None) or [])
+    comparisons = len(getattr(context, "comparisons", None) or [])
+
+    reason = None
+    if conflicts:
+        reason = "retrieved_source_conflict"
+    elif plan.needs_cross_source and (comparisons or marker_count + risk_count >= 3):
+        reason = "retrieved_cross_source_complexity"
+    elif plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary} and marker_count + risk_count >= 5:
+        reason = "retrieved_whole_health_breadth"
+    elif domain_count >= 2 and marker_count + risk_count >= 4:
+        reason = "retrieved_multi_domain_breadth"
+    elif ops & {"CORRELATE", "IDENTIFY_PATTERN", "IDENTIFY_GAPS", "PRIORITIZE"} and marker_count + risk_count >= 4:
+        reason = "retrieved_reasoning_breadth"
+
+    if not reason:
+        return plan
+    plan.answer_model_tier = AnswerModelTier.deep_medical_reasoning
+    plan.model_tier = AnswerModelTier.deep_medical_reasoning
+    plan.complexity = AnswerComplexity.high
+    plan.reasoning_depth = ReasoningDepth.deep
+    plan.reasoning_required = True
+    plan.model_selection_reasons = list(dict.fromkeys([*(plan.model_selection_reasons or []), reason, "pre_generation_deep_promotion"]))
+    return plan

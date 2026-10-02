@@ -552,7 +552,10 @@ export interface components {
         };
         /** Body_transcribe_api_v1_voice_post */
         Body_transcribe_api_v1_voice_post: {
-            /** Audio */
+            /**
+             * Audio
+             * Format: binary
+             */
             audio: string;
             /** Language */
             language?: string | null;
@@ -564,7 +567,10 @@ export interface components {
         };
         /** Body_transcribe_api_v1_voice_transcribe_post */
         Body_transcribe_api_v1_voice_transcribe_post: {
-            /** Audio */
+            /**
+             * Audio
+             * Format: binary
+             */
             audio: string;
             /** Language */
             language?: string | null;
@@ -576,7 +582,10 @@ export interface components {
         };
         /** Body_transcribe_compat_cura_transcribe_post */
         Body_transcribe_compat_cura_transcribe_post: {
-            /** Audio */
+            /**
+             * Audio
+             * Format: binary
+             */
             audio: string;
             /** Language */
             language?: string | null;
@@ -590,7 +599,10 @@ export interface components {
         Body_upload_document_api_v1_documents_post: {
             /** Conversation Id */
             conversation_id?: string | null;
-            /** File */
+            /**
+             * File
+             * Format: binary
+             */
             file: string;
         };
         /** CapabilitiesResponse */
@@ -817,6 +829,7 @@ export interface components {
             conversation_id: string;
             /** Evidence */
             evidence?: components["schemas"]["EvidenceItem"][];
+            experience?: components["schemas"]["TurnExperience"] | null;
             /** Follow Ups */
             follow_ups?: components["schemas"]["FollowUpSuggestion"][];
             meta?: components["schemas"]["ChatMeta"];
@@ -1067,6 +1080,21 @@ export interface components {
             /** Measured On */
             measured_on?: string | null;
         };
+        /** ExperienceBlock */
+        ExperienceBlock: {
+            /** Findings */
+            findings?: components["schemas"]["PresentedFinding"][];
+            kind: components["schemas"]["ExperienceBlockKind"];
+            /** Sequence */
+            sequence: number;
+            /** Text */
+            text?: string | null;
+        };
+        /**
+         * ExperienceBlockKind
+         * @enum {string}
+         */
+        ExperienceBlockKind: "direct_answer" | "key_facts" | "interpretation" | "personal_relevance" | "uncertainty" | "next_step" | "continuation";
         /**
          * FactKind
          * @enum {string}
@@ -1834,6 +1862,11 @@ export interface components {
              */
             personal_unavailable: boolean;
         };
+        /**
+         * StreamPolicy
+         * @enum {string}
+         */
+        StreamPolicy: "SEMANTIC_BLOCKS" | "COMPLETE_ONLY";
         /** StructuredResponse */
         StructuredResponse: {
             /** Blocks */
@@ -2036,6 +2069,32 @@ export interface components {
             text?: string | null;
             /** Transcript */
             transcript: string;
+        };
+        /**
+         * TurnExperience
+         * @description Single response contract consumed by streaming and final presentation.
+         */
+        TurnExperience: {
+            /** Blocks */
+            blocks?: components["schemas"]["ExperienceBlock"][];
+            /** Continuation */
+            continuation?: string | null;
+            /** Direct Answer */
+            direct_answer?: string | null;
+            /** Interpretation */
+            interpretation?: string | null;
+            /** Key Facts */
+            key_facts?: components["schemas"]["PresentedFinding"][];
+            /** Next Steps */
+            next_steps?: string[];
+            /** Personal Relevance */
+            personal_relevance?: string | null;
+            /** Response Mode */
+            response_mode?: string | null;
+            /** @default SEMANTIC_BLOCKS */
+            stream_policy: components["schemas"]["StreamPolicy"];
+            /** Uncertainties */
+            uncertainties?: string[];
         };
         /** UserProvenance */
         UserProvenance: {

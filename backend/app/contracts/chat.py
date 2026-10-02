@@ -6,6 +6,7 @@ from app.contracts.followup import FollowUpSuggestion
 from app.contracts.context_ref import ContextRef
 from app.contracts.operations import SourceOutcome
 from app.contracts.presentation import StructuredResponse
+from app.contracts.turn_experience import TurnExperience
 from app.contracts.recommendation import ApprovedRecommendation
 
 
@@ -130,6 +131,7 @@ class ChatResponse(BaseModel):
     meta: ChatMeta = Field(default_factory=ChatMeta)
     provenance: UserProvenance = Field(default_factory=UserProvenance)
     presentation: StructuredResponse | None = None
+    experience: TurnExperience | None = None
     testing_option: TestingOption | None = None
 
 

@@ -219,10 +219,10 @@ def test_starters_case_d_bio_only():
     assert any("Cardiac" in q.text or "cardiac" in q.text.lower() for q in out.personal)
 
 
-def test_starters_case_e_hindi():
+def test_starters_stay_english_when_language_query_is_sent():
     res = client.get("/api/v1/me?language=hi", headers=H).json()
     blob = " ".join(q["text"] for q in res["starters"]["personal"] + res["starters"]["general"])
-    assert any("\u0900" <= ch <= "\u097F" for ch in blob)
+    assert not any("\u0900" <= ch <= "\u097F" for ch in blob)
     assert "HbA1c" in blob or "LDL" in blob or "Vitamin D" in blob or "TSH" in blob or "Vitamin B12" in blob
 
 
