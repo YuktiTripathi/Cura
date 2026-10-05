@@ -83,31 +83,34 @@ def answer_uploaded_document(
     narrative = wants_document_narrative(message, plan)
     mixed = mixed_document_query(message, plan)
     selectors = {str(item).upper() for item in (plan.selectors or [])}
-    keys = list(
-        dict.fromkeys(
-            [
-                *(plan.requested_metrics or []),
-                *match_lab_keys(message),
-                *([plan.topic] if plan.topic else []),
-            ]
+    named = [key for key in match_lab_keys(message) if key]
+    if not named:
+        primary = primary_lab_key(message)
+        if primary:
+            named = [primary]
+    # Named analytes in the current question win over a previous conversation topic
+    # (e.g. Vitamin D) so an attached-report lookup cannot return the wrong marker.
+    if named:
+        keys = list(dict.fromkeys(named))
+    else:
+        keys = list(
+            dict.fromkeys(
+                [
+                    *(plan.requested_metrics or []),
+                    *([plan.topic] if plan.topic else []),
+                ]
+            )
         )
-    )
-    keys = [key for key in keys if key]
+        keys = [key for key in keys if key]
     trace("USER QUERY", message=message)
     trace(
         "REQUESTED ENTITIES",
         rows=[f"{display_name_for(key)} → {key}" for key in keys],
     )
-    if not keys:
-        primary = primary_lab_key(message)
-        if primary:
-            keys = [primary]
 
     if structured and not narrative:
         facts = _select_facts(contexts, keys, selectors)
-        if keys:
-            return _structured_answer(facts, keys, selectors, contexts)
-        if facts:
+        if keys or selectors:
             return _structured_answer(facts, keys, selectors, contexts)
         return DocumentAnswer(answer=DOCUMENT_NO_MATCH, status="document_no_match", used_structured=True)
 
@@ -118,8 +121,8 @@ def answer_uploaded_document(
         if pending and not ready:
             facts = lookup_facts(contexts, keys=keys or None) if structured or keys else []
             extra = ""
-            if facts:
-                extra = " " + format_fact(facts[0])
+            if facts and keys:
+                extra = " " + format_coverage(cover_requested_entities(contexts, keys))
             return DocumentAnswer(
                 answer=NARRATIVE_PENDING + extra,
                 status="document_indexing",
@@ -135,13 +138,8 @@ def answer_uploaded_document(
             hits.extend(retrieve_pageindex(tree, message))
         if hits:
             structured_bits = []
-            if mixed or keys:
-                if keys:
-                    structured_bits.append(format_coverage(cover_requested_entities(contexts, keys)))
-                else:
-                    facts = _select_facts(contexts, keys, selectors)
-                    if facts:
-                        structured_bits.append(format_fact(facts[0]))
+            if keys:
+                structured_bits.append(format_coverage(cover_requested_entities(contexts, keys)))
             return DocumentAnswer(
                 answer=_narrative_answer(hits, structured_bits),
                 evidence=[_hit_evidence(rows[0], hit) for hit in hits[:3]],
@@ -150,12 +148,12 @@ def answer_uploaded_document(
             )
         if structured or keys:
             facts = _select_facts(contexts, keys, selectors)
-            if keys or facts:
+            if keys or selectors:
                 return _structured_answer(facts, keys, selectors, contexts)
         return DocumentAnswer(answer=DOCUMENT_NO_MATCH, status="document_no_match")
 
     facts = _select_facts(contexts, keys, selectors)
-    if keys or facts:
+    if keys or selectors:
         return _structured_answer(facts, keys, selectors, contexts)
     return None
 

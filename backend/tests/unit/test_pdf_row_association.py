@@ -175,6 +175,58 @@ def test_one_sided_range_reaches_the_answer_text():
     assert "4" not in answer.split("is 142")[1].replace("< 100", "")
 
 
+def test_columnar_table_reads_value_on_following_lines():
+    lines = [
+        "KIDNEY FUNCTION & ELECTROLYTES",
+        "Test Name",
+        "Value",
+        "Unit",
+        "Biological Reference Interval",
+        "Creatinine",
+        "0.57",
+        "mg/dL",
+        "0.3 - 1.2",
+        "Sodium",
+        "137",
+        "mmol/L",
+        "136 - 146",
+        "Chloride",
+        "105",
+        "mmol/L",
+        "101 - 109",
+    ]
+    markers, _ = _pdf_markers([lines])
+    assert (markers["creatinine"].value, markers["creatinine"].unit) == (0.57, "mg/dL")
+    assert (markers["sodium"].value, markers["sodium"].unit, markers["sodium"].reference_low, markers["sodium"].reference_high) == (
+        137.0,
+        "mmol/L",
+        136.0,
+        146.0,
+    )
+    assert (markers["chloride"].value, markers["chloride"].unit, markers["chloride"].reference_low, markers["chloride"].reference_high) == (
+        105.0,
+        "mmol/L",
+        101.0,
+        109.0,
+    )
+    assert markers["creatinine"].reference_high != 146.0
+
+
+def test_columnar_table_does_not_give_next_marker_the_previous_value():
+    markers, _ = _pdf_markers(
+        [[
+            "Sodium",
+            "137",
+            "mmol/L",
+            "Chloride",
+            "105",
+            "mmol/L",
+        ]]
+    )
+    assert markers["sodium"].value == 137.0
+    assert markers["chloride"].value == 105.0
+
+
 def test_one_sided_range_reaches_fact_evidence():
     from app.pipeline.document_answer import _fact_evidence
 

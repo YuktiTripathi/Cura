@@ -96,14 +96,24 @@ def _mentions(text: str) -> list[_Mention]:
 
 
 def _row_end(text: str, mention: _Mention, mentions: list[_Mention]) -> int:
-    """A result row runs from its name to the end of the line or to the next *different*
-    biomarker name, whichever is first. Values, units and ranges never cross that edge."""
+    """A result row runs from its name to the next *different* biomarker name.
+
+    Same-line layouts stop at the newline once a value is present, so LDL cannot
+    take HbA1c's range from the next printed row. Columnar table exports often put
+    the name, value, unit and range on separate lines; if this line has no number,
+    the row continues across those following lines until the next marker.
+    """
     newline = text.find("\n", mention.end)
-    end = len(text) if newline < 0 else newline
+    line_end = len(text) if newline < 0 else newline
+    next_marker = len(text)
     for other in mentions:
         if other.start >= mention.end and other.key != mention.key:
-            return min(end, other.start)
-    return end
+            next_marker = other.start
+            break
+    same_line = text[mention.end : min(line_end, next_marker)]
+    if _NUMBER.search(same_line):
+        return min(line_end, next_marker)
+    return next_marker
 
 
 def _has_value(text: str, mention: _Mention, mentions: list[_Mention]) -> bool:

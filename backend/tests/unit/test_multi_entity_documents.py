@@ -41,6 +41,7 @@ def storage_dir(tmp_path, monkeypatch):
         ("Show HDL cholesterol and haemoglobin.", {"hdl", "hemoglobin"}),
         ("What is my serum HDL cholesterol and HGB?", {"hdl", "hemoglobin"}),
         ("What is my HDL cholesterol & Hemoglobin level?", {"hdl", "hemoglobin"}),
+        ("this is the report, I have attached, I want to know my Sodium & Chloride level", {"sodium", "chloride"}),
         ("Show glucose, HbA1c, LDL and triglycerides.", {"glucose", "hba1c", "ldl", "triglycerides"}),
         ("What are my TSH, T3 and T4?", {"tsh", "t3", "t4"}),
     ],
@@ -70,6 +71,10 @@ def test_multi_entity_query_extracts_all(message, expected):
         ("PLT", "platelets"),
         ("TLC", "wbc"),
         ("WBC", "wbc"),
+        ("Sodium", "sodium"),
+        ("Serum Sodium", "sodium"),
+        ("Chloride", "chloride"),
+        ("Na+", "sodium"),
     ],
 )
 def test_provider_labels_map_to_canonical(label, code):
@@ -167,6 +172,46 @@ def test_chat_multi_entity_does_not_drop_hdl(storage_dir):
     assert "11.7" in answer
     assert "hdl" in answer.lower()
     assert "haemoglobin" in answer.lower() or "hemoglobin" in answer.lower()
+
+
+def test_chat_sodium_chloride_columnar_table_does_not_return_vitamin_d(storage_dir):
+    pdf = make_text_pdf(
+        [
+            [
+                "Vitamin D Total 25 ng/ml",
+                "KIDNEY FUNCTION & ELECTROLYTES",
+                "Sodium",
+                "137",
+                "mmol/L",
+                "136 - 146",
+                "Chloride",
+                "105",
+                "mmol/L",
+                "101 - 109",
+            ]
+        ]
+    )
+    uploaded = client.post(
+        "/api/v1/documents",
+        headers={"X-Cura-User-Id": "user-electrolytes"},
+        files={"file": ("electrolytes.pdf", io.BytesIO(pdf), "application/pdf")},
+    )
+    did = uploaded.json()["document_id"]
+    chat = client.post(
+        "/api/v1/chat",
+        headers={"X-Cura-User-Id": "user-electrolytes"},
+        json={
+            "message": "this is the report, I have attached, I want to know my Sodium & Chloride level",
+            "document_ids": [did],
+        },
+    ).json()
+    answer = chat["answer"].lower()
+    assert "137" in chat["answer"]
+    assert "105" in chat["answer"]
+    assert "sodium" in answer
+    assert "chloride" in answer
+    assert "vitamin d" not in answer
+    assert "25" not in chat["answer"]
 
 
 def extract_pdf_pages_safe(lines: list[str]):

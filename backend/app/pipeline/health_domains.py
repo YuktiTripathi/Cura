@@ -99,7 +99,7 @@ DOMAINS: tuple[HealthDomain, ...] = (
             "kidney",
         ),
         primary_entities=("creatinine", "egfr"),
-        supporting_entities=("urea", "uric_acid", "albumin", "sodium", "potassium"),
+        supporting_entities=("urea", "uric_acid", "albumin", "sodium", "chloride", "potassium"),
         contextual_entities=("blood_pressure", "hba1c", "glucose"),
         sources=("blood",),
         related_domains=("blood_pressure_health", "glycemic_health"),

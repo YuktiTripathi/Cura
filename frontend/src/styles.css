@@ -509,21 +509,8 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
   .dialog-content { top: auto; bottom: 0; left: 0; transform: none; width: 100vw; max-height: 85vh; border-radius: 14px 14px 0 0; }
 }
 
-/* Home dashboard */
-.health-home { display: grid; gap: 14px; margin: 18px 0 8px; padding: 16px; border: 1px solid var(--border-subtle); border-radius: 14px; background: var(--surface); }
-.health-home-header { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 12px; }
-.health-home-header h2 { margin: 0; font-size: 17px; }
-.health-home-header span { font-size: 13px; }
-.health-home-block { display: grid; gap: 8px; }
-.health-home-block h3 { margin: 0; font-size: 12px; letter-spacing: 0.04em; text-transform: uppercase; color: var(--text-muted); }
-.health-home-block .chips { margin: 0; }
-.health-home-calm { margin: 0; color: var(--text-muted); }
-.insight-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
-.insight-list li { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 4px 12px; padding: 8px 10px; border-radius: 10px; background: var(--surface-subtle); font-size: 14px; }
-.insight-actions { display: inline-flex; gap: 4px; font-size: 13px; }
 .value-card-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; }
 .value-card-footer .text-button { white-space: nowrap; }
-.health-home .value-cards { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
 
 /* Marker detail panel: side column on wide screens, bottom sheet below 1100px */
 .marker-panel {
