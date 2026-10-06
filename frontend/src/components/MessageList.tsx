@@ -119,7 +119,7 @@ export function MessageList({
             {m.role === "assistant" && m.presentation ? <InsightNote insights={readInsights(m.presentation.proactive_insights)} /> : null}
             {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
             {m.recommendations && <Recommendations items={m.recommendations} />}
-            {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} />}
+            {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} contacts={m.meta.emergency_contacts} />}
             {m.role === "assistant" && (
               <ProvenanceLine
                 provenance={m.provenance}

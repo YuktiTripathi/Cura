@@ -79,6 +79,22 @@ class Settings(BaseSettings):
     chat_streaming_mode: str = "complete_only"
     crisis_helpline_text: str = ""
     crisis_helpline_region: str = ""
+    # India numbers used by the emergency and self-harm replies and the client call
+    # buttons. Defaults are 112 (national emergency) and Tele-MANAS 14416; the clinical
+    # safety owner must confirm them before the pilot.
+    emergency_number: str = "112"
+    crisis_helpline_number: str = "14416"
+    # Model-backed safety classifier, combined with the deterministic rules.
+    safety_llm_classifier_enabled: bool = True
+    safety_classifier_model: str = "openai/gpt-5.6-luna"
+    safety_classifier_timeout_seconds: float = 3.0
+    # Production /chat responses carry only a small public meta; full meta stays in logs.
+    public_meta_only: bool | None = None
+    # Consent: chat requires an accepted consent record at this version when enforced.
+    consent_version: str = "2026-10-v1"
+    consent_required: bool | None = None
+    # Read-only SuperShyft session guards (defence in depth behind the read-only role).
+    supershyft_statement_timeout_ms: int = 5000
     document_encryption_key: str = ""
     document_retention_days: int = 90
     supershyft_pool_size: int = 5
@@ -200,6 +216,16 @@ class Settings(BaseSettings):
 
     def active_llm_api_key(self) -> str:
         return (self.openrouter_api_key or self.llm_api_key).strip()
+
+    def public_meta_enabled(self) -> bool:
+        if self.public_meta_only is not None:
+            return bool(self.public_meta_only)
+        return not self.is_development
+
+    def consent_enforced(self) -> bool:
+        if self.consent_required is not None:
+            return bool(self.consent_required)
+        return not self.is_development
 
     def cura_database_is_sqlite(self) -> bool:
         return self.database_url.startswith("sqlite")

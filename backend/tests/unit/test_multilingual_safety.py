@@ -12,6 +12,7 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 from app.pipeline.safety import _crisis_answer, _urgent_answer
+from app.pipeline.safety_messages import detect_safety_language
 
 client = TestClient(app)
 H = {"X-Cura-User-Id": "demo-user-001"}
@@ -61,8 +62,8 @@ def test_emergencies_are_escalated_in_every_supported_language(language, message
     assert body["meta"]["status"] == "safety_block"
     assert body["meta"]["escalation"] == "urgent_care"
     assert body["meta"]["llm_called"] is False and body["meta"]["supershyft_called"] is False
-    # The reviewed safety text, never a summary of the user's records.
-    assert body["answer"] == _urgent_answer()
+    # Reviewed safety text in the member's language, never a summary of their records.
+    assert body["answer"] == _urgent_answer(detect_safety_language(message))
 
 
 @pytest.mark.parametrize("language, message", SELF_HARM)
@@ -70,7 +71,7 @@ def test_self_harm_gets_crisis_support_in_every_supported_language(language, mes
     body = _chat(language, message)
     assert body["meta"]["status"] == "safety_block"
     assert body["meta"]["escalation"] == "crisis_support"
-    assert body["answer"] == _crisis_answer()
+    assert body["answer"] == _crisis_answer(detect_safety_language(message))
 
 
 @pytest.mark.parametrize("language, message", ROUTINE)

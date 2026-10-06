@@ -8,8 +8,9 @@ from sqlalchemy.orm import Session
 
 from app.auth.deps import get_current_user
 from app.auth.models import AuthenticatedPrincipal
-from app.contracts.chat import ChatRequest, ChatResponse
+from app.contracts.chat import ChatRequest, ChatResponse, public_chat_response
 from app.core.config import settings
+from app.core.consent import require_consent
 from app.core.errors import CuraError
 from app.core.request_controls import request_controls
 from app.db.session import SessionLocal, get_db
@@ -29,16 +30,21 @@ def chat(
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> ChatResponse:
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
+    require_consent(db, principal.subject_id)
     request_controls.check_rate_limit(principal.subject_id)
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
-        return cached
+        return _client_view(cached)
     response = ChatService(db, get_registry()).chat(principal, payload, request_id)
     request_controls.idempotency_store(
         principal.subject_id, idempotency_key, payload, response
     )
-    return response
+    return _client_view(response)
+
+
+def _client_view(response: ChatResponse) -> ChatResponse:
+    return public_chat_response(response) if settings.public_meta_enabled() else response
 
 
 @router.post("/chat/stream")
@@ -49,10 +55,16 @@ def chat_stream(
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> StreamingResponse:
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
+    consent_session = SessionLocal()
+    try:
+        require_consent(consent_session, principal.subject_id)
+    finally:
+        consent_session.close()
     request_controls.check_rate_limit(principal.subject_id)
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
+        cached = _client_view(cached)
 
         def cached_events():
             yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
@@ -91,7 +103,7 @@ def chat_stream(
             request_controls.idempotency_store(
                 principal.subject_id, idempotency_key, payload, response
             )
-            events_q.put(("complete", response.model_dump(mode="json")))
+            events_q.put(("complete", _client_view(response).model_dump(mode="json")))
         except CuraError as exc:
             events_q.put(("error", {"code": exc.code, "message": exc.message}))
         except Exception:

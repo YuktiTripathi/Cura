@@ -326,7 +326,7 @@
       "Body_transcribe_api_v1_voice_post": {
         "properties": {
           "audio": {
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "Audio",
             "type": "string"
           },
@@ -356,7 +356,7 @@
       "Body_transcribe_api_v1_voice_transcribe_post": {
         "properties": {
           "audio": {
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "Audio",
             "type": "string"
           },
@@ -386,7 +386,7 @@
       "Body_transcribe_compat_cura_transcribe_post": {
         "properties": {
           "audio": {
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "Audio",
             "type": "string"
           },
@@ -427,7 +427,7 @@
             "title": "Conversation Id"
           },
           "file": {
-            "format": "binary",
+            "contentMediaType": "application/octet-stream",
             "title": "File",
             "type": "string"
           }
@@ -595,6 +595,16 @@
               }
             ],
             "title": "Documents Queried"
+          },
+          "emergency_contacts": {
+            "items": {
+              "additionalProperties": {
+                "type": "string"
+              },
+              "type": "object"
+            },
+            "title": "Emergency Contacts",
+            "type": "array"
           },
           "escalation": {
             "anyOf": [
@@ -1073,6 +1083,17 @@
             ],
             "title": "Router"
           },
+          "safety_caution": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Safety Caution"
+          },
           "safety_flags": {
             "items": {
               "type": "string"
@@ -1455,6 +1476,35 @@
           "topic"
         ],
         "title": "Comparison",
+        "type": "object"
+      },
+      "ConsentRequest": {
+        "properties": {
+          "accepted": {
+            "title": "Accepted",
+            "type": "boolean"
+          },
+          "language": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language"
+          },
+          "version": {
+            "title": "Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "version",
+          "accepted"
+        ],
+        "title": "ConsentRequest",
         "type": "object"
       },
       "ContextRef": {
@@ -5520,6 +5570,64 @@
           }
         },
         "summary": "Chat Stream"
+      }
+    },
+    "/api/v1/consent": {
+      "get": {
+        "operationId": "get_consent_api_v1_consent_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Consent Api V1 Consent Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Consent"
+      },
+      "post": {
+        "operationId": "post_consent_api_v1_consent_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConsentRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Post Consent Api V1 Consent Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Consent"
       }
     },
     "/api/v1/context/{context_type}/{object_id}": {

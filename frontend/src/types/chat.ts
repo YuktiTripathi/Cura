@@ -52,6 +52,8 @@ export type ChatMeta = {
   recommendation_flags?: string[];
   grounding_flags?: string[];
   escalation?: string | null;
+  emergency_contacts?: EmergencyContact[];
+  safety_caution?: string | null;
   request_id?: string;
   response_mode?: string;
   conversation_goal?: string;
@@ -217,6 +219,8 @@ export type ChatResponse = {
   experience?: TurnExperience | null;
   testing_option?: TestingOption | null;
 };
+
+export type EmergencyContact = { kind: string; label: string; number: string };
 
 export function followUpText(item: FollowUp | string): string {
   return typeof item === "string" ? item : item.text;

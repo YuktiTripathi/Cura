@@ -58,6 +58,9 @@ For whole-health summaries also return overall_summary and themes (3–5 items).
 """
 
 
+from app.pipeline.topic_risk import high_risk_topics  # noqa: E402
+
+
 class PromptBuilder:
     def build(
         self,
@@ -87,7 +90,7 @@ class PromptBuilder:
                 "General medical evidence may explain the personal facts, but must not replace or alter them.\n"
                 + _fact_kind_blocks(context)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{payload}\n"
-                + _medical_block(context)
+                + _medical_block(context, user_message)
             )
         else:
             topic = context.resolved_topic_name or "the asked topic"
@@ -101,7 +104,7 @@ class PromptBuilder:
                 "Do not say 'your result' or 'your report'. "
                 "Do not name any organization that is not in the retrieved evidence. "
                 "Do not write a Source line.\n"
-                + _medical_block(context)
+                + _medical_block(context, user_message)
             )
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else SAFETY_INSTRUCTIONS
         return [
@@ -110,13 +113,25 @@ class PromptBuilder:
         ]
 
 
-def _medical_block(context: HealthContext) -> str:
+def _medical_block(context: HealthContext, user_message: str = "") -> str:
     passages = getattr(context, "medical_passages", None) or []
     if not passages:
-        return (
+        base = (
             "No medical evidence was retrieved for this turn. "
             "Do not claim the answer is guideline-verified. "
             "Do not invent WHO, NICE, CDC, NIH, or other source names.\n"
+        )
+        risky = high_risk_topics(user_message)
+        if risky:
+            return base + (
+                f"HIGH RISK TOPIC ({', '.join(risky)}): Cura has no reviewed source for this. "
+                "Do not answer from general model knowledge. Say briefly that Cura cannot give reliable "
+                "information on this without a reviewed source, and suggest the member ask their doctor or "
+                "pharmacist. You may still restate the member's own measured values if they are in context.\n"
+            )
+        return base + (
+            "LOW RISK EDUCATION: you may answer from general knowledge, but begin that part with "
+            "\"General information:\" and keep it short and non-prescriptive.\n"
         )
     return (
         "RETRIEVED SOURCE POINTERS (title + URL). Accompanying notes are CURA topic index text, "

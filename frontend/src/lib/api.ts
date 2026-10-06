@@ -21,6 +21,43 @@ function authHeaders(): HeadersInit {
   return headers;
 }
 
+type ConsentStatus = { version: string; notice: string; required: boolean; accepted: boolean };
+
+export async function getConsent(): Promise<ConsentStatus> {
+  const res = await fetch(`${API}/api/v1/consent`, { headers: authHeaders(), credentials: "include" });
+  if (!res.ok) throw new Error("The data notice isn't available right now.");
+  return (await res.json()) as ConsentStatus;
+}
+
+export async function acceptConsent(version: string, accepted = true): Promise<ConsentStatus> {
+  const res = await fetch(`${API}/api/v1/consent`, {
+    method: "POST",
+    headers: authHeaders(),
+    credentials: "include",
+    body: JSON.stringify({ version, accepted, language: navigator.language || null }),
+  });
+  if (!res.ok) throw new Error("Couldn't save your choice. Please try again.");
+  return (await res.json()) as ConsentStatus;
+}
+
+async function isConsentRequired(res: Response): Promise<boolean> {
+  if (res.status !== 403) return false;
+  const data = await parseJson(res.clone());
+  return (data.error as { code?: string } | undefined)?.code === "CONSENT_REQUIRED";
+}
+
+// Shows the versioned data notice once, records the member's answer, and retries.
+// Interim UI until the dedicated consent screen ships in the web and Flutter apps.
+async function fetchWithConsent(url: string, init: RequestInit): Promise<Response> {
+  const res = await fetch(url, init);
+  if (!(await isConsentRequired(res))) return res;
+  const status = await getConsent();
+  const ok = window.confirm(`${status.notice}\n\nDo you agree?`);
+  if (!ok) throw new Error("Cura needs your consent before it can answer health questions.");
+  await acceptConsent(status.version, true);
+  return fetch(url, init);
+}
+
 async function parseJson(res: Response): Promise<Record<string, unknown>> {
   const raw = await res.text();
   try {
@@ -116,13 +153,14 @@ export async function sendChat(
   if (contextRef) payload.context_ref = contextRef;
   let res: Response;
   try {
-    res = await fetch(`${API}/api/v1/chat`, {
+    res = await fetchWithConsent(`${API}/api/v1/chat`, {
       method: "POST",
       headers: authHeaders(),
       credentials: "include",
       body: JSON.stringify(payload),
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Cura needs your consent")) throw error;
     throw new Error(
       "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
     );
@@ -157,13 +195,14 @@ export async function streamChat(
   headers["Idempotency-Key"] = crypto.randomUUID();
   let res: Response;
   try {
-    res = await fetch(`${API}/api/v1/chat/stream`, {
+    res = await fetchWithConsent(`${API}/api/v1/chat/stream`, {
       method: "POST",
       headers,
       credentials: "include",
       body: JSON.stringify(payload),
     });
-  } catch {
+  } catch (error) {
+    if (error instanceof Error && error.message.startsWith("Cura needs your consent")) throw error;
     throw new Error(
       "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
     );

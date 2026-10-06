@@ -385,6 +385,8 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 .testing-option-details ul { margin: 0; padding-left: 18px; }
 .testing-option-not_recommended_now { background: var(--surface-muted); border-color: var(--border-divider); }
 .escalation { border-left: 4px solid var(--warning); background: var(--warning-bg); padding: 8px 10px; margin-top: 10px; }
+.escalation-calls { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.escalation-call { display: inline-block; padding: 8px 12px; border-radius: 6px; background: var(--warning); color: #fff; font-weight: 600; text-decoration: none; }
 .feedback-actions { display: inline-flex; align-items: center; gap: 6px; }
 .user-actions { display: flex; align-items: center; gap: 6px; margin-top: 8px; font-size: 12px; }
 .edit-question { display: grid; gap: 8px; }

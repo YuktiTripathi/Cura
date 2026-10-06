@@ -101,6 +101,21 @@ def _assert_readonly(statement: Any) -> None:
         raise ProviderUnavailableError(PERSONAL_DATA_UNAVAILABLE, reason=DB_QUERY_FAILED)
 
 
+def readonly_session_options() -> str:
+    """Server-side guards for every SuperShyft session.
+
+    The primary control is the read-only Postgres role in
+    integrations/supershyft/readonly_role.sql. These session settings and the
+    ``_assert_readonly`` text check are additional layers.
+    """
+    timeout_ms = max(100, int(settings.supershyft_statement_timeout_ms))
+    return (
+        "-c default_transaction_read_only=on "
+        f"-c statement_timeout={timeout_ms} "
+        "-c idle_in_transaction_session_timeout=10000"
+    )
+
+
 def sanitized_db_target(url: str) -> dict[str, Any]:
     parsed = urlparse(normalize_sync_url(url or ""))
     return {
@@ -139,7 +154,7 @@ def get_supershyft_engine() -> Engine:
         pool_pre_ping=True,
         pool_size=max(1, int(settings.supershyft_pool_size)),
         max_overflow=max(0, int(settings.supershyft_max_overflow)),
-        connect_args={"connect_timeout": timeout},
+        connect_args={"connect_timeout": timeout, "options": readonly_session_options()},
     )
     return _engine
 

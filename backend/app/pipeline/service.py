@@ -81,7 +81,13 @@ from app.pipeline.renderer import (
     render_missing_blood_marker,
     render_provenance,
 )
-from app.pipeline.safety import SafetyLayer, package_suggestion_allowed
+from app.pipeline.safety_messages import emergency_contacts, see_doctor_soon_message
+from app.pipeline.safety import (
+    SAFETY_ESCALATION_INTENT,
+    SafetyLayer,
+    conversation_in_safe_mode,
+    package_suggestion_allowed,
+)
 from app.pipeline.testing_option import TestingOptionService
 from app.pipeline.grounding import GroundingChecker
 from app.pipeline.recommendation_engine import RecommendationEngine
@@ -231,8 +237,10 @@ class ChatService:
             else:
                 conv = self.repo.create(principal.subject_id, title=conversation_title(payload.message))
             answer = pre_safety.answer or "I can't help with that request."
-            self.repo.add_message(conv, "user", payload.message, intent="safety_block")
-            self.repo.add_message(conv, "assistant", answer, intent="safety_block")
+            urgent = getattr(pre_safety, "category", None) in {"emergency", "self_harm"}
+            block_intent = SAFETY_ESCALATION_INTENT if urgent else "safety_block"
+            self.repo.add_message(conv, "user", payload.message, intent=block_intent)
+            self.repo.add_message(conv, "assistant", answer, intent=block_intent)
             eval_turn["conv"] = conv
             return ChatResponse(
                 conversation_id=conv.id,
@@ -252,6 +260,8 @@ class ChatService:
                     safety_mode=SafetyLayer.request_safety_mode(pre_safety),
                     escalation=pre_safety.escalation,
                     db_status=DB_PROVIDER_NOT_CALLED,
+                    response_language=getattr(pre_safety, "reply_language", None),
+                    emergency_contacts=emergency_contacts() if urgent else [],
                 ),
             )
         if (
@@ -924,11 +934,16 @@ class ChatService:
             payload.message,
             previous_user_question=getattr(conv_state, "previous_user_question", None),
         )
-        if getattr(pre_safety, "category", None) in {
+        safe_mode = conversation_in_safe_mode(conv)
+        if safe_mode:
+            # An earlier turn escalated: stay cautious, no routine package suggestions.
+            flags.append("safe_mode")
+        if safe_mode or getattr(pre_safety, "category", None) in {
             "emergency",
             "self_harm",
             "medication_misuse",
             "diagnosis_request",
+            "urgent_soon",
         }:
             allowed_packages = False
         testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
@@ -976,6 +991,11 @@ class ChatService:
         self._progress.measure("compose")
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
+        safety_caution = getattr(pre_safety, "caution", None)
+        if not safety_caution and safe_mode:
+            safety_caution = see_doctor_soon_message(getattr(pre_safety, "reply_language", None))
+        if safety_caution:
+            answer = f"{safety_caution}\n\n{answer}"
 
         micro_insight = compose_micro_insight(
             plan=plan,
@@ -1200,6 +1220,7 @@ class ChatService:
                 supershyft_record_count=len(evidence) if plan.needs_personal_data else 0,
                 safety_flags=flags,
                 safety_mode=SafetyLayer.request_safety_mode(pre_safety),
+                safety_caution=safety_caution,
                 recommendation_flags=recommendation_flags,
                 grounding_flags=grounding_flags,
                 escalation=escalation,

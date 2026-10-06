@@ -103,6 +103,28 @@ class ChatMeta(BaseModel):
     next_conversation_action: str | None = None
     timing: dict | None = None
     debug: dict | None = None
+    # Numbers the clients render as call buttons on emergency and self-harm replies.
+    emergency_contacts: list[dict[str, str]] = Field(default_factory=list)
+    # Short caution prepended for "see a doctor soon" red flags.
+    safety_caution: str | None = None
+
+
+# Fields a production client may see. Model, provider, cost, tokens and routing stay in logs.
+PUBLIC_META_FIELDS = frozenset(
+    {
+        "intent",
+        "status",
+        "request_id",
+        "detected_language",
+        "response_language",
+        "safety_flags",
+        "safety_mode",
+        "escalation",
+        "emergency_contacts",
+        "safety_caution",
+        "cache_hit",
+    }
+)
 
 
 class EvidenceItem(EvidenceRecord):
@@ -159,3 +181,9 @@ class FeedbackRequest(BaseModel):
     message_id: str | None = None
     rating: str
     comment: str | None = None
+
+
+def public_chat_response(response: ChatResponse) -> ChatResponse:
+    """Copy of ``response`` whose meta carries only ``PUBLIC_META_FIELDS``."""
+    kept = response.meta.model_dump(include=set(PUBLIC_META_FIELDS))
+    return response.model_copy(update={"meta": ChatMeta(**kept)})

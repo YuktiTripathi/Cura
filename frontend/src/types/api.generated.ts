@@ -72,6 +72,24 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Get Consent */
+        get: operations["get_consent_api_v1_consent_get"];
+        put?: never;
+        /** Post Consent */
+        post: operations["post_consent_api_v1_consent_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/context/{context_type}/{object_id}": {
         parameters: {
             query?: never;
@@ -552,10 +570,7 @@ export interface components {
         };
         /** Body_transcribe_api_v1_voice_post */
         Body_transcribe_api_v1_voice_post: {
-            /**
-             * Audio
-             * Format: binary
-             */
+            /** Audio */
             audio: string;
             /** Language */
             language?: string | null;
@@ -567,10 +582,7 @@ export interface components {
         };
         /** Body_transcribe_api_v1_voice_transcribe_post */
         Body_transcribe_api_v1_voice_transcribe_post: {
-            /**
-             * Audio
-             * Format: binary
-             */
+            /** Audio */
             audio: string;
             /** Language */
             language?: string | null;
@@ -582,10 +594,7 @@ export interface components {
         };
         /** Body_transcribe_compat_cura_transcribe_post */
         Body_transcribe_compat_cura_transcribe_post: {
-            /**
-             * Audio
-             * Format: binary
-             */
+            /** Audio */
             audio: string;
             /** Language */
             language?: string | null;
@@ -599,10 +608,7 @@ export interface components {
         Body_upload_document_api_v1_documents_post: {
             /** Conversation Id */
             conversation_id?: string | null;
-            /**
-             * File
-             * Format: binary
-             */
+            /** File */
             file: string;
         };
         /** CapabilitiesResponse */
@@ -656,6 +662,10 @@ export interface components {
             document_retrieval_called: boolean;
             /** Documents Queried */
             documents_queried?: boolean | null;
+            /** Emergency Contacts */
+            emergency_contacts?: {
+                [key: string]: string;
+            }[];
             /** Escalation */
             escalation?: string | null;
             /** Estimated Cost Usd */
@@ -775,6 +785,8 @@ export interface components {
             retrieval_used?: boolean | null;
             /** Router */
             router?: string | null;
+            /** Safety Caution */
+            safety_caution?: string | null;
             /** Safety Flags */
             safety_flags?: string[];
             /** Safety Mode */
@@ -879,6 +891,15 @@ export interface components {
             previous_value?: number | null;
             /** Topic */
             topic: string;
+        };
+        /** ConsentRequest */
+        ConsentRequest: {
+            /** Accepted */
+            accepted: boolean;
+            /** Language */
+            language?: string | null;
+            /** Version */
+            version: string;
         };
         /** ContextRef */
         ContextRef: {
@@ -2238,6 +2259,63 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    get_consent_api_v1_consent_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
+                };
+            };
+        };
+    };
+    post_consent_api_v1_consent_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["ConsentRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": {
+                        [key: string]: unknown;
+                    };
                 };
             };
             /** @description Validation Error */

@@ -8,6 +8,14 @@ from dataclasses import dataclass
 from app.contracts.common import MarkerFlag
 from app.contracts.health_context import HealthContext
 from app.core.config import settings
+from app.pipeline.red_flags import RED_FLAGS, URGENCY_SOON, match_red_flags, normalize_text
+from app.pipeline.safety_messages import (
+    crisis_message,
+    detect_safety_language,
+    emergency_message,
+    medication_message,
+    see_doctor_soon_message,
+)
 
 DIAGNOSIS = re.compile(r"\b(you have|diagnosed with|this confirms|this proves you)\b", re.I)
 MEDICATION = re.compile(r"\b(take \d+ mg|prescribe|dosage of|start metformin|take insulin)\b", re.I)
@@ -32,60 +40,58 @@ DIAGNOSIS_REQUEST = re.compile(
     re.I,
 )
 
-_DEVANAGARI = re.compile(r"[\u0900-\u097F]")
+_DEVANAGARI = re.compile(r"[ऀ-ॿ]")
+
+# Maintained drug lexicon: generics plus common Indian brand names. Extend with the
+# clinical team; matching is case-insensitive on normalized text.
+DRUG_LEXICON = (
+    "metformin", "glycomet", "glucophage", "janumet", "glimepiride", "amaryl", "gliclazide", "glipizide",
+    "sitagliptin", "vildagliptin", "galvus", "teneligliptin", "dapagliflozin", "empagliflozin", "jardiance",
+    "pioglitazone", "insulin", "lantus", "mixtard", "ozempic", "semaglutide",
+    "amlodipine", "amlong", "stamlo", "telmisartan", "telma", "losartan", "olmesartan", "ramipril",
+    "enalapril", "atenolol", "metoprolol", "bisoprolol", "nebivolol", "hydrochlorothiazide",
+    "chlorthalidone", "furosemide", "lasix", "spironolactone",
+    "atorvastatin", "atorva", "rosuvastatin", "rosuvas", "simvastatin", "statin", "statins",
+    "aspirin", "ecosprin", "clopidogrel", "warfarin", "apixaban", "rivaroxaban",
+    "levothyroxine", "thyroxine", "eltroxin", "thyronorm", "thyrox",
+    "paracetamol", "dolo", "crocin", "calpol", "ibuprofen", "brufen", "combiflam", "diclofenac",
+    "pantoprazole", "pan 40", "omeprazole", "rabeprazole", "prednisolone", "wysolone", "deflazacort",
+    "azithromycin", "amoxicillin", "augmentin", "ciprofloxacin", "doxycycline",
+    "sertraline", "escitalopram", "alprazolam", "clonazepam",
+)
+_DRUG_ALT = "|".join(re.escape(name) for name in sorted(DRUG_LEXICON, key=len, reverse=True))
 _MED_NOUN = (
-    r"(?:medicine|medication|medicines|tablet|tablets|pill|pills|dose|doses|"
-    r"insulin|statin|statins|metformin|drug|drugs|bp (?:tablet|pill)|"
-    r"blood pressure (?:tablet|pill|medicine)|dawai|dawa| दवा|गोली)"
+    r"(?:medicine|medicines|medication|medications|tablet|tablets|pill|pills|capsule|capsules|"
+    r"dose|doses|drug|drugs|injection|injections|bp (?:tablet|pill|medicine)|"
+    r"(?:blood pressure|sugar|diabetes|thyroid|cholesterol|heart) (?:tablet|tablets|pill|pills|medicine|medicines|medication)|"
+    r"dawai|dawaai|dawa|goli|गोली|दवा|दवाई|औषध|ਦਵਾਈ|દવા|ওষুধ|"
+    rf"{_DRUG_ALT})"
+)
+_MED_CHANGE_VERB = (
+    r"(?:stop|stopping|quit|quitting|skip|skipping|miss|missing|start|starting|change|changing|switch|switching|"
+    r"double|doubling|halve|halving|increase|increasing|reduce|reducing|decrease|decreasing|lower|raise|"
+    r"cut down|come off|coming off|get off|give up|discontinue|discontinuing|combine|combining|mix|mixing|"
+    r"swap|replace|taper)"
 )
 
-EMERGENCY_PATTERNS = (
-    re.compile(
-        r"\b(chest pain|difficulty breathing|shortness of breath|can't breathe|cannot breathe|"
-        r"unconscious|loss of consciousness|severe bleeding|stroke symptoms|"
-        r"anaphyla(?:xis|ctic)|severe allergic reaction|overdose|"
-        r"seizure|severe dehydration|major bleeding|rapidly worsening)\b",
-        re.I,
-    ),
-    re.compile(r"(छाती|chest)\s*(में|mein|me)?\s*(बहुत\s*|bahut\s*)?(दर्द|dard|pain)", re.I),
-    re.compile(r"(सांस|saans|saas)\s*(नही|nahi|nahin).{0,12}(आ|aa)", re.I),
-    re.compile(r"(बेहोश|behos[h]?|behosh|unconscious)", re.I),
-    re.compile(r"(लकवा|stroke|मुंह टेढ़ा|face droop)", re.I),
-    # Marathi
-    re.compile(r"छाती(?:त|मध्ये)?\s*(?:खूप\s*|फार\s*)?(?:दुख|वेदना|कळ)", re.I),
-    re.compile(r"श्वास\s*(?:घेता\s*येत\s*नाही|घ्यायला\s*त्रास|घेण्यास\s*त्रास)|दम\s*लागत|बेशुद्ध|अर्धांगवायू|खूप\s*रक्तस्त्राव", re.I),
-    # Punjabi (Gurmukhi)
-    re.compile(r"ਛਾਤੀ\s*(?:ਵਿੱਚ|ਵਿਚ)?\s*(?:ਬਹੁਤ\s*|ਤੇਜ਼\s*)?ਦਰਦ", re.I),
-    re.compile(r"ਸਾਹ\s*(?:ਨਹੀਂ|ਨਹੀ)\s*(?:ਆ|ਲੈ)|ਸਾਹ\s*ਲੈਣ\s*(?:ਵਿੱਚ|ਚ)\s*(?:ਤਕਲੀਫ|ਤਕਲੀਫ਼|ਮੁਸ਼ਕਲ)|ਬੇਹੋਸ਼|ਅਧਰੰਗ|ਲਕਵਾ", re.I),
-    # Gujarati
-    re.compile(r"છાતી(?:માં)?\s*(?:ખૂબ\s*|બહુ\s*)?(?:દુખાવો|દુખે|દર્દ)", re.I),
-    re.compile(r"શ્વાસ\s*(?:લેવામાં|લેવા)\s*(?:તકલીફ|મુશ્કેલી)|શ્વાસ\s*(?:નથી\s*આવતો|લઈ\s*શકતો\s*નથી|લઈ\s*શકતી\s*નથી)|બેભાન|બેહોશ|લકવો", re.I),
-    # Bengali
-    re.compile(r"বুকে\s*(?:প্রচণ্ড\s*|খুব\s*|তীব্র\s*)?(?:ব্যথা|ব্যাথা)", re.I),
-    re.compile(r"শ্বাস\s*নিতে\s*(?:পারছি\s*না|কষ্ট)|শ্বাসকষ্ট|দম\s*বন্ধ|অজ্ঞান|জ্ঞান\s*হারা|পক্ষাঘাত|স্ট্রোক", re.I),
-)
-
-SELF_HARM_PATTERNS = (
-    re.compile(r"\b(suicid(?:e|al)|kill myself|end my life|don't want to live|do not want to live)\b", re.I),
-    re.compile(r"(जीना नहीं|जीना नहि|mujhe jeena nahi|jeena nahi hai|marna chahta)", re.I),
-    re.compile(r"(आत्महत्या|aatmahatya|suicide kar)", re.I),
-    # Marathi, Punjabi, Gujarati, Bengali
-    re.compile(r"जगायचं\s*नाही|जगायचे\s*नाही|जीव\s*द्यायचा", re.I),
-    re.compile(r"ਖੁਦਕੁਸ਼ੀ|ਖ਼ੁਦਕੁਸ਼ੀ|ਆਤਮਹੱਤਿਆ|ਜੀਣਾ\s*ਨਹੀਂ|ਮਰਨਾ\s*ਚਾਹੁੰਦ", re.I),
-    re.compile(r"આત્મહત્યા|આપઘાત|જીવવું\s*નથી|મરી\s*જવું\s*છે", re.I),
-    re.compile(r"আত্মহত্যা|বাঁচতে\s*চাই\s*না|মরে\s*যেতে\s*চাই", re.I),
-)
+EMERGENCY_PATTERNS = tuple(p for flag in RED_FLAGS if flag.category == "emergency" for p in flag.patterns)
+SELF_HARM_PATTERNS = tuple(p for flag in RED_FLAGS if flag.category == "self_harm" for p in flag.patterns)
 
 MEDICATION_MISUSE = (
     re.compile(
-        rf"\b(what dose|how many (?:mg|tablets)|increase my dose|decrease my dose|"
-        rf"double my dose|dosage)\b",
+        r"\b(what dose|which dose|how many (?:mg|tablets|pills)|how much (?:mg|insulin)|"
+        r"increase my dose|decrease my dose|double (?:my |the )?dose|dosage)\b",
         re.I,
     ),
-    re.compile(rf"\b(stop|start)\s+(?:taking\s+)?(?:my\s+)?{_MED_NOUN}\b", re.I),
-    re.compile(rf"\b{_MED_NOUN}\s+(double|badha|band)\b", re.I),
-    re.compile(r"(tablet|dawai|dawa|गोली|दवा).{0,20}(double|दोगुनी|band kar|बंद)", re.I),
+    re.compile(rf"\b{_MED_CHANGE_VERB}\s+(?:taking\s+|using\s+)?(?:my\s+|his\s+|her\s+|the\s+|this\s+)?(?:\S+\s+){{0,2}}{_MED_NOUN}\b", re.I),
+    re.compile(rf"\b{_MED_NOUN}\b.{{0,30}}\b(?:stop|skip|double|instead of|band|badha|chhod|kam kar|zyada)\b", re.I),
+    re.compile(rf"\b(?:take|have|give)\s+(?:\d+|two|three|four|half|extra|another|double)\s+(?:\w+\s+)?(?:of\s+)?{_MED_NOUN}", re.I),
+    re.compile(rf"\b(?:take|taking|have)\b.{{0,40}}\binstead of\b", re.I),
+    re.compile(rf"\b{_MED_NOUN}\b.{{0,40}}\b(?:with|and|together with|along with)\b.{{0,20}}\b{_MED_NOUN}\b.{{0,20}}\btogether\b", re.I),
+    re.compile(rf"\bcan i (?:take|have|mix|combine)\b.{{0,30}}\b{_MED_NOUN}\b.{{0,30}}\b(?:with|and)\b.{{0,20}}\b{_MED_NOUN}\b", re.I),
+    re.compile(r"(tablet|dawai|dawa|goli|गोली|दवा|दवाई).{0,20}(double|दोगुनी|band kar|बंद|chhod|छोड़)", re.I),
     re.compile(r"\b(bp ki tablet|bp tablet).{0,16}(double|badha)", re.I),
+    re.compile(r"(?:औषध|ਦਵਾਈ|દવા|ওষুধ).{0,20}(?:बंद|थांबव|ਬੰਦ|બંધ|বন্ধ)", re.I),
 )
 
 ACUTE_TESTING_SUPPRESS = (
@@ -146,20 +152,27 @@ def detect_language_hint(text: str) -> str:
 def match_safety_category(text: str) -> tuple[str, str, float]:
     message = text or ""
     language = detect_language_hint(message)
-    if any(pattern.search(message) for pattern in SELF_HARM_PATTERNS):
+    normalized = normalize_text(message)
+    hits = match_red_flags(message)
+    if any(flag.category == "self_harm" for flag in hits):
         return "self_harm", language, 0.99
-    if any(pattern.search(message) for pattern in EMERGENCY_PATTERNS):
+    if any(flag.category == "emergency" for flag in hits):
         return "emergency", language, 0.99
-    if PROMPT_INJECTION.search(message):
+    if PROMPT_INJECTION.search(normalized):
         return "prompt_injection", language, 0.95
-    if OUT_OF_SCOPE.search(message):
+    if OUT_OF_SCOPE.search(normalized):
         return "out_of_scope", language, 0.95
-    if LIFESTYLE_OK.search(message) and not any(pattern.search(message) for pattern in MEDICATION_MISUSE):
+    medication = any(pattern.search(normalized) for pattern in MEDICATION_MISUSE) or bool(
+        DOSAGE_LEGACY.search(normalized)
+    )
+    if LIFESTYLE_OK.search(normalized) and not medication:
         return "", language, 0.2
-    if any(pattern.search(message) for pattern in MEDICATION_MISUSE) or DOSAGE_LEGACY.search(message):
+    if medication:
         return "medication_misuse", language, 0.9
-    if DIAGNOSIS_REQUEST.search(message):
+    if DIAGNOSIS_REQUEST.search(normalized):
         return "diagnosis_request", language, 0.9
+    if any(flag.urgency == URGENCY_SOON for flag in hits):
+        return "urgent_soon", language, 0.85
     return "", language, 0.0
 
 
@@ -171,6 +184,16 @@ DOSAGE_LEGACY = re.compile(
     re.I,
 )
 
+# Words that suggest a symptom report. Used only when the model classifier is unavailable,
+# to add a conservative caution instead of silently answering.
+SYMPTOM_HINT = re.compile(
+    r"\b(pain|ache|bleed\w*|vomit\w*|dizz\w*|faint\w*|breath\w*|fever|numb\w*|swell\w*|"
+    r"weak\w*|confus\w*|rash|palpitation\w*|dard|bukhar|chakkar|ulti)\b|दर्द|बुखार|चक्कर|उल्टी",
+    re.I,
+)
+
+_URGENT_CATEGORIES = {"emergency", "self_harm"}
+
 
 @dataclass
 class PreSafetyDecision:
@@ -180,64 +203,79 @@ class PreSafetyDecision:
     escalation: str | None = None
     category: str | None = None
     language: str | None = None
+    reply_language: str | None = None
+    # Non-blocking caution text prepended to the final answer ("see a doctor soon").
+    caution: str | None = None
 
 
-def _crisis_answer() -> str:
+def _crisis_answer(language: str | None = None) -> str:
     configured = (settings.crisis_helpline_text or "").strip()
     if configured:
         return configured
-    region = (settings.crisis_helpline_region or "").strip()
-    suffix = f" ({region})" if region else ""
-    return (
-        "If you are thinking about harming yourself, please seek help now. "
-        "Contact local emergency services or a trusted person nearby"
-        f"{suffix}. Cura cannot provide crisis counselling or emergency care."
-    )
+    return crisis_message(language)
 
 
-def _urgent_answer() -> str:
-    return (
-        "This may need urgent medical attention. Contact your local emergency service or seek urgent in-person care now. "
-        "Cura cannot assess emergencies."
-    )
+def _urgent_answer(language: str | None = None) -> str:
+    return emergency_message(language)
 
 
 class SafetyLayer:
     def __init__(self, classifier=None):
         if classifier is None:
-            from app.pipeline.safety_classifier import HeuristicMultilingualClassifier
+            from app.pipeline.safety_classifier import default_classifier
 
-            classifier = HeuristicMultilingualClassifier()
+            classifier = default_classifier()
         self.classifier = classifier
+
+    def _classify(self, user_message: str):
+        try:
+            return self.classifier.classify(user_message), False
+        except Exception:  # noqa: BLE001 - a classifier failure must never open the gate
+            return None, True
 
     def check_input(self, user_message: str) -> PreSafetyDecision:
         category, language, confidence = match_safety_category(user_message)
-        classified = self.classifier.classify(user_message)
-        # Low-confidence classifier results cannot override a high-confidence local rule.
-        if confidence >= 0.8:
+        reply_language = detect_safety_language(user_message)
+        classified, classifier_failed = self._classify(user_message)
+        classifier_failed = classifier_failed or bool(getattr(classified, "degraded", False))
+        classified_category = getattr(classified, "category", "none") or "none"
+        classified_confidence = float(getattr(classified, "confidence", 0.0) or 0.0)
+
+        # Urgent from either layer wins. Otherwise a high-confidence local rule wins.
+        if category in _URGENT_CATEGORIES:
             effective = category
-        elif classified.confidence >= 0.8:
-            effective = classified.category
+        elif classified_category in _URGENT_CATEGORIES and classified_confidence >= 0.6:
+            effective = classified_category
+        elif confidence >= 0.8:
+            effective = category
+        elif classified_confidence >= 0.8:
+            effective = classified_category
         else:
-            effective = category or classified.category
+            effective = category or classified_category
+
+        extra_flags: list[str] = []
+        if classifier_failed:
+            extra_flags.append("safety_classifier_unavailable")
 
         if effective == "self_harm":
             return PreSafetyDecision(
                 blocked=True,
-                answer=_crisis_answer(),
-                flags=["self_harm", "urgent_symptoms"],
+                answer=_crisis_answer(reply_language),
+                flags=["self_harm", "urgent_symptoms", *extra_flags],
                 escalation="crisis_support",
                 category="self_harm",
                 language=language,
+                reply_language=reply_language,
             )
         if effective == "emergency":
             return PreSafetyDecision(
                 blocked=True,
-                answer=_urgent_answer(),
-                flags=["urgent_symptoms"],
+                answer=_urgent_answer(reply_language),
+                flags=["urgent_symptoms", *extra_flags],
                 escalation="urgent_care",
                 category="emergency",
                 language=language,
+                reply_language=reply_language,
             )
         if effective == "prompt_injection":
             return PreSafetyDecision(
@@ -245,39 +283,61 @@ class SafetyLayer:
                 answer=(
                     "I can help with health questions, but I can't follow instructions that try to override Cura's safety or privacy rules."
                 ),
-                flags=["prompt_injection"],
+                flags=["prompt_injection", *extra_flags],
                 category="prompt_injection",
                 language=language,
+                reply_language=reply_language,
             )
         if effective == "medication_misuse":
             return PreSafetyDecision(
                 blocked=True,
-                answer=(
-                    "I can't recommend medication doses or tell you to start, stop, or change medicine. "
-                    "Please contact the clinician or pharmacist managing your medication."
-                ),
-                flags=["medication_or_dosage_request"],
+                answer=medication_message(reply_language),
+                flags=["medication_or_dosage_request", *extra_flags],
                 escalation="clinician",
                 category="medication_misuse",
                 language=language,
+                reply_language=reply_language,
             )
         if effective == "diagnosis_request":
             return PreSafetyDecision(
                 blocked=False,
-                flags=["diagnosis_request"],
+                flags=["diagnosis_request", *extra_flags],
                 escalation="clinician",
                 category="diagnosis_request",
                 language=language,
+                reply_language=reply_language,
             )
         if effective == "out_of_scope":
             return PreSafetyDecision(
                 blocked=True,
                 answer="I can only help with Cura's supported health-education and health-report questions.",
-                flags=["out_of_scope"],
+                flags=["out_of_scope", *extra_flags],
                 category="out_of_scope",
                 language=language,
+                reply_language=reply_language,
             )
-        return PreSafetyDecision(flags=[], category="none", language=language)
+        if effective == "urgent_soon":
+            return PreSafetyDecision(
+                blocked=False,
+                flags=["see_doctor_soon", *extra_flags],
+                escalation="see_doctor_24h",
+                category="urgent_soon",
+                language=language,
+                reply_language=reply_language,
+                caution=see_doctor_soon_message(reply_language),
+            )
+        caution = None
+        if classifier_failed and SYMPTOM_HINT.search(normalize_text(user_message)):
+            # Conservative fallback when the model layer is down and symptoms are mentioned.
+            extra_flags.append("symptom_caution")
+            caution = see_doctor_soon_message(reply_language)
+        return PreSafetyDecision(
+            flags=extra_flags,
+            category="none",
+            language=language,
+            reply_language=reply_language,
+            caution=caution,
+        )
 
     @staticmethod
     def request_safety_mode(decision: PreSafetyDecision | None) -> str:
@@ -318,3 +378,12 @@ class SafetyLayer:
                 "Please discuss your results with a clinician."
             )
         return out, flags
+
+
+SAFETY_ESCALATION_INTENT = "safety_escalation"
+
+
+def conversation_in_safe_mode(conversation) -> bool:
+    """True once any earlier turn in the conversation escalated (emergency or self harm)."""
+    messages = getattr(conversation, "messages", None) or []
+    return any(getattr(message, "intent", None) == SAFETY_ESCALATION_INTENT for message in messages)

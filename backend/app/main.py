@@ -16,13 +16,14 @@ from app.api.routes.chat import compat_router as chat_compat_router
 from app.api.routes.voice import compat_router as voice_compat_router
 from app.core.config import settings
 from app.core.errors import CuraError, cura_error_handler, http_error_handler
-from app.core.invariants import assert_safe_auth_health_pairing
+from app.core.invariants import assert_production_config, assert_safe_auth_health_pairing
 from app.core.logging import configure_logging
 from app.db.session import init_db
 from fastapi import HTTPException
 
 configure_logging()
 assert_safe_auth_health_pairing(settings)
+assert_production_config(settings)
 init_db()
 try:
     from app.documents.jobs import drain_pending_document_jobs

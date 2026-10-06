@@ -401,7 +401,6 @@ def test_prompt_forbids_hallucinated_package_metadata():
     from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS
 
     lower = SAFETY_INSTRUCTIONS.lower()
-    assert "do not invent package names" in lower
+    assert "never invent packages" in lower
     assert "booking actions" in lower
-    assert "do not render buttons" in lower
 

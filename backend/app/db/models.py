@@ -217,3 +217,17 @@ class ProcessingJob(Base):
     attempts: Mapped[int] = mapped_column(Integer, default=0)
     last_error: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
+
+
+class ConsentRecord(Base):
+    """Versioned member consent before health data reaches third party model providers."""
+
+    __tablename__ = "consent_records"
+
+    id: Mapped[str] = mapped_column(String(36), primary_key=True)
+    subject_id: Mapped[str] = mapped_column(String(128), index=True)
+    version: Mapped[str] = mapped_column(String(32))
+    accepted: Mapped[bool] = mapped_column(Boolean, default=False)
+    notice_sha256: Mapped[str] = mapped_column(String(64))
+    language: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
