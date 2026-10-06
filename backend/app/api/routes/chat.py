@@ -32,15 +32,23 @@ def chat(
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
     require_consent(db, principal.subject_id)
     request_controls.check_rate_limit(principal.subject_id)
+    request_controls.check_token_budget(principal.subject_id)
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
         return _client_view(cached)
     response = ChatService(db, get_registry()).chat(principal, payload, request_id)
+    _record_usage(principal.subject_id, response)
     request_controls.idempotency_store(
         principal.subject_id, idempotency_key, payload, response
     )
     return _client_view(response)
+
+
+def _record_usage(subject_id: str, response: ChatResponse) -> None:
+    meta = response.meta
+    used = (meta.input_tokens or 0) + (meta.output_tokens or 0) + (meta.jev_input_tokens or 0) + (meta.jev_output_tokens or 0)
+    request_controls.record_token_usage(subject_id, used)
 
 
 def _client_view(response: ChatResponse) -> ChatResponse:
@@ -61,6 +69,7 @@ def chat_stream(
     finally:
         consent_session.close()
     request_controls.check_rate_limit(principal.subject_id)
+    request_controls.check_token_budget(principal.subject_id)
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
@@ -100,6 +109,7 @@ def chat_stream(
             response = ChatService(session, get_registry()).chat(
                 principal, payload, request_id, progress=emitter
             )
+            _record_usage(principal.subject_id, response)
             request_controls.idempotency_store(
                 principal.subject_id, idempotency_key, payload, response
             )

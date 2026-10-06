@@ -27,7 +27,13 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 1.5 Trim API meta | Code: production `/chat` responses carry only the public meta (`PUBLIC_META_FIELDS`), with no model, cost, token or routing fields |
 | 2.6 Safe mode | Code: once a conversation escalates, later turns are flagged `safe_mode`, start with a caution, and get no package suggestions |
 | 5.8 CI | Code: CI runs the safety gate, the backend tests and the secret scan |
+| 1.6 Voice under the same policy | Code: OpenRouter voice calls use the model allowlist, data_collection=deny and ZDR, and voice is refused when ZDR is required but not configured |
+| 1.7 Retention and deletion | Code: deleting a conversation or document also removes extracted facts, interactions, feedback and jobs, with an audit row. `scripts/purge_expired.py` deletes documents after 90 days and conversations after 365 (`CONVERSATION_RETENTION_DAYS`). **Owner action: schedule it daily** |
+| 2.7 Output check | Code: dose, stop, skip and switch instructions in model answers are removed (negated advice is kept), and a failed check returns a safe fallback |
+| 3.5 Local digits | Code: Devanagari, Gurmukhi, Gujarati and Bengali digits are normalized before the numeric grounding check |
+| 5.3 (part) Model timeout | Code: the default chat model timeout is 30 s instead of 180 s |
+| 6.7 (part) Budgets | Code: each member has a daily model token budget (`MEMBER_DAILY_TOKEN_BUDGET`, default 200,000) and gets a clear message when it runs out. The monthly spend alert is still open |
 
 ## Still open
 
-These need separate work or owner input: 1.6 to 1.9, 2.7 to 2.9, 3.3 to 3.8, all of section 4 except 4.6, sections 5 and 6, and the answers to the open questions in the plan.
+These need separate work or owner input: 1.8, 1.9, 2.8, 2.9, 3.3, 3.4, 3.6 to 3.8, all of section 4 except 4.6, sections 5 and 6, and the answers to the open questions in the plan.

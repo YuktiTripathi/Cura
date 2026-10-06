@@ -1,4 +1,5 @@
 import re
+import unicodedata
 
 from app.contracts.health_context import HealthContext
 from app.retrieval.medical import MedicalEvidenceDoc
@@ -21,6 +22,14 @@ _OVERCLAIM_FALLBACK = (
 )
 
 
+def to_ascii_digits(text: str) -> str:
+    """Map Devanagari, Gurmukhi, Gujarati, Bengali (and any Unicode) digits to ASCII.
+
+    A value written in local digits must not slip past the numeric grounding check.
+    """
+    return "".join(str(unicodedata.digit(ch)) if ch.isdigit() and not ch.isascii() else ch for ch in text or "")
+
+
 def _norm(value: float) -> str:
     return f"{float(value):.4f}"
 
@@ -32,7 +41,8 @@ class GroundingChecker:
         for values in by_marker.values():
             all_allowed.update(values)
         issues: list[str] = []
-        for sentence in re.split(r"(?<=[.!?])\s+", answer or ""):
+        answer = to_ascii_digits(answer)
+        for sentence in re.split(r"(?<=[.!?।])\s+", answer or ""):
             bound = list(_MARKER_CLAIM.finditer(sentence))
             if bound:
                 for match in bound:

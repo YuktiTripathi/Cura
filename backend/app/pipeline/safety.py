@@ -219,6 +219,41 @@ def _urgent_answer(language: str | None = None) -> str:
     return emergency_message(language)
 
 
+SAFE_REVIEW_FALLBACK = (
+    "I couldn't check this answer safely, so I'm not showing it. "
+    "Please try again, or discuss your question with a clinician."
+)
+
+_DOSE_UNIT = r"(?:mg|mcg|µg|g|ml|units?|iu|tablets?|pills?|capsules?|puffs?)"
+OUTPUT_MEDICATION_PATTERNS = (
+    re.compile(
+        rf"\b(?:take|increase|decrease|reduce|raise|lower|double|halve|adjust|titrate)\s+(?:your\s+|the\s+)?"
+        rf"(?:\w+\s+){{0,3}}?(?:to|by|at)\s+\d+(?:\.\d+)?\s*{_DOSE_UNIT}\b",
+        re.I,
+    ),
+    re.compile(rf"\b\d+(?:\.\d+)?\s*{_DOSE_UNIT}\s+(?:once|twice|thrice|daily|a day|per day|every|at night|in the morning|before|after)\b", re.I),
+    re.compile(
+        rf"\b(?:you should|you can|you may|it is (?:fine|safe|ok) to|go ahead and|try to|i recommend|i suggest)\s+"
+        rf"(?:stop|skip|discontinue|switch|start|double|halve|change|come off|quit)\b[^.!?\n]{{0,60}}",
+        re.I,
+    ),
+    re.compile(rf"\bswitch (?:from|to)\s+(?:\S+\s+){{0,2}}{_MED_NOUN}\b", re.I),
+)
+_OUTPUT_NEGATION = re.compile(r"\b(?:not|never|don't|do not|without|avoid|unless|before you)\b[^.!?]{0,30}$", re.I)
+
+
+def unsafe_medication_spans(answer: str) -> list[str]:
+    """Medication instructions in a model answer (dose, stop, skip, switch), skipping negated ones."""
+    spans: list[str] = []
+    text = answer or ""
+    for pattern in OUTPUT_MEDICATION_PATTERNS:
+        for match in pattern.finditer(text):
+            if _OUTPUT_NEGATION.search(text[max(0, match.start() - 40):match.start()]):
+                continue
+            spans.append(match.group(0))
+    return spans
+
+
 class SafetyLayer:
     def __init__(self, classifier=None):
         if classifier is None:
@@ -357,8 +392,23 @@ class SafetyLayer:
         return ["critical_value"], "urgent_clinician_review"
 
     def review(self, answer: str, user_message: str | None = None) -> tuple[str, list[str]]:
+        try:
+            return self._review(answer, user_message)
+        except Exception:  # noqa: BLE001 - a failed check must give the safe fallback, not the raw answer
+            return SAFE_REVIEW_FALLBACK, ["safety_review_failed"]
+
+    def _review(self, answer: str, user_message: str | None = None) -> tuple[str, list[str]]:
         flags: list[str] = []
         out = answer
+        med_spans = unsafe_medication_spans(answer)
+        if med_spans:
+            flags.append("medication_instruction")
+            for span in sorted(med_spans, key=len, reverse=True):
+                out = out.replace(span, "[medication advice removed]")
+            out += (
+                "\n\nI can't advise starting, stopping, switching or changing the dose of a medicine. "
+                "Please talk to the clinician who manages it."
+            )
         if DIAGNOSIS.search(answer):
             flags.append("diagnosis_language")
             out += "\n\nThis is not a diagnosis. Discuss results with a clinician."

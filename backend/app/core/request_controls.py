@@ -76,6 +76,35 @@ class RequestControlStore:
         if count > max(1, settings.rate_limit_requests):
             raise RateLimitedError("Too many requests. Please try again shortly.")
 
+    def _budget_key(self, subject_id: str) -> str:
+        day = time.strftime("%Y%m%d", time.gmtime())
+        return f"cura:tokens:{self._subject_key(subject_id)}:{day}"
+
+    def tokens_used_today(self, subject_id: str) -> int:
+        return int(self._get(self._budget_key(subject_id)) or 0)
+
+    def check_token_budget(self, subject_id: str) -> None:
+        """Refuse a new chat once the member's daily model token budget is spent."""
+        budget = int(settings.member_daily_token_budget or 0)
+        if budget > 0 and self.tokens_used_today(subject_id) >= budget:
+            raise RateLimitedError(
+                "You've reached today's limit for Cura answers. Please try again tomorrow."
+            )
+
+    def record_token_usage(self, subject_id: str, tokens: int) -> None:
+        if tokens <= 0 or int(settings.member_daily_token_budget or 0) <= 0:
+            return
+        key = self._budget_key(subject_id)
+        client = self._client()
+        if client:
+            client.incrby(key, int(tokens))
+            client.expire(key, 2 * 86400)
+            return
+        with self._lock:
+            entry = self._memory.get(key)
+            total = (int(entry.value) if entry else 0) + int(tokens)
+            self._memory[key] = _Entry(time.time() + 2 * 86400, str(total))
+
     def idempotency_lookup(
         self,
         subject_id: str,

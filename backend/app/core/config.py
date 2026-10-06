@@ -38,7 +38,7 @@ class Settings(BaseSettings):
     jev_model: str = "typesafe/jev-1.13"
     jev_enabled: bool = True
     jev_timeout_seconds: int = 10
-    llm_timeout_seconds: int = 180
+    llm_timeout_seconds: int = 30
     llm_max_retries: int = 1
     llm_max_output_tokens: int = 800
     enable_llm: bool = False
@@ -97,6 +97,8 @@ class Settings(BaseSettings):
     supershyft_statement_timeout_ms: int = 5000
     document_encryption_key: str = ""
     document_retention_days: int = 90
+    # Conversations untouched for this many days are purged with their derived rows. 0 disables.
+    conversation_retention_days: int = 365
     supershyft_pool_size: int = 5
     supershyft_max_overflow: int = 2
     store_health_fact_values: bool = False
@@ -127,6 +129,8 @@ class Settings(BaseSettings):
     redis_url: str = ""
     redis_required: bool = False
     rate_limit_requests: int = 30
+    # Model tokens (input + output) a member may use per UTC day. 0 disables the budget.
+    member_daily_token_budget: int = 200_000
     rate_limit_window_seconds: int = 60
     idempotency_ttl_seconds: int = 300
 

@@ -44,6 +44,8 @@ class OpenRouterPolicy:
         models.update(model_registry().values())
         models.add(settings.jev_model)
         models.add(settings.active_llm_model())
+        if (settings.stt_provider or "").strip().lower() == "openrouter":
+            models.add(settings.resolved_stt_model())
         if (settings.eval_candidate_model or "").strip():
             models.add(settings.eval_candidate_model.strip())
         gateway = {item.strip().lower() for item in (settings.llm_allowed_providers or "openrouter").split(",") if item.strip()}

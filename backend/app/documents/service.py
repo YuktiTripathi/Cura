@@ -202,8 +202,11 @@ class DocumentService:
         return docs
 
     def delete(self, user_id: str, document_id: str) -> None:
+        from app.core.retention import delete_document_derived
+
         row = self.get_owned(user_id, document_id)
         key = row.storage_key
+        delete_document_derived(self.db, document_id, user_id)
         self.db.delete(row)
         self.db.commit()
         try:

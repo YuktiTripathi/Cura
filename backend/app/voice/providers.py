@@ -55,11 +55,26 @@ class OpenAICompatibleSTTProvider:
             headers["HTTP-Referer"] = settings.openrouter_http_referer or "http://localhost:5173"
             headers["X-Title"] = settings.openrouter_app_title or "Cura"
         hint = WHISPER_LANG.get((language_hint or "").lower())
+        stt_model = settings.resolved_stt_model()
+        provider_prefs: dict = {}
+        if "openrouter.ai" in base:
+            # Voice is personal health data: same allowlist and zero retention policy as chat.
+            from app.core.errors import LLMUnavailableError
+            from app.llm.openrouter_policy import openrouter_policy
+
+            try:
+                provider_prefs = openrouter_policy().provider_preferences(stt_model, personal_health=True)
+            except LLMUnavailableError as exc:
+                logger.warning("stt_policy_refused provider=%s", self.name)
+                raise VoiceUnavailableError(
+                    "Voice input isn't available right now. Please type your message."
+                ) from exc
         try:
             with httpx.Client(timeout=settings.stt_timeout_seconds) as client:
                 if "openrouter.ai" in base:
                     payload: dict[str, object] = {
-                        "model": settings.resolved_stt_model(),
+                        "model": stt_model,
+                        "provider": provider_prefs,
                         "prompt": STT_PROMPT,
                         "input_audio": {
                             "data": base64.b64encode(audio).decode("ascii"),

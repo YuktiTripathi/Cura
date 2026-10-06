@@ -96,7 +96,10 @@ class ConversationRepository:
         self.db.commit()
 
     def delete_for_subject(self, conversation_id: str, subject_id: str) -> None:
+        from app.core.retention import delete_conversation_derived
+
         conv = self.get_for_subject(conversation_id, subject_id)
+        delete_conversation_derived(self.db, conversation_id, subject_id)
         self.db.delete(conv)
         self.db.commit()
 
