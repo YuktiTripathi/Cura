@@ -9,6 +9,12 @@ anyio==4.15.1
     #   httpx
     #   starlette
     #   watchfiles
+boto3==1.43.108
+    # via -r requirements.txt
+botocore==1.43.108
+    # via
+    #   boto3
+    #   s3transfer
 certifi==2026.7.22
     # via
     #   httpcore
@@ -35,6 +41,10 @@ idna==3.20
     # via
     #   anyio
     #   httpx
+jmespath==1.1.0
+    # via
+    #   boto3
+    #   botocore
 mako==1.4.3
     # via alembic
 markupsafe==3.0.4
@@ -64,6 +74,8 @@ pyjwt==2.15.1
     #   pyjwt
 pypdf==6.19.0
     # via -r requirements.txt
+python-dateutil==2.9.0.post0
+    # via botocore
 python-dotenv==1.2.4
     # via
     #   -r requirements.txt
@@ -75,6 +87,10 @@ pyyaml==6.0.3
     # via uvicorn
 redis==8.1.0
     # via -r requirements.txt
+s3transfer==0.19.2
+    # via boto3
+six==1.17.0
+    # via python-dateutil
 sqlalchemy==2.1.3
     # via
     #   -r requirements.txt
@@ -96,6 +112,8 @@ typing-inspection==0.4.4
     #   fastapi
     #   pydantic
     #   pydantic-settings
+urllib3==2.8.0
+    # via botocore
 uvicorn==0.54.0
     # via -r requirements.txt
 uvloop==0.23.0

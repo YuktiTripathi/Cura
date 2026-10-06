@@ -45,6 +45,9 @@ class Settings(BaseSettings):
     llm_timeout_seconds: int = 30
     llm_max_retries: int = 1
     llm_max_output_tokens: int = 800
+    # Reasoning models (plan 6.6): effort and the output cap that includes hidden reasoning.
+    llm_reasoning_effort: str = "low"
+    llm_reasoning_output_cap: int = 1200
     enable_llm: bool = False
     allow_mock_auth_with_real_health: bool = False
     mock_user_id: str = ""
@@ -97,6 +100,13 @@ class Settings(BaseSettings):
     # Consent: chat requires an accepted consent record at this version when enforced.
     consent_version: str = "2026-10-v1"
     consent_required: bool | None = None
+    # Languages Cura answers in (English pivot + translation). Plan suggests en,hi for the pilot.
+    answer_languages: str = "en,hi,hinglish"
+    answer_translation_enabled: bool = True
+    translation_model: str = "openai/gpt-5.6-luna"
+    translation_timeout_seconds: float = 8.0
+    # Serve only reviewed, in-date medical passages (default on outside development).
+    medical_require_reviewed: bool | None = None
     # Read-only SuperShyft session guards (defence in depth behind the read-only role).
     supershyft_statement_timeout_ms: int = 5000
     document_encryption_key: str = ""
@@ -176,6 +186,11 @@ class Settings(BaseSettings):
     # User-uploaded medical documents (Phase 7). Files live outside SuperShyft.
     document_storage_backend: str = "local"
     document_storage_path: str = "./data/uploads"
+    document_s3_bucket: str = ""
+    document_s3_prefix: str = "documents"
+    document_s3_region: str = "ap-south-1"
+    document_s3_endpoint_url: str = ""
+    document_s3_kms_key_id: str = ""
     document_max_upload_bytes: int = 20_000_000
     document_ocr_provider: str = "none"
     document_min_text_chars: int = 80
@@ -234,6 +249,11 @@ class Settings(BaseSettings):
     def public_meta_enabled(self) -> bool:
         if self.public_meta_only is not None:
             return bool(self.public_meta_only)
+        return not self.is_development
+
+    def medical_require_reviewed_enabled(self) -> bool:
+        if self.medical_require_reviewed is not None:
+            return bool(self.medical_require_reviewed)
         return not self.is_development
 
     def consent_enforced(self) -> bool:

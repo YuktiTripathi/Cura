@@ -37,9 +37,14 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 5.6 Observability | Code: Prometheus `/metrics` with per-stage latency, outcomes, fallbacks, safety flags, tokens and cost; alerts are listed in `docs/operations.md` |
 | 5.7 Load test | Code: k6 script `scripts/load/chat_mix.js` with the plan's targets as thresholds. **Owner action: run it on staging** |
 | 5.8 Release hygiene | Code: `requirements.lock`, and CI installs from the lock file and builds the image |
+| 3.3 Pivot translation | Code: the answer is written and checked in English, then translated by the fast tier. The translation is used only if every number matches; otherwise the member gets the checked English answer. Enabled languages come from `ANSWER_LANGUAGES` (default en, hi, Hinglish). **Owner action: confirm the launch languages; native clinicians review samples** |
+| 4.3 Attributed passages | Code: entries carry `content_kind`, reviewer, review and expiry dates, licence and region. Cura summaries are labelled "Cura summary, not a quotation", and reviewed content files go in `app/retrieval/content/` |
+| 4.4 Clinical review | Code: outside development, only reviewed or published entries that are in date (at most 12 months after review) are served. **Note: none of the 17 existing entries is reviewed, so production has no general medical evidence until content is added, and high-risk topics are redirected to a clinician** |
+| 5.2 State out of process | Code: an S3 document store (KMS-encrypted, hashed keys, ap-south-1 by default). Production refuses to start with local storage, SQLite or without Redis. Alembic migrations, including the new `0002_consent_records`, were run on Postgres 16, and the full test suite passes against Postgres; CI now runs both. Separate extraction workers are still open |
+| 6.6 Reasoning tokens | Code: `LLM_REASONING_EFFORT` and `LLM_REASONING_OUTPUT_CAP` |
 | 6 lever 3 Prompt caching | Code: stable text and member data come first and the question last. **Owner action: confirm cache hits in the provider usage report** |
 | 6.7 (part) Budgets | Code: each member has a daily model token budget (`MEMBER_DAILY_TOKEN_BUDGET`, default 200,000) and gets a clear message when it runs out. The monthly spend alert is still open |
 
 ## Still open
 
-These need separate work or owner input: 1.8, 1.9, 2.8, 2.9, 3.3, 3.4, 3.6 to 3.8, all of section 4 except 4.6, sections 5 and 6, and the answers to the open questions in the plan.
+These need separate work or owner input: 1.8, 1.9, 2.8, 2.9, 3.4, 3.6 to 3.8, 4.1, 4.2, 4.5, 4.7, 4.8, sections 5 and 6, and the answers to the open questions in the plan.

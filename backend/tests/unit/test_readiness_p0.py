@@ -28,6 +28,11 @@ def _prod(**overrides) -> Settings:
         openrouter_zero_data_retention=True,
         require_zdr_for_personal_health=True,
         document_encryption_key="e" * 44,
+        document_storage_backend="s3",
+        document_s3_bucket="cura-docs-ap-south-1",
+        redis_url="redis://cache:6379/0",
+        redis_required=True,
+        database_url="postgresql+psycopg://cura:pw@db/cura",
     )
     base.update(overrides)
     return Settings(**base)
@@ -45,6 +50,9 @@ def test_production_config_accepts_a_complete_setup():
         ({"openrouter_zero_data_retention": False}, "OPENROUTER_ZERO_DATA_RETENTION"),
         ({"require_zdr_for_personal_health": False}, "REQUIRE_ZDR_FOR_PERSONAL_HEALTH"),
         ({"health_provider": "supershyft", "supershyft_database_url": "postgresql://u:password@localhost/db"}, "SUPERSHYFT_DATABASE_URL"),
+        ({"document_storage_backend": "local"}, "DOCUMENT_STORAGE_BACKEND"),
+        ({"redis_required": False}, "REDIS_REQUIRED"),
+        ({"database_url": "sqlite:///./cura.db"}, "DATABASE_URL"),
     ],
 )
 def test_production_refuses_dev_or_placeholder_values(overrides, fragment):

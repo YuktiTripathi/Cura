@@ -150,8 +150,9 @@ class OpenAICompatibleLLMClient:
             "max_tokens": settings.llm_max_output_tokens,
         }
         if uses_reasoning_tokens(self.model):
-            payload["reasoning"] = {"effort": "low"}
-            payload["max_tokens"] = max(int(settings.llm_max_output_tokens), 1200)
+            # Hidden reasoning is billed as output: keep effort low and the cap explicit.
+            payload["reasoning"] = {"effort": settings.llm_reasoning_effort or "low"}
+            payload["max_tokens"] = max(int(settings.llm_max_output_tokens), int(settings.llm_reasoning_output_cap))
         from app.llm.openrouter_policy import openrouter_policy
 
         policy = openrouter_policy()

@@ -81,6 +81,8 @@ from app.pipeline.renderer import (
     render_missing_blood_marker,
     render_provenance,
 )
+from app.retrieval.medical import passage_label
+from app.pipeline.translation import target_language, translate_answer
 from app.pipeline.safety_messages import emergency_contacts, see_doctor_soon_message
 from app.pipeline.safety import (
     SAFETY_ESCALATION_INTENT,
@@ -832,9 +834,7 @@ class ChatService:
         if getattr(plan, "medical_evidence_required", False) or general_only:
             limit = 2 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 1
             medical_hits = self.medical_knowledge.query(payload.message, plan.topic, limit=limit)
-            context.medical_passages = [
-                f"{doc.name} ({doc.url}): {doc.excerpt}" for doc in medical_hits
-            ]
+            context.medical_passages = [passage_label(doc) for doc in medical_hits]
             attach_medical_evidence(context, medical_hits)
             ContextMerger().merge_into(context, plan, principal.subject_id)
         eval_turn["medical"] = medical_hits
@@ -996,6 +996,10 @@ class ChatService:
             safety_caution = see_doctor_soon_message(getattr(pre_safety, "reply_language", None))
         if safety_caution:
             answer = f"{safety_caution}\n\n{answer}"
+        # Checked English answer -> member's language, only if every number survives.
+        reply_language = target_language(payload.message, payload.language, payload.language_mode)
+        answer, response_language, translation_flags = translate_answer(answer, reply_language)
+        flags.extend(translation_flags)
 
         micro_insight = compose_micro_insight(
             plan=plan,
@@ -1221,6 +1225,7 @@ class ChatService:
                 safety_flags=flags,
                 safety_mode=SafetyLayer.request_safety_mode(pre_safety),
                 safety_caution=safety_caution,
+                response_language=response_language,
                 recommendation_flags=recommendation_flags,
                 grounding_flags=grounding_flags,
                 escalation=escalation,

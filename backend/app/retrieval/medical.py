@@ -2,8 +2,13 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass
+import json
+from dataclasses import dataclass, fields
+from datetime import date, timedelta
+from pathlib import Path
 from typing import Protocol
+
+from app.core.config import settings
 
 
 @dataclass(frozen=True)
@@ -21,6 +26,14 @@ class MedicalEvidenceDoc:
     review_status: str = "unreviewed_index"
     version: str = "cura-kb-v1"
     retrieved_at: str | None = None
+    # Governance (readiness plan 4.3, 4.4). "cura_summary" is Cura's own wording that
+    # points at a source; "quoted_passage" is the source's exact text.
+    content_kind: str = "cura_summary"
+    reviewer: str | None = None
+    reviewed_on: str | None = None
+    expires_on: str | None = None
+    licence_status: str | None = None
+    region: str | None = None
 
     @property
     def evidence_text(self) -> str:
@@ -266,6 +279,58 @@ CORPUS: tuple[MedicalEvidenceDoc, ...] = (
 )
 
 
+SERVABLE_STATUSES = frozenset({"reviewed", "published"})
+REVIEW_STATUSES = ("draft", "reviewed", "published", "expired")
+MAX_REVIEW_AGE_DAYS = 366
+
+
+def is_servable(doc: MedicalEvidenceDoc, today: date | None = None) -> bool:
+    """Only reviewed or published entries that are in date may be served to members."""
+    if doc.review_status not in SERVABLE_STATUSES or not doc.reviewer or not doc.reviewed_on:
+        return False
+    current = today or date.today()
+    try:
+        reviewed = date.fromisoformat(doc.reviewed_on)
+        expires = date.fromisoformat(doc.expires_on) if doc.expires_on else reviewed + timedelta(days=MAX_REVIEW_AGE_DAYS)
+    except ValueError:
+        return False
+    # Expiry is capped at 12 months after review even if a later date was entered.
+    expires = min(expires, reviewed + timedelta(days=MAX_REVIEW_AGE_DAYS))
+    return reviewed <= current <= expires
+
+
+def passage_label(doc: MedicalEvidenceDoc) -> str:
+    """Prompt line for a passage. Never presents a Cura paraphrase as the source's words."""
+    if doc.content_kind == "quoted_passage":
+        return f'Quoted from {doc.name} ({doc.url}): "{doc.excerpt}"'
+    return f"Cura summary, not a quotation (source pointer: {doc.name}, {doc.url}): {doc.excerpt}"
+
+
+def load_content_dir(path: Path) -> tuple[MedicalEvidenceDoc, ...]:
+    """Load reviewed content files (one JSON list per file) written by the content team."""
+    docs: list[MedicalEvidenceDoc] = []
+    if not path.is_dir():
+        return ()
+    allowed = {f.name for f in fields(MedicalEvidenceDoc)}
+    for file in sorted(path.glob("*.json")):
+        for row in json.loads(file.read_text(encoding="utf-8")):
+            data = {k: v for k, v in row.items() if k in allowed}
+            data["topics"] = tuple(data.get("topics") or ())
+            data["keywords"] = tuple(data.get("keywords") or ())
+            docs.append(MedicalEvidenceDoc(**data))
+    return tuple(docs)
+
+
+CONTENT_DIR = Path(__file__).resolve().parent / "content"
+
+
+def active_corpus() -> tuple[MedicalEvidenceDoc, ...]:
+    corpus = CORPUS + load_content_dir(CONTENT_DIR)
+    if settings.medical_require_reviewed_enabled():
+        return tuple(doc for doc in corpus if is_servable(doc))
+    return corpus
+
+
 class MedicalKnowledgeProvider(Protocol):
     """General medical knowledge only. Never a source of personal lab values."""
 
@@ -284,7 +349,7 @@ def retrieve_medical_evidence(message: str, topic: str | None = None, limit: int
     text = (message or "").lower()
     topic_key = (topic or "").lower().replace(" ", "_")
     scored: list[tuple[int, int, int, MedicalEvidenceDoc]] = []
-    for index, doc in enumerate(CORPUS):
+    for index, doc in enumerate(active_corpus()):
         score = 0
         if topic_key and topic_key in doc.topics:
             score += 4

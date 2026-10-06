@@ -77,8 +77,15 @@ def production_config_problems(cfg: Settings) -> list[str]:
         url = (cfg.supershyft_database_url or "").lower()
         if not url or "password" in url or "localhost" in url or "127.0.0.1" in url:
             problems.append("SUPERSHYFT_DATABASE_URL is missing or points at a dev/placeholder target")
-    if cfg.document_storage_backend == "local" and _looks_placeholder(cfg.document_encryption_key):
-        problems.append("DOCUMENT_ENCRYPTION_KEY must be set in production")
+    backend = (cfg.document_storage_backend or "local").strip().lower()
+    if backend == "local":
+        problems.append("DOCUMENT_STORAGE_BACKEND must be s3 in production (local disk is lost with the container)")
+    elif backend == "s3" and not (cfg.document_s3_bucket or "").strip():
+        problems.append("DOCUMENT_S3_BUCKET must be set")
+    if not (cfg.redis_url or "").strip() or not cfg.redis_required:
+        problems.append("REDIS_URL and REDIS_REQUIRED=true are needed so instances share rate limits and budgets")
+    if cfg.cura_database_is_sqlite():
+        problems.append("DATABASE_URL must be Postgres in production, not SQLite")
     return problems
 
 
