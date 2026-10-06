@@ -87,7 +87,7 @@ _REFERENCE = re.compile(
     r"\b(it|that|this|these|those|they|them|the above|that score|that result|"
     r"the previous one|previous one|the latest one|latest one|"
     r"what about that|is that concerning|why|"
-    r"another test|repeat it|test this again|which package|through supershyft|"
+    r"another test|repeat it|test this again|"
     r"should i (?:repeat|retest)|when should i test)\b",
     re.I,
 )
@@ -265,15 +265,8 @@ def persistable_state(
     domain = (plan_domains[0] if plan_domains else None) or resolved.active_domain
     if plan_topic and plan_topic not in entities and is_lab_key(plan_topic):
         entities.insert(0, plan_topic)
-    same_topic = bool(resolved.active_domain and domain == resolved.active_domain) or (
-        resolved.active_entities and set(entities) & set(resolved.active_entities)
-    )
-    switched = resolved.turn_type == TurnType.topic_switch or (
-        resolved.turn_type == TurnType.new_question and resolved.active_entities and not same_topic
-    )
-    turns = 1 if switched or resolved.turn_type == TurnType.new_question and not resolved.prior_personal else (
-        (resolved.topic_turn_count or 0) + 1
-    )
+    switched = resolved.turn_type in {TurnType.topic_switch, TurnType.new_question}
+    turns = 1 if switched else (resolved.topic_turn_count or 0) + 1
     explained = list(dict.fromkeys([*(resolved.explained_entities or []), *(explained_entities or []), *entities]))[:12]
     return ConversationState(
         turn_type=resolved.turn_type,

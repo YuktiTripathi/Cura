@@ -58,7 +58,8 @@ def build_query_plan(
     }
     if personal and intent in {IntentType.health_scenario, IntentType.nutrition_guidance}:
         needs_blood = True
-        needs_bio_ai = True
+        if intent == IntentType.health_scenario:
+            needs_bio_ai = True
     if personal and intent == IntentType.broad_health_summary:
         text = message.lower()
         if "blood" in text:

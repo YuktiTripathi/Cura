@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 import time
 from dataclasses import dataclass, field
 
@@ -83,7 +84,10 @@ class ReasoningService:
             and context.status != "ambiguous"
             and not plan.needs_user_uploaded
         )
-        if structured_bio_ai:
+        explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand)\b", message or "", re.I))
+        if explain_bio and context.bio_ai_risks and settings.enable_llm and not uses_answer_llm(plan.answer_model_tier):
+            plan = plan.model_copy(update={"answer_model_tier": AnswerModelTier.standard_medical})
+        if structured_bio_ai and not (explain_bio and settings.enable_llm):
             return ReasoningResult(
                 answer=render_bio_ai_score_list(context.bio_ai_risks),
                 llm_mode="structured_bio_ai",
@@ -176,7 +180,9 @@ class ReasoningService:
                     llm_mode="unavailable",
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
-        if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (plan_needs_reasoning(plan) or not lookup):
+        if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (
+            plan_needs_reasoning(plan) or not lookup or (explain_bio and context.bio_ai_risks)
+        ):
             messages = self.prompts.build(
                 context, conversation_summary, message, response_lang, routing_note=routing_note
             )
@@ -186,8 +192,10 @@ class ReasoningService:
                 escalated = False
                 escalation_reason = None
                 if used_tier == AnswerModelTier.standard_medical:
+                    from app.routing.model_tier import _keep_on_flash
+
                     gate = review_answer(answer, plan, context)
-                    if should_escalate_to_deep(gate.flags, plan, context, answer, llm_result):
+                    if not _keep_on_flash(plan) and should_escalate_to_deep(gate.flags, plan, context, answer, llm_result):
                         deep_plan = plan.model_copy(update={
                             "answer_model_tier": AnswerModelTier.deep_medical_reasoning,
                             "model_tier": AnswerModelTier.deep_medical_reasoning,

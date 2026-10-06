@@ -3,6 +3,27 @@ import type { PresentedFinding } from "../../types/chat";
 import { numericValue } from "../../lib/range";
 import { RangeBar } from "./RangeBar";
 
+const MISSING_STATUS = new Set(["missing", "not_available", "unavailable", "not_present"]);
+
+/** Rows without a measured value are omitted from result tables and cards. */
+export function availableFindings(findings: PresentedFinding[]): PresentedFinding[] {
+  return findings.filter((item) => {
+    const status = (item.status || "").toLowerCase().replace(/[\s-]+/g, "_");
+    const measured =
+      item.numeric_value != null && Number.isFinite(item.numeric_value)
+        ? true
+        : (() => {
+            const value = item.value == null ? "" : String(item.value).trim();
+            if (!value || /^[-—–−]+$/.test(value)) return false;
+            if (/^(n\/a|na|missing|null|none)$/i.test(value)) return false;
+            return /\d/.test(value);
+          })();
+    if (!measured) return false;
+    if (MISSING_STATUS.has(status)) return false;
+    return true;
+  });
+}
+
 export function RelatedResults({ findings }: { findings: PresentedFinding[] }) {
   const [open, setOpen] = useState(false);
   if (!findings.length) return null;
@@ -30,15 +51,18 @@ export function RawResultsDisclosure({ findings }: { findings: PresentedFinding[
 }
 
 export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
-  const showRange = findings.some((item) => item.reference_low != null || item.reference_high != null);
+  findings = availableFindings(findings);
+  if (!findings.length) return null;
+  const riskScores = findings.every((item) => item.source_type === "bio_ai_report");
+  const showRange = !riskScores && findings.some((item) => item.reference_low != null || item.reference_high != null);
   return (
     <div className="findings-table-wrap">
       <table className="findings-table">
         <thead>
           <tr>
             <th>Measurement</th>
-            <th>Value</th>
-            <th>Status</th>
+            <th>{riskScores ? "Risk Score" : "Value"}</th>
+            {riskScores ? <th>Status</th> : null}
             {showRange ? <th>Range</th> : null}
           </tr>
         </thead>
@@ -50,7 +74,7 @@ export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
                 {item.value ?? "—"}
                 {item.unit ? ` ${item.unit}` : ""}
               </td>
-              <td>{(item.status || "").replace(/_/g, " ")}</td>
+              {riskScores ? <td>{riskStatusLabel(item.status)}</td> : null}
               {showRange ? (
                 <td>
                   <RangeBar
@@ -68,4 +92,10 @@ export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
       </table>
     </div>
   );
+}
+
+function riskStatusLabel(status: string | null | undefined): string {
+  const text = (status || "").trim();
+  if (!text || text.toLowerCase() === "unknown") return "—";
+  return text.replace(/[_-]+/g, " ").replace(/\b\w/g, (letter) => letter.toUpperCase());
 }

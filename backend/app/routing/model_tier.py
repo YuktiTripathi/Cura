@@ -145,6 +145,27 @@ class _Inference:
         self.reasons = reasons
 
 
+_ROUTINE_FLASH = {
+    IntentType.bio_ai_score,
+    IntentType.bio_ai_explanation,
+    IntentType.nutrition_guidance,
+}
+
+
+def _keep_on_flash(plan: QueryPlan) -> bool:
+    """Bio-AI reports and nutrition guidance stay on Gemini. Sonnet is for synthesis."""
+    if plan.intent == IntentType.health_scenario or _SCENARIO.search(plan.raw_message or ""):
+        return False
+    if plan.intent in _ROUTINE_FLASH:
+        if _RELATED.search(plan.raw_message or "") or _UNCERTAINTY.search(plan.raw_message or ""):
+            return False
+        if re.search(r"\b(overall picture|increased|decreased|over time|contradict)\b", plan.raw_message or "", re.I):
+            return False
+        return True
+    text = plan.raw_message or ""
+    return bool(re.search(r"\b(bio-?ai report|my nutrition|about my nutrition|what should i eat)\b", text, re.I))
+
+
 def infer_answer_model_routing(plan: QueryPlan) -> _Inference:
     message = plan.raw_message or ""
     mentioned = list(dict.fromkeys(match_lab_keys(message)))
@@ -262,12 +283,15 @@ def infer_answer_model_routing(plan: QueryPlan) -> _Inference:
             reasons,
         )
     deep = bool(
-        scenario
-        or pdf_analysis
-        or (domain_count >= 2 and (history or cross or related or uncertainty))
-        or (len(mentioned) >= 3 and (history or related or uncertainty or cross))
-        or (cross and (related or uncertainty or history))
-        or (score >= 8 and (domain_count >= 2 or cross or related or uncertainty or history))
+        not _keep_on_flash(plan)
+        and (
+            scenario
+            or pdf_analysis
+            or (domain_count >= 2 and (history or cross or related or uncertainty))
+            or (len(mentioned) >= 3 and (history or related or uncertainty or cross))
+            or (cross and (related or uncertainty or history))
+            or (score >= 8 and (domain_count >= 2 or cross or related or uncertainty or history))
+        )
     )
     if deep:
         reasons.append("deep_medical_complexity")
@@ -364,6 +388,10 @@ def _constrain_tier(
         selected = AnswerModelTier.standard_medical if plan.intent != IntentType.health_scenario else AnswerModelTier.deep_medical_reasoning
         depth = ReasoningDepth.deep if selected == AnswerModelTier.deep_medical_reasoning else ReasoningDepth.standard
         extra.append("interpretation_promoted_from_deterministic")
+    if selected == AnswerModelTier.deep_medical_reasoning and _keep_on_flash(plan):
+        selected = AnswerModelTier.standard_medical
+        depth = ReasoningDepth.standard
+        extra.append("routine_question_stays_on_gemini")
     return selected, depth, extra
 
 
@@ -375,6 +403,8 @@ def promote_for_retrieved_complexity(plan: QueryPlan, context) -> QueryPlan:
     Promoting here avoids paying for STANDARD_MEDICAL and then a second DEEP call.
     """
     if plan.answer_model_tier != AnswerModelTier.standard_medical:
+        return plan
+    if _keep_on_flash(plan):
         return plan
 
     ops = {str(item).upper() for item in (plan.operations or [])}

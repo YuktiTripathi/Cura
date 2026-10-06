@@ -5,6 +5,15 @@ import { fmt, formatBounds } from "../../lib/range";
 import { RangeBar } from "../messages/RangeBar";
 import { TrendChart, shortDate } from "./TrendChart";
 
+function historyStatus(status: string | null | undefined): string {
+  const value = (status || "").toLowerCase().replace(/[\s-]+/g, "_");
+  if (!value || value === "unknown") return "—";
+  if (value === "low" || value === "below_range") return "Below range";
+  if (value === "high" || value === "above_range") return "Above range";
+  if (value === "normal" || value === "in_range") return "Within range";
+  return status || "—";
+}
+
 const TREND_TEXT: Record<string, string> = {
   toward_range: "Moving toward the reference range",
   away_from_range: "Moving away from the reference range",
@@ -79,6 +88,7 @@ export function MarkerPanel({
           <tr>
             <th>Date</th>
             <th>Value</th>
+            <th>Range</th>
             <th>Status</th>
           </tr>
         </thead>
@@ -90,7 +100,8 @@ export function MarkerPanel({
                 {fmt(point.value)}
                 {marker.unit ? ` ${marker.unit}` : ""}
               </td>
-              <td>{point.status === "unknown" ? "—" : point.status}</td>
+              <td>{bounds || "—"}</td>
+              <td>{historyStatus(point.status)}</td>
             </tr>
           ))}
         </tbody>

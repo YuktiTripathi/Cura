@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 
 from app.contracts.health_context import HealthContext
+from app.contracts.common import KnowledgeScope
 from app.contracts.operations import QualityGateResult
 from app.contracts.query import QueryPlan
 from app.core.config import settings
@@ -78,6 +79,10 @@ class ResponseValidator:
 def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> QualityGateResult:
     flags: list[str] = []
     repairs: list[str] = []
+    if plan.knowledge_scope == KnowledgeScope.general or not plan.needs_personal_data:
+        return QualityGateResult(passed=True, flags=flags, repairs=repairs)
+    if not re.search(r"\b(my|mine)\b", plan.raw_message or "", re.I):
+        return QualityGateResult(passed=True, flags=flags, repairs=repairs)
     blob = (answer or "").lower()
     already_discloses_missing = any(
         token in blob

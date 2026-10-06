@@ -286,16 +286,19 @@ class ChatService:
         prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
         conv_state = ConversationStateResolver().resolve(routing_message, conv)
         eval_turn["conversation_state"] = conv_state
-        if not prior_topic and conv_state.active_entities:
+        continuing = conv_state.turn_type.value not in {"NEW_QUESTION", "TOPIC_SWITCH"}
+        if not continuing:
+            prior_topic, prior_name = None, None
+        elif not prior_topic and conv_state.active_entities:
             prior_topic = conv_state.active_entities[0]
             prior_name = prior_name or prior_topic.replace("_", " ")
-        prior_personal = (
+        prior_personal = continuing and (
             self.memory.prior_was_personal(conv)
             or conv_state.prior_personal
             or conv_state.turn_type.value != "NEW_QUESTION"
         )
-        previous_user_message = self.memory.last_user_message(conv)
-        previous_intent = self.memory.last_user_intent(conv)
+        previous_user_message = self.memory.last_user_message(conv) if continuing else None
+        previous_intent = self.memory.last_user_intent(conv) if continuing else None
         conversation_summary = self.memory.semantic_summary(conv)
         doc_svc = DocumentService(self.db)
         listed_docs = doc_svc.list_for_user(principal.subject_id)
@@ -303,7 +306,7 @@ class ChatService:
             d for d in listed_docs if d.extraction_status == "completed" or d.structured_facts_ready
         ]
         response_lang = LanguageCode.en
-        follow_up = conv_state.turn_type.value != "NEW_QUESTION"
+        follow_up = continuing
         self._progress.follow_up = follow_up
         self._progress.emit(ProcessingStage.planning)
         self._progress.mark("planning")

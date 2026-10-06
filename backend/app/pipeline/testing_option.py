@@ -27,7 +27,7 @@ from app.contracts.health_context import HealthContext
 from app.contracts.query import QueryPlan
 from app.core.config import settings
 from app.pipeline.health_gaps import HealthGapDetector
-from app.pipeline.lab_parameters import display_name_for, match_lab_keys, primary_lab_key
+from app.pipeline.lab_parameters import FAMILY_MEMBERS, display_name_for, match_lab_keys, primary_lab_key
 from app.pipeline.package_matcher import PackageMatcher
 from app.pipeline.package_policy import PackageRecommendationPolicy
 from app.pipeline.test_need import TestNeedGenerator
@@ -38,7 +38,11 @@ _EXPLICIT_PACKAGE = re.compile(
     r"\b(which (?:supershyft )?(?:package|panel|test group)|"
     r"package includes|which package has|"
     r"can i get (?:this|that|it|them) through supershyft|"
-    r"supershyft package)\b",
+    r"supershyft package|"
+    r"which test (?:shall|should|can|do) i|"
+    r"(?:opt|choose|pick) for|"
+    r"get tested for|"
+    r"(?:on|for|through|from|via) supershyft)\b",
     re.I,
 )
 _ANOTHER_TEST = re.compile(
@@ -79,6 +83,15 @@ _MONTH = {
 
 def is_explicit_catalog_lookup(message: str) -> bool:
     return bool(_EXPLICIT_PACKAGE.search(message or ""))
+
+
+def panel_member_keys(message: str) -> list[str]:
+    """Map a named panel such as CBC onto the markers a catalog package is matched against."""
+    lowered = (message or "").lower()
+    keys: list[str] = []
+    if re.search(r"\b(cbc|complete blood count)\b", lowered):
+        keys.extend(FAMILY_MEMBERS.get("cbc", ()))
+    return list(dict.fromkeys(keys))
 
 
 def wants_another_test(message: str) -> bool:
@@ -427,7 +440,7 @@ class TestingOptionService:
         )
         test_need = self.needs.generate(gaps, explicit_catalog_lookup=explicit)
         requested = list(test_need.recommended_test_entities)
-        mentioned = match_lab_keys(message) or (
+        mentioned = match_lab_keys(message) or panel_member_keys(message) or (
             [primary_lab_key(message)] if primary_lab_key(message) else []
         )
         if not mentioned and conversation_state:

@@ -7,13 +7,10 @@ export function InsightNote({ insights }: { insights: AnswerInsight[] }) {
   if (!insights.length) return null;
   return (
     <div className="insight-note" data-testid="insight-note">
-      <p className="insight-note-label">Worth a look</p>
       <ul>
         {insights.map((insight, index) => (
           <li key={`${insight.summary}-${index}`}>
-            <span>
-              <strong>{insight.title}.</strong> {insight.summary}
-            </span>
+            <span>{insight.summary}</span>
             {insight.entity && panel.has(insight.entity) ? (
               <button type="button" className="text-button" onClick={() => panel.open(insight.entity!)}>
                 History

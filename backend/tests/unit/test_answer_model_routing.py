@@ -99,7 +99,7 @@ def test_registry_maps_capability_tiers_to_configured_models():
     assert "DETERMINISTIC" not in registry
     assert registry["FAST_REASONING"] == settings.answer_model_fast_reasoning == "openai/gpt-5.6-luna"
     assert registry["STANDARD_MEDICAL"] == settings.answer_model_standard_medical == "google/gemini-3.8-flash"
-    assert registry["DEEP_MEDICAL_REASONING"] == settings.answer_model_deep_medical == "anthropic/claude-sonnet-5"
+    assert registry["DEEP_MEDICAL_REASONING"] == settings.answer_model_deep_medical == "google/gemini-3.8-flash"
     assert model_id_for_tier("DETERMINISTIC") == ""
     assert model_id_for_tier("FAST_REASONING") == settings.answer_model_fast_reasoning
     client = get_llm_client(model_tier="STANDARD_MEDICAL")

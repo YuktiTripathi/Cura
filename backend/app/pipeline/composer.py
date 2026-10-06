@@ -21,6 +21,7 @@ from app.pipeline.conversation_experience import (
 from app.pipeline.lab_parameters import display_name_for
 from app.pipeline.narrative import finding_from_marker
 from app.pipeline.response_planner import build_response_plan
+from app.pipeline.testing_option import is_explicit_catalog_lookup
 from app.pipeline.presentation import (
     build_structured_response,
     flatten_structured_response,
@@ -179,6 +180,12 @@ class ResponseComposer:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
         if testing_option:
             presentation.testing_option = testing_option
+            if is_explicit_catalog_lookup(plan.raw_message or ""):
+                lead = testing_option.headline or testing_option.display_name
+                detail = testing_option.reason
+                text = " ".join(part for part in (lead, detail) if part).strip() or text
+                presentation.summary = text
+                presentation.headline = lead or presentation.headline
         presentation = attach_presentation_personalization(presentation, context, plan)
         presentation.conversation_goal = experience.goal.value
         presentation.response_depth = experience.depth.value
@@ -186,7 +193,7 @@ class ResponseComposer:
         presentation.blocks = [item.model_dump(mode="json") for item in experience_blocks_from_answer(text, experience, context)]
         presentation.related_findings = _related_findings(context, experience)
         presentation.suggestion_chips = [item.text for item in chips]
-        if experience.topic_summary:
+        if experience.topic_summary and not is_explicit_catalog_lookup(plan.raw_message or ""):
             presentation.topic_summary = experience.topic_summary.model_dump(mode="json")
         if presentation.mode.value == "CLINICIAN_HANDOFF" and presentation.summary:
             text = presentation.summary

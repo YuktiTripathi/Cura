@@ -1,10 +1,14 @@
 import type { StructuredResponse, TestingOption } from "../../types/chat";
 import { AssistantBody } from "./AssistantBody";
-import { FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsTable";
+import { availableFindings, FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsTable";
 import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
 import { ValueCard } from "./ValueCard";
 import { NextSteps } from "./NextSteps";
+
+function isScoreList(text: string): boolean {
+  return /Bio-AI assessment shows|• \*\*/.test(text);
+}
 
 function isDisclaimer(text: string): boolean {
   return /not a (medical )?diagnosis/i.test(text);
@@ -20,8 +24,12 @@ export function PresentedAnswer({
   testingOption?: TestingOption | null;
 }) {
   const narrative = presentation.summary_style === "NARRATIVE_HEALTH_SUMMARY" || Boolean(presentation.themes && presentation.themes.length > 0);
-  const showHeadline = !narrative && presentation.mode !== "SINGLE_VALUE" && Boolean(presentation.headline);
-  const findings = presentation.findings || [];
+  const showHeadline =
+    !narrative &&
+    presentation.mode !== "SINGLE_VALUE" &&
+    Boolean(presentation.headline) &&
+    presentation.headline?.trim().toLowerCase() !== "nutrition";
+  const findings = availableFindings(presentation.findings || []);
   const gaps = (presentation.uncertainties || []).filter((item) => !isDisclaimer(item));
   const notes = (presentation.uncertainties || []).filter(isDisclaimer);
   const useCards = findings.length > 0 && findings.length <= 3 && presentation.mode !== "SINGLE_VALUE";
@@ -62,11 +70,8 @@ export function PresentedAnswer({
           <FindingsTable findings={findings} />
         )
       ) : null}
-      {!narrative && presentation.interpretation ? (
-        <section className="answer-section">
-          <h4>How to read this</h4>
-          <p>{presentation.interpretation}</p>
-        </section>
+      {!narrative && presentation.interpretation && !isScoreList(presentation.interpretation) ? (
+        <p className="answer-summary">{presentation.interpretation}</p>
       ) : null}
       {!narrative && gaps.length > 0 ? (
         <section className="answer-section">

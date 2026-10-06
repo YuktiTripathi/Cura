@@ -256,6 +256,13 @@ def _status_for(flag) -> str:
     return _FLAG_STATUS.get(str(value), str(value) if value else "unknown")
 
 
+def _has_measured_value(marker) -> bool:
+    """A report row is showable only when a number was actually retrieved."""
+    if getattr(marker, "value", None) is None:
+        return False
+    return _status_for(getattr(marker, "flag", None)) != "missing"
+
+
 def _finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     when = marker.measured_at
     value = None if marker.value is None else f"{marker.value}"
@@ -360,6 +367,11 @@ def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:
     return list(dict.fromkeys(rows))[:4]
 
 
+def _score_dump(text: str | None) -> bool:
+    value = text or ""
+    return "Bio-AI assessment shows" in value or "• **" in value
+
+
 def _extract_interpretation(answer: str, mode: ResponseMode, message: str | None) -> str | None:
     if not _include_interpretation(mode, message):
         return None
@@ -433,6 +445,7 @@ def build_structured_response(
         raw = [
             _finding_from_marker(marker, latest=plan.intent != IntentType.previous_result)
             for marker in dedupe_markers(list(context.markers or []))
+            if _has_measured_value(marker)
         ]
         return StructuredResponse(
             mode=ResponseMode.result_list,
@@ -451,6 +464,7 @@ def build_structured_response(
     findings = [
         _finding_from_marker(marker, latest=plan.intent != IntentType.previous_result)
         for marker in _visible_markers(plan, context)
+        if _has_measured_value(marker)
     ]
     allowed_bioai: set[str] = set()
     for code in list(plan.domains or []) + list(context.domains or []):
@@ -458,6 +472,16 @@ def build_structured_response(
         if domain:
             allowed_bioai.update(domain.bioai_domains)
     for risk in context.bio_ai_risks or []:
+        if plan.intent not in {
+            IntentType.bio_ai_score,
+            IntentType.bio_ai_explanation,
+            IntentType.bio_ai_comparison,
+        } and context.intent not in {
+            IntentType.bio_ai_score,
+            IntentType.bio_ai_explanation,
+            IntentType.bio_ai_comparison,
+        }:
+            break
         if mode == ResponseMode.domain_summary and allowed_bioai and (risk.code or "").lower() not in allowed_bioai:
             continue
         if mode in {
@@ -498,9 +522,21 @@ def build_structured_response(
             reasoning_context=reasoning_context_codes(plan),
         )
     headline = _headline(plan, context, mode)
-    if context.intent == IntentType.bio_ai_score and context.bio_ai_risks:
+    if (context.intent == IntentType.bio_ai_score or plan.intent == IntentType.bio_ai_score) and context.bio_ai_risks:
         headline = "Your Bio-AI Report"
+    asks_explanation = bool(_MEANING.search(message or "") or re.search(r"\bwhat should i know\b", message or "", re.I))
+    if asks_explanation and plan.intent not in {IntentType.bio_ai_score, IntentType.bio_ai_explanation}:
+        findings = [
+            item
+            for item in findings
+            if item.source_type != "bio_ai_report" and (item.status or "") in {"high", "low", "critical"}
+        ][:5]
     interpretation = _extract_interpretation(answer, mode, message)
+    bio_report = (plan.intent == IntentType.bio_ai_score or context.intent == IntentType.bio_ai_score) and bool(
+        context.bio_ai_risks
+    )
+    if bio_report:
+        interpretation = None
     summary = None
     if mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary} and findings:
         if mode == ResponseMode.single_value and findings:
@@ -510,16 +546,32 @@ def build_structured_response(
             prefix = "Your previous" if plan.intent == IntentType.previous_result else "Your latest"
             summary = f"{prefix} {item.label} is {item.value}{unit}{status}.".replace("  ", " ")
             interpretation = None
-        elif context.intent == IntentType.bio_ai_score:
-            summary = "Your latest Bio-AI assessment shows:"
+        elif context.intent == IntentType.bio_ai_score or plan.intent == IntentType.bio_ai_score:
+            prose = sanitize_internal_ids(answer or "")
+            summary = None if _score_dump(prose) else prose or None
             interpretation = None
         elif mode == ResponseMode.result_list:
-            summary = f"{headline} from your retrieved records."
+            prose = sanitize_internal_ids(answer or "")
+            if asks_explanation and prose and not _score_dump(prose):
+                summary = prose
+            else:
+                summary = f"{headline} from your retrieved records."
             interpretation = None
         else:
-            summary = f"{headline} using the measurements available in your latest records."
+            prose = sanitize_internal_ids(answer or "")
+            if asks_explanation and prose and not _score_dump(prose):
+                summary = prose
+                interpretation = None
+            else:
+                summary = f"{headline} using the measurements available in your latest records."
     elif answer and mode in {ResponseMode.interpretation, ResponseMode.comparison, ResponseMode.trend, ResponseMode.health_overview}:
-        summary = None
+        prose = sanitize_internal_ids(answer)
+        if bio_report:
+            summary = None if _score_dump(prose) else prose or None
+            interpretation = None
+        else:
+            summary = prose or None
+            interpretation = None
     uncertainties = _uncertainties(plan, context)
     next_steps: list[str] = []
     if mode == ResponseMode.safety:
@@ -654,6 +706,7 @@ def strip_lookup_disclaimers(text: str, mode: ResponseMode) -> str:
 
 def sanitize_internal_ids(text: str) -> str:
     out = _REPORT_PAREN.sub("", text or "")
+    out = re.sub(r"(?i)^\s*general information:\s*", "", out)
     out = _REPORT_CLAUSE.sub("the retrieved report", out)
     out = _INTERNAL_ID.sub("", out)
     out = re.sub(r"\s{2,}", " ", out)

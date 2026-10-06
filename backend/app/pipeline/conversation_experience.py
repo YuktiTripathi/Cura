@@ -219,6 +219,8 @@ def select_next_action(
 def build_topic_summary(state: ConversationState | None, plan: QueryPlan) -> TopicSummary | None:
     if state is None or (state.topic_turn_count or 0) < 3:
         return None
+    if (plan.conversation_turn or "NEW_QUESTION") in {"NEW_QUESTION", "TOPIC_SWITCH"}:
+        return None
     facts = [state.previous_assistant_summary] if state.previous_assistant_summary else []
     told = list(state.recent_context_notes or [])[:3]
     remaining = state.previous_assistant_follow_up

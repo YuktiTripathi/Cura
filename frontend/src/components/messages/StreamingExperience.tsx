@@ -1,4 +1,5 @@
 import type { ExperienceBlock, PresentedFinding } from "../../types/chat";
+import { availableFindings } from "./FindingsTable";
 import { ValueCard } from "./ValueCard";
 
 type BlockGroup = {
@@ -38,7 +39,7 @@ function collect(blocks: ExperienceBlock[]): BlockGroup {
       }
     }
   }
-  return { direct, facts, interpretation, relevance, uncertainties, nextSteps };
+  return { direct, facts: availableFindings(facts), interpretation, relevance, uncertainties, nextSteps };
 }
 
 /**

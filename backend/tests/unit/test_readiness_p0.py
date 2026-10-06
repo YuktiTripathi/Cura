@@ -119,4 +119,6 @@ def test_high_risk_topic_without_evidence_is_redirected_in_prompt():
         medical_passages: list = []
 
     assert "HIGH RISK TOPIC" in _medical_block(Ctx(), "is this antibiotic safe in pregnancy")
-    assert "General information:" in _medical_block(Ctx(), "how much sleep do adults need")
+    block = _medical_block(Ctx(), "how much sleep do adults need")
+    assert "LOW RISK EDUCATION" in block
+    assert "General information:" not in block

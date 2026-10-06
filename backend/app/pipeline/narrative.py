@@ -85,7 +85,41 @@ def canonical_marker_key(marker) -> str:
 
 def canonical_display_label(marker) -> str:
     key = canonical_marker_key(marker)
-    return display_name_for(key) if key else (getattr(marker, "name", None) or "Result")
+    raw = display_name_for(key) if key else (getattr(marker, "name", None) or "Result")
+    return format_marker_name(raw)
+
+
+_ACRONYMS = {
+    "rdw", "cv", "sd", "mcv", "mch", "mchc", "hdl", "ldl", "vldl", "tsh", "t3", "t4",
+    "esr", "alc", "anc", "wbc", "rbc", "ast", "alt", "crp", "bmi", "pcv", "plt", "hba1c",
+    "egfr", "bun", "ggt", "sgot", "sgpt", "hb", "hgb",
+}
+_SUPERSCRIPTS = str.maketrans("0123456789+-", "⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻")
+
+
+def format_marker_name(name: str) -> str:
+    """Title-case a lab label and keep short codes uppercase (RDW, MCV, ALC)."""
+    parts = re.split(r"(\s+)", (name or "").strip())
+    out: list[str] = []
+    for part in parts:
+        if not part or not part.strip():
+            out.append(part)
+            continue
+        token = re.sub(r"[^a-z0-9]", "", part.lower())
+        if token in _ACRONYMS:
+            out.append(token.upper())
+        elif part[:1].isupper() and not part.islower():
+            out.append(part)
+        else:
+            out.append(part[:1].upper() + part[1:])
+    return "".join(out)
+
+
+def format_unit(unit: str | None) -> str | None:
+    """Render caret exponents as superscripts: 10^3/uL → 10³/uL."""
+    if not unit:
+        return unit
+    return re.sub(r"\^([0-9+\-]+)", lambda match: match.group(1).translate(_SUPERSCRIPTS), unit)
 
 
 def wants_raw_snapshot(message: str | None, plan: QueryPlan | None = None) -> bool:
@@ -163,7 +197,7 @@ def finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     return PresentedFinding(
         label=canonical_display_label(marker),
         value=value,
-        unit=getattr(marker, "unit", None),
+        unit=format_unit(getattr(marker, "unit", None)),
         status=_FLAG_STATUS.get(flag, flag or "unknown"),
         source_type="blood_report",
         source_date=dated,
@@ -190,11 +224,7 @@ def build_narrative_summary(
     groups = _merge_related_groups(groups)
     themes = _themes_from_groups(groups, context, present, message or (plan.raw_message if plan else "") or "")
     if llm_themes:
-        grounded = _ground_llm_themes(llm_themes, markers, raw)
-        if 3 <= len(grounded) <= 5:
-            themes = grounded
-        elif grounded:
-            themes = (grounded + [item for item in themes if item.status == ThemeStatus.reassuring])[:5]
+        themes = _overlay_llm_wording(themes, llm_themes, markers, raw)
     extra_missing = _question_missing(message or (plan.raw_message if plan else "") or "", context, present)
     if extra_missing and themes:
         target = next((item for item in themes if item.status != ThemeStatus.reassuring), themes[0])
@@ -225,15 +255,10 @@ def flatten_narrative(
     themes: list[HealthTheme],
     next_action: str | None = None,
 ) -> str:
+    """Lead text only. Theme cards already show each pattern, so values are not repeated here."""
+    del themes
     parts = [overall.strip()] if overall else []
-    for theme in themes:
-        block = theme.title
-        if theme.interpretation:
-            block = f"{theme.title}. {theme.interpretation}"
-        if theme.missing_information:
-            block += " " + " ".join(theme.missing_information)
-        parts.append(block.strip())
-    if next_action:
+    if next_action and next_action.lower() not in (overall or "").lower():
         parts.append(next_action)
     return "\n\n".join(part for part in parts if part).strip()
 
@@ -261,7 +286,19 @@ def _theme_code(key: str) -> str:
     if key in _LIPID_KEYS:
         return "lipid_health"
     domain = domain_for_entity(key)
-    return domain.code if domain else "other"
+    if domain:
+        return domain.code
+    lowered = key.replace("_", " ")
+    tokens = set(lowered.split())
+    if tokens & {"rdw", "hematocrit", "mch", "mcv", "mchc"} or any(
+        token in lowered for token in ("rdw", "hematocrit", "haemoglobin", "hemoglobin")
+    ):
+        return "red_cell_anaemia_health"
+    if tokens & {"neutrophil", "lymphocyte", "eosinophil", "monocyte", "basophil"} or any(
+        token in lowered for token in ("neutrophil", "lymphocyte", "eosinophil", "monocyte", "basophil", "leukocyte", "leucocyte")
+    ):
+        return "white_cell_immune_profile"
+    return "other"
 
 
 def _group_markers(markers: list) -> dict[str, list]:
@@ -382,6 +419,8 @@ def _score_theme(
 
 
 def _title(code: str) -> str:
+    if code == "other":
+        return "Other results"
     return _DOMAIN_TITLE.get(code, code.replace("_", " ").replace(" health", "").title())
 
 
@@ -449,20 +488,19 @@ def _question_missing(message: str, context: HealthContext, present: set[str]) -
 
 
 def _interpret(code: str, findings: list[PresentedFinding], persistent: int, bio_support: int) -> str:
+    del code
     bits = []
     for item in findings[:4]:
-        unit = f" {item.unit}" if item.unit else ""
+        name = format_marker_name(item.label or "Result")
+        unit = f" {format_unit(item.unit)}" if item.unit else ""
         status = (item.status or "").replace("_", " ")
         value = item.value if item.value is not None else "not available"
-        bits.append(f"{item.label} is {value}{unit} ({status})" if status else f"{item.label} is {value}{unit}")
+        bits.append(f"{name} is {value}{unit} ({status})" if status else f"{name} is {value}{unit}")
     lead = "; ".join(bits) + "."
-    if len(findings) >= 2:
-        lead += " These sit together as one pattern rather than separate unrelated alerts."
     if persistent:
-        lead += " The same pattern is also present when looking across recent reports."
+        lead += " The same pattern is also present across recent reports."
     if bio_support:
-        lead += " Your Bio-AI assessment points in a similar direction and remains an assessment, not a diagnosis."
-    lead += " This can be worth discussing with a clinician; it is not a diagnosis."
+        lead += " The Bio-AI assessment points in a similar direction."
     return lead
 
 
@@ -481,15 +519,68 @@ def _overall_summary(themes: list[HealthTheme]) -> str:
     ]
     reassuring = [item for item in themes if item.status == ThemeStatus.reassuring]
     if attention and reassuring:
+        focus = attention[0].title
         return (
-            f"Most of your major health areas look reassuring, but the main pattern that stands out is "
-            f"{attention[0].title.lower()}."
+            f"Most of your major health areas look reassuring, but the main pattern that stands out is {focus}. "
+            "This is a reading of your records, not a diagnosis."
         )
     if attention:
-        return f"The main pattern that stands out is {attention[0].title.lower()}."
+        return (
+            f"The main pattern that stands out is {attention[0].title}. "
+            "This is a reading of your records, not a diagnosis."
+        )
     if reassuring:
         return "Most of the available measurements look reassuring."
     return "Here is a concise reading of the health records currently available."
+
+
+def _overlay_llm_wording(
+    themes: list[HealthTheme],
+    raw: list[dict],
+    markers: list,
+    findings: list[PresentedFinding],
+) -> list[HealthTheme]:
+    """Keep the grouped cards, and replace their sentences with the model's wording when it stays on those results."""
+    grounded = _ground_llm_themes(raw, markers, findings)
+    used: set[int] = set()
+    for theme in themes:
+        if theme.status == ThemeStatus.reassuring:
+            continue
+        best_index = None
+        best_score = 0
+        theme_ids = set(theme.supporting_fact_ids)
+        title_words = {word for word in re.split(r"\W+", theme.title.lower()) if len(word) > 2}
+        for index, item in enumerate(grounded):
+            if index in used:
+                continue
+            shared = theme_ids & set(item.supporting_fact_ids)
+            words = {word for word in re.split(r"\W+", item.title.lower()) if len(word) > 2}
+            score = len(shared) * 3 + len(title_words & words)
+            if score > best_score:
+                best_index, best_score = index, score
+        if best_index is None or best_score <= 0:
+            continue
+        chosen = grounded[best_index]
+        if not _wording_stays_on_findings(chosen.interpretation, theme.related_findings):
+            continue
+        theme.interpretation = chosen.interpretation
+        if chosen.next_step:
+            theme.next_step = chosen.next_step
+        used.add(best_index)
+    return themes
+
+
+def _wording_stays_on_findings(text: str, findings: list[PresentedFinding]) -> bool:
+    """Reject a sentence that introduces a measurement the card does not contain."""
+    allowed: set[str] = set()
+    for item in findings:
+        if item.value is not None:
+            allowed.add(str(item.value).rstrip("0").rstrip(".") if "." in str(item.value) else str(item.value))
+            allowed.add(str(item.value))
+    for number in re.findall(r"\d+(?:\.\d+)?", text or ""):
+        if number not in allowed and number.lstrip("0") not in {value.lstrip("0") for value in allowed}:
+            return False
+    return True
 
 
 def _ground_llm_themes(raw: list[dict], markers: list, findings: list[PresentedFinding]) -> list[HealthTheme]:

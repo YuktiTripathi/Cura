@@ -54,18 +54,18 @@ class Settings(BaseSettings):
     allow_mock_header_override: bool = False
     answer_model_fast_reasoning: str = "openai/gpt-5.6-luna"
     answer_model_standard_medical: str = "google/gemini-3.8-flash"
-    answer_model_deep_medical: str = "anthropic/claude-sonnet-5"
+    answer_model_deep_medical: str = "google/gemini-3.8-flash"
     answer_model_nano: str = "openai/gpt-5.6-luna"
     answer_model_standard: str = "google/gemini-3.8-flash"
-    answer_model_advanced: str = "anthropic/claude-sonnet-5"
+    answer_model_advanced: str = "google/gemini-3.8-flash"
     llm_allowed_providers: str = "openrouter"
     llm_allowed_models: str = (
-        "openai/gpt-5.6-luna,google/gemini-3.8-flash,anthropic/claude-sonnet-5,"
-        "openai/gpt-4o-mini,typesafe/jev-1.13,anthropic/claude-sonnet-4.6"
+        "openai/gpt-5.6-luna,google/gemini-3.8-flash,"
+        "openai/gpt-4o-mini,typesafe/jev-1.13"
     )
     assistant_quality_v2: bool = True
     llm_json_schema_output: bool = True
-    eval_candidate_model: str = "anthropic/claude-sonnet-4.6"
+    eval_candidate_model: str = "google/gemini-3.8-flash"
     # Request OpenRouter not to use prompts for training. This is not proof of ZDR.
     openrouter_data_collection_deny: bool = True
     # Route via OpenRouter ZDR-eligible endpoints when true. CURA cannot independently

@@ -7,6 +7,7 @@ from app.llm.structured import parse_llm_structured
 from app.main import app
 from app.pipeline.lab_parameters import canonicalize_marker_name, display_name_for
 from app.pipeline.narrative import (
+    _overlay_llm_wording,
     build_narrative_summary,
     canonical_display_label,
     dedupe_markers,
@@ -177,6 +178,8 @@ def test_chat_health_summary_does_not_dump_the_full_report():
     assert " ast " not in interp
     assert "urea" not in interp
     assert "not a diagnosis" in answer
+    assert "sit together as one pattern" not in answer
+    assert answer.count("not a diagnosis") == 1
     assert pres["next_steps"]
 
 
@@ -203,6 +206,35 @@ def test_chat_related_iron_pattern_is_grouped():
     labels = [item["label"].lower() for item in related]
     assert any("hemoglobin" in label or "haemoglobin" in label for label in labels)
     assert any("iron" in label for label in labels)
+
+
+def test_llm_wording_replaces_the_repeated_card_sentence():
+    markers = [
+        _marker(id="hb", key="hemoglobin", name="Haemoglobin", value=10.5, unit="g/dL", flag=MarkerFlag.low),
+        _marker(id="mcv", key="mcv", name="MCV", value=76.9, unit="fL", flag=MarkerFlag.low),
+    ]
+    context = _context(markers)
+    overall, themes, raw, _ = build_narrative_summary(context, message="Summarize my health scenario")
+    attention = next(item for item in themes if item.status != "reassuring")
+    rewritten = _overlay_llm_wording(
+        themes,
+        [
+            {
+                "title": "Red cell and iron findings",
+                "priority": "high",
+                "status": "needs_attention",
+                "supporting_fact_ids": ["hemoglobin", "mcv"],
+                "interpretation": "Haemoglobin at 10.5 g/dL and MCV at 76.9 fL sit on the low side of the red-cell picture.",
+                "next_step": "A clinician can decide whether this red-cell pattern needs a closer look.",
+            }
+        ],
+        markers,
+        raw,
+    )
+    card = next(item for item in rewritten if item.status != "reassuring")
+    assert "sit on the low side" in card.interpretation
+    assert "is 10.5" not in card.interpretation
+    assert overall
 
 
 def test_llm_theme_payload_is_parsed():
