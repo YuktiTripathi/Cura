@@ -12,7 +12,8 @@ from app.contracts.chat import ChatRequest, ChatResponse, public_chat_response
 from app.core.config import settings
 from app.core.consent import require_consent
 from app.core.errors import CuraError
-from app.core.request_controls import request_controls
+from app.core.metrics import observe_chat
+from app.core.request_controls import chat_capacity, request_controls
 from app.db.session import SessionLocal, get_db
 from app.pipeline.observability import ProgressEmitter
 from app.pipeline.service import ChatService
@@ -37,7 +38,11 @@ def chat(
     if cached:
         cached.meta.cache_hit = True
         return _client_view(cached)
-    response = ChatService(db, get_registry()).chat(principal, payload, request_id)
+    chat_capacity.acquire()
+    try:
+        response = ChatService(db, get_registry()).chat(principal, payload, request_id)
+    finally:
+        chat_capacity.release()
     _record_usage(principal.subject_id, response)
     request_controls.idempotency_store(
         principal.subject_id, idempotency_key, payload, response
@@ -47,6 +52,7 @@ def chat(
 
 def _record_usage(subject_id: str, response: ChatResponse) -> None:
     meta = response.meta
+    observe_chat(meta)
     used = (meta.input_tokens or 0) + (meta.output_tokens or 0) + (meta.jev_input_tokens or 0) + (meta.jev_output_tokens or 0)
     request_controls.record_token_usage(subject_id, used)
 
@@ -87,6 +93,7 @@ def chat_stream(
             headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
         )
 
+    chat_capacity.acquire()
     events_q: queue.Queue = queue.Queue()
 
     def on_progress(event) -> None:
@@ -120,6 +127,7 @@ def chat_stream(
             events_q.put(("error", {"code": "INTERNAL_ERROR", "message": "Something went wrong. Please try again."}))
         finally:
             session.close()
+            chat_capacity.release()
 
     thread = threading.Thread(target=worker, daemon=True)
     thread.start()

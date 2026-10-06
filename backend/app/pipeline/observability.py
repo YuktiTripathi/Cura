@@ -138,6 +138,9 @@ class ProgressEmitter:
             return 0
         ms = int((time.perf_counter() - started) * 1000)
         self.timing.marks[name] = ms
+        from app.core.metrics import observe_stage
+
+        observe_stage(name, ms)
         return ms
 
     def finish(self, *, llm_calls: int = 0, input_tokens: int | None = None, output_tokens: int | None = None) -> TimingReport:

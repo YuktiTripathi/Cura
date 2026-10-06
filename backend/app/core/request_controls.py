@@ -223,3 +223,36 @@ class RequestControlStore:
 
 
 request_controls = RequestControlStore()
+
+
+class ChatCapacity:
+    """Per-process cap on concurrent chats so a full worker sheds load instead of queueing."""
+
+    def __init__(self) -> None:
+        self._lock = threading.Lock()
+        self._in_flight = 0
+
+    def acquire(self) -> None:
+        from app.core.errors import OverloadedError
+        from app.core.metrics import IN_FLIGHT, SHED
+
+        with self._lock:
+            if self._in_flight >= max(1, int(settings.max_in_flight_chats)):
+                SHED.inc()
+                raise OverloadedError(retry_after=2)
+            self._in_flight += 1
+            IN_FLIGHT.set(self._in_flight)
+
+    def release(self) -> None:
+        from app.core.metrics import IN_FLIGHT
+
+        with self._lock:
+            self._in_flight = max(0, self._in_flight - 1)
+            IN_FLIGHT.set(self._in_flight)
+
+    @property
+    def in_flight(self) -> int:
+        return self._in_flight
+
+
+chat_capacity = ChatCapacity()

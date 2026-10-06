@@ -76,6 +76,19 @@ class RateLimitedError(CuraError):
         super().__init__("RATE_LIMITED", message, 429)
 
 
+class OverloadedError(CuraError):
+    """This process is at capacity; the client should retry after ``retry_after`` seconds."""
+
+    def __init__(self, retry_after: int = 2):
+        super().__init__(
+            "OVERLOADED",
+            "Cura is busy right now. Please try again in a moment.",
+            429,
+            {"retry_after_seconds": retry_after},
+        )
+        self.retry_after = retry_after
+
+
 class InternalError(CuraError):
     def __init__(self, message: str = "Internal error"):
         super().__init__("INTERNAL_ERROR", message, 500)
@@ -89,9 +102,11 @@ async def cura_error_handler(_request: Request, exc: CuraError) -> JSONResponse:
     if isinstance(exc, ProviderUnavailableError):
         message = PERSONAL_DATA_UNAVAILABLE
         details = {}
+    headers = {"Retry-After": str(exc.retry_after)} if isinstance(exc, OverloadedError) else None
     return JSONResponse(
         status_code=exc.status_code,
         content={"error": {"code": exc.code, "message": message, "details": details}},
+        headers=headers,
     )
 
 

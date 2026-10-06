@@ -75,36 +75,38 @@ class PromptBuilder:
         if personal:
             compact = _use_compact_context(context)
             payload = _minimal_context_payload(context, compact=compact)
+            # Stable text and the member's data come first and the question last, so
+            # follow-up turns share a long prefix that providers can cache (plan 6, lever 3).
             user = (
                 "Mode: PERSONAL_HEALTH\n"
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
-                f"User question: {user_message}\n"
-                f"Answer depth: {context.answer_depth.value}\n"
-                f"{depth}\n"
-                f"{_adaptive_response_brief(context)}"
-                "Conversation focus (topic and follow-up only; never a source of current lab values): "
-                f"{conversation_summary}\n"
-                f"Data source: {context.data_source}\n"
-                + (f"Routing (not medical evidence): {routing_note}\n" if routing_note else "")
-                + "DISPLAY_ENTITIES are what the user asked to see. REASONING_CONTEXT is background only; surface it only when it changes the answer.\n"
+                "DISPLAY_ENTITIES are what the user asked to see. REASONING_CONTEXT is background only; surface it only when it changes the answer.\n"
                 "General medical evidence may explain the personal facts, but must not replace or alter them.\n"
+                f"Data source: {context.data_source}\n"
                 + _fact_kind_blocks(context)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{payload}\n"
                 + _medical_block(context, user_message)
+                + "Conversation focus (topic and follow-up only; never a source of current lab values): "
+                f"{conversation_summary}\n"
+                + (f"Routing (not medical evidence): {routing_note}\n" if routing_note else "")
+                + f"Answer depth: {context.answer_depth.value}\n"
+                f"{depth}\n"
+                f"{_adaptive_response_brief(context)}"
+                f"User question: {user_message}\n"
             )
         else:
             topic = context.resolved_topic_name or "the asked topic"
             user = (
                 "Mode: GENERAL_HEALTH\n"
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
-                f"User question: {user_message}\n"
-                f"Topic: {topic}\n"
                 "Answer from the retrieved medical evidence below when present. "
                 "Do not use or invent personal SuperShyft values. "
                 "Do not say 'your result' or 'your report'. "
                 "Do not name any organization that is not in the retrieved evidence. "
                 "Do not write a Source line.\n"
                 + _medical_block(context, user_message)
+                + f"Topic: {topic}\n"
+                f"User question: {user_message}\n"
             )
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else SAFETY_INSTRUCTIONS
         return [

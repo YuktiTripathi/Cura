@@ -1,5 +1,6 @@
 import logging
 import time
+from contextlib import asynccontextmanager
 import uuid
 from pathlib import Path
 import sys
@@ -15,6 +16,8 @@ from app.api.router import api_router
 from app.api.routes.chat import compat_router as chat_compat_router
 from app.api.routes.voice import compat_router as voice_compat_router
 from app.core.config import settings
+from app.core.metrics import HTTP_LATENCY, HTTP_REQUESTS
+from app.core.metrics import render as render_metrics
 from app.core.errors import CuraError, cura_error_handler, http_error_handler
 from app.core.invariants import assert_production_config, assert_safe_auth_health_pairing
 from app.core.logging import configure_logging
@@ -32,7 +35,17 @@ try:
 except Exception:
     logging.getLogger("cura").warning("pending_document_job_drain_failed")
 
-app = FastAPI(title="Cura", version="0.1.0")
+@asynccontextmanager
+async def lifespan(_app):
+    # Chat handlers are sync and wait on Jev and the model in a worker thread. Size the
+    # pool deliberately instead of relying on the ~40 thread default (plan 5.3).
+    import anyio.to_thread
+
+    anyio.to_thread.current_default_thread_limiter().total_tokens = max(8, int(settings.worker_threads))
+    yield
+
+
+app = FastAPI(title="Cura", version="0.1.0", lifespan=lifespan)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[o.strip() for o in settings.cors_origins.split(",") if o.strip()],
@@ -81,6 +94,9 @@ async def request_id_middleware(request: Request, call_next):
         )
         raise
     response.headers["X-Request-Id"] = request.state.request_id
+    route = getattr(request.scope.get("route"), "path", "unmatched")
+    HTTP_REQUESTS.labels(request.method, route, str(response.status_code)).inc()
+    HTTP_LATENCY.labels(request.method, route).observe(time.perf_counter() - started)
     logging.getLogger("cura").info(
         "request request_id=%s method=%s path=%s status=%s latency_ms=%s",
         request.state.request_id,
@@ -90,6 +106,17 @@ async def request_id_middleware(request: Request, call_next):
         int((time.perf_counter() - started) * 1000),
     )
     return response
+
+
+@app.get("/metrics", include_in_schema=False)
+def metrics(request: Request):
+    from fastapi.responses import Response
+
+    token = (settings.metrics_token or "").strip()
+    if token and request.headers.get("Authorization", "") != f"Bearer {token}":
+        return Response(status_code=401)
+    body, content_type = render_metrics()
+    return Response(content=body, media_type=content_type)
 
 
 @app.get("/health")

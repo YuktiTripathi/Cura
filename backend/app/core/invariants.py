@@ -59,7 +59,10 @@ def production_config_problems(cfg: Settings) -> list[str]:
     if (cfg.auth_provider or "").strip().lower() not in MOCK_AUTH_PROVIDERS:
         secret = cfg.auth_jwt_secret or ""
         algorithm = (cfg.auth_jwt_algorithm or "").upper()
-        if algorithm.startswith("HS") and (_looks_placeholder(secret) or len(secret) < 32):
+        if (cfg.auth_jwks_url or "").strip():
+            if not cfg.auth_jwks_url.strip().lower().startswith("https://"):
+                problems.append("AUTH_JWKS_URL must use https")
+        elif algorithm.startswith("HS") and (_looks_placeholder(secret) or len(secret) < 32):
             problems.append("AUTH_JWT_SECRET is empty, a placeholder, or shorter than 32 characters")
         if not (cfg.auth_jwt_issuer or "").strip() or not (cfg.auth_jwt_audience or "").strip():
             problems.append("AUTH_JWT_ISSUER and AUTH_JWT_AUDIENCE must be set")

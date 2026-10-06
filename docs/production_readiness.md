@@ -31,7 +31,13 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 1.7 Retention and deletion | Code: deleting a conversation or document also removes extracted facts, interactions, feedback and jobs, with an audit row. `scripts/purge_expired.py` deletes documents after 90 days and conversations after 365 (`CONVERSATION_RETENTION_DAYS`). **Owner action: schedule it daily** |
 | 2.7 Output check | Code: dose, stop, skip and switch instructions in model answers are removed (negated advice is kept), and a failed check returns a safe fallback |
 | 3.5 Local digits | Code: Devanagari, Gurmukhi, Gujarati and Bengali digits are normalized before the numeric grounding check |
-| 5.3 (part) Model timeout | Code: the default chat model timeout is 30 s instead of 180 s |
+| 1.8 Asymmetric tokens | Code: with `AUTH_JWKS_URL` set, Cura verifies RS256 tokens against Supershyft's public keys, requires `exp`, `iss` and `aud`, and rejects HS256. **Owner action: Supershyft publishes a JWKS endpoint; httpOnly cookie on the web, Keychain/Keystore on Flutter** |
+| 5.1 Containerize | Code: `Dockerfile` with several workers and no reload, running as non-root, with a health check. CI builds the image. **Owner action: ECS/Fargate service and autoscaling** |
+| 5.3 Waiting model | Code: the model timeout is 30 s instead of 180 s, the thread pool is sized explicitly, and a full process returns 429 with `Retry-After`. Converting the handlers to async is still open |
+| 5.6 Observability | Code: Prometheus `/metrics` with per-stage latency, outcomes, fallbacks, safety flags, tokens and cost; alerts are listed in `docs/operations.md` |
+| 5.7 Load test | Code: k6 script `scripts/load/chat_mix.js` with the plan's targets as thresholds. **Owner action: run it on staging** |
+| 5.8 Release hygiene | Code: `requirements.lock`, and CI installs from the lock file and builds the image |
+| 6 lever 3 Prompt caching | Code: stable text and member data come first and the question last. **Owner action: confirm cache hits in the provider usage report** |
 | 6.7 (part) Budgets | Code: each member has a daily model token budget (`MEMBER_DAILY_TOKEN_BUDGET`, default 200,000) and gets a clear message when it runs out. The monthly spend alert is still open |
 
 ## Still open

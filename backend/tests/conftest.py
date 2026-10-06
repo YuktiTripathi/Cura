@@ -25,9 +25,13 @@ OpenAICompatibleLLMClient._real_complete = OpenAICompatibleLLMClient.complete
 
 def _test_llm_complete(self, messages, json_mode=False):
     user = next((m.get("content", "") for m in messages if m.get("role") == "user"), "")
+    # The question is the last line of the prompt (prompt caching layout).
+    question = next((line for line in reversed(user.splitlines()) if line.startswith("User question:")), "")
     return (
         "This is general medical education, not a personal lab result. "
         "HbA1c LDL HDL TSH Vitamin D B12 CRP insulin resistance metabolic age. "
+        + question
+        + " "
         + user[:240]
     )
 

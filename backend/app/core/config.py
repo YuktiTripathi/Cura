@@ -21,6 +21,10 @@ class Settings(BaseSettings):
     health_provider: str = "mock"
     auth_jwt_secret: str = ""
     auth_jwt_algorithm: str = "HS256"
+    # Preferred: Supershyft's JWKS endpoint for RS256/ES256 tokens. When set, the shared
+    # HS256 secret is not used and exp, iss and aud are required.
+    auth_jwks_url: str = ""
+    auth_jwt_algorithms: str = "RS256"
     auth_jwt_issuer: str = ""
     auth_jwt_audience: str = ""
     auth_subject_claim: str = "sub"
@@ -120,6 +124,12 @@ class Settings(BaseSettings):
     supershyft_db_connect_timeout: int = 10
 
     log_level: str = "INFO"
+    # Bearer token required on GET /metrics when set (recommended in production).
+    metrics_token: str = ""
+    # Chat requests one process handles at once; more get 429 with Retry-After.
+    max_in_flight_chats: int = 32
+    # Worker threads for sync handlers (chat waits on Jev and the model in a thread).
+    worker_threads: int = 64
     dev_auth_header: bool = True
     cors_origins: str = (
         "http://localhost:5173,http://127.0.0.1:5173,"
