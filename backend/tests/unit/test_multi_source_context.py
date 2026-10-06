@@ -119,7 +119,9 @@ def test_pdf_plus_supershyft_blood_compare(tmp_path, monkeypatch):
 
 def test_pdf_plus_bio_ai_uses_both_sources(tmp_path, monkeypatch):
     monkeypatch.setattr(settings, "document_storage_path", str(tmp_path / "uploads"))
-    did = _upload()
+    # demo-user-002 has one Bio-AI report; demo-user-001 has two on the same date, which
+    # correctly triggers a "which report?" clarification instead of a combined answer.
+    did = _upload(user="demo-user-002")
     plan = build_query_plan(
         "Considering this report and my Bio-AI results, what should I improve?",
         document_ids=[did],
@@ -129,7 +131,7 @@ def test_pdf_plus_bio_ai_uses_both_sources(tmp_path, monkeypatch):
     assert not is_lab_source_compare(plan)
     body = client.post(
         "/api/v1/chat",
-        headers=H,
+        headers={"X-Cura-User-Id": "demo-user-002"},
         json={
             "message": "Considering this report and my Bio-AI results, what should I improve?",
             "document_ids": [did],
