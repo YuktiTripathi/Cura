@@ -134,9 +134,11 @@ def test_blood_bio_questionnaire_and_evidence_together():
     assert plan.medical_evidence_required is True
     ctx = ContextBuilder(build_registry()).build(Q1, plan)
     prompt = "\n".join(item["content"] for item in PromptBuilder().build(ctx, "", plan.raw_message))
-    assert "PERSONAL BLOOD DATA" in prompt
-    assert "QUESTIONNAIRE RESPONSES" in prompt
-    assert "BIO-AI DATA" in prompt
+    # Selected evidence keeps the three sources distinct and labelled.
+    assert "ANSWER EVIDENCE JSON:" in prompt
+    assert "measured blood result" in prompt
+    assert "questionnaire (user-reported)" in prompt
+    assert "Bio-AI risk assessment (not a diagnosis)" in prompt
     assert ctx.markers
     assert ctx.questionnaire
     assert ctx.bio_ai_risks or ctx.facts

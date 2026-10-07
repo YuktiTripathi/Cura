@@ -88,6 +88,7 @@ from app.pipeline.renderer import (
 )
 from app.core.log_ids import subject_ref
 from app.pipeline.claim_check import supporting_passages
+from app.pipeline.questionnaire_relevance import should_enrich_with_questionnaire
 from app.retrieval.hybrid import HybridMedicalKnowledgeProvider
 from app.retrieval.medical import passage_label
 from app.pipeline.translation import target_language, translate_answer
@@ -756,6 +757,23 @@ class ChatService:
                 meta=_meta(status=status, llm_mode="none"),
             )
 
+        # Relevance-driven questionnaire enrichment: fetch lifestyle answers only when they can
+        # change this answer (advice, "why", priorities, reviews), never for a plain lookup.
+        if (
+            not plan.needs_questionnaire
+            and plan.knowledge_scope == KnowledgeScope.personal
+            and should_enrich_with_questionnaire(
+                payload.message,
+                personal=True,
+                entities=list(dict.fromkeys([*(plan.requested_metrics or []), *([plan.topic] if plan.topic else [])])),
+                domains=list(plan.domains or []),
+                overall=plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
+                or "overall_health" in (plan.domains or []),
+            )
+        ):
+            plan = plan.model_copy(update={"needs_questionnaire": True})
+            eval_turn["questionnaire_enriched"] = True
+
         general_only = (
             plan.knowledge_scope == KnowledgeScope.general
             and not plan.needs_personal_data
@@ -873,6 +891,11 @@ class ChatService:
             context.medical_passages = [passage_label(doc) for doc in medical_hits]
             attach_medical_evidence(context, medical_hits)
             ContextMerger().merge_into(context, plan, principal.subject_id)
+        # Recent user statements ("I now work out 5 days a week") supersede older questionnaire answers.
+        context.recent_user_messages = [
+            m.content for m in sorted(getattr(conv, "messages", None) or [], key=lambda m: (m.created_at or m.id, m.id))
+            if m.role == "user"
+        ][-4:]
         eval_turn["medical"] = medical_hits
         eval_turn["context"] = context
 
@@ -1747,6 +1770,9 @@ class ChatService:
         meta.timing = timing.model_dump(exclude_none=True)
         self._progress.emit(ProcessingStage.complete)
         medical = turn.get("medical") or []
+        trace_context = turn.get("context")
+        if settings.is_development and trace_context is not None and getattr(trace_context, "answer_evidence_trace", None):
+            meta.debug = {**(meta.debug or {}), "answer_evidence": trace_context.answer_evidence_trace}
         jev_trace = turn.get("jev_trace")
         if medical and not plan.needs_personal_data:
             # Cite only passages that support a claim in the answer (plan 4.7).

@@ -1,4 +1,4 @@
-import type { StructuredResponse, TestingOption } from "../../types/chat";
+import type { PresentedFinding, StructuredResponse, TestingOption } from "../../types/chat";
 import { AssistantBody } from "./AssistantBody";
 import { availableFindings, FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsTable";
 import { TestingOptionCard } from "./TestingOptionCard";
@@ -31,6 +31,7 @@ export function PresentedAnswer({
     Boolean(presentation.headline) &&
     presentation.headline?.trim().toLowerCase() !== "nutrition";
   const findings = availableFindings(presentation.findings || []);
+  const relatedFindings = uniqueRelated(presentation.related_findings || [], findings);
   const gaps = (presentation.uncertainties || []).filter((item) => !isDisclaimer(item));
   const notes = (presentation.uncertainties || []).filter(isDisclaimer);
   const useCards = findings.length > 0 && findings.length <= 3 && presentation.mode !== "SINGLE_VALUE";
@@ -95,12 +96,23 @@ export function PresentedAnswer({
           <AssistantBody content={fallback} />
         </p>
       ) : null}
-      {(presentation.related_findings || []).length > 0 ? (
-        <RelatedResults findings={presentation.related_findings || []} />
+      {relatedFindings.length > 0 ? (
+        <RelatedResults findings={relatedFindings} />
       ) : null}
       {(testingOption || presentation.testing_option) ? (
         <TestingOptionCard option={(testingOption || presentation.testing_option)!} />
       ) : null}
     </div>
   );
+}
+
+/** Single visual owner: a value already shown above is not repeated under related results. */
+export function uniqueRelated(related: PresentedFinding[], shown: PresentedFinding[]): PresentedFinding[] {
+  const seen = new Set(shown.map((f) => f.canonical_key || f.label));
+  return related.filter((f) => {
+    const key = f.canonical_key || f.label;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
 }

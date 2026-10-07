@@ -95,6 +95,14 @@ def keys_for_plan(
     message: str = "",
 ) -> list[str]:
     keys: list[str] = []
+    lab_metrics = [item for item in (requested_metrics or []) if item in LAB_METRIC_KEYS]
+    if topic in LAB_METRIC_KEYS and topic not in lab_metrics:
+        lab_metrics.append(topic)
+    if lab_metrics:
+        # Personalization for a marker question: only the answers that could change its advice.
+        from app.pipeline.questionnaire_relevance import relevant_questionnaire_keys
+
+        keys.extend(relevant_questionnaire_keys(lab_metrics))
     for item in requested_metrics or []:
         if item in LAB_METRIC_KEYS:
             continue

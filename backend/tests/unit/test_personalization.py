@@ -91,7 +91,11 @@ def test_cross_source_plan_keeps_separated_evidence():
     assert ctx.markers or ctx.bio_ai_risks or ctx.scenario
     messages = PromptBuilder().build(ctx, "Current topic: lipids", "What should I focus on?")
     blob = messages[1]["content"]
-    assert "MEASURED_DATA JSON:" in blob
+    # Personal answers now receive selected ANSWER EVIDENCE instead of the full record dump,
+    # but every fact still carries its source and the boundaries are stated explicitly.
+    assert "ANSWER EVIDENCE JSON:" in blob
+    assert "measured blood result" in blob
+    assert "SOURCE BOUNDARIES" in blob
     assert "never a source of current lab values" in blob
 
 

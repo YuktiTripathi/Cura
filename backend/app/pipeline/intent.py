@@ -229,6 +229,18 @@ _PROFILE = re.compile(
     re.I,
 )
 _PERSONAL_ACTION = re.compile(r"\b(what should i|what can i|for me)\b", re.I)
+# "How can I improve my HbA1c?" asks for advice about the member's own result: it needs their
+# data (and lifestyle context), unlike "how to lower LDL". Not a trend question either.
+_PERSONAL_IMPROVE = re.compile(
+    r"\b(?:improve|lower|reduce|raise|increase|bring down|bring up|fix|manage|control|boost|get)\s+"
+    r"(?:up\s+|down\s+)?my\b",
+    re.I,
+)
+
+
+def is_personal_improvement_request(message: str) -> bool:
+    text = normalize_for_intent(message)
+    return bool(_PERSONAL_IMPROVE.search(text)) and not _HYPOTHETICAL.search(text)
 _CASUAL = re.compile(
     r"^\s*("
     r"hi|hello|hey|howdy|"
@@ -512,7 +524,9 @@ def classify_intent(
 
     if marker and personal_turn and _PREVIOUS.search(text):
         return IntentType.previous_result, marker, _name(marker), depth
-    if marker and personal_turn and (_TREND.search(text) or _TREND_I18N.search(text)):
+    if marker and personal_turn and not is_personal_improvement_request(message) and (
+        _TREND.search(text) or _TREND_I18N.search(text)
+    ):
         return IntentType.trend, marker, _name(marker), depth
     if is_provenance_request(message):
         topic = marker or follow_up_topic
@@ -521,6 +535,9 @@ def classify_intent(
         return IntentType.general_health_question, marker, _name(marker), depth
     if marker and (_contains(text, "why", "what does", "mean", "normal", "ok", "okay") or (contextual and educational and prior_personal)):
         return IntentType.blood_marker_explanation, marker, _name(marker), depth
+    if marker and is_personal_improvement_request(message):
+        # Advice about the member's own result (a personal turn): interpret it, then personalize the steps.
+        return IntentType.blood_marker_explanation, marker, _name(marker), AnswerDepth.focused
     if marker:
         return IntentType.latest_result, marker, _name(marker), AnswerDepth.simple
 

@@ -204,6 +204,11 @@ class ResponseComposer:
                     "so I would not suggest changing anything based on this report alone."
                 )
                 presentation.summary = text
+        from app.pipeline.presentation_policy import apply_presentation_policy
+
+        presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
+        if context.answer_evidence_trace is not None:
+            context.answer_evidence_trace.update(policy_trace)
         return text, combined, presentation
 
 

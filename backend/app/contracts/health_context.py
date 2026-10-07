@@ -170,3 +170,8 @@ class HealthContext(BaseModel):
     resolved_user_message: str | None = None
     response_plan_mode: str | None = None
     open_threads: list[str] = Field(default_factory=list)
+    # Recent user messages in this conversation (newest last), for lifestyle statements that
+    # supersede older questionnaire answers. Never a source of lab values.
+    recent_user_messages: list[str] = Field(default_factory=list)
+    # Developer trace of what the answer director selected (never shown to members).
+    answer_evidence_trace: dict | None = None

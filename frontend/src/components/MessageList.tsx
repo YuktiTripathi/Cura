@@ -117,7 +117,10 @@ export function MessageList({
             {m.role === "user" && editingIndex !== i && onEditQuestion && (
               <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
             )}
-            {m.role === "assistant" && m.presentation ? <InsightNote insights={readInsights(m.presentation.proactive_insights)} /> : null}
+            {m.role === "assistant" && m.presentation && !(m.testingOption || m.presentation.testing_option) ? (
+              // One proactive element per turn: a testing card already is that element.
+              <InsightNote insights={readInsights(m.presentation.proactive_insights, 1)} />
+            ) : null}
             {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
             {m.recommendations && <Recommendations items={m.recommendations} />}
             {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} contacts={m.meta.emergency_contacts} />}
