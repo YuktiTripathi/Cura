@@ -2,6 +2,7 @@ from app.contracts.common import KnowledgeScope
 from app.contracts.facts import FactKind
 from app.contracts.health_context import HealthContext
 from app.pipeline.model_safe_context import to_model_safe_payload, wrap_untrusted_document_text
+import json
 import re
 
 
@@ -88,7 +89,7 @@ class PromptBuilder:
                 "General medical evidence may explain the personal facts, but must not replace or alter them.\n"
                 f"Data source: {context.data_source}\n"
                 + _fact_kind_blocks(context)
-                + f"PERSONAL HEALTH CONTEXT JSON:\n{payload}\n"
+                + f"PERSONAL HEALTH CONTEXT JSON:\n{compact_json(payload)}\n"
                 + _medical_block(context, user_message)
                 + "Conversation focus (topic and follow-up only; never a source of current lab values): "
                 f"{conversation_summary}\n"
@@ -162,6 +163,21 @@ def _medical_block(context: HealthContext, user_message: str = "") -> str:
     )
 
 
+def _prune(value):
+    """Drop None, empty strings and empty containers, recursively."""
+    if isinstance(value, dict):
+        pruned = {k: _prune(v) for k, v in value.items()}
+        return {k: v for k, v in pruned.items() if v not in (None, "", [], {})}
+    if isinstance(value, (list, tuple)):
+        pruned = [_prune(v) for v in value]
+        return [v for v in pruned if v not in (None, "", [], {})]
+    return value
+
+
+def compact_json(value) -> str:
+    return json.dumps(_prune(value), ensure_ascii=False, separators=(",", ":"), default=str)
+
+
 def _fact_kind_blocks(context: HealthContext) -> str:
     facts = list(getattr(context, "facts", None) or [])
     measured = [
@@ -202,18 +218,27 @@ def _fact_kind_blocks(context: HealthContext) -> str:
             for event in context.timeline.events[-12:]
         ]
     progress = [row.model_dump(mode="json", exclude_none=True) for row in (context.goal_progress or [])]
+    sections = (
+        ("PERSONAL BLOOD DATA / MEASURED_DATA JSON", measured),
+        ("QUESTIONNAIRE RESPONSES JSON", questionnaire),
+        ("BIO-AI DATA JSON", bio),
+        ("DERIVED FACTS JSON", derived),
+        ("USER_STATED_HEALTH_INFORMATION JSON", stated),
+        ("USER PROFILE/GOALS JSON", profile),
+        ("USER_PROVIDED_DATA_AND_PREFERENCES JSON", provided),
+        ("PERSONAL_HEALTH_TIMELINE JSON", timeline),
+        ("GOAL_PROGRESS JSON", progress),
+        ("SOURCE CONFLICTS JSON", [row.model_dump(mode="json", exclude_none=True) for row in (context.source_conflicts or [])]),
+    )
+    # Cost lever 2: compact JSON, empty fields and empty sections left out. No fact is dropped.
     return (
-        f"PERSONAL BLOOD DATA / MEASURED_DATA JSON:\n{measured}\n"
-        f"QUESTIONNAIRE RESPONSES JSON:\n{questionnaire}\n"
-        f"BIO-AI DATA JSON:\n{bio}\n"
-        f"DERIVED FACTS JSON:\n{derived}\n"
-        f"USER_STATED_HEALTH_INFORMATION JSON:\n{stated}\n"
-        f"USER PROFILE/GOALS JSON:\n{profile}\n"
-        f"USER_PROVIDED_DATA_AND_PREFERENCES JSON:\n{provided}\n"
-        f"PERSONAL_HEALTH_TIMELINE JSON:\n{timeline}\n"
-        f"GOAL_PROGRESS JSON:\n{progress}\n"
-        f"SOURCE CONFLICTS JSON:\n{[row.model_dump(mode='json', exclude_none=True) for row in (context.source_conflicts or [])]}\n"
-        "MODEL_INTERPRETATION and MODEL_RECOMMENDATION must be generated only after the facts above. "
+        "".join(
+            f"{title}:\n{compact_json(value)}\n"
+            for title, value in sections
+            # MEASURED_DATA always appears: the rules below depend on seeing it empty.
+            if title.startswith("PERSONAL BLOOD DATA") or _prune(value) not in (None, [], {})
+        )
+        + "MODEL_INTERPRETATION and MODEL_RECOMMENDATION must be generated only after the facts above. "
         "QUESTIONNAIRE_RESPONSE is user-reported, not a laboratory measurement. "
         "USER_STATED_HEALTH_INFORMATION is not a retrieved lab. "
         "If MEASURED_DATA is empty, do not invent lab values. Do not infer questionnaire facts that were not supplied.\n"

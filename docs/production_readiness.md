@@ -55,12 +55,19 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 5.5 Protect the Supershyft database | Code: a member's Supershyft reads are reused for 90 s (`HEALTH_DATA_CACHE_SECONDS`), shared through Redis; the hit rate is in `cura_health_data_cache_total`. Freshness is bounded by the TTL rather than change events. **Owner action: point Cura at a read replica** |
 | 6 lever 7 Budgets | Code: daily per-member token budgets, plus hourly spend tracking. Above `SPEND_SPIKE_HOURLY_USD`, deep answers try the standard tier first, with deep kept as the fallback. Monthly spend alerts come from `cura_llm_cost_usd_total` |
 
+| 2.3 (completed) Classifier in parallel with Jev | Code: rules still block instantly before anything else runs. The model classifier now runs alongside Jev routing and is joined before any personal data is fetched, so its latency no longer adds to every chat |
+| 3.7 Glossary | Code: `backend/app/i18n/glossary.json` (draft) with local names and plain-English explanations; the translation prompt uses the approved names. **Owner action: clinician review** |
+| 3.8 Language evaluation | Code: parallel set of 12 questions in English plus 6 languages; CI checks each language routes like English (now 100% in every language, floor 90%). Answer-quality scoring by native speaking clinicians is still an owner task |
+| 6 lever 2 Trim prompt context | Code: member data goes to the model as compact JSON with empty fields and sections left out (15 to 19% smaller prompts on sample questions, no facts removed) |
+| 6 lever 4 Widen the no-model path | Code: plain definition questions ("what is HbA1c") on a non-high-risk topic are answered from a matching reviewed passage with no model call (production only, never from the unreviewed index) |
+
 ## P2 items done
 
 | Plan item | Status |
 | --- | --- |
 | 1.9 Smaller hardening | Code: member ids are hashed in every log line. Per-member limits on uploads (20 an hour) and voice (30 per 10 min), and a per-IP limit on all API routes (300 a minute; `X-Forwarded-For` is trusted only with `TRUST_PROXY_HEADERS`). Uploads with JavaScript, launch actions, embedded files or XFA are refused, as are encrypted PDFs and PDFs over the page cap. An optional ClamAV scan refuses the upload if the scanner can't be reached. **Owner action: run clamd and set `DOCUMENT_CLAMAV_HOST`; red-team prompt injection through uploaded reports** |
 | 5.9 Client resilience | Code: the web client sends an `Idempotency-Key` on every chat and keeps it across retries. It retries network failures, 429 (honouring `Retry-After`) and 502 to 504, and reconnects a dropped stream once, getting the finished answer rather than a second run. Flutter is not in this repository |
+| 5.4 Perceived speed | Code: with `CHAT_STREAMING_MODE=tokens_low_risk`, low-risk general answers stream token by token, then the checked answer replaces the draft. High-risk topics and personal answers are never streamed. Off by default |
 | 6 lever 5 Cache validated explanations | Code: a model answer is reused for an identical prompt (same member data, question, context and model) for 24 h, shared through Redis. Grounding, safety review and translation still run each time. A cache hit costs no tokens; `cura_answer_cache_total` shows the hit rate |
 
 ## Still open

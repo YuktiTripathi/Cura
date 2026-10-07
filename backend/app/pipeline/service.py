@@ -67,7 +67,12 @@ from app.pipeline.micro_insights import compose_micro_insight
 from app.pipeline.conversation_title import conversation_title
 from app.pipeline.health_sources import has_supershyft_sources, is_lab_source_compare
 from app.pipeline.document_context import resolve_attached_documents
+from concurrent.futures import ThreadPoolExecutor
+
+from app.pipeline.safety_classifier import HeuristicMultilingualClassifier, model_safety_classifier_active
 from app.pipeline.stages import RouteStage, SafetyStage
+
+_SAFETY_POOL = ThreadPoolExecutor(max_workers=16, thread_name_prefix="cura-safety")
 from app.pipeline.observability import ProgressEmitter
 from app.contracts.presentation import AnswerPreview
 from app.contracts.processing import ProcessingStage
@@ -216,6 +221,42 @@ class ChatService:
         elif plan.needs_personal_data:
             self._progress.emit(ProcessingStage.fetching_personal_data, plan=plan)
 
+    def _safety_block_response(self, principal, payload, request_id, eval_turn, pre_safety, conv=None) -> ChatResponse:
+        if conv is None:
+            if payload.conversation_id:
+                conv = self.repo.get_for_subject(payload.conversation_id, principal.subject_id)
+            else:
+                conv = self.repo.create(principal.subject_id, title=conversation_title(payload.message))
+        answer = pre_safety.answer or "I can't help with that request."
+        urgent = getattr(pre_safety, "category", None) in {"emergency", "self_harm"}
+        block_intent = SAFETY_ESCALATION_INTENT if urgent else "safety_block"
+        self.repo.add_message(conv, "user", payload.message, intent=block_intent)
+        self.repo.add_message(conv, "assistant", answer, intent=block_intent)
+        eval_turn["conv"] = conv
+        eval_turn["pre_safety"] = pre_safety
+        return ChatResponse(
+            conversation_id=conv.id,
+            answer=answer,
+            evidence=[],
+            follow_ups=[],
+            meta=ChatMeta(
+                intent="safety_block",
+                status="safety_block",
+                llm_mode="none",
+                request_id=request_id,
+                llm_called=False,
+                supershyft_called=False,
+                document_retrieval_called=False,
+                jev_called=False,
+                safety_flags=pre_safety.flags or [],
+                safety_mode=SafetyLayer.request_safety_mode(pre_safety),
+                escalation=pre_safety.escalation,
+                db_status=DB_PROVIDER_NOT_CALLED,
+                response_language=getattr(pre_safety, "reply_language", None),
+                emergency_contacts=emergency_contacts() if urgent else [],
+            ),
+        )
+
     def _execute_chat(self, principal: AuthenticatedPrincipal, payload: ChatRequest, request_id: str, eval_turn: dict) -> ChatResponse:
         started = time.perf_counter()
         from app.core.time_budget import TimeBudget
@@ -226,8 +267,16 @@ class ChatService:
         from app.pipeline.dev_trace import trace
 
         trace("AUTH", authenticated_user_resolved=True, user_id=principal.subject_id)
-        # Local safety gate: no Jev, SuperShyft, documents, or LLM until this passes.
-        pre_safety = SafetyStage().run(payload.message)
+        # Local safety gate. Rules run first and block instantly: no Jev, SuperShyft, documents
+        # or LLM for a rule hit. The model classifier, when configured, runs in parallel with
+        # Jev routing (plan 2.3) and is joined before any data is fetched.
+        classifier_future = None
+        if model_safety_classifier_active():
+            pre_safety = SafetyLayer(classifier=HeuristicMultilingualClassifier()).check_input(payload.message)
+            if not pre_safety.blocked:
+                classifier_future = _SAFETY_POOL.submit(SafetyStage().run, payload.message)
+        else:
+            pre_safety = SafetyStage().run(payload.message)
         eval_turn["pre_safety"] = pre_safety
         from app.pipeline.dev_trace import trace
 
@@ -237,38 +286,7 @@ class ChatService:
             medication_risk=getattr(pre_safety, "category", None) == "medication_misuse",
         )
         if pre_safety.blocked:
-            if payload.conversation_id:
-                conv = self.repo.get_for_subject(payload.conversation_id, principal.subject_id)
-            else:
-                conv = self.repo.create(principal.subject_id, title=conversation_title(payload.message))
-            answer = pre_safety.answer or "I can't help with that request."
-            urgent = getattr(pre_safety, "category", None) in {"emergency", "self_harm"}
-            block_intent = SAFETY_ESCALATION_INTENT if urgent else "safety_block"
-            self.repo.add_message(conv, "user", payload.message, intent=block_intent)
-            self.repo.add_message(conv, "assistant", answer, intent=block_intent)
-            eval_turn["conv"] = conv
-            return ChatResponse(
-                conversation_id=conv.id,
-                answer=answer,
-                evidence=[],
-                follow_ups=[],
-                meta=ChatMeta(
-                    intent="safety_block",
-                    status="safety_block",
-                    llm_mode="none",
-                    request_id=request_id,
-                    llm_called=False,
-                    supershyft_called=False,
-                    document_retrieval_called=False,
-                    jev_called=False,
-                    safety_flags=pre_safety.flags or [],
-                    safety_mode=SafetyLayer.request_safety_mode(pre_safety),
-                    escalation=pre_safety.escalation,
-                    db_status=DB_PROVIDER_NOT_CALLED,
-                    response_language=getattr(pre_safety, "reply_language", None),
-                    emergency_contacts=emergency_contacts() if urgent else [],
-                ),
-            )
+            return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety)
         if (
             payload.context_ref
             and payload.context_ref.document_id
@@ -330,6 +348,15 @@ class ChatService:
             conversation_state=conv_state,
         )
         plan, jev_trace = routed.plan, routed.jev_trace
+        if classifier_future is not None:
+            # Join the model classifier before any personal data is fetched.
+            try:
+                pre_safety = classifier_future.result(timeout=float(settings.safety_classifier_timeout_seconds) + 2)
+            except Exception:  # noqa: BLE001 - keep the rule decision and flag the outage
+                pre_safety.flags = [*(pre_safety.flags or []), "safety_classifier_unavailable"]
+            eval_turn["pre_safety"] = pre_safety
+            if pre_safety.blocked:
+                return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety, conv=conv)
         from app.pipeline.dev_trace import trace
 
         trace(
@@ -884,6 +911,7 @@ class ChatService:
             diagnosis_restraint=diagnosis_restraint,
             budget=eval_turn.get("budget"),
             complete_answer=self._complete_answer,
+            on_token=getattr(self._progress, "token_callback", None),
         )
         self._progress.measure("reasoner")
         answer = reasoned.answer

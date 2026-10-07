@@ -48,6 +48,8 @@ class Settings(BaseSettings):
     # Reasoning models (plan 6.6): effort and the output cap that includes hidden reasoning.
     # Reuse a model answer for an identical prompt (same data, question and context). 0 disables.
     answer_cache_ttl_seconds: int = 86400
+    # Answer plain definition questions from a reviewed passage without a model (cost lever 4).
+    deterministic_definitions_enabled: bool = True
     # Bump to invalidate every cached answer, for example after a prompt or model change.
     answer_cache_version: str = "1"
     llm_reasoning_effort: str = "low"

@@ -176,3 +176,8 @@ def default_classifier() -> SafetyClassifier:
     if settings.safety_llm_classifier_enabled and settings.enable_llm:
         return LLMSafetyClassifier()
     return HeuristicMultilingualClassifier()
+
+
+def model_safety_classifier_active() -> bool:
+    """True when the default classifier calls a model (and is worth running in parallel)."""
+    return bool(settings.safety_llm_classifier_enabled and settings.enable_llm)

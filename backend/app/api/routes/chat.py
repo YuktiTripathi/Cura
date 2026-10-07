@@ -99,6 +99,7 @@ async def chat_stream(
                 callback=lambda event: put("progress", event.model_dump(mode="json")),
                 preview_callback=lambda preview: put("preview", preview.model_dump(mode="json")),
                 experience_callback=lambda block: put("experience_block", block.model_dump(mode="json")),
+                token_callback=lambda text: put("token", {"text": text}),
             )
             response = ChatService(session, get_registry()).chat(
                 principal, payload, request_id, progress=emitter
@@ -130,7 +131,7 @@ async def chat_stream(
             except asyncio.TimeoutError:
                 yield _event("error", {"code": "TIMEOUT", "message": "The request timed out. Please try again."})
                 break
-            if kind in {"progress", "preview", "experience_block"}:
+            if kind in {"progress", "preview", "experience_block", "token"}:
                 yield _event(kind, payload_data)
             elif kind == "complete":
                 yield _event("complete", payload_data)

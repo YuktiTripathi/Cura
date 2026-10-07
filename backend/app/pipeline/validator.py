@@ -60,9 +60,8 @@ class ResponseValidator:
                     grounding_flags.extend(claim_flags)
                 elif llm_called and unmapped_share(answer, medical_hits) > 0.5:
                     # Most claims map to no retrieved passage: say so instead of implying a source.
+                    # Flag only: the prompt asks for no "General information" label on answers.
                     grounding_flags.append("claims_unmapped")
-                    if not answer.lstrip().lower().startswith("general information"):
-                        answer = "General information: " + answer.lstrip()
         answer, safety_flags = self.safety.review(answer, message)
         flags.extend(safety_flags)
         if settings.cura_clinical_safety_enabled:

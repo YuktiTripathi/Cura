@@ -28,7 +28,7 @@ from app.pipeline.renderer import (
     render_missing_blood_marker,
     render_provenance,
 )
-from app.retrieval.medical import render_medical_evidence_answer
+from app.retrieval.medical import is_servable, render_medical_evidence_answer
 
 logger = logging.getLogger("cura.reasoning")
 
@@ -66,6 +66,7 @@ class ReasoningService:
         diagnosis_restraint: bool = False,
         budget=None,
         complete_answer=None,
+        on_token=None,
     ) -> ReasoningResult:
         started = time.perf_counter()
         medical_hits = medical_hits or []
@@ -152,9 +153,20 @@ class ReasoningService:
         completer = complete_answer or self._complete_answer
         if general_only:
             corpus_answer = render_medical_evidence_answer(plan.topic, medical_hits)
+            if corpus_answer and definition_from_reviewed_passage(message, plan, medical_hits):
+                # Cost lever 4: a plain definition is answered from the reviewed passage, no model call.
+                return ReasoningResult(
+                    answer=corpus_answer,
+                    llm_called=False,
+                    llm_mode="medical_corpus_definition",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                )
             messages = self.prompts.build(
                 context, conversation_summary, message, response_lang, routing_note=routing_note
             )
+            streamed = self._stream_low_risk(message, plan, messages, on_token, started)
+            if streamed is not None:
+                return streamed
             try:
                 llm_result, answer_client, _tier, fallback = completer(messages, plan, budget=budget)
                 return ReasoningResult(
@@ -283,3 +295,60 @@ class ReasoningService:
                 last_error = exc
                 remaining = budget.remaining() if budget is not None else remaining
         raise last_error or LLMUnavailableError("LLM request failed")
+
+
+
+    def _stream_low_risk(self, message, plan, messages, on_token, started) -> ReasoningResult | None:
+        """Stream tokens for low-risk general answers only (plan 5.4). None = use the normal path."""
+        from app.pipeline.topic_risk import is_high_risk_topic
+
+        if on_token is None or settings.chat_streaming_mode != "tokens_low_risk" or not settings.enable_llm:
+            return None
+        if is_high_risk_topic(message):
+            return None
+        try:
+            client = get_llm_client(
+                model_tier=(plan.answer_model_tier or AnswerModelTier.standard_medical).value,
+                timeout=float(settings.llm_timeout_seconds),
+                personal_health=False,
+            )
+            text = client.stream_text(
+                [*messages, {"role": "user", "content": "Reply in plain text, not JSON."}],
+                on_token,
+            )
+        except Exception:  # noqa: BLE001 - fall back to the normal, non-streamed answer
+            logger.warning("answer_stream status=fallback")
+            return None
+        return ReasoningResult(
+            answer=text,
+            llm_result=LLMStructuredOutput(answer=text),
+            llm_called=True,
+            llm_mode=settings.resolved_llm_provider(),
+            answer_client=client,
+            latency_ms=int((time.perf_counter() - started) * 1000),
+        )
+
+
+_DEFINITION = re.compile(
+    r"^\s*(what\s+(is|are|does)\b.{0,40}?\b(mean|measure|stand for|do)?\??\s*$|"
+    r"what\s+is\s+the\s+difference\s+between\b|define\b|meaning\s+of\b)",
+    re.I,
+)
+
+
+def definition_from_reviewed_passage(message: str, plan, medical_hits) -> bool:
+    """True for a plain definition question that a reviewed passage on the same topic answers."""
+    from app.pipeline.topic_risk import is_high_risk_topic
+
+    if not settings.deterministic_definitions_enabled or not medical_hits:
+        return False
+    if not settings.medical_require_reviewed_enabled():
+        return False  # never answer directly from the unreviewed development index
+    if is_high_risk_topic(message) or not _DEFINITION.search(message or ""):
+        return False
+    if len((message or "").split()) > 14:
+        return False
+    if not all(is_servable(doc) for doc in medical_hits):
+        return False
+    topic = (plan.topic or "").lower()
+    return bool(topic) and any(topic in doc.topics for doc in medical_hits)

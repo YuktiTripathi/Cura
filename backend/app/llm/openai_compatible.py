@@ -2,6 +2,8 @@ import logging
 import re
 import time
 
+import json
+
 import httpx
 
 from app.core.circuit_breaker import CircuitOpenError, openrouter_breaker
@@ -298,6 +300,56 @@ class OpenAICompatibleLLMClient:
         parsed.finish_reason = self.last_finish_reason or None
         parsed.truncated = self.last_finish_reason in {"length", "max_tokens"}
         return parsed
+
+    def stream_text(self, messages: list[dict[str, str]], on_token) -> str:
+        """Stream a plain-text answer token by token (readiness plan 5.4).
+
+        Used only for low-risk general answers. The caller still runs every grounding and
+        safety check on the full text, and the client replaces the streamed draft with the
+        checked answer.
+        """
+        url = f"{self.base_url}/chat/completions"
+        headers = {"Content-Type": "application/json", "Authorization": f"Bearer {self.api_key}"}
+        if settings.openrouter_app_title:
+            headers["X-Title"] = settings.openrouter_app_title
+        payload = self._build_payload(messages, "text")
+        payload["stream"] = True
+        payload["stream_options"] = {"include_usage": True}
+        parts: list[str] = []
+        usage: dict = {}
+        try:
+            with get_http_client().stream("POST", url, headers=headers, json=payload, timeout=self.timeout) as response:
+                if response.status_code >= 400:
+                    openrouter_breaker.record_failure()
+                    raise LLMUnavailableError("LLM provider returned an error")
+                for line in response.iter_lines():
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data)
+                    except ValueError:
+                        continue
+                    usage = chunk.get("usage") or usage
+                    for choice in chunk.get("choices") or []:
+                        delta = (choice.get("delta") or {}).get("content") or ""
+                        if delta:
+                            parts.append(delta)
+                            on_token(delta)
+        except httpx.HTTPError as exc:
+            openrouter_breaker.record_failure()
+            raise LLMUnavailableError("LLM stream failed") from exc
+        self.last_usage = {
+            "input_tokens": int(usage.get("prompt_tokens") or 0),
+            "output_tokens": int(usage.get("completion_tokens") or 0),
+        }
+        text = strip_reasoning("".join(parts))
+        if not text:
+            raise LLMUnavailableError("LLM returned an empty answer")
+        openrouter_breaker.record_success()
+        return text
 
     def stream(self, messages: list[dict[str, str]]):
         yield self.complete_structured(messages).answer

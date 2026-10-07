@@ -83,8 +83,10 @@ class ProgressEmitter:
         callback: Callable[[ProcessingEvent], None] | None = None,
         preview_callback: Callable[[AnswerPreview], None] | None = None,
         experience_callback: Callable[[ExperienceBlock], None] | None = None,
+        token_callback: Callable[[str], None] | None = None,
     ):
         self._callback = callback
+        self.token_callback = token_callback
         self._preview_callback = preview_callback
         self._experience_callback = experience_callback
         self._started = time.perf_counter()

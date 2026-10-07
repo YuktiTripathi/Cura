@@ -128,3 +128,13 @@ def test_identical_question_reuses_the_cached_model_answer(monkeypatch):
         body = client.post("/api/v1/chat", headers={"X-Cura-User-Id": "cache-e2e"}, json={"message": "What does LDL stand for?"}).json()
         assert "low-density lipoprotein" in body["answer"].lower()
     assert len(calls) == 1
+
+
+def test_compact_prompt_json_is_lossless_and_keeps_measured_section():
+    import json as _json
+
+    from app.pipeline.prompt_builder import _prune, compact_json
+
+    value = {"a": 1, "b": None, "c": [], "d": {"e": "", "f": 0, "g": [None, 2]}, "h": False}
+    assert _json.loads(compact_json(value)) == {"a": 1, "d": {"f": 0, "g": [2]}, "h": False}
+    assert _prune([None, "", {}]) == []
