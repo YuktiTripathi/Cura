@@ -1,0 +1,17 @@
+{
+  "_status": "DRAFT translations for the language evaluation set (plan 3.8); native speaking clinicians to review and extend",
+  "cases": [
+    {"id": "gen_ldl", "en": "What is LDL?", "hi": "LDL क्या है?", "hinglish": "LDL kya hai?", "mr": "LDL म्हणजे काय?", "pa": "LDL ਕੀ ਹੈ?", "gu": "LDL શું છે?", "bn": "LDL কী?"},
+    {"id": "my_ldl", "en": "What is my LDL?", "hi": "मेरा LDL कितना है?", "hinglish": "mera LDL kitna hai?", "mr": "माझे LDL किती आहे?", "pa": "ਮੇਰਾ LDL ਕਿੰਨਾ ਹੈ?", "gu": "મારું LDL કેટલું છે?", "bn": "আমার LDL কত?"},
+    {"id": "gen_hba1c", "en": "What does HbA1c measure?", "hi": "HbA1c क्या मापता है?", "hinglish": "HbA1c kya measure karta hai?", "mr": "HbA1c काय मोजते?", "pa": "HbA1c ਕੀ ਮਾਪਦਾ ਹੈ?", "gu": "HbA1c શું માપે છે?", "bn": "HbA1c কী মাপে?"},
+    {"id": "my_hba1c", "en": "What is my latest HbA1c?", "hi": "मेरा सबसे नया HbA1c क्या है?", "hinglish": "mera latest HbA1c kya hai?", "mr": "माझे सर्वात नवीन HbA1c किती आहे?", "pa": "ਮੇਰਾ ਸਭ ਤੋਂ ਨਵਾਂ HbA1c ਕੀ ਹੈ?", "gu": "મારું સૌથી નવું HbA1c શું છે?", "bn": "আমার সর্বশেষ HbA1c কত?"},
+    {"id": "my_vitd", "en": "Is my vitamin D low?", "hi": "क्या मेरा विटामिन D कम है?", "hinglish": "kya mera vitamin D kam hai?", "mr": "माझे व्हिटॅमिन D कमी आहे का?", "pa": "ਕੀ ਮੇਰਾ ਵਿਟਾਮਿਨ D ਘੱਟ ਹੈ?", "gu": "શું મારું વિટામિન D ઓછું છે?", "bn": "আমার ভিটামিন D কি কম?"},
+    {"id": "gen_vitd", "en": "Why is vitamin D important?", "hi": "विटामिन D क्यों ज़रूरी है?", "hinglish": "vitamin D kyon zaroori hai?", "mr": "व्हिटॅमिन D का महत्त्वाचे आहे?", "pa": "ਵਿਟਾਮਿਨ D ਕਿਉਂ ਜ਼ਰੂਰੀ ਹੈ?", "gu": "વિટામિન D કેમ જરૂરી છે?", "bn": "ভিটামিন D কেন জরুরি?"},
+    {"id": "trend_ldl", "en": "How has my LDL changed over time?", "hi": "समय के साथ मेरा LDL कैसे बदला है?", "hinglish": "time ke saath mera LDL kaise badla hai?", "mr": "काळानुसार माझे LDL कसे बदलले आहे?", "pa": "ਸਮੇਂ ਨਾਲ ਮੇਰਾ LDL ਕਿਵੇਂ ਬਦਲਿਆ ਹੈ?", "gu": "સમય સાથે મારું LDL કેવી રીતે બદલાયું છે?", "bn": "সময়ের সাথে আমার LDL কীভাবে বদলেছে?"},
+    {"id": "my_tsh", "en": "What is my TSH result?", "hi": "मेरा TSH रिज़ल्ट क्या है?", "hinglish": "mera TSH result kya hai?", "mr": "माझा TSH रिझल्ट काय आहे?", "pa": "ਮੇਰਾ TSH ਨਤੀਜਾ ਕੀ ਹੈ?", "gu": "મારું TSH પરિણામ શું છે?", "bn": "আমার TSH রিপোর্ট কী?"},
+    {"id": "gen_tsh", "en": "What does TSH do?", "hi": "TSH क्या करता है?", "hinglish": "TSH kya karta hai?", "mr": "TSH काय करते?", "pa": "TSH ਕੀ ਕਰਦਾ ਹੈ?", "gu": "TSH શું કરે છે?", "bn": "TSH কী করে?"},
+    {"id": "my_bioai", "en": "What are my Bio-AI risk scores?", "hi": "मेरे Bio-AI रिस्क स्कोर क्या हैं?", "hinglish": "mere Bio-AI risk scores kya hain?", "mr": "माझे Bio-AI रिस्क स्कोअर काय आहेत?", "pa": "ਮੇਰੇ Bio-AI ਰਿਸਕ ਸਕੋਰ ਕੀ ਹਨ?", "gu": "મારા Bio-AI રિસ્ક સ્કોર શું છે?", "bn": "আমার Bio-AI ঝুঁকি স্কোর কী?"},
+    {"id": "my_hb", "en": "What is my haemoglobin?", "hi": "मेरा हीमोग्लोबिन कितना है?", "hinglish": "mera hemoglobin kitna hai?", "mr": "माझे हिमोग्लोबिन किती आहे?", "pa": "ਮੇਰਾ ਹੀਮੋਗਲੋਬਿਨ ਕਿੰਨਾ ਹੈ?", "gu": "મારું હિમોગ્લોબિન કેટલું છે?", "bn": "আমার হিমোগ্লোবিন কত?"},
+    {"id": "gen_chol", "en": "What causes high cholesterol?", "hi": "हाई कोलेस्ट्रॉल किस वजह से होता है?", "hinglish": "high cholesterol kis wajah se hota hai?", "mr": "जास्त कोलेस्टेरॉल कशामुळे होते?", "pa": "ਹਾਈ ਕੋਲੈਸਟ੍ਰੋਲ ਕਿਸ ਕਾਰਨ ਹੁੰਦਾ ਹੈ?", "gu": "ઊંચું કોલેસ્ટ્રોલ શેના કારણે થાય છે?", "bn": "উচ্চ কোলেস্টেরল কেন হয়?"}
+  ]
+}

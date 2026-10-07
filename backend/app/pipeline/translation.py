@@ -48,13 +48,22 @@ def numbers_match(source: str, translated: str) -> bool:
     return bag(source) == bag(translated)
 
 
-def _prompt(language: str) -> str:
+def _prompt(language: str, answer: str = "") -> str:
+    from app.i18n.glossary import glossary_lines
+
+    approved = glossary_lines(answer, language)
+    glossary = (
+        " Use these approved local names for the terms that appear: " + "; ".join(approved) + "."
+        if approved
+        else ""
+    )
     return (
         f"Translate the health answer into {LANGUAGE_NAMES[language]} for an Indian reader at about a "
         "grade 6 to 8 reading level. Rules: keep every number, unit, date and range exactly as written, "
         "using the same digits; keep biomarker abbreviations (HbA1c, LDL, TSH, eGFR...) unchanged; when you "
         "use a local name for a biomarker, put the English name in brackets after it; keep line breaks and "
         "bullet structure; add nothing and leave nothing out. Reply with the translation only."
+        + glossary
     )
 
 
@@ -77,7 +86,7 @@ def translate_answer(answer: str, language: str, client: httpx.Client | None = N
 
         payload = {
             "model": model,
-            "messages": [{"role": "system", "content": _prompt(language)}, {"role": "user", "content": answer}],
+            "messages": [{"role": "system", "content": _prompt(language, answer)}, {"role": "user", "content": answer}],
             "temperature": 0,
             "max_tokens": min(4000, 3 * max(200, len(answer) // 2)),
             "provider": openrouter_policy().provider_preferences(model, personal_health=True),

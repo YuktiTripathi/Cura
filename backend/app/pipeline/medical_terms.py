@@ -33,8 +33,23 @@ MARKER_ALIASES_I18N = {
     "ਵਿਟਾਮਿਨ ਡੀ": "vitamin_d",
     "વિટામિન ડી": "vitamin_d",
     "ভিটামিন ডি": "vitamin_d",
+    # Mixed script, as people type it: Indic "vitamin" with a Latin "D".
+    "व्हिटॅमिन d": "vitamin_d",
+    "ਵਿਟਾਮਿਨ d": "vitamin_d",
+    "વિટામિન d": "vitamin_d",
+    "ভিটামিন d": "vitamin_d",
+    "हीमोग्लोबिन": "hemoglobin",
+    "हिमोग्लोबिन": "hemoglobin",
+    "ਹੀਮੋਗਲੋਬਿਨ": "hemoglobin",
+    "હિમોગ્લોબિન": "hemoglobin",
+    "হিমোগ্লোবিন": "hemoglobin",
     "विटामिन बी12": "vitamin_b12",
     "कोलेस्ट्रॉल": "cholesterol",
+    "कोलेस्टेरॉल": "cholesterol",
+    "ਕੋਲੈਸਟ੍ਰੋਲ": "cholesterol",
+    "ਕੋਲੇਸਟ੍ਰੋਲ": "cholesterol",
+    "કોલેસ્ટ્રોલ": "cholesterol",
+    "কোলেস্টেরল": "cholesterol",
     "cholesterol": "cholesterol",
 }
 

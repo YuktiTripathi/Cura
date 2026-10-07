@@ -1,0 +1,181 @@
+{
+  "_status": "DRAFT - local names need review by native speaking clinicians before the pilot",
+  "terms": {
+    "haemoglobin": {
+      "aliases": [
+        "hemoglobin",
+        "hb",
+        "hgb"
+      ],
+      "plain_en": "the protein in red blood cells that carries oxygen",
+      "hi": "हीमोग्लोबिन",
+      "hinglish": "hemoglobin"
+    },
+    "hba1c": {
+      "aliases": [
+        "glycated haemoglobin",
+        "a1c"
+      ],
+      "plain_en": "average blood sugar over the last 2 to 3 months",
+      "hi": "HbA1c (लंबे समय की औसत शुगर)",
+      "hinglish": "HbA1c (lambe samay ki average sugar)"
+    },
+    "blood sugar": {
+      "aliases": [
+        "glucose",
+        "blood glucose",
+        "fasting glucose"
+      ],
+      "plain_en": "the amount of sugar in your blood",
+      "hi": "ब्लड शुगर",
+      "hinglish": "blood sugar"
+    },
+    "cholesterol": {
+      "aliases": [
+        "total cholesterol"
+      ],
+      "plain_en": "a fat-like substance in the blood",
+      "hi": "कोलेस्ट्रॉल",
+      "hinglish": "cholesterol"
+    },
+    "ldl": {
+      "aliases": [
+        "ldl cholesterol",
+        "bad cholesterol"
+      ],
+      "plain_en": "the kind of cholesterol that can build up in blood vessels",
+      "hi": "LDL (खराब कोलेस्ट्रॉल)",
+      "hinglish": "LDL (kharab cholesterol)"
+    },
+    "hdl": {
+      "aliases": [
+        "hdl cholesterol",
+        "good cholesterol"
+      ],
+      "plain_en": "the kind of cholesterol that helps clear other cholesterol",
+      "hi": "HDL (अच्छा कोलेस्ट्रॉल)",
+      "hinglish": "HDL (achha cholesterol)"
+    },
+    "triglycerides": {
+      "aliases": [],
+      "plain_en": "a type of fat in the blood",
+      "hi": "ट्राइग्लिसराइड (खून में वसा)",
+      "hinglish": "triglycerides (khoon mein fat)"
+    },
+    "thyroid": {
+      "aliases": [
+        "thyroid gland"
+      ],
+      "plain_en": "a gland in the neck that controls how the body uses energy",
+      "hi": "थायरॉइड ग्रंथि",
+      "hinglish": "thyroid gland"
+    },
+    "tsh": {
+      "aliases": [
+        "thyroid stimulating hormone"
+      ],
+      "plain_en": "a hormone that tells the thyroid how hard to work",
+      "hi": "TSH (थायरॉइड को संकेत देने वाला हार्मोन)",
+      "hinglish": "TSH (thyroid ko signal dene wala hormone)"
+    },
+    "kidney function": {
+      "aliases": [
+        "renal function"
+      ],
+      "plain_en": "how well the kidneys filter the blood",
+      "hi": "गुर्दे (किडनी) की कार्यक्षमता",
+      "hinglish": "kidney ka kaam"
+    },
+    "creatinine": {
+      "aliases": [],
+      "plain_en": "a waste product the kidneys clear from the blood",
+      "hi": "क्रिएटिनिन",
+      "hinglish": "creatinine"
+    },
+    "egfr": {
+      "aliases": [
+        "estimated gfr"
+      ],
+      "plain_en": "an estimate of how well the kidneys filter",
+      "hi": "eGFR (किडनी की छानने की क्षमता)",
+      "hinglish": "eGFR (kidney ki filter karne ki kshamta)"
+    },
+    "liver": {
+      "aliases": [],
+      "plain_en": "the organ that processes nutrients and clears toxins",
+      "hi": "लिवर (यकृत)",
+      "hinglish": "liver"
+    },
+    "vitamin d": {
+      "aliases": [
+        "25-oh vitamin d"
+      ],
+      "plain_en": "a vitamin that keeps bones and muscles healthy",
+      "hi": "विटामिन D",
+      "hinglish": "vitamin D"
+    },
+    "vitamin b12": {
+      "aliases": [
+        "b12",
+        "cobalamin"
+      ],
+      "plain_en": "a vitamin needed for nerves and red blood cells",
+      "hi": "विटामिन B12",
+      "hinglish": "vitamin B12"
+    },
+    "iron": {
+      "aliases": [
+        "serum iron"
+      ],
+      "plain_en": "a mineral the body needs to make haemoglobin",
+      "hi": "आयरन (लौह)",
+      "hinglish": "iron"
+    },
+    "ferritin": {
+      "aliases": [],
+      "plain_en": "a protein that shows how much iron the body has stored",
+      "hi": "फ़ेरिटिन (शरीर में जमा आयरन)",
+      "hinglish": "ferritin (jama iron)"
+    },
+    "anaemia": {
+      "aliases": [
+        "anemia"
+      ],
+      "plain_en": "fewer healthy red blood cells or less haemoglobin than normal",
+      "hi": "खून की कमी (एनीमिया)",
+      "hinglish": "khoon ki kami (anaemia)"
+    },
+    "high blood pressure": {
+      "aliases": [
+        "hypertension"
+      ],
+      "plain_en": "blood pushing too hard against the vessel walls",
+      "hi": "हाई ब्लड प्रेशर",
+      "hinglish": "high BP"
+    },
+    "diabetes": {
+      "aliases": [
+        "type 2 diabetes"
+      ],
+      "plain_en": "a condition where blood sugar stays too high",
+      "hi": "डायबिटीज़ (मधुमेह)",
+      "hinglish": "diabetes (sugar ki bimari)"
+    },
+    "crp": {
+      "aliases": [
+        "c-reactive protein"
+      ],
+      "plain_en": "a marker that rises with inflammation",
+      "hi": "CRP (सूजन का संकेत)",
+      "hinglish": "CRP (inflammation ka signal)"
+    },
+    "reference range": {
+      "aliases": [
+        "normal range"
+      ],
+      "plain_en": "the range of values the lab treats as usual",
+      "hi": "सामान्य सीमा",
+      "hinglish": "normal range"
+    }
+  }
+}

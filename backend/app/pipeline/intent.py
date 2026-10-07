@@ -195,6 +195,12 @@ _TREND = re.compile(
     r"went up|went down|risen|rose|fallen|fell)\b",
     re.I,
 )
+# "Changed over time" in Hinglish and the Indic scripts (word boundaries do not apply to Indic text).
+_TREND_I18N = re.compile(
+    r"\b(badla|badli|badle|badal gaya|time ke saath|samay ke saath)\b|"
+    r"बदला|बदली|बदले|समय के साथ|बदलले|बदलल|काळानुसार|ਬਦਲਿਆ|ਸਮੇਂ ਨਾਲ|બદલાયું|સમય સાથે|বদলেছে|সময়ের সাথে",
+    re.I,
+)
 _LATEST = re.compile(r"\b(latest|current|most recent|recent|now)\b", re.I)
 _BIO_REPORT = re.compile(r"\b(bio-?ai|bio ai)\b", re.I)
 _BLOOD_REPORT = re.compile(r"\b(blood report|blood result|blood test|lab report)\b", re.I)
@@ -506,7 +512,7 @@ def classify_intent(
 
     if marker and personal_turn and _PREVIOUS.search(text):
         return IntentType.previous_result, marker, _name(marker), depth
-    if marker and personal_turn and _TREND.search(text):
+    if marker and personal_turn and (_TREND.search(text) or _TREND_I18N.search(text)):
         return IntentType.trend, marker, _name(marker), depth
     if is_provenance_request(message):
         topic = marker or follow_up_topic
