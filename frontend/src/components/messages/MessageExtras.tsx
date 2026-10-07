@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 import { followUpText, type EmergencyContact, type FollowUp, type Recommendation } from "../../types/chat";
 
 export function Recommendations({ items }: { items: Recommendation[] }) {
@@ -25,21 +26,21 @@ export function EscalationNote({
   const urgent = escalation === "urgent_care" || escalation === "crisis_support";
   return (
     <div className="escalation">
-      <strong>Next step</strong>
+      <strong>{t("escalation.title", "Next step")}</strong>
       <p>
         {escalation === "crisis_support"
-          ? "Please talk to someone now. Help is free and available 24x7."
+          ? t("escalation.crisis", "Please talk to someone now. Help is free and available 24x7.")
           : escalation === "urgent_care"
-          ? "Seek urgent in-person medical care."
+          ? t("escalation.urgent", "Seek urgent in-person medical care.")
           : escalation === "see_doctor_24h"
-          ? "See a doctor within the next day."
-          : "Discuss this with a qualified clinician."}
+          ? t("escalation.soon", "See a doctor within the next day.")
+          : t("escalation.clinician", "Discuss this with a qualified clinician.")}
       </p>
       {urgent && contacts.length > 0 && (
         <div className="escalation-calls">
           {contacts.map((c) => (
             <a key={c.kind} className="escalation-call" href={`tel:${c.number}`}>
-              Call {c.label} {c.number}
+              {t("escalation.call", "Call {label} {number}", { label: c.label, number: c.number })}
             </a>
           ))}
         </div>

@@ -1,0 +1,19 @@
+{
+  "general_knowledge_unavailable": "Abhi main general medical jaankari service tak nahi pahunch pa raha hoon. Thodi der baad phir try karein.",
+  "personal_data_unavailable": "Abhi main aapka SuperShyft health data nahi dekh pa raha hoon, isliye aapke result ka andaaza nahi lagaunga. Thodi der baad phir try karein.",
+  "personal_data_not_found": "Aapke health records mein yeh result nahi mila, isliye main koi value nahi banaunga.",
+  "greeting_fallback": "Namaste 👋",
+  "greeting_named": "Namaste {name} 👋",
+  "casual_help": "Namaste. Main aapki blood report values, Bio-AI scores, general health sawaal aur nutrition ya lifestyle guidance mein madad kar sakta hoon. Aap kya jaanna chahenge?",
+  "document_unread": "Document mil gaya hai, lekin abhi process ho raha hai.",
+  "document_failed": "Main yeh document nahi padh paaya.",
+  "document_ocr": "Document upload ho gaya, lekin OCR set na hone ki wajah se uska text nahi nikal paaya.",
+  "document_no_match": "Upload kiye gaye document mein yeh jaankari nahi mili.",
+  "document_extraction_unavailable": "Upload kiye gaye document se structured data nahi nikal paaya, isliye main usse koi health value nahi banaunga.",
+  "starter_latest": "Mera latest {name} kya hai?",
+  "starter_meaning": "Mere {name} result ka kya matlab hai?",
+  "starter_how": "Mera {name} level kaisa hai?",
+  "starter_trend": "Kya time ke saath mera {name} badla hai?",
+  "starter_bio": "Mere {name} score ka kya matlab hai?",
+  "starter_nutrition": "Mujhe apne nutrition ke baare mein kya jaanna chahiye?"
+}

@@ -5,6 +5,7 @@ from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.db.session import get_db
 from app.documents.contracts import DocumentFactsOut, DocumentListOut, DocumentOut, DocumentPageOut
+from app.core.config import settings
 from app.documents.jobs import enqueue_document_job, run_document_job
 from app.documents.service import DocumentService
 
@@ -28,7 +29,8 @@ async def upload_document(
         conversation_id=conversation_id,
     )
     enqueue_document_job(db, out.document_id, principal.subject_id)
-    background_tasks.add_task(run_document_job, out.document_id, principal.subject_id)
+    if not settings.document_workers_external():
+        background_tasks.add_task(run_document_job, out.document_id, principal.subject_id)
     return out
 
 

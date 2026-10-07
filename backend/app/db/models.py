@@ -215,6 +215,8 @@ class ProcessingJob(Base):
     user_id: Mapped[str] = mapped_column(String(128), index=True)
     status: Mapped[str] = mapped_column(String(24), default="pending", index=True)
     attempts: Mapped[int] = mapped_column(Integer, default=0)
+    # Set when a worker claims the job; a job stuck in "processing" past the lease is reclaimed.
+    claimed_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     last_error: Mapped[str | None] = mapped_column(String(255), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 

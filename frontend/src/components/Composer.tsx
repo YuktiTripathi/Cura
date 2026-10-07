@@ -2,6 +2,7 @@ import { FormEvent, useEffect, useRef, useState, type ChangeEvent, type RefObjec
 import { transcribeVoice } from "../lib/api";
 import { useDocumentUpload, type DocumentUploader, type UploadChip } from "../hooks/useDocumentUpload";
 import { useAudioLevels } from "../hooks/useAudioLevels";
+import { t } from "../i18n";
 
 type Props = {
   disabled: boolean;
@@ -184,12 +185,16 @@ export function Composer({
       </button>
       <input
         id="cura-message-input"
-        aria-label="Message Cura"
+        aria-label={t("composer.aria", "Message Cura")}
         ref={inputRef}
         value={value}
         onChange={(e) => setValue(e.target.value)}
         placeholder={
-          transcribing ? "Turning your voice into text…" : recording ? "Listening…" : "Ask Cura about your health"
+          transcribing
+            ? t("composer.transcribing", "Turning your voice into text…")
+            : recording
+            ? t("composer.listening", "Listening…")
+            : t("composer.placeholder", "Ask Cura about your health")
         }
         disabled={disabled || transcribing}
       />

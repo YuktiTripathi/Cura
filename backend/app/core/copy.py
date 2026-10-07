@@ -1,4 +1,9 @@
-"""User-facing copy. Keep technical details out of these strings."""
+"""User-facing copy. Keep technical details out of these strings.
+
+The constants are the English source; the functions read the message catalog.
+"""
+
+from app.i18n.catalog import t
 
 GENERAL_KNOWLEDGE_UNAVAILABLE = (
     "I can't access the general medical knowledge service right now. Please try again shortly."
@@ -19,7 +24,7 @@ CASUAL_HELP = (
 
 
 def casual_reply(_language=None) -> str:
-    return CASUAL_HELP
+    return t("casual_help", _language)
 
 
 DOCUMENT_UNREAD = "I've received the document, but it is still being processed."
@@ -31,19 +36,19 @@ DOCUMENT_NO_MATCH = "I couldn't find that information in the uploaded document."
 
 
 def document_unread(_language=None) -> str:
-    return DOCUMENT_UNREAD
+    return t("document_unread", _language)
 
 
 def document_failed(_language=None) -> str:
-    return DOCUMENT_FAILED
+    return t("document_failed", _language)
 
 
 def document_ocr_unavailable(_language=None) -> str:
-    return DOCUMENT_OCR
+    return t("document_ocr", _language)
 
 
 def document_no_match(_language=None) -> str:
-    return DOCUMENT_NO_MATCH
+    return t("document_no_match", _language)
 
 
 PERSONAL_DATA_NOT_FOUND = (
@@ -58,23 +63,23 @@ DOCUMENT_EXTRACTION_UNAVAILABLE = (
 
 
 def personal_data_not_found(_language=None) -> str:
-    return PERSONAL_DATA_NOT_FOUND
+    return t("personal_data_not_found", _language)
 
 
 def document_extraction_unavailable(_language=None) -> str:
-    return DOCUMENT_EXTRACTION_UNAVAILABLE
+    return t("document_extraction_unavailable", _language)
 
 
 def personal_data_unavailable(_language=None) -> str:
-    return PERSONAL_DATA_UNAVAILABLE
+    return t("personal_data_unavailable", _language)
 
 
 def general_knowledge_unavailable(_language=None) -> str:
-    return GENERAL_KNOWLEDGE_UNAVAILABLE
+    return t("general_knowledge_unavailable", _language)
 
 
 def greeting_for_first_name(first_name: str | None, _language=None) -> str:
     name = (first_name or "").strip()
     if not name:
-        return GREETING_FALLBACK
-    return f"Hi {name} 👋"
+        return t("greeting_fallback", _language)
+    return t("greeting_named", _language, name=name)

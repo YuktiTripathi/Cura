@@ -31,7 +31,8 @@ init_db()
 try:
     from app.documents.jobs import drain_pending_document_jobs
 
-    drain_pending_document_jobs()
+    if not settings.document_workers_external():
+        drain_pending_document_jobs()
 except Exception:
     logging.getLogger("cura").warning("pending_document_job_drain_failed")
 

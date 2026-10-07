@@ -192,6 +192,11 @@ class Settings(BaseSettings):
     document_s3_endpoint_url: str = ""
     document_s3_kms_key_id: str = ""
     document_max_upload_bytes: int = 20_000_000
+    # "inline": the web process extracts uploads (development). "external": the web
+    # process only enqueues and scripts/document_worker.py does the work (production).
+    document_worker_mode: str | None = None
+    document_job_lease_seconds: int = 600
+    document_job_max_attempts: int = 3
     document_ocr_provider: str = "none"
     document_min_text_chars: int = 80
     document_sparse_page_chars: int = 40
@@ -254,6 +259,11 @@ class Settings(BaseSettings):
     def medical_require_reviewed_enabled(self) -> bool:
         if self.medical_require_reviewed is not None:
             return bool(self.medical_require_reviewed)
+        return not self.is_development
+
+    def document_workers_external(self) -> bool:
+        if self.document_worker_mode:
+            return self.document_worker_mode.strip().lower() == "external"
         return not self.is_development
 
     def consent_enforced(self) -> bool:

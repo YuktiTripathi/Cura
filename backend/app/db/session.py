@@ -24,6 +24,10 @@ def init_db() -> None:
         if "language_preference" not in cols:
             conn.execute(text("ALTER TABLE conversations ADD COLUMN language_preference VARCHAR(8)"))
         tables = {r[0] for r in conn.execute(text("SELECT name FROM sqlite_master WHERE type='table'")).fetchall()}
+        if "processing_jobs" in tables:
+            job_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(processing_jobs)")).fetchall()}
+            if "claimed_at" not in job_cols:
+                conn.execute(text("ALTER TABLE processing_jobs ADD COLUMN claimed_at DATETIME"))
         if "documents" in tables:
             doc_cols = {row[1] for row in conn.execute(text("PRAGMA table_info(documents)")).fetchall()}
             if "extraction_error" not in doc_cols:

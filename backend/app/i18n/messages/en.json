@@ -1,0 +1,19 @@
+{
+  "general_knowledge_unavailable": "I can't access the general medical knowledge service right now. Please try again shortly.",
+  "personal_data_unavailable": "I can't access your personal SuperShyft health data right now, so I don't want to guess at your result. Please try again shortly.",
+  "personal_data_not_found": "I couldn't find that result in your available health records, so I will not invent a value.",
+  "greeting_fallback": "Hi there 👋",
+  "greeting_named": "Hi {name} 👋",
+  "casual_help": "Hello. I can help with your blood report values, Bio-AI scores, general health questions, and nutrition or lifestyle guidance. What would you like to know?",
+  "document_unread": "I've received the document, but it is still being processed.",
+  "document_failed": "I couldn't read this document.",
+  "document_ocr": "The document was uploaded, but its text could not be extracted because OCR is not configured.",
+  "document_no_match": "I couldn't find that information in the uploaded document.",
+  "document_extraction_unavailable": "I couldn't extract structured data from that uploaded document, so I will not invent a personal health value from it.",
+  "starter_latest": "What is my latest {name}?",
+  "starter_meaning": "What does my {name} result mean?",
+  "starter_how": "How is my {name} level?",
+  "starter_trend": "Has my {name} changed over time?",
+  "starter_bio": "What does my {name} score mean?",
+  "starter_nutrition": "What should I know about my nutrition?"
+}

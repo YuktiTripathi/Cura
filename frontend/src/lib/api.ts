@@ -1,3 +1,4 @@
+import { explicitLocale, t } from "../i18n";
 import type { AnswerPreview, ChatResponse, ContextRef, ExperienceBlock } from "../types/chat";
 import type { MeResponse } from "../types/me";
 import type { HealthOverview } from "../types/overview";
@@ -19,6 +20,12 @@ function authHeaders(): HeadersInit {
   if (token) headers.Authorization = `Bearer ${token}`;
   else if (import.meta.env.DEV && USER) headers["X-Cura-User-Id"] = USER;
   return headers;
+}
+
+// A language the member picked in the app overrides detection from their message.
+function languageFields(): Record<string, string> {
+  const locale = explicitLocale();
+  return locale ? { language: locale, language_mode: "manual" } : {};
 }
 
 type ConsentStatus = { version: string; notice: string; required: boolean; accepted: boolean };
@@ -52,8 +59,8 @@ async function fetchWithConsent(url: string, init: RequestInit): Promise<Respons
   const res = await fetch(url, init);
   if (!(await isConsentRequired(res))) return res;
   const status = await getConsent();
-  const ok = window.confirm(`${status.notice}\n\nDo you agree?`);
-  if (!ok) throw new Error("Cura needs your consent before it can answer health questions.");
+  const ok = window.confirm(`${status.notice}\n\n${t("consent.question", "Do you agree?")}`);
+  if (!ok) throw new Error(t("consent.required", "Cura needs your consent before it can answer health questions."));
   await acceptConsent(status.version, true);
   return fetch(url, init);
 }
@@ -148,6 +155,7 @@ export async function sendChat(
   const payload: Record<string, unknown> = {
     message,
     conversation_id: conversationId,
+    ...languageFields(),
   };
   if (documentIds.length) payload.document_ids = documentIds;
   if (contextRef) payload.context_ref = contextRef;
@@ -160,7 +168,7 @@ export async function sendChat(
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Cura needs your consent")) throw error;
+    if (error instanceof Error && error.message === t("consent.required", "Cura needs your consent before it can answer health questions.")) throw error;
     throw new Error(
       "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
     );
@@ -187,6 +195,7 @@ export async function streamChat(
   const payload: Record<string, unknown> = {
     message,
     conversation_id: conversationId,
+    ...languageFields(),
   };
   if (documentIds.length) payload.document_ids = documentIds;
   if (contextRef) payload.context_ref = contextRef;
@@ -202,7 +211,7 @@ export async function streamChat(
       body: JSON.stringify(payload),
     });
   } catch (error) {
-    if (error instanceof Error && error.message.startsWith("Cura needs your consent")) throw error;
+    if (error instanceof Error && error.message === t("consent.required", "Cura needs your consent before it can answer health questions.")) throw error;
     throw new Error(
       "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
     );

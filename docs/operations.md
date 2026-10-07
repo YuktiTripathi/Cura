@@ -12,6 +12,19 @@ load balancer to `GET /health/live` (liveness) and `GET /health/ready` (readines
 Dependencies are pinned in `backend/requirements.lock`. To update them, edit
 `requirements.txt` and run `pip-compile --strip-extras --no-header --output-file=requirements.lock requirements.txt`.
 
+## Document workers
+
+Outside development the API only queues uploaded documents (`DOCUMENT_WORKER_MODE=external`).
+Run one or more workers from the same image:
+
+```
+docker run --env-file backend/.env cura-api python scripts/document_worker.py
+```
+
+Workers claim jobs atomically, so several can run at once. If a worker dies, its job is
+picked up again after `DOCUMENT_JOB_LEASE_SECONDS`. After `DOCUMENT_JOB_MAX_ATTEMPTS`, the job
+and its document are marked failed and the member sees a "please upload again" message.
+
 ## Capacity controls
 
 | Setting | Default | Meaning |

@@ -62,6 +62,12 @@ def translate_answer(answer: str, language: str, client: httpx.Client | None = N
     """Return (text, response_language, flags). Falls back to English on any problem."""
     if language == "en" or not (answer or "").strip():
         return answer, "en", []
+    from app.i18n.catalog import localize_known
+
+    known = localize_known(answer, language)
+    if known:
+        # Fixed catalog text: reviewed translation, no model call.
+        return known, language, []
     if not (settings.enable_llm and settings.answer_translation_enabled):
         return answer, "en", ["translation_unavailable"]
     api_key = settings.active_llm_api_key()

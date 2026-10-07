@@ -1023,3 +1023,4 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
   .follow-up-chips button { animation: none !important; transition: none !important; }
   .experience-working > span:first-child::after { width: 100%; opacity: 0.55; transform: none; }
 }
+.language-picker { margin-right: 8px; padding: 4px 6px; border-radius: 6px; border: 1px solid var(--border, #ccc); background: transparent; color: inherit; font: inherit; }

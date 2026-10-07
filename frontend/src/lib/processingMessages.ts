@@ -1,3 +1,5 @@
+import { t } from "../i18n";
+
 export type ProcessingStageKey =
   | "REQUEST_RECEIVED"
   | "PLANNING"
@@ -173,9 +175,9 @@ function familyFallback(family: RequestFamily | undefined, followUp: boolean | u
 
 export function processingCopy(event: ProcessingEvent): string {
   const keyed = COPY[event.message_key];
-  if (keyed) return keyed;
+  if (keyed) return t(`progress.${event.message_key}`, keyed);
   const fallback = familyFallback(event.family, event.follow_up);
-  return fallback[event.stage] || fallback[event.message_key] || "Working on your answer…";
+  return fallback[event.stage] || fallback[event.message_key] || t("progress.working", "Working on your answer…");
 }
 
 export function uiStageFor(stage: string): CuraProcessingUiStage {

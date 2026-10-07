@@ -1,3 +1,4 @@
+import { LanguagePicker } from "./LanguagePicker";
 import { ThemeToggle } from "./ThemeToggle";
 
 export function CuraHeader({
@@ -13,6 +14,7 @@ export function CuraHeader({
         </button>
         <h1>Cura ✨</h1>
         <span className="header-controls">
+          <LanguagePicker />
           <ThemeToggle />
         </span>
       </div>

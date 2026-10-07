@@ -1,8 +1,8 @@
+import asyncio
 import json
-import queue
-import threading
 
 from fastapi import APIRouter, Depends, Header, Request
+from fastapi.concurrency import run_in_threadpool
 from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
@@ -62,13 +62,91 @@ def _client_view(response: ChatResponse) -> ChatResponse:
 
 
 @router.post("/chat/stream")
-def chat_stream(
+async def chat_stream(
     payload: ChatRequest,
     request: Request,
     principal: AuthenticatedPrincipal = Depends(get_current_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> StreamingResponse:
+    """Server-sent events. The pipeline runs in one bounded worker-pool thread and its
+    progress reaches the client through an asyncio queue, so a stream no longer holds an
+    extra raw thread plus a pool thread blocked on a queue (readiness plan 5.3)."""
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
+    cached = await run_in_threadpool(_stream_prelude, principal, payload, idempotency_key)
+    headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
+    if cached:
+
+        async def cached_events():
+            yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
+            yield _event("progress", {"stage": "COMPLETE", "message_key": "complete", "family": "personal", "follow_up": False})
+            yield _event("complete", cached.model_dump(mode="json"))
+            yield _event("answer", cached.model_dump(mode="json"))
+
+        return StreamingResponse(cached_events(), media_type="text/event-stream", headers=headers)
+
+    chat_capacity.acquire()
+    loop = asyncio.get_running_loop()
+    events_q: asyncio.Queue = asyncio.Queue()
+
+    def put(kind: str, data: dict) -> None:
+        loop.call_soon_threadsafe(events_q.put_nowait, (kind, data))
+
+    def worker() -> None:
+        session = SessionLocal()
+        try:
+            emitter = ProgressEmitter(
+                callback=lambda event: put("progress", event.model_dump(mode="json")),
+                preview_callback=lambda preview: put("preview", preview.model_dump(mode="json")),
+                experience_callback=lambda block: put("experience_block", block.model_dump(mode="json")),
+            )
+            response = ChatService(session, get_registry()).chat(
+                principal, payload, request_id, progress=emitter
+            )
+            _record_usage(principal.subject_id, response)
+            request_controls.idempotency_store(
+                principal.subject_id, idempotency_key, payload, response
+            )
+            put("complete", _client_view(response).model_dump(mode="json"))
+        except CuraError as exc:
+            put("error", {"code": exc.code, "message": exc.message})
+        except Exception:
+            put("error", {"code": "INTERNAL_ERROR", "message": "Something went wrong. Please try again."})
+        finally:
+            session.close()
+            chat_capacity.release()
+
+    # Keep a reference so the task finishes (and releases capacity) even if the client leaves.
+    task = asyncio.ensure_future(run_in_threadpool(worker))
+    _RUNNING.add(task)
+    task.add_done_callback(_RUNNING.discard)
+
+    async def events():
+        yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
+        timeout = max(float(settings.request_timeout_seconds) + 10.0, 30.0)
+        while True:
+            try:
+                kind, payload_data = await asyncio.wait_for(events_q.get(), timeout=timeout)
+            except asyncio.TimeoutError:
+                yield _event("error", {"code": "TIMEOUT", "message": "The request timed out. Please try again."})
+                break
+            if kind in {"progress", "preview", "experience_block"}:
+                yield _event(kind, payload_data)
+            elif kind == "complete":
+                yield _event("complete", payload_data)
+                yield _event("answer", payload_data)
+                break
+            elif kind == "error":
+                yield _event("error", payload_data)
+                break
+
+    return StreamingResponse(events(), media_type="text/event-stream", headers=headers)
+
+
+_RUNNING: set[asyncio.Future] = set()
+
+
+def _stream_prelude(principal: AuthenticatedPrincipal, payload: ChatRequest, idempotency_key: str | None):
+    """Blocking checks (database, Redis) kept off the event loop."""
     consent_session = SessionLocal()
     try:
         require_consent(consent_session, principal.subject_id)
@@ -79,87 +157,8 @@ def chat_stream(
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
-        cached = _client_view(cached)
-
-        def cached_events():
-            yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
-            yield _event("progress", {"stage": "COMPLETE", "message_key": "complete", "family": "personal", "follow_up": False})
-            yield _event("complete", cached.model_dump(mode="json"))
-            yield _event("answer", cached.model_dump(mode="json"))
-
-        return StreamingResponse(
-            cached_events(),
-            media_type="text/event-stream",
-            headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-        )
-
-    chat_capacity.acquire()
-    events_q: queue.Queue = queue.Queue()
-
-    def on_progress(event) -> None:
-        events_q.put(("progress", event.model_dump(mode="json")))
-
-    def on_preview(preview) -> None:
-        events_q.put(("preview", preview.model_dump(mode="json")))
-
-    def on_experience_block(block) -> None:
-        events_q.put(("experience_block", block.model_dump(mode="json")))
-
-    def worker() -> None:
-        session = SessionLocal()
-        try:
-            emitter = ProgressEmitter(
-                callback=on_progress,
-                preview_callback=on_preview,
-                experience_callback=on_experience_block,
-            )
-            response = ChatService(session, get_registry()).chat(
-                principal, payload, request_id, progress=emitter
-            )
-            _record_usage(principal.subject_id, response)
-            request_controls.idempotency_store(
-                principal.subject_id, idempotency_key, payload, response
-            )
-            events_q.put(("complete", _client_view(response).model_dump(mode="json")))
-        except CuraError as exc:
-            events_q.put(("error", {"code": exc.code, "message": exc.message}))
-        except Exception:
-            events_q.put(("error", {"code": "INTERNAL_ERROR", "message": "Something went wrong. Please try again."}))
-        finally:
-            session.close()
-            chat_capacity.release()
-
-    thread = threading.Thread(target=worker, daemon=True)
-    thread.start()
-
-    def events():
-        yield _event("status", {"state": "started", "request_id": request_id, "streaming": settings.chat_streaming_mode})
-        timeout = max(float(settings.request_timeout_seconds) + 10.0, 30.0)
-        while True:
-            try:
-                kind, payload_data = events_q.get(timeout=timeout)
-            except queue.Empty:
-                yield _event("error", {"code": "TIMEOUT", "message": "The request timed out. Please try again."})
-                break
-            if kind == "progress":
-                yield _event("progress", payload_data)
-            elif kind == "preview":
-                yield _event("preview", payload_data)
-            elif kind == "experience_block":
-                yield _event("experience_block", payload_data)
-            elif kind == "complete":
-                yield _event("complete", payload_data)
-                yield _event("answer", payload_data)
-                break
-            elif kind == "error":
-                yield _event("error", payload_data)
-                break
-
-    return StreamingResponse(
-        events(),
-        media_type="text/event-stream",
-        headers={"Cache-Control": "no-cache", "X-Accel-Buffering": "no"},
-    )
+        return _client_view(cached)
+    return None
 
 
 def _event(name: str, payload: dict) -> str:
@@ -181,10 +180,10 @@ def cura_chat(
 
 
 @compat_router.post("/cura/chat/stream")
-def cura_chat_stream(
+async def cura_chat_stream(
     payload: ChatRequest,
     request: Request,
     principal: AuthenticatedPrincipal = Depends(get_current_user),
     idempotency_key: str | None = Header(default=None, alias="Idempotency-Key"),
 ) -> StreamingResponse:
-    return chat_stream(payload, request, principal, idempotency_key)
+    return await chat_stream(payload, request, principal, idempotency_key)

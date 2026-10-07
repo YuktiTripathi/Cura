@@ -37,8 +37,10 @@ _PERSONAL_TEMPLATES = {
 }
 
 
-def _t(kind: str, name: str) -> str:
-    return _PERSONAL_TEMPLATES[kind].format(name=name)
+def _t(kind: str, name: str, language: str | None = None) -> str:
+    from app.i18n.catalog import t
+
+    return t(f"starter_{kind}", language, name=name)
 
 
 @dataclass
