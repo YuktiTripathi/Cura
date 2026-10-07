@@ -167,6 +167,11 @@ class ResponseComposer:
         if presentation.mode in {ResponseMode.single_value, ResponseMode.result_list} and response_plan.kind != "report_overview":
             combined = combined[:1] if not answer_turn else []
         text = flatten_structured_response(presentation, raw_answer=cleaned)
+        model_wrote = bool(llm_result and (llm_result.answer or "").strip()) and presentation.mode != ResponseMode.clinician_handoff
+        if model_wrote and cleaned.strip():
+            # The model's answer IS the chat answer. Cards, missing-data notes and stock next
+            # steps stay in the structured presentation; they are not spliced into the prose.
+            text = cleaned.strip()
         if response_plan.kind == "report_overview":
             abnormal = [
                 m for m in (context.markers or [])
@@ -179,7 +184,7 @@ class ResponseComposer:
             text = f"{response_plan.direct_answer} {response_plan.summary}{highlight}".strip()
         if not text:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
-        change_line = _change_summary(context)
+        change_line = None if model_wrote else _change_summary(context)
         if change_line and not any(name.lower() in text.lower() for name in change_line[1]):
             # A comparison question is answered with what moved, before any wider summary.
             text = f"{change_line[0]} {text}".strip()

@@ -17,6 +17,7 @@ from dataclasses import dataclass, field
 from app.contracts.common import IntentType, MarkerFlag
 from app.contracts.health_context import HealthContext
 from app.pipeline.health_domains import domain_for_entity
+from app.pipeline.health_patterns import find_patterns, theme_codes_for
 from app.pipeline.health_topics import (
     TopicMatch,
     concept_spec,
@@ -112,26 +113,32 @@ GOAL_GUIDANCE = {
         "confirm it. Never just say 'improved' without the numbers."
     ),
     PRIORITIZATION: (
-        "Give at most three priorities in order. For each: what it is and why it ranks there (degree of "
-        "abnormality, related findings, Bio-AI risk, change over time, habits). Say this is a reasonable order to "
-        "work on, not a formal clinical ranking. Do not list every abnormal value."
+        "Prioritize by PATTERN, not by marker: use the ranked 'patterns' (e.g. glucose regulation, blood fats, iron "
+        "and red cells). Give at most three numbered priorities. For each: the pattern in plain words, the one or two "
+        "values that show it, why it ranks there (how far outside range, several markers agreeing, Bio-AI risk, "
+        "change since the last report, habits). Do not rank a minor finding above a clearly significant pattern. "
+        "Mention one reassuring system if listed. Say it is a sensible order to work on, not a formal risk ranking. "
+        "Never list every abnormal value."
     ),
     ACTION_PLAN: (
         "One-sentence assessment, then at most three actions tied to the listed findings and habits. Skip what the "
         "member already does; no medicines or doses."
     ),
     OVERVIEW: (
-        "Open with the overall picture in plain words, then the few areas that matter (connecting blood, Bio-AI "
-        "and habits where they point the same way), what looks reassuring, and the one priority."
+        "Open with the overall picture in one or two sentences. Then the two or three patterns that matter most "
+        "(connect the markers within each pattern and any Bio-AI risk or habit pointing the same way), then what is "
+        "reassuring from 'reassuring_systems', then the one thing to focus on first. Do not walk through every "
+        "result; minor findings can be summarised in one clause."
     ),
     RISK: (
         "Calibrated explanation of what this could mean, the personal evidence for and against concern, and when "
         "seeing a clinician makes sense. No alarm unless a listed fact warrants it."
     ),
     BIO_AI: (
-        "Explain the Bio-AI result as a risk estimate built from several inputs, not a diagnosis and not one "
-        "biomarker. Connect it to the listed measured results and habits that point the same way, and note listed "
-        "results that are reassuring. Do not describe how the model works internally."
+        "Explain why the Bio-AI risk is elevated as a synthesis: it is a risk estimate built from several inputs, "
+        "not a diagnosis and not one biomarker. Name the strongest measured signals from the 'patterns' that point in "
+        "the same direction (with their values), the habits that fit, and what is reassuring. End with which pattern "
+        "to focus on first. Do not list every Bio-AI score and do not describe the model's internals."
     ),
 }
 
@@ -253,6 +260,8 @@ class AnswerEvidence:
     premise_check: dict | None = None
     checked_without_concern: list[str] = field(default_factory=list)
     extra_guidance: list[str] = field(default_factory=list)
+    patterns: list[dict] = field(default_factory=list)
+    reassuring: list[dict] = field(default_factory=list)
 
     def payload(self) -> dict:
         """What the answering model receives instead of the full health record."""
@@ -275,6 +284,8 @@ class AnswerEvidence:
             "ranked_next_steps": self.next_action_context,
             "already_doing": self.already_doing,
             "reassuring_groups": self.reassuring_groups,
+            "patterns": self.patterns,
+            "reassuring_systems": self.reassuring,
             "already_explained_in_this_conversation": self.already_explained,
             "answer_budget": {
                 "target_words": f"{self.budget.words[0]}-{self.budget.words[1]}",
@@ -364,12 +375,29 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     goal = (context.personalization.primary_health_goal if context.personalization else None) or next(
         (g.goal_code for g in context.goals or [] if getattr(g, "status", "active") == "active"), None)
 
+    # ---- patterns across systems (synthesis) and what is reassuring
+    trend_codes = {
+        b.entity: "worse" for b in context.baselines or []
+        if getattr(getattr(b, "classification", None), "value", "") == "WORSENED" or b.newly_abnormal
+    }
+    patterns, reassuring = find_patterns(markers, context.bio_ai_risks or [], trend_codes=trend_codes)
+
     # ---- primary and supporting facts
     if mode in {OVERVIEW, PRIORITIZATION}:
         abnormal = prioritize_findings(markers, context.bio_ai_risks or [], goal)
-        evidence.primary_facts = [_marker_fact(m) for m in abnormal[: budget.primary]]
-        evidence.supporting_facts = [_risk_fact(r) for r in (context.bio_ai_risks or []) if _elevated(r)][
-            : (5 if mode == OVERVIEW else budget.supporting)]
+        if mode == PRIORITIZATION and patterns:
+            # One lead finding per pattern: "glucose regulation" is one priority, not two
+            # (HbA1c and glucose); the rest of each pattern is supporting evidence.
+            order = [p["out_of_range"][0]["code"] for p in patterns[: budget.primary]]
+            others = {f["code"] for p in patterns[: budget.primary] for f in p["out_of_range"][1:]}
+            by_key = {m.key: m for m in markers}
+            evidence.primary_facts = [_marker_fact(by_key[c]) for c in order if c in by_key]
+            evidence.supporting_facts = [_marker_fact(m) for m in markers if m.key in others][:3]
+        else:
+            evidence.primary_facts = [_marker_fact(m) for m in abnormal[: budget.primary]]
+        evidence.supporting_facts = list(evidence.supporting_facts) + [
+            _risk_fact(r) for r in (context.bio_ai_risks or []) if _elevated(r)
+        ][: (5 if mode == OVERVIEW else budget.supporting)]
         if mode == OVERVIEW:
             evidence.reassuring_groups = _reassuring_groups(markers)
     elif mode == BIO_AI:
@@ -407,6 +435,10 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         evidence.supporting_facts = [_marker_fact(m) for m in flagged[budget.primary: budget.primary + budget.supporting]]
     elif mode != QUESTIONNAIRE_LOOKUP:
         named = [m for m in markers if m.key in requested]
+        if not named:
+            # "my sugar" asks for the glucose family: use whichever glucose the report stores.
+            fam = set().union(*(_family(c) for c in requested)) if requested else set()
+            named = [m for m in markers if m.key in fam]
         cap = min(3, max(budget.primary, len({m.key for m in named}))) if named else budget.primary
         primary = named[:cap] or ([m for m in markers if _flag(m) in _ABNORMAL] or markers)[: budget.primary]
         evidence.primary_facts = [_marker_fact(m) for m in primary]
@@ -424,6 +456,18 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             aligned = [r for r in context.bio_ai_risks or [] if _elevated(r) and _risk_in_domains(r.code, domains)]
             room = budget.supporting - len(evidence.supporting_facts)
             evidence.supporting_facts += [_risk_fact(r) for r in aligned[:room]]
+
+    whole_picture = mode in {OVERVIEW, PRIORITIZATION, BIO_AI} or "overall_health" in (semantic.get("health_topics") or [])
+    if whole_picture:
+        evidence.patterns = patterns[:5]
+        evidence.reassuring = reassuring[:4]
+    elif mode not in {LOOKUP, QUESTIONNAIRE_LOOKUP}:
+        # Focused question: only the patterns its findings belong to, and the reassuring
+        # systems those findings sit next to.
+        codes = {f.get("code") for f in [*evidence.primary_facts, *evidence.supporting_facts] if f.get("code")}
+        wanted = theme_codes_for(codes)
+        evidence.patterns = [p for p in patterns if p["pattern"] in wanted][:2]
+        evidence.reassuring = [r for r in reassuring if r["system"] in wanted][:2]
 
     # ---- trend for the primary fact
     if budget.trend and not evidence.trend_facts:
@@ -444,10 +488,20 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     # ---- one uncertainty that changes interpretation
     if budget.missing:
         primary_codes = {f.get("code") for f in evidence.primary_facts}
+        present = {m.key for m in markers}
+        asked = set(requested) | set(topics.markers)
         for item in context.missing or []:
-            if item.key in primary_codes or mode in {EXPLANATION, ACTION_PLAN}:
-                evidence.uncertainty_facts.append({"code": item.key, "name": item.name, "reason": item.reason})
-                break
+            # Only a gap in what was actually asked, and not when a sibling measurement answers
+            # it (fasting glucose missing but glucose present).
+            if item.key not in asked or (_family(item.key) & present):
+                continue
+            evidence.uncertainty_facts.append({"code": item.key, "name": item.name, "reason": item.reason})
+            break
+        if "glucose" in present and {"glucose", "fasting_blood_glucose"} & asked and "fasting_blood_glucose" not in present:
+            evidence.uncertainty_facts.append({
+                "code": "glucose",
+                "note": "The report lists glucose without saying whether the sample was fasting; mention it only if it changes the interpretation.",
+            })
 
     # ---- questionnaire as reasoning context (never the whole questionnaire)
     selection = QuestionnaireSelection()
@@ -532,9 +586,23 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
 _FOLLOW_UP_TURNS = {"FOLLOW_UP_QUESTION", "REFERENCE_RESOLUTION", "CORRECTION", "ANSWER_TO_ASSISTANT", "CLARIFICATION"}
 
 
+_FAMILIES = (
+    {"glucose", "fasting_blood_glucose", "postprandial_glucose"},
+    {"cholesterol", "total_cholesterol"},
+)
+
+
+def _family(code: str) -> set[str]:
+    for family in _FAMILIES:
+        if code in family:
+            return family - {code}
+    return set()
+
+
 def _conversation_codes(context: HealthContext) -> list[str]:
+    """Supporting markers carried in: from earlier turns, then interpretation-changing ones."""
     semantic = getattr(context, "semantic_plan", None) or {}
-    return list(semantic.get("conversation_markers") or [])
+    return list(dict.fromkeys([*(semantic.get("conversation_markers") or []), *(semantic.get("related_markers") or [])]))
 
 
 def _trend_fact(row) -> dict:

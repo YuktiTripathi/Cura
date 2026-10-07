@@ -220,7 +220,8 @@ def extract_topics(message: str, *, conversation_entities: list[str] | None = No
     if re.search(r"\b(?:my |mera |meri )?sugar\b", text, re.I) and not match.markers and not re.search(
         r"\bsugar (?:intake|in my diet|drinks?)\b", text, re.I
     ):
-        match.markers.append("fasting_blood_glucose")
+        # The glucose family: whichever glucose the report stores (fasting or not) answers it.
+        match.markers.append("glucose")
     scrubbed = _FATTY.sub(" ", text)
     for pattern, code in _alias_patterns():
         if code not in match.concepts and pattern.search(scrubbed):

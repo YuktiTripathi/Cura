@@ -55,7 +55,7 @@ SUITE = {
 STAGES = (
     "intent_ms", "retrieval_ms", "profile_fetch_ms", "blood_bioai_fetch_ms", "blood_fetch_ms", "bioai_fetch_ms",
     "lifestyle_fetch_ms", "questionnaire_fetch_ms", "scenario_fetch_ms", "context_only_ms", "knowledge_lookup_ms",
-    "prompt_build_ms", "llm_ms", "safety_ms", "recommendation_ms", "persistence_ms",
+    "prompt_build_ms", "llm_ms", "safety_ms", "recommendation_ms", "composition_ms", "persistence_ms",
 )
 
 
@@ -122,8 +122,13 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--simulate-llm-ms", type=int, default=0)
     parser.add_argument("--out", default="latency_suite_results.json")
+    parser.add_argument("--mode", choices=["plain", "rich"], default=None, help="CURA_RESPONSE_MODE override")
     args = parser.parse_args()
     _configure(args)
+    if args.mode:
+        from app.core.config import settings as _settings
+
+        _settings.cura_response_mode = args.mode
 
     from fastapi.testclient import TestClient
 

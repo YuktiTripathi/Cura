@@ -50,6 +50,9 @@ class Settings(BaseSettings):
     answer_cache_ttl_seconds: int = 86400
     # Reuse an identical prompt's answer. Turn off for cold-latency measurement and evals.
     answer_cache_enabled: bool = True
+    # CURA_RESPONSE_MODE: "rich" (cards, tables, chips) or "plain" (the conversational answer
+    # only). Plain mode debugs answer quality separately from presentation.
+    cura_response_mode: str = "rich"
     # Skip the Jev router call for unambiguous single-value lookups and short definitions.
     jev_fast_path: bool = True
     # Answer plain definition questions from a reviewed passage without a model (cost lever 4).

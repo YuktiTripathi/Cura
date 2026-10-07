@@ -10,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.chat import ChatMeta, ChatRequest, ChatResponse, EvidenceItem
 from app.contracts.followup import FollowUpSuggestion
-from app.contracts.common import IntentType, KnowledgeScope, LanguageCode
+from app.contracts.common import AnswerModelTier, IntentType, KnowledgeScope, LanguageCode
 from app.contracts.health_context import CrossSourceFinding, CrossSourceValue, HealthContext
 from app.core.config import settings
 from app.core.copy import (
@@ -59,6 +59,7 @@ from app.core import perf
 from app.pipeline.evidence_planner import reconcile_query_plan
 from app.pipeline.semantic_plan import build_semantic_plan
 from app.pipeline.urgency_guard import strip_unsupported_urgency
+from app.pipeline.response_mode import apply_response_mode, plain_answer, plain_mode
 from app.pipeline.context_merger import ContextMerger, attach_medical_evidence
 from app.pipeline.personalized_followups import PersonalizedFollowUpEngine, build_inventory
 from app.pipeline.prompt_builder import PromptBuilder
@@ -213,6 +214,7 @@ class ChatService:
         request_perf = perf.begin(request_id)
         try:
             response = self._execute_chat(principal, payload, request_id, eval_turn)
+            response = apply_response_mode(response)
             with perf.stage("persistence"):
                 response = self._record_evaluation(response, eval_turn)
             _attach_perf(response, eval_turn, request_perf)
@@ -399,14 +401,31 @@ class ChatService:
             jev_temporal=getattr(decision, "temporal_requirement", None),
         )
         plan, semantic_changes = reconcile_query_plan(plan, semantic)
+        if (
+            semantic.primary_goal.value not in {"LOOKUP", "GENERAL_EDUCATION"}
+            and semantic.goal_from_cue
+            and plan.needs_personal_data
+            and plan.answer_model_tier in {None, AnswerModelTier.deterministic}
+        ):
+            # A question that asks for reasoning ("is that because of my sugar?") is answered by
+            # the model, even when the routed intent began life as a value lookup.
+            plan = plan.model_copy(update={
+                "answer_model_tier": AnswerModelTier.standard_medical,
+                "model_tier": AnswerModelTier.standard_medical,
+                "operations": list(dict.fromkeys([*(plan.operations or []), "INTERPRET"])),
+                "reasoning_required": True,
+            })
+            semantic_changes.append("tier_to_model")
         if semantic.clarification_needed and plan.intent.value == "general_health_question" and not continuing:
             plan = plan.model_copy(update={"intent": IntentType.ambiguous_clarification})
         # Carry earlier markers only when the new turn reasons about them ("but my fasting
         # glucose is normal?"), never into a plain lookup ("what about my creatinine?").
-        carrying = (continuing or bool(_CONTRAST_OPENER.match(payload.message or ""))) and (
+        refers_back = bool(re.search(r"\b(?:that|it|this|those|these|same)\b", payload.message or "", re.I))
+        carrying = (continuing or refers_back or bool(_CONTRAST_OPENER.match(payload.message or ""))) and (
             semantic.goal_from_cue and semantic.primary_goal.value not in {"LOOKUP", "GENERAL_EDUCATION"}
         )
         plan = _carry_conversation_markers(plan, conv_state, carrying, _previous_entities(conv))
+        plan, related_codes = _add_related_markers(plan, semantic)
         eval_turn["semantic_plan"] = semantic
         eval_turn["semantic_changes"] = semantic_changes
         self._progress.timing.marks["semantic"] = int((time.perf_counter() - semantic_started) * 1000)
@@ -995,6 +1014,7 @@ class ChatService:
             "conversation_markers": [
                 k for k in (plan.conversation_entities or []) if k not in set(plan.display_entities or [])
             ] if carrying else [],
+            "related_markers": related_codes,
         }
 
         routing_note = None
@@ -1039,6 +1059,14 @@ class ChatService:
             )
         self._progress.measure("reasoner")
         answer = reasoned.answer
+        # Developer trace of where answer quality is gained or lost (never sent in production).
+        eval_turn["answer_stages"] = {
+            "path": reasoned.llm_mode,
+            "llm_called": bool(reasoned.llm_called),
+            "model_tier": plan.answer_model_tier.value if plan.answer_model_tier else None,
+            "raw_llm_answer": (reasoned.llm_result.answer if reasoned.llm_result else None),
+            "reasoner_answer": answer,
+        }
         llm_result = reasoned.llm_result
         llm_called = reasoned.llm_called
         llm_mode = reasoned.llm_mode
@@ -1082,6 +1110,7 @@ class ChatService:
                 pre_safety=pre_safety,
             )
 
+        eval_turn.setdefault("answer_stages", {})["post_validator_answer"] = answer
         critical_flags, critical_escalation = self.safety.scan_critical_context(context)
         if critical_escalation:
             escalation = critical_escalation
@@ -1150,19 +1179,32 @@ class ChatService:
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
-        with perf.stage("composition"):
-            answer, suggestions, presentation = self.composer.compose(
-                answer,
-                plan=plan,
-                context=context,
-                follow_ups=suggestions,
-                llm_follow_ups=llm_follow,
-                llm_result=llm_result,
-                testing_option=testing_option,
-                experience=experience,
-                conversation_turn=conv_state.turn_type.value,
-            )
+        pre_compose_answer = answer
+        if plain_mode():
+            # Plain mode skips card/table/chip assembly entirely; only the answer is returned.
+            from app.contracts.presentation import StructuredResponse
+
+            suggestions, presentation = [], StructuredResponse()
+        else:
+            with perf.stage("composition"):
+                answer, suggestions, presentation = self.composer.compose(
+                    answer,
+                    plan=plan,
+                    context=context,
+                    follow_ups=suggestions,
+                    llm_follow_ups=llm_follow,
+                    llm_result=llm_result,
+                    testing_option=testing_option,
+                    experience=experience,
+                    conversation_turn=conv_state.turn_type.value,
+                )
         self._progress.measure("compose")
+        eval_turn.setdefault("answer_stages", {})["post_safety_answer"] = pre_compose_answer
+        eval_turn["answer_stages"]["post_composer_answer"] = answer
+        if plain_mode():
+            # Plain mode: the conversational answer is the answer. The composer's presentation is
+            # kept internally (sources, metadata) but its text assembly is bypassed.
+            answer = plain_answer(pre_compose_answer, reasoned.llm_mode, context)
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
         safety_caution = getattr(pre_safety, "caution", None)
@@ -2081,6 +2123,8 @@ class ChatService:
                 meta.debug["semantic_plan"] = semantic_debug
             if context is not None and getattr(context, "answer_evidence_trace", None):
                 meta.debug["answer_evidence"] = context.answer_evidence_trace
+            if turn.get("answer_stages"):
+                meta.debug["answer_stages"] = {**turn["answer_stages"], "final_answer": response.answer}
         refs = []
         for item in response.evidence or []:
             refs.append(
@@ -2254,3 +2298,28 @@ def _carry_conversation_markers(plan, conv_state, continuing: bool, previous: li
             "needs_blood": True,
         }
     )
+
+
+def _add_related_markers(plan, semantic):
+    """Read the markers that change how a named result is interpreted (glucose and HDL for
+    triglycerides). They are supporting context for the model, not extra answer cards."""
+    from app.pipeline.health_patterns import related_markers
+
+    if (
+        not plan.needs_personal_data
+        or not semantic.markers
+        or semantic.primary_goal.value in {"LOOKUP", "GENERAL_EDUCATION", "COMPARE"}
+        or plan.premise_claim
+        or plan.history
+        or plan.intent.value in {"trend", "previous_result", "bio_ai_comparison"}
+    ):
+        return plan, []
+    current = list(plan.requested_metrics or semantic.markers)
+    related = related_markers(list(semantic.markers))
+    if not related:
+        return plan, []
+    return plan.model_copy(update={
+        "requested_metrics": list(dict.fromkeys([*current, *related])),
+        "display_entities": list(plan.display_entities or current),
+        "needs_blood": True,
+    }), related

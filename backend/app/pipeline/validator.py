@@ -44,10 +44,10 @@ class ResponseValidator:
         grounding_flags: list[str] = []
         medical_hits = medical_hits or []
         if llm_called and plan.needs_personal_data:
-            unsupported = self.grounding.unsupported_personal_numbers(answer, context)
+            unsupported = self.grounding.unsupported_number_sentences(answer, context)
             if unsupported:
                 grounding_flags.append("unsupported_personal_numbers")
-                answer = self.renderer.render(message, context)
+                answer = _drop_unsupported(answer, unsupported) or self.renderer.render(message, context)
         if medical_hits:
             answer, medical_flags = self.grounding.sanitize_medical_answer(answer, medical_hits)
             grounding_flags.extend(medical_flags)
@@ -110,6 +110,21 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
     ]
     coverage_codes = list(dict.fromkeys([*(plan.display_entities or []), *named]))
     coverage_codes = [item for item in coverage_codes if str(item).lower() not in skip]
+    semantic = getattr(context, "semantic_plan", None) or {}
+    if semantic:
+        # Only what the member actually named must be covered. Entities added by domain
+        # expansion (fasting insulin for "metabolic risk") are context, not obligations, and
+        # a missing one must not be appended to a good answer.
+        named_by_user = {str(c).lower() for c in [*(semantic.get("markers") or []), *(semantic.get("bio_ai") or [])]}
+        present = {(m.key or "").lower() for m in context.markers}
+        glucose_family = {"glucose", "fasting_blood_glucose", "postprandial_glucose"}
+        coverage_codes = [
+            c for c in coverage_codes
+            if str(c).lower() in named_by_user
+            and not (str(c).lower() in glucose_family and present & glucose_family)
+            # "metabolic risk" resolves to the report-level score; its absence is not news.
+            and str(c).lower() not in {"metabolic_score", "metabolic_age"}
+        ]
     for code in coverage_codes:
         name = (display_name_for(code) or code).lower()
         slug = code.replace("_", " ").lower()
@@ -138,3 +153,20 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
             repairs.append(f"{display_name_for(code)} was not found in the retrieved records.")
             flags.append("entity_undisclosed")
     return QualityGateResult(passed=not flags, flags=list(dict.fromkeys(flags)), repairs=repairs)
+
+
+def _drop_unsupported(answer: str, unsupported: list[tuple[str, str]]) -> str | None:
+    """Remove only the sentences that state an unsupported personal value.
+
+    The member keeps the model's explanation; a value that is not in their record is never
+    shown. If most of the answer is unsupported, None asks for the deterministic fallback.
+    """
+    from app.pipeline.grounding import to_ascii_digits
+
+    bad = {sentence.strip() for sentence, _ in unsupported}
+    text = to_ascii_digits(answer or "")
+    sentences = re.split(r"(?<=[.!?।])\s+", text)
+    kept = [s for s in sentences if s.strip() not in bad]
+    if not kept or len(kept) < len(sentences) / 2:
+        return None
+    return " ".join(kept).strip()

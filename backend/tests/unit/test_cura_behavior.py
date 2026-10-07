@@ -112,7 +112,8 @@ def test_priority_response_prioritizes_with_multiple_sources():
     areas = {f["area"] for f in evidence.questionnaire_facts}
     assert areas & {"physical activity", "sitting time", "food choices"}
     assert any(f.get("source", "").startswith("Bio-AI") for f in evidence.supporting_facts)
-    assert "not a formal clinical ranking" in evidence.payload()["how_to_answer"]
+    how = evidence.payload()["how_to_answer"]
+    assert "Prioritize by PATTERN" in how and "not a formal risk ranking" in how
 
 
 def test_questionnaire_personalization_uses_reported_habits_without_inventing():

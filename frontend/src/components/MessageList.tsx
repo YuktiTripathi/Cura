@@ -103,6 +103,11 @@ export function MessageList({
                 onSave={saveEdit}
                 onCancel={() => setEditingIndex(null)}
               />
+            ) : m.role === "assistant" && isPlain(m) ? (
+              // Plain response mode: the conversational answer only (no cards, tables or widgets).
+              <p>
+                <AssistantBody content={m.content} />
+              </p>
             ) : m.role === "assistant" && m.presentation ? (
               <PresentedAnswer
                 presentation={m.presentation}
@@ -117,14 +122,14 @@ export function MessageList({
             {m.role === "user" && editingIndex !== i && onEditQuestion && (
               <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
             )}
-            {m.role === "assistant" && m.presentation && !(m.testingOption || m.presentation.testing_option) ? (
+            {m.role === "assistant" && !isPlain(m) && m.presentation && !(m.testingOption || m.presentation.testing_option) ? (
               // One proactive element per turn: a testing card already is that element.
               <InsightNote insights={readInsights(m.presentation.proactive_insights, 1)} />
             ) : null}
-            {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
-            {m.recommendations && <Recommendations items={m.recommendations} />}
+            {!isPlain(m) && m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
+            {!isPlain(m) && m.recommendations && <Recommendations items={m.recommendations} />}
             {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} contacts={m.meta.emergency_contacts} />}
-            {m.role === "assistant" && (
+            {m.role === "assistant" && !isPlain(m) && (
               <ProvenanceLine
                 provenance={m.provenance}
                 findings={
@@ -142,10 +147,10 @@ export function MessageList({
                 disabled={editingDisabled}
                 sourceCount={groupEvidence(m.evidence).length}
                 onViewSources={() => setSourcesIndex(i)}
-                onDoctorSummary={readHandoff(m.presentation?.clinician_handoff) ? () => setHandoffIndex(i) : undefined}
+                onDoctorSummary={!isPlain(m) && readHandoff(m.presentation?.clinician_handoff) ? () => setHandoffIndex(i) : undefined}
               />
             )}
-            {m.role === "assistant" ? (
+            {m.role === "assistant" && !isPlain(m) ? (
               <FollowUpChips items={mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])} onPick={onFollowUp} />
             ) : null}
           </article>
@@ -167,4 +172,9 @@ export function MessageList({
       />
     </div>
   );
+}
+
+/** Plain response mode (CURA_RESPONSE_MODE=plain): render the answer as ordinary chat text. */
+export function isPlain(m: { role: string; meta?: { response_mode?: string | null } | null }): boolean {
+  return m.role === "assistant" && m.meta?.response_mode === "plain";
 }

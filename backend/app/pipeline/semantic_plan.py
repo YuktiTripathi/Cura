@@ -166,6 +166,7 @@ _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
     ReasoningGoal.prioritize: (
         _rx(r"\b(?:focus(?:ing)? on|fix first|work on first|first|firstly|priorit\w*|most important|matters? most|biggest|top|main thing|start with|where (?:do|should) i start|which one|only (?:change|do|fix) one|one thing|pehle|sabse)\b"),
         _rx(r"\b(?:most|really) (?:matters?|important|relevant|useful)\b"),
+        _rx(r"\b(?:matters? (?:most|less|least)|probably matter|less important|least important|least worrying|(?:needs?|deserves?) (?:the )?most attention|most attention|top \d+|top (?:three|two|five))\b"),
         _rx(r"\bwhich (?:of my|habit|change|result|thing)\w*\b.*\b(?:most|first)\b"),
     ),
     ReasoningGoal.risk: (
@@ -187,6 +188,7 @@ _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
         _rx(r"\b(?:pay attention to|stand(?:s)? out|anything (?:in|on|from) my|anything i should|what do my (?:reports|results) (?:say|show)|overall|overview|big picture|in general how|how am i doing|fit together|together|all my|everything|whole|complete|summar\w*|both|combined?)\b"),
     ),
     ReasoningGoal.explain: (
+        _rx(r"\b(?:because of|due to|caused by|related to|linked to|connected (?:to|with)|is that why|is it from|has to do with)\b"),
         _rx(r"\b(?:mean|means|meaning|explain|interpret\w*|understand|what does|what do|tell me about|how can both|both be true|makes? sense|matlab)\b"),
     ),
     ReasoningGoal.lookup: (
@@ -219,7 +221,12 @@ _HYPOTHETICAL = _rx(
     r"what is (?:a|an)\b|what are\b|normal range for)\b"
 )
 _EXPLICIT_VALUE = _rx(r"\b(?:of|at|is|=)\s*\d+(?:\.\d+)?\s*(?:%|mg|ng|mmol|g/dl|iu|pg|u/l)?\b")
-_BARE_NUMBER = _rx(r"^\D*\d+(?:\.\d+)?\D*$")
+# A message that is essentially a number to judge ("Is 120 bad?", "140 ok?") with no named
+# measure. "Top 3 things", "last 2 reports" are counts, not measurements.
+_BARE_NUMBER = _rx(
+    r"^\s*(?:is|are|what about|and|my)?\s*(?:a |an )?\d+(?:\.\d+)?\s*(?:%|mg/?dl|mmol/?l|units?)?\s*"
+    r"(?:bad|good|ok|okay|high|low|normal|fine|dangerous|safe|too high|too low)?\s*\??\s*$"
+)
 _REFERRING = _rx(r"\b(?:it|this|that|these|those|them|they|same)\b")
 _TREND = _rx(r"\b(?:trend|over time|improving|getting (?:better|worse)|progress|track(?:ing)?|history|historical)\b")
 _HISTORICAL = _rx(r"\b(?:previous|last time|before|earlier|older|old report|last year|past)\b")
@@ -330,7 +337,9 @@ def build_semantic_plan(
 
     self_ref = bool(_SELF.search(text))
     conditional = bool(re.search(r"\b(?:if|suppose|supposing|what if)\s+my\b", text, re.I))
-    hypothetical = conditional or (bool(_HYPOTHETICAL.search(text)) and not re.search(r"\bmy\b", text, re.I))
+    # "What are the top 3 things I should work on?" is about the member: a generic phrasing
+    # only signals general knowledge when the user does not refer to themselves.
+    hypothetical = conditional or (bool(_HYPOTHETICAL.search(text)) and not self_ref)
     explicit_value = bool(_EXPLICIT_VALUE.search(text)) and not re.search(r"\bmy\b", text, re.I)
 
     # Personalization: does the answer depend on THIS member's data?

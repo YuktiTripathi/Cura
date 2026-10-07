@@ -33,6 +33,8 @@ class FollowUp(FollowUpSuggestion):
 
 
 class ChatMeta(BaseModel):
+    # "rich" (cards, tables, chips) or "plain" (conversational answer only).
+    response_mode: str | None = None
     intent: str | None = None
     answer_depth: str | None = None
     status: str = "ok"

@@ -16,6 +16,20 @@ _MARKER_CLAIM = re.compile(
     r"dyslipidemia|metabolic age|metabolic score)\b[^.]{0,80}?(\d+(?:\.\d+)?)",
     re.I,
 )
+# Numbers that are explanation, not a personal measurement.
+_NON_MEASUREMENT = re.compile(
+    r"\b\d+(?:\.\d+)?\s*(?:-|–|to)\s*\d+(?:\.\d+)?\s*(?:months?|weeks?|days?|years?|hours?|minutes?|times?|servings?)\b|"
+    r"\b\d+(?:\.\d+)?\s*(?:months?|weeks?|days?|years?|hours?|hrs?|minutes?|mins?|times?|servings?|steps?|"
+    r"glasses|cups|kg of|percent of people)\b|"
+    r"\b(?:type|top|step|stage|grade|priority|number|no\.?|#)\s*\d+\b|"
+    r"\b(?:19|20)\d{2}\b",
+    re.I,
+)
+_UNIT_VALUE = re.compile(
+    r"\b(\d+(?:\.\d+)?)\s*(?:%|mg/dl|mg/l|ng/ml|pg/ml|g/dl|u/l|iu/l|miu/l|uiu/ml|µiu/ml|mmol/l|fl|pg|"
+    r"ml/min(?:/1\.73\s?m2)?|kg/m2|mm ?hg)",
+    re.I,
+)
 _OVERCLAIM_FALLBACK = (
     "I can share the retrieved medical information without absolute claims. "
     "Please discuss personal treatment decisions with a clinician."
@@ -36,27 +50,41 @@ def _norm(value: float) -> str:
 
 class GroundingChecker:
     def unsupported_personal_numbers(self, answer: str, context: HealthContext) -> list[str]:
+        return [number for _sentence, number in self.unsupported_number_sentences(answer, context)]
+
+    def unsupported_number_sentences(self, answer: str, context: HealthContext) -> list[tuple[str, str]]:
+        """(sentence, number) pairs where a stated personal value is not in the member's record.
+
+        Only measurement-like numbers count: a number with a lab unit, or a decimal / multi-digit
+        number claimed for a named marker. Time spans ("2-3 months"), counts ("top 3"), steps,
+        names ("type 2 diabetes") and dates are explanation, not personal values.
+        """
         by_marker = self._allowed_by_marker(context)
         all_allowed = set()
         for values in by_marker.values():
             all_allowed.update(values)
-        issues: list[str] = []
-        answer = to_ascii_digits(answer)
-        for sentence in re.split(r"(?<=[.!?।])\s+", answer or ""):
-            bound = list(_MARKER_CLAIM.finditer(sentence))
+        issues: list[tuple[str, str]] = []
+        text = to_ascii_digits(answer)
+        for sentence in re.split(r"(?<=[.!?।])\s+", text or ""):
+            scrubbed = _NON_MEASUREMENT.sub(" ", sentence)
+            bound = list(_MARKER_CLAIM.finditer(scrubbed))
             if bound:
+                # A value must belong to a marker named in the same sentence ("HbA1c 9.1% and
+                # glucose 214 mg/dL"); another marker's value attributed here is still caught.
+                named = set()
                 for match in bound:
-                    marker = _canonical_marker(match.group(1))
+                    named |= by_marker.get(_canonical_marker(match.group(1)), set())
+                for match in bound:
                     number = match.group(2)
-                    allowed = by_marker.get(marker, set())
-                    if _norm(float(number)) not in allowed:
-                        issues.append(number)
+                    if "." not in number and len(number) < 2:
+                        continue
+                    if _norm(float(number)) not in named:
+                        issues.append((sentence, number))
                 continue
-            for match in _NUMBER.findall(sentence):
-                if "." not in match and len(match) < 2:
-                    continue
-                if _norm(float(match)) not in all_allowed:
-                    issues.append(match)
+            for match in _UNIT_VALUE.finditer(scrubbed):
+                number = match.group(1)
+                if _norm(float(number)) not in all_allowed:
+                    issues.append((sentence, number))
         return issues
 
     def _allowed_by_marker(self, context: HealthContext) -> dict[str, set[str]]:
