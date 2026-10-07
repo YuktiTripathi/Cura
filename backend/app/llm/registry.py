@@ -53,13 +53,30 @@ def estimate_cost_usd(model_id: str, input_tokens: int, output_tokens: int) -> f
 
 
 def fallback_tiers(tier: AnswerModelTier | str | None) -> list[AnswerModelTier]:
-    """Upgrade-only availability fallback. Deep never silently drops."""
+    """Upgrade-only availability fallback. Deep never drops, except during a configured
+    spend spike, when it tries standard first and keeps deep as the fallback (plan 6.7)."""
     selected = _as_tier(tier)
     if selected is None or selected in {AnswerModelTier.deterministic, AnswerModelTier.fast_reasoning}:
         return []
     if selected == AnswerModelTier.standard_medical:
         return [AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning]
+    if _spend_spike():
+        # Spend spike (plan 6.7): try standard first; deep stays as the fallback.
+        return [AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning]
     return [AnswerModelTier.deep_medical_reasoning]
+
+
+def _spend_spike() -> bool:
+    if settings.answer_model_deep_medical == settings.answer_model_standard_medical:
+        return False
+    from app.core.request_controls import request_controls
+
+    active = request_controls.spend_spike_active()
+    if active:
+        from app.core.metrics import SPEND_SPIKE
+
+        SPEND_SPIKE.inc()
+    return active
 
 
 def uses_answer_llm(tier: AnswerModelTier | str | None) -> bool:

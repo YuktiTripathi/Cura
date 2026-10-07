@@ -9,7 +9,7 @@ from app.contracts.common import KnowledgeScope
 from app.contracts.operations import QualityGateResult
 from app.contracts.query import QueryPlan
 from app.core.config import settings
-from app.pipeline.claim_check import ClaimVerdict, check_claims, revise_unsupported_answer
+from app.pipeline.claim_check import ClaimVerdict, check_claims, revise_unsupported_answer, unmapped_share
 from app.pipeline.clinical_postcheck import review_clinical_output
 from app.pipeline.grounding import GroundingChecker
 from app.pipeline.lab_parameters import DERIVED_ENTITY_KEYS, aliases_for, display_name_for
@@ -58,6 +58,11 @@ class ResponseValidator:
                 if any(flag == "contradicted" for flag in grounding_flags):
                     answer, claim_flags = revise_unsupported_answer(answer, medical_hits)
                     grounding_flags.extend(claim_flags)
+                elif llm_called and unmapped_share(answer, medical_hits) > 0.5:
+                    # Most claims map to no retrieved passage: say so instead of implying a source.
+                    grounding_flags.append("claims_unmapped")
+                    if not answer.lstrip().lower().startswith("general information"):
+                        answer = "General information: " + answer.lstrip()
         answer, safety_flags = self.safety.review(answer, message)
         flags.extend(safety_flags)
         if settings.cura_clinical_safety_enabled:

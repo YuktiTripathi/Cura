@@ -55,6 +55,7 @@ def _record_usage(subject_id: str, response: ChatResponse) -> None:
     observe_chat(meta)
     used = (meta.input_tokens or 0) + (meta.output_tokens or 0) + (meta.jev_input_tokens or 0) + (meta.jev_output_tokens or 0)
     request_controls.record_token_usage(subject_id, used)
+    request_controls.record_spend(meta.estimated_cost_usd)
 
 
 def _client_view(response: ChatResponse) -> ChatResponse:

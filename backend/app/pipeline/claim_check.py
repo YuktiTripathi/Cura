@@ -137,3 +137,46 @@ def revise_unsupported_answer(
         "guideline-verified answer.",
         flags,
     )
+
+
+_SUPPORTING = {ClaimVerdict.SUPPORTED, ClaimVerdict.PARTIALLY_SUPPORTED, ClaimVerdict.CONTEXT_DEPENDENT}
+
+
+def map_claims_to_passages(
+    answer: str,
+    evidence: list[MedicalEvidenceDoc] | list[MedicalEvidenceSource],
+) -> list[tuple[str, ClaimVerdict, int | None]]:
+    """Each claim with its verdict and the index of the passage that best supports it (plan 4.7)."""
+    texts = [getattr(item, "evidence_text", None) or getattr(item, "excerpt", "") or "" for item in evidence]
+    rank = {
+        ClaimVerdict.SUPPORTED: 3,
+        ClaimVerdict.CONTEXT_DEPENDENT: 2,
+        ClaimVerdict.PARTIALLY_SUPPORTED: 1,
+        ClaimVerdict.UNSUPPORTED: 0,
+        ClaimVerdict.CONTRADICTED: -1,
+    }
+    mapped: list[tuple[str, ClaimVerdict, int | None]] = []
+    for claim in extract_claims(answer):
+        best: tuple[int, ClaimVerdict, int | None] = (0, ClaimVerdict.UNSUPPORTED, None)
+        for index, text in enumerate(texts):
+            verdict = classify_claim(claim, text)
+            if verdict == ClaimVerdict.CONTRADICTED:
+                best = (-1, verdict, index)
+                break
+            if rank[verdict] > best[0]:
+                best = (rank[verdict], verdict, index)
+        mapped.append((claim, best[1], best[2] if best[1] in _SUPPORTING else None))
+    return mapped
+
+
+def supporting_passages(answer: str, evidence: list) -> list:
+    """Passages that support at least one claim, in retrieval order."""
+    used = {index for _, _, index in map_claims_to_passages(answer, evidence) if index is not None}
+    return [doc for index, doc in enumerate(evidence) if index in used]
+
+
+def unmapped_share(answer: str, evidence: list) -> float:
+    mapped = map_claims_to_passages(answer, evidence)
+    if not mapped:
+        return 0.0
+    return sum(1 for _, _, index in mapped if index is None) / len(mapped)

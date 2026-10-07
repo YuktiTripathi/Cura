@@ -115,6 +115,9 @@ class Settings(BaseSettings):
     medical_require_reviewed: bool | None = None
     # Read-only SuperShyft session guards (defence in depth behind the read-only role).
     supershyft_statement_timeout_ms: int = 5000
+    # Reuse a member's Supershyft reads for this long (plan 5.5). 0 disables.
+    health_data_cache_seconds: int = 90
+    health_data_cache_version: str = "1"
     document_encryption_key: str = ""
     document_retention_days: int = 90
     # Conversations untouched for this many days are purged with their derived rows. 0 disables.
@@ -166,6 +169,8 @@ class Settings(BaseSettings):
     trust_proxy_headers: bool = False
     # Model tokens (input + output) a member may use per UTC day. 0 disables the budget.
     member_daily_token_budget: int = 200_000
+    # Above this model spend per hour, deep answers try the standard tier first (plan 6.7). 0 disables.
+    spend_spike_hourly_usd: float = 5.0
     rate_limit_window_seconds: int = 60
     idempotency_ttl_seconds: int = 300
 

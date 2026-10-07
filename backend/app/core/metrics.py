@@ -19,6 +19,8 @@ CHAT_OUTCOMES = Counter("cura_chat_total", "Chat answers by outcome", ["status",
 SAFETY_FLAGS = Counter("cura_safety_flags_total", "Safety flags raised", ["flag"])
 TOKENS = Counter("cura_llm_tokens_total", "Model tokens", ["kind", "tier"])
 ANSWER_CACHE = Counter("cura_answer_cache_total", "Model answer cache lookups", ["result"])
+HEALTH_DATA_CACHE = Counter("cura_health_data_cache_total", "Supershyft read cache lookups", ["kind", "result"])
+SPEND_SPIKE = Counter("cura_spend_spike_downgrades_total", "Deep answers sent to standard during a spend spike")
 COST = Counter("cura_llm_cost_usd_total", "Estimated model cost in USD", ["tier"])
 
 _KNOWN_FLAGS_LIMIT = 64

@@ -130,6 +130,42 @@ class RequestControlStore:
             total = (int(entry.value) if entry else 0) + int(tokens)
             self._memory[key] = _Entry(time.time() + 2 * 86400, str(total))
 
+    @staticmethod
+    def _spend_key(offset_hours: int = 0) -> str:
+        return f"cura:spend:{int(time.time() // 3600) - offset_hours}"
+
+    def record_spend(self, usd: float | None) -> None:
+        """Add model spend to the current hour, stored in micro-dollars (plan 6.7)."""
+        micro = int(round((usd or 0.0) * 1_000_000))
+        if micro <= 0:
+            return
+        key = self._spend_key()
+        client = self._client()
+        if client:
+            client.incrby(key, micro)
+            client.expire(key, 3 * 3600)
+            return
+        with self._lock:
+            entry = self._memory.get(key)
+            total = (int(entry.value) if entry else 0) + micro
+            self._memory[key] = _Entry(time.time() + 3 * 3600, str(total))
+
+    def spend_last_hour_usd(self) -> float:
+        """Spend in the current and previous hour bucket, scaled to roughly one hour."""
+        current = int(self._get(self._spend_key()) or 0)
+        previous = int(self._get(self._spend_key(1)) or 0)
+        elapsed = (time.time() % 3600) / 3600
+        return (current + previous * (1 - elapsed)) / 1_000_000
+
+    def spend_spike_active(self) -> bool:
+        limit = float(settings.spend_spike_hourly_usd or 0)
+        if limit <= 0:
+            return False
+        try:
+            return self.spend_last_hour_usd() > limit
+        except Exception:  # noqa: BLE001 - never block answers on a metrics read
+            return False
+
     def idempotency_lookup(
         self,
         subject_id: str,

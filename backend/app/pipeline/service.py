@@ -82,6 +82,8 @@ from app.pipeline.renderer import (
     render_provenance,
 )
 from app.core.log_ids import subject_ref
+from app.pipeline.claim_check import supporting_passages
+from app.retrieval.hybrid import HybridMedicalKnowledgeProvider
 from app.retrieval.medical import passage_label
 from app.pipeline.translation import target_language, translate_answer
 from app.pipeline.safety_messages import emergency_contacts, see_doctor_soon_message
@@ -112,7 +114,7 @@ class ChatService:
         self.reasoner = ReasoningService(self.prompts, self.renderer)
         self.validator = ResponseValidator(grounding=GroundingChecker(), safety=SafetyLayer(), renderer=self.renderer)
         self.composer = ResponseComposer()
-        self.medical_knowledge = CuratedMedicalKnowledgeProvider()
+        self.medical_knowledge = HybridMedicalKnowledgeProvider()
         self.safety = SafetyLayer()
         self.grounding = GroundingChecker()
         self.recommendations = RecommendationEngine()
@@ -838,7 +840,8 @@ class ChatService:
 
         medical_hits = []
         if getattr(plan, "medical_evidence_required", False) or general_only:
-            limit = 2 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 1
+            # Three passages by default, five for broader "what should I do" questions (plan 4.5).
+            limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
             medical_hits = self.medical_knowledge.query(payload.message, plan.topic, limit=limit)
             context.medical_passages = [passage_label(doc) for doc in medical_hits]
             attach_medical_evidence(context, medical_hits)
@@ -1717,6 +1720,9 @@ class ChatService:
         self._progress.emit(ProcessingStage.complete)
         medical = turn.get("medical") or []
         jev_trace = turn.get("jev_trace")
+        if medical and not plan.needs_personal_data:
+            # Cite only passages that support a claim in the answer (plan 4.7).
+            medical = supporting_passages(response.answer or "", medical)
         response.provenance = build_user_provenance(plan, list(response.evidence or []), medical)
         if settings.is_development:
             context = turn.get("context")

@@ -64,13 +64,15 @@ def build_registry() -> ProviderRegistry:
             SuperShyftUserProvider,
         )
 
-        users = SuperShyftUserProvider()
-        blood = SuperShyftBloodProvider()
-        bio_ai = SuperShyftBioAIProvider()
-        lifestyle = SuperShyftLifestyleProvider()
+        from app.providers.cache import cached_bio_ai, cached_blood, cached_lifestyle, cached_questionnaires
         from integrations.supershyft.questionnaire import SuperShyftQuestionnaireProvider
 
-        questionnaires = SuperShyftQuestionnaireProvider()
+        users = SuperShyftUserProvider()
+        # Short-lived per-member cache in front of the Supershyft database (plan 5.5).
+        blood = cached_blood(SuperShyftBloodProvider())
+        bio_ai = cached_bio_ai(SuperShyftBioAIProvider())
+        lifestyle = cached_lifestyle(SuperShyftLifestyleProvider())
+        questionnaires = cached_questionnaires(SuperShyftQuestionnaireProvider())
         return ProviderRegistry(
             auth=auth,
             users=users,

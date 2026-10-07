@@ -50,6 +50,11 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 2.7 Strengthen the output check | Code: rule checks for dose, stop and switch language, plus an optional model judge (`SAFETY_ANSWER_JUDGE_ENABLED`, off by default) that replaces answers stating a diagnosis or medicine instruction with a safe fallback |
 | 2.8 Critical lab handling | Code: an answer that touches a value the lab flagged `critical` starts with an escalation notice (contact a doctor today, call 112 if unwell) in the member's language. No thresholds are invented. **Owner action: clinicians confirm the critical list** |
 
+| 4.5 Upgrade retrieval | Code: `HybridMedicalKnowledgeProvider` normalizes Indic and lay wording to English, maps biomarkers and conditions to topics through an ontology, ranks with BM25 (plus an optional embedding scorer), drops weak matches below a threshold, and returns 3 to 5 reviewed passages. No embedding index is configured yet |
+| 4.7 Tie claims to passages | Code: each claim is mapped to the passage that supports it. General answers cite only sources that support a claim, and an answer whose claims mostly map to no passage is labelled "General information" |
+| 5.5 Protect the Supershyft database | Code: a member's Supershyft reads are reused for 90 s (`HEALTH_DATA_CACHE_SECONDS`), shared through Redis; the hit rate is in `cura_health_data_cache_total`. Freshness is bounded by the TTL rather than change events. **Owner action: point Cura at a read replica** |
+| 6 lever 7 Budgets | Code: daily per-member token budgets, plus hourly spend tracking. Above `SPEND_SPIKE_HOURLY_USD`, deep answers try the standard tier first, with deep kept as the fallback. Monthly spend alerts come from `cura_llm_cost_usd_total` |
+
 ## P2 items done
 
 | Plan item | Status |
