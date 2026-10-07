@@ -5,7 +5,7 @@ export function Recommendations({ items }: { items: Recommendation[] }) {
   if (!items.length) return null;
   return (
     <div className="recommendations">
-      <p>Suggested actions</p>
+      <p>{t("ui.MessageExtras.suggested_actions", "Suggested actions")}</p>
       {items.map((r, index) => (
         <div className="recommendation-card" key={`${r.category}-${index}`}>
           <strong>{r.category.replace(/_/g, " ")}</strong>
@@ -59,7 +59,7 @@ export function FollowUpChips({
   if (!items.length) return null;
   return (
     <div className="follow-up-group">
-      <span className="follow-up-label">Continue with CURA</span>
+      <span className="follow-up-label">{t("ui.MessageExtras.continue_with_cura", "Continue with CURA")}</span>
       <div className="chips follow-up-chips">
         {items.map((f) => {
           const text = followUpText(f);

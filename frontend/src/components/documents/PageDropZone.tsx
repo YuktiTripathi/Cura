@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { t } from "../../i18n";
 
 const hasFiles = (event: DragEvent) => Array.from(event.dataTransfer?.types || []).includes("Files");
 
@@ -49,8 +50,8 @@ export function PageDropZone({ onFile, disabled = false }: { onFile: (file: File
   return (
     <div className="drop-overlay" data-testid="drop-overlay" aria-hidden="true">
       <div className="drop-target">
-        <strong>Drop your PDF report</strong>
-        <span>Cura will read its values so you can review and ask about them.</span>
+        <strong>{t("ui.PageDropZone.drop_your_pdf_report", "Drop your PDF report")}</strong>
+        <span>{t("ui.PageDropZone.cura_will_read_its_values_so_you_can_rev", "Cura will read its values so you can review and ask about them.")}</span>
       </div>
     </div>
   );

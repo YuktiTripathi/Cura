@@ -1,5 +1,6 @@
 import { LanguagePicker } from "./LanguagePicker";
 import { ThemeToggle } from "./ThemeToggle";
+import { t } from "../i18n";
 
 export function CuraHeader({
   onOpenSidebar,
@@ -9,7 +10,7 @@ export function CuraHeader({
   return (
     <header className="cura-header">
       <div className="title-row">
-        <button type="button" className="menu-button" aria-label="Open conversations" onClick={onOpenSidebar}>
+        <button type="button" className="menu-button" aria-label={t("ui.CuraHeader.open_conversations", "Open conversations")} onClick={onOpenSidebar}>
           ☰
         </button>
         <h1>Cura ✨</h1>

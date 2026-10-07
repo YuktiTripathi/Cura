@@ -1,6 +1,7 @@
 import * as Dialog from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { handoffAsText, type DoctorHandoff } from "../lib/companion";
+import { t } from "../i18n";
 
 const SECTIONS: Array<[keyof DoctorHandoff, string]> = [
   ["key_findings", "Key findings"],
@@ -40,8 +41,8 @@ export function DoctorSummary({
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content className="dialog-content doctor-summary" aria-describedby="doctor-summary-desc">
           <header className="dialog-header">
-            <Dialog.Title>Summary for my doctor</Dialog.Title>
-            <Dialog.Close className="dialog-close no-print" aria-label="Close summary">
+            <Dialog.Title>{t("ui.DoctorSummary.summary_for_my_doctor", "Summary for my doctor")}</Dialog.Title>
+            <Dialog.Close className="dialog-close no-print" aria-label={t("ui.DoctorSummary.close_summary", "Close summary")}>
               ×
             </Dialog.Close>
           </header>

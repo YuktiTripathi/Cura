@@ -16,6 +16,7 @@ import { ProvenanceLine } from "./messages/ProvenanceLine";
 import { TestingOptionCard } from "./messages/TestingOptionCard";
 import { UserQuestionActions, UserQuestionEditor } from "./messages/UserQuestion";
 import { StreamingExperience } from "./messages/StreamingExperience";
+import { t } from "../i18n";
 
 function assistantContextLabel(type?: string | null, streaming = false): string {
   if (streaming) return "Building your answer";
@@ -28,7 +29,7 @@ function AssistantIdentity({ label, busy = false }: { label: string; busy?: bool
   return (
     <header className="assistant-identity" aria-label={`CURA · ${label}`}>
       <span className="assistant-mark" aria-hidden="true">C</span>
-      <span className="assistant-name">CURA</span>
+      <span className="assistant-name">{t("ui.MessageList.cura", "CURA")}</span>
       <span className="assistant-context">{label}</span>
       {busy ? <span className="assistant-live-dot" aria-hidden="true" /> : null}
     </header>

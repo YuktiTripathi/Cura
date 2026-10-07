@@ -15,5 +15,6 @@
   "starter_how": "How is my {name} level?",
   "starter_trend": "Has my {name} changed over time?",
   "starter_bio": "What does my {name} score mean?",
-  "starter_nutrition": "What should I know about my nutrition?"
+  "starter_nutrition": "What should I know about my nutrition?",
+  "critical_value_notice": "Important: the lab marked {markers} as critical. Please contact your doctor today. If you feel unwell, call {emergency} now."
 }

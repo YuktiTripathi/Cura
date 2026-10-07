@@ -15,5 +15,6 @@
   "starter_how": "Mera {name} level kaisa hai?",
   "starter_trend": "Kya time ke saath mera {name} badla hai?",
   "starter_bio": "Mere {name} score ka kya matlab hai?",
-  "starter_nutrition": "Mujhe apne nutrition ke baare mein kya jaanna chahiye?"
+  "starter_nutrition": "Mujhe apne nutrition ke baare mein kya jaanna chahiye?",
+  "critical_value_notice": "Zaroori: lab ne {markers} ko critical bataya hai. Kripya aaj hi apne doctor se sampark karein. Agar tabiyat theek na lage, to abhi {emergency} par call karein."
 }

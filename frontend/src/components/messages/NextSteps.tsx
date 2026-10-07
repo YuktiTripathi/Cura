@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { t } from "../../i18n";
 
 const STORAGE_KEY = "cura_done_steps";
 
@@ -33,7 +34,7 @@ export function NextSteps({ items }: { items: string[] }) {
 
   return (
     <section className="answer-section next-steps">
-      <h4>Worth considering</h4>
+      <h4>{t("ui.NextSteps.worth_considering", "Worth considering")}</h4>
       <ul>
         {items.map((item) => (
           <li key={item}>

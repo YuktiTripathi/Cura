@@ -53,7 +53,11 @@ describe("in-chat companion pieces", () => {
 
   it("merges suggestion chips into follow-ups without repeats", () => {
     renderAnswer();
-    const chips = screen.getAllByRole("button").filter((b) => b.closest(".chips")).map((b) => b.textContent);
+    // Chips end with a decorative arrow; compare the question text only.
+    const chips = screen
+      .getAllByRole("button")
+      .filter((b) => b.closest(".chips"))
+      .map((b) => (b.textContent || "").replace(/→\s*$/, "").trim());
     expect(chips).toEqual(["Why is this pattern still present?", "What should I discuss with my doctor?"]);
   });
 

@@ -1,3 +1,4 @@
+import { t } from "../../i18n";
 export function UserQuestionEditor({
   draft,
   onDraftChange,
@@ -14,7 +15,7 @@ export function UserQuestionEditor({
       <textarea
         value={draft}
         onChange={(e) => onDraftChange(e.target.value)}
-        aria-label="Edit question"
+        aria-label={t("ui.UserQuestion.edit_question", "Edit question")}
       />
       <div className="edit-question-actions">
         <button type="button" onClick={onSave} disabled={!draft.trim()}>

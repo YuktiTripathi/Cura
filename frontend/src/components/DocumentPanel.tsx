@@ -2,6 +2,7 @@ import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { deleteDocument, listDocuments, type UploadedDocument } from "../lib/api";
 import { queryKeys } from "../lib/queryClient";
 import { useRefetchOnChange } from "../hooks/useRefetchOnChange";
+import { t } from "../i18n";
 
 const POLL_MS = 2000;
 
@@ -43,7 +44,7 @@ export function DocumentPanel({ refreshKey, selected, onSelectedChange, onReview
 
   return (
     <section className="doc-panel">
-      <h2>Uploaded Documents</h2>
+      <h2>{t("ui.DocumentPanel.uploaded_documents", "Uploaded Documents")}</h2>
       <ul>
         {docs.map((d) => (
           <li key={d.document_id}>

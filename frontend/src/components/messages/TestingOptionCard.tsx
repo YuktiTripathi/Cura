@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { openSuperShyftPackage } from "../../lib/packageActions";
 import type { PackageAction, TestingOption } from "../../types/chat";
+import { t } from "../../i18n";
 
 export function TestingOptionCard({ option }: { option: TestingOption }) {
   const [detailsOpen, setDetailsOpen] = useState(false);
@@ -80,7 +81,7 @@ export function TestingOptionCard({ option }: { option: TestingOption }) {
           ) : null}
           {(option.relevant_tests || []).length > 0 ? (
             <div>
-              <h4>Relevant tests</h4>
+              <h4>{t("ui.TestingOptionCard.relevant_tests", "Relevant tests")}</h4>
               <ul>
                 {(option.relevant_tests || []).map((label) => (
                   <li key={label}>{label}</li>
@@ -90,7 +91,7 @@ export function TestingOptionCard({ option }: { option: TestingOption }) {
           ) : null}
           {alreadyHave.length > 0 ? (
             <div>
-              <h4>Already in your reports</h4>
+              <h4>{t("ui.TestingOptionCard.already_in_your_reports", "Already in your reports")}</h4>
               <ul>
                 {alreadyHave.map((item) => (
                   <li key={item.key}>
@@ -103,7 +104,7 @@ export function TestingOptionCard({ option }: { option: TestingOption }) {
           ) : null}
           {(comparison?.adds_information || []).length > 0 ? (
             <div>
-              <h4>Would add new information</h4>
+              <h4>{t("ui.TestingOptionCard.would_add_new_information", "Would add new information")}</h4>
               <ul>
                 {comparison!.adds_information.map((label) => (
                   <li key={label}>{label}</li>

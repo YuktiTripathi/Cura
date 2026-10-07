@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { niceNumber, trendLayout, type TrendPoint } from "../../lib/trend";
+import { t } from "../../i18n";
 
 /** One marker over time against its reference band. Hover or focus a point for its value. */
 export function TrendChart({
@@ -93,7 +94,7 @@ export function TrendChart({
               {unit ? ` ${unit}` : ""}
             </strong>
             <span>{shortDate(hover.date)}</span>
-            {hover.outOfRange ? <span>Outside reference range</span> : null}
+            {hover.outOfRange ? <span>{t("ui.TrendChart.outside_reference_range", "Outside reference range")}</span> : null}
           </div>
         ) : null}
       </div>

@@ -4,6 +4,7 @@ import type { MarkerOverview } from "../../types/overview";
 import { fmt, formatBounds } from "../../lib/range";
 import { RangeBar } from "../messages/RangeBar";
 import { TrendChart, shortDate } from "./TrendChart";
+import { t } from "../../i18n";
 
 function historyStatus(status: string | null | undefined): string {
   const value = (status || "").toLowerCase().replace(/[\s-]+/g, "_");
@@ -81,15 +82,15 @@ export function MarkerPanel({
           high={marker.reference_high}
         />
       ) : (
-        <p className="muted">Only one result so far. A trend appears after your next report.</p>
+        <p className="muted">{t("ui.MarkerPanel.only_one_result_so_far_a_trend_appears_a", "Only one result so far. A trend appears after your next report.")}</p>
       )}
       <table className="findings-table" aria-label={`${marker.label} results`}>
         <thead>
           <tr>
-            <th>Date</th>
-            <th>Value</th>
-            <th>Range</th>
-            <th>Status</th>
+            <th>{t("ui.MarkerPanel.date", "Date")}</th>
+            <th>{t("ui.MarkerPanel.value", "Value")}</th>
+            <th>{t("ui.MarkerPanel.range", "Range")}</th>
+            <th>{t("ui.MarkerPanel.status", "Status")}</th>
           </tr>
         </thead>
         <tbody>

@@ -1,5 +1,6 @@
 import { processingCopy, type ProcessingEvent } from "../lib/processingMessages";
 import { CuraProcessingState } from "./CuraProcessingState";
+import { t } from "../i18n";
 
 const MAX_DONE_VISIBLE = 3;
 
@@ -29,7 +30,7 @@ export function ProgressStepper({ events }: { events: ProcessingEvent[] }) {
   return (
     <div className="progress-stepper" data-testid="progress-stepper">
       {done.length > 0 && (
-        <ol className="progress-done" aria-label="Completed steps">
+        <ol className="progress-done" aria-label={t("ui.ProgressStepper.completed_steps", "Completed steps")}>
           {done.map((step) => (
             <li key={step.text}>
               <span className="progress-check" aria-hidden="true">✓</span>

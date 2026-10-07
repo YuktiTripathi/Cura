@@ -3,6 +3,7 @@ import { useQuery } from "@tanstack/react-query";
 import { getDocumentFacts, type DocumentFact } from "../../lib/api";
 import { fmt } from "../../lib/range";
 import { RangeBar } from "../messages/RangeBar";
+import { t } from "../../i18n";
 
 /**
  * What Cura read from an uploaded report, row by row, so the user can check it before relying on it,
@@ -32,7 +33,7 @@ export function ReviewValues({
         <Dialog.Content className="dialog-content review-values" aria-describedby="review-values-desc">
           <header className="dialog-header">
             <Dialog.Title>{data ? `Values read from ${data.filename}` : "Values read from your report"}</Dialog.Title>
-            <Dialog.Close className="dialog-close" aria-label="Close review">
+            <Dialog.Close className="dialog-close" aria-label={t("ui.ReviewValues.close_review", "Close review")}>
               ×
             </Dialog.Close>
           </header>
@@ -40,9 +41,9 @@ export function ReviewValues({
             Check these against your report. Each value shows the line it came from.
           </p>
           {query.isPending ? <p className="muted">Loading values…</p> : null}
-          {query.isError ? <p className="error">These values aren't available right now.</p> : null}
+          {query.isError ? <p className="error">{t("ui.ReviewValues.these_values_aren_t_available_right_now", "These values aren't available right now.")}</p> : null}
           {data && !data.facts.length ? (
-            <p>No measurements were found in this report. You can still ask questions about its text.</p>
+            <p>{t("ui.ReviewValues.no_measurements_were_found_in_this_repor", "No measurements were found in this report. You can still ask questions about its text.")}</p>
           ) : null}
           {data && data.facts.length ? (
             <ul className="review-list">
@@ -87,7 +88,7 @@ function ReviewRow({ fact }: { fact: DocumentFact }) {
       {hasRange && fact.value != null ? (
         <RangeBar label={fact.label} value={fact.value} unit={fact.unit} low={fact.reference_low} high={fact.reference_high} />
       ) : (
-        <span className="muted review-row-norange">No reference range on this line</span>
+        <span className="muted review-row-norange">{t("ui.ReviewValues.no_reference_range_on_this_line", "No reference range on this line")}</span>
       )}
       {fact.excerpt ? (
         <p className="review-row-quote">

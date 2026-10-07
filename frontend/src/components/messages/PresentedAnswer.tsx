@@ -5,6 +5,7 @@ import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
 import { ValueCard } from "./ValueCard";
 import { NextSteps } from "./NextSteps";
+import { t } from "../../i18n";
 
 function isScoreList(text: string): boolean {
   return /Bio-AI assessment shows|• \*\*/.test(text);
@@ -51,8 +52,8 @@ export function PresentedAnswer({
         <p className="answer-summary">{presentation.overall_summary || presentation.summary}</p>
       ) : null}
       {presentation.personal_relevance ? (
-        <aside className="personal-relevance" aria-label="Why this matters for you">
-          <span>Why this matters for you</span>
+        <aside className="personal-relevance" aria-label={t("ui.PresentedAnswer.why_this_matters_for_you", "Why this matters for you")}>
+          <span>{t("ui.PresentedAnswer.why_this_matters_for_you", "Why this matters for you")}</span>
           <p>{presentation.personal_relevance}</p>
         </aside>
       ) : null}
@@ -75,7 +76,7 @@ export function PresentedAnswer({
       ) : null}
       {!narrative && gaps.length > 0 ? (
         <section className="answer-section">
-          <h4>What’s still unclear</h4>
+          <h4>{t("ui.PresentedAnswer.what_s_still_unclear", "What’s still unclear")}</h4>
           <ul>
             {gaps.map((item) => (
               <li key={item}>{item}</li>

@@ -17,6 +17,10 @@ from app.pipeline.safety_messages import (
     see_doctor_soon_message,
 )
 
+import logging
+
+logger = logging.getLogger("cura.safety")
+
 DIAGNOSIS = re.compile(r"\b(you have|diagnosed with|this confirms|this proves you)\b", re.I)
 MEDICATION = re.compile(r"\b(take \d+ mg|prescribe|dosage of|start metformin|take insulin)\b", re.I)
 EMERGENCY = re.compile(r"\b(call 911|emergency department immediately|you are having a heart attack)\b", re.I)
@@ -219,6 +223,11 @@ def _urgent_answer(language: str | None = None) -> str:
     return emergency_message(language)
 
 
+ANSWER_JUDGE_FALLBACK = (
+    "I can explain what your results mean in general, but I can't advise on starting, stopping or "
+    "changing medicine, or tell you whether you have a condition. Please discuss this with your doctor."
+)
+
 SAFE_REVIEW_FALLBACK = (
     "I couldn't check this answer safely, so I'm not showing it. "
     "Please try again, or discuss your question with a clinician."
@@ -385,6 +394,24 @@ class SafetyLayer:
             return "DIAGNOSIS_RESTRAINT"
         return "STANDARD"
 
+    @staticmethod
+    def critical_notice(context: HealthContext, language: str | None) -> str | None:
+        """Escalation sentence that must open any answer touching a critical lab value (plan 2.8).
+
+        Cura never invents thresholds: it only uses the lab's own ``critical`` flag.
+        """
+        names = list(dict.fromkeys(m.name for m in context.markers if m.flag == MarkerFlag.critical))
+        if not names:
+            return None
+        from app.i18n.catalog import t
+
+        return t(
+            "critical_value_notice",
+            language,
+            markers=", ".join(names[:4]),
+            emergency=(settings.emergency_number or "112").strip(),
+        )
+
     def scan_critical_context(self, context: HealthContext) -> tuple[list[str], str | None]:
         critical = [m.name for m in context.markers if m.flag == MarkerFlag.critical]
         if not critical:
@@ -393,9 +420,19 @@ class SafetyLayer:
 
     def review(self, answer: str, user_message: str | None = None) -> tuple[str, list[str]]:
         try:
-            return self._review(answer, user_message)
+            out, flags = self._review(answer, user_message)
         except Exception:  # noqa: BLE001 - a failed check must give the safe fallback, not the raw answer
             return SAFE_REVIEW_FALLBACK, ["safety_review_failed"]
+        from app.pipeline.answer_judge import judge_answer, should_judge
+
+        if should_judge(out):
+            verdict = judge_answer(out)
+            if not verdict.available:
+                flags.append("answer_judge_unavailable")
+            elif verdict.unsafe:
+                logger.warning("answer_judge status=blocked reason=%s", verdict.reason)
+                return ANSWER_JUDGE_FALLBACK, [*flags, "answer_judge_blocked"]
+        return out, flags
 
     def _review(self, answer: str, user_message: str | None = None) -> tuple[str, list[str]]:
         flags: list[str] = []

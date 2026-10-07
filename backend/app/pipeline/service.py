@@ -1006,6 +1006,10 @@ class ChatService:
         reply_language = target_language(payload.message, payload.language, payload.language_mode)
         answer, response_language, translation_flags = translate_answer(answer, reply_language)
         flags.extend(translation_flags)
+        # A critical lab value is answered with escalation first, in the member's language.
+        critical_first = self.safety.critical_notice(context, reply_language)
+        if critical_first and not answer.startswith(critical_first):
+            answer = f"{critical_first}\n\n{answer}"
 
         micro_insight = compose_micro_insight(
             plan=plan,

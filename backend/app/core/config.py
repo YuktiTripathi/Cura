@@ -99,6 +99,8 @@ class Settings(BaseSettings):
     safety_llm_classifier_enabled: bool = True
     safety_classifier_model: str = "openai/gpt-5.6-luna"
     safety_classifier_timeout_seconds: float = 3.0
+    # Optional model judge on answers that mention medicines or diagnoses (plan 2.7).
+    safety_answer_judge_enabled: bool = False
     # Production /chat responses carry only a small public meta; full meta stays in logs.
     public_meta_only: bool | None = None
     # Consent: chat requires an accepted consent record at this version when enforced.

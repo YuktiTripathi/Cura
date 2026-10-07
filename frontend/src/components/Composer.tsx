@@ -179,7 +179,7 @@ export function Composer({
         className="attach"
         disabled={disabled || transcribing}
         onClick={() => fileRef.current?.click()}
-        aria-label="Attach PDF"
+        aria-label={t("ui.Composer.attach_pdf", "Attach PDF")}
       >
         📎
       </button>
@@ -241,7 +241,7 @@ export function Composer({
               Review values
             </button>
           ) : null}
-          <button type="button" onClick={uploader.clear} aria-label="Remove attachment">
+          <button type="button" onClick={uploader.clear} aria-label={t("ui.Composer.remove_attachment", "Remove attachment")}>
             ×
           </button>
         </div>

@@ -2,6 +2,7 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useQuery } from "@tanstack/react-query";
 import { getDocumentPage } from "../lib/api";
 import { highlightedLines, type SourceGroup } from "../lib/sources";
+import { t } from "../i18n";
 
 /** Where an answer's values came from: each record's values, or the uploaded page with quoted rows marked. */
 export function SourceViewer({
@@ -19,8 +20,8 @@ export function SourceViewer({
         <Dialog.Overlay className="dialog-overlay" />
         <Dialog.Content className="dialog-content source-viewer" aria-describedby="source-viewer-desc">
           <header className="dialog-header">
-            <Dialog.Title>Sources for this answer</Dialog.Title>
-            <Dialog.Close className="dialog-close" aria-label="Close sources">
+            <Dialog.Title>{t("ui.SourceViewer.sources_for_this_answer", "Sources for this answer")}</Dialog.Title>
+            <Dialog.Close className="dialog-close" aria-label={t("ui.SourceViewer.close_sources", "Close sources")}>
               ×
             </Dialog.Close>
           </header>
@@ -34,9 +35,9 @@ export function SourceViewer({
                 <table className="findings-table">
                   <thead>
                     <tr>
-                      <th>Measurement</th>
-                      <th>Value</th>
-                      <th>Reference</th>
+                      <th>{t("ui.SourceViewer.measurement", "Measurement")}</th>
+                      <th>{t("ui.SourceViewer.value", "Value")}</th>
+                      <th>{t("ui.SourceViewer.reference", "Reference")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -78,7 +79,7 @@ function DocumentPageView({ documentId, page, excerpts }: { documentId: string; 
     staleTime: Infinity,
   });
   if (query.isPending) return <p className="muted">Loading page {page}…</p>;
-  if (query.isError || !query.data) return <p className="muted">This page isn't available any more.</p>;
+  if (query.isError || !query.data) return <p className="muted">{t("ui.SourceViewer.this_page_isn_t_available_any_more", "This page isn't available any more.")}</p>;
   const lines = query.data.text.split("\n");
   const marked = highlightedLines(query.data.text, excerpts);
   return (

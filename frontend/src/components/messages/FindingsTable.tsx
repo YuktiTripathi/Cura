@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { PresentedFinding } from "../../types/chat";
 import { numericValue } from "../../lib/range";
 import { RangeBar } from "./RangeBar";
+import { t } from "../../i18n";
 
 const MISSING_STATUS = new Set(["missing", "not_available", "unavailable", "not_present"]);
 
@@ -60,10 +61,10 @@ export function FindingsTable({ findings }: { findings: PresentedFinding[] }) {
       <table className="findings-table">
         <thead>
           <tr>
-            <th>Measurement</th>
+            <th>{t("ui.FindingsTable.measurement", "Measurement")}</th>
             <th>{riskScores ? "Risk Score" : "Value"}</th>
-            {riskScores ? <th>Status</th> : null}
-            {showRange ? <th>Range</th> : null}
+            {riskScores ? <th>{t("ui.FindingsTable.status", "Status")}</th> : null}
+            {showRange ? <th>{t("ui.FindingsTable.range", "Range")}</th> : null}
           </tr>
         </thead>
         <tbody>

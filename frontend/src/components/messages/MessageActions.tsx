@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { t } from "../../i18n";
 
 export type FeedbackRating = "up" | "down";
 
@@ -83,11 +84,11 @@ export function MessageActions({
           </span>
         ) : (
           <span className="feedback-actions">
-            <span className="muted">Was this helpful?</span>
-            <button type="button" className="text-button" aria-label="Helpful" onClick={() => rate("up")}>
+            <span className="muted">{t("ui.MessageActions.was_this_helpful", "Was this helpful?")}</span>
+            <button type="button" className="text-button" aria-label={t("ui.MessageActions.helpful", "Helpful")} onClick={() => rate("up")}>
               👍
             </button>
-            <button type="button" className="text-button" aria-label="Not helpful" onClick={() => rate("down")}>
+            <button type="button" className="text-button" aria-label={t("ui.MessageActions.not_helpful", "Not helpful")} onClick={() => rate("down")}>
               👎
             </button>
           </span>
@@ -104,11 +105,11 @@ export function MessageActions({
           <input
             value={reason}
             onChange={(event) => setReason(event.target.value)}
-            placeholder="What was wrong or missing? (optional)"
-            aria-label="What was wrong or missing?"
+            placeholder={t("ui.MessageActions.what_was_wrong_or_missing_optional", "What was wrong or missing? (optional)")}
+            aria-label={t("ui.MessageActions.what_was_wrong_or_missing", "What was wrong or missing?")}
             autoFocus
           />
-          <button type="submit">Send</button>
+          <button type="submit">{t("ui.MessageActions.send", "Send")}</button>
           <button type="button" className="text-button" onClick={() => sendDown(false)}>
             Skip
           </button>

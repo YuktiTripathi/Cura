@@ -1,5 +1,6 @@
 import type { UserProvenance } from "../../types/chat";
 import { debugMode } from "./debug";
+import { t } from "../../i18n";
 
 export function ProvenanceLine({
   provenance,
@@ -43,7 +44,7 @@ export function ProvenanceLine({
                 .filter((item, index, all) => all.findIndex((row) => row.source_label === item.source_label) === index)
                 .map((item) => <p key={item.source_label || ""}>{item.source_label}</p>)
             ) : (
-              <p>Internal record identifiers are hidden. Dates above identify the report that was used.</p>
+              <p>{t("ui.ProvenanceLine.internal_record_identifiers_are_hidden_d", "Internal record identifiers are hidden. Dates above identify the report that was used.")}</p>
             )}
       </div>
     </details>

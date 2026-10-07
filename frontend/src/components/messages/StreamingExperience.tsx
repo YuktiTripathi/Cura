@@ -1,6 +1,7 @@
 import type { ExperienceBlock, PresentedFinding } from "../../types/chat";
 import { availableFindings } from "./FindingsTable";
 import { ValueCard } from "./ValueCard";
+import { t } from "../../i18n";
 
 type BlockGroup = {
   direct?: string;
@@ -61,7 +62,7 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
 
       {view.facts.length ? (
         <section className="experience-segment experience-reveal" data-kind="key_facts">
-          <div className="experience-segment-label">From your records</div>
+          <div className="experience-segment-label">{t("ui.StreamingExperience.from_your_records", "From your records")}</div>
           <div className="value-cards streaming-values">
             {view.facts.map((finding, index) => (
               <ValueCard key={`${finding.canonical_key || finding.label}-${index}`} finding={finding} compact={view.facts.length === 1} />
@@ -72,21 +73,21 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
 
       {view.interpretation ? (
         <section className="experience-segment experience-reveal" data-kind="interpretation">
-          <div className="experience-segment-label">What it means</div>
+          <div className="experience-segment-label">{t("ui.StreamingExperience.what_it_means", "What it means")}</div>
           <p>{view.interpretation}</p>
         </section>
       ) : null}
 
       {view.relevance ? (
-        <aside className="personal-relevance experience-reveal" data-kind="personal_relevance" aria-label="Why this matters for you">
-          <span>Why this matters for you</span>
+        <aside className="personal-relevance experience-reveal" data-kind="personal_relevance" aria-label={t("ui.StreamingExperience.why_this_matters_for_you", "Why this matters for you")}>
+          <span>{t("ui.StreamingExperience.why_this_matters_for_you", "Why this matters for you")}</span>
           <p>{view.relevance}</p>
         </aside>
       ) : null}
 
       {view.uncertainties.length ? (
         <section className="experience-segment experience-segment-muted experience-reveal" data-kind="uncertainty">
-          <div className="experience-segment-label">Still unclear</div>
+          <div className="experience-segment-label">{t("ui.StreamingExperience.still_unclear", "Still unclear")}</div>
           <ul>
             {view.uncertainties.map((item) => (
               <li key={item}>{item}</li>
@@ -97,7 +98,7 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
 
       {view.nextSteps.length ? (
         <section className="experience-segment experience-next experience-reveal" data-kind="next_step">
-          <div className="experience-segment-label">A useful next step</div>
+          <div className="experience-segment-label">{t("ui.StreamingExperience.a_useful_next_step", "A useful next step")}</div>
           <ul>
             {view.nextSteps.map((item) => (
               <li key={item}>{item}</li>
@@ -108,7 +109,7 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
 
       <div className="experience-working" role="status">
         <span aria-hidden="true" />
-        <span>CURA is completing the picture</span>
+        <span>{t("ui.StreamingExperience.cura_is_completing_the_picture", "CURA is completing the picture")}</span>
       </div>
     </div>
   );

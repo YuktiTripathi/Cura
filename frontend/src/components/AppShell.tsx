@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { t } from "../i18n";
 
 export function AppShell({
   sidebar,
@@ -24,7 +25,7 @@ export function AppShell({
         <button
           type="button"
           className="sidebar-backdrop"
-          aria-label="Close conversations"
+          aria-label={t("ui.AppShell.close_conversations", "Close conversations")}
           onClick={onCloseDrawer}
         />
       )}
