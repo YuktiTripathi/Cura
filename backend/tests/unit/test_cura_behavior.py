@@ -183,10 +183,13 @@ def test_bun_aliases_retrieve_the_stored_marker(message):
     assert "14" in answer and "mg/dL" in answer
 
 
-def test_urea_is_not_converted_from_bun():
+def test_urea_question_never_converts_or_relabels_bun():
+    # The report stores BUN only. CURA may answer with the stored BUN (labelled as BUN) or say
+    # urea is absent, but never converts the number or presents BUN 14 as a urea value.
     answer = _chat("What is my urea?")["answer"]
-    assert "I don't see Urea" in answer
-    assert "Urea is 14" not in answer and "urea of 14" not in answer.lower()
+    assert "Urea is 14" not in answer and "urea of 14" not in answer.lower() and "urea 14" not in answer.lower()
+    assert "30" not in answer  # 14 x 2.14 would be ~30 mg/dL urea
+    assert "BUN" in answer or "I don't see Urea" in answer
 
 
 def test_missing_data_answer_is_honest():

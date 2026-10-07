@@ -289,6 +289,12 @@ def test_this_report_without_uploads_means_the_supershyft_report():
     assert "96" in body["answer"]  # latest LDL on the SuperShyft report
 
 
+def test_no_document_selected_uses_personal_records():
+    plan = build_query_plan("What is my LDL in this report?")
+    assert plan.needs_user_uploaded is False
+    assert plan.needs_blood is True
+
+
 def test_jev_unavailable_uses_deterministic_fallback(monkeypatch):
     monkeypatch.setattr(settings, "jev_enabled", True)
     monkeypatch.setattr(

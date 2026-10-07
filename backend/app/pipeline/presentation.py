@@ -50,7 +50,8 @@ _SYNTHESIS = re.compile(
     re.I,
 )
 _MEANING = re.compile(
-    r"\b(what does (?:this|that|it|my .{0,32}) mean|explain|interpret|why|are they consistent)\b",
+    r"\b(what does (?:this|that|it|my .{0,32}) mean|explain|interpret|understand|"
+    r"how should i read|why|are they consistent)\b",
     re.I,
 )
 _INTERNAL_ID = re.compile(
@@ -679,6 +680,40 @@ def _repeats(candidate: str, parts: list[str]) -> bool:
         if cand in existing or existing in cand or cand[:80] == existing[:80]:
             return True
     return False
+
+
+_RANGE_CONTRADICTION = re.compile(
+    r"within (?:this |the )?(?:standard |typical |normal )?reference range|"
+    r"comfortably within|commonly normal|often start at 0|frequently begin at 0|"
+    r"is a frequent and commonly norm",
+    re.I,
+)
+
+
+def prefer_report_range(answer: str, context: HealthContext) -> str:
+    """If the prose treats an out-of-range result as normal, lead with the report range."""
+    text = answer or ""
+    if not _RANGE_CONTRADICTION.search(text):
+        return text
+    notes = []
+    for marker in context.markers or []:
+        flag = getattr(marker.flag, "value", str(marker.flag or ""))
+        if flag not in {"high", "low", "critical"}:
+            continue
+        if marker.reference_low is None and marker.reference_high is None:
+            continue
+        name = marker.name or marker.key
+        if not name or name.lower() not in text.lower():
+            continue
+        note = (
+            f"Your report marks {name} as {flag} "
+            f"(report range {marker.reference_low}–{marker.reference_high} {marker.unit or ''}).".replace("  ", " ")
+        )
+        if note.lower() not in text.lower():
+            notes.append(note.strip())
+    if not notes:
+        return text
+    return f"{' '.join(notes[:2])} {text}".strip()
 
 
 def flatten_structured_response(presentation: StructuredResponse, *, raw_answer: str = "") -> str:

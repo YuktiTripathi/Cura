@@ -29,6 +29,7 @@ from app.pipeline.presentation import (
     sanitize_internal_ids,
     strip_lookup_disclaimers,
     attach_presentation_personalization,
+    prefer_report_range,
 )
 
 _HANDLED_LLM = re.compile(
@@ -144,7 +145,7 @@ class ResponseComposer:
             ]
             chips = list(combined)
         follow_text = question[0].text if question else None
-        cleaned = sanitize_internal_ids(answer or "")
+        cleaned = sanitize_internal_ids(prefer_report_range(answer or "", context))
         if context.premise_verified is False and context.premise and context.premise.note:
             note = sanitize_internal_ids(context.premise.note)
             if note.lower() not in cleaned.lower():

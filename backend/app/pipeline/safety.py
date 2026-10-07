@@ -153,6 +153,11 @@ def detect_language_hint(text: str) -> str:
     return "en"
 
 
+def explicit_diagnosis_request(text: str) -> bool:
+    """True only when the user asks to be diagnosed. Explaining a result is not a diagnosis request."""
+    return bool(DIAGNOSIS_REQUEST.search(text or ""))
+
+
 def match_safety_category(text: str) -> tuple[str, str, float]:
     message = text or ""
     language = detect_language_hint(message)
@@ -360,6 +365,17 @@ class SafetyLayer:
                 language=language,
                 reply_language=reply_language,
             )
+        if effective == "urgent_soon":
+            # A model label alone must not attach a next-day emergency warning to a lab question.
+            # The caution is used when the message itself matches a red-flag pattern.
+            from app.pipeline.red_flags import URGENCY_NOW, URGENCY_SOON, match_red_flags
+
+            grounded = any(
+                flag.urgency in {URGENCY_NOW, URGENCY_SOON} and flag.category in {"emergency", "urgent_soon"}
+                for flag in match_red_flags(user_message)
+            )
+            if not grounded:
+                effective = "none"
         if effective == "urgent_soon":
             return PreSafetyDecision(
                 blocked=False,

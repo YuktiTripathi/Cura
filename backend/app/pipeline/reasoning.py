@@ -98,7 +98,7 @@ class ReasoningService:
             and context.status != "ambiguous"
             and not plan.needs_user_uploaded
         )
-        explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand)\b", message or "", re.I))
+        explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand|how should i read)\b", message or "", re.I))
         if explain_bio and context.bio_ai_risks and settings.enable_llm and not uses_answer_llm(plan.answer_model_tier):
             plan = plan.model_copy(update={"answer_model_tier": AnswerModelTier.standard_medical})
         if structured_bio_ai and not (explain_bio and settings.enable_llm):
@@ -139,6 +139,7 @@ class ReasoningService:
 
         if (
             lookup
+            and not explain_bio
             and plan.intent in {IntentType.latest_result, IntentType.previous_result}
             and plan.needs_blood
             and context.markers
