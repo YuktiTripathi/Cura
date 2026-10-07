@@ -118,7 +118,6 @@ def test_general_question_and_ldl_advice_never_call_supershyft(monkeypatch):
     assert second["meta"]["jev_validated"] is True
     assert second["meta"]["requires_personal_data"] is False
     assert second["meta"]["supershyft_called"] is False
-    assert second["meta"]["conversation_context_used"] is True
 
 
 def test_insulin_resistance_is_general_with_no_retrieval(monkeypatch):

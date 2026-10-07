@@ -31,20 +31,17 @@ def model_id_for_tier(tier: AnswerModelTier | str | None) -> str:
 
 
 def model_pricing() -> dict[str, ModelPrice]:
-    return {
-        settings.answer_model_fast_reasoning: ModelPrice(
-            settings.model_price_fast_reasoning_input_per_1m,
-            settings.model_price_fast_reasoning_output_per_1m,
-        ),
-        settings.answer_model_standard_medical: ModelPrice(
-            settings.model_price_standard_medical_input_per_1m,
-            settings.model_price_standard_medical_output_per_1m,
-        ),
-        settings.answer_model_deep_medical: ModelPrice(
-            settings.model_price_deep_medical_input_per_1m,
-            settings.model_price_deep_medical_output_per_1m,
-        ),
-    }
+    """Price per model id. When two tiers share a model, the cheaper tier's price wins:
+    a model has one price, and the deep tier's default prices assume a different model."""
+    tiers = (
+        (settings.answer_model_fast_reasoning, settings.model_price_fast_reasoning_input_per_1m, settings.model_price_fast_reasoning_output_per_1m),
+        (settings.answer_model_standard_medical, settings.model_price_standard_medical_input_per_1m, settings.model_price_standard_medical_output_per_1m),
+        (settings.answer_model_deep_medical, settings.model_price_deep_medical_input_per_1m, settings.model_price_deep_medical_output_per_1m),
+    )
+    prices: dict[str, ModelPrice] = {}
+    for model, input_price, output_price in tiers:
+        prices.setdefault(model, ModelPrice(input_price, output_price))
+    return prices
 
 
 def estimate_cost_usd(model_id: str, input_tokens: int, output_tokens: int) -> float | None:

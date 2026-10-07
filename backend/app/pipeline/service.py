@@ -292,10 +292,12 @@ class ChatService:
         elif not prior_topic and conv_state.active_entities:
             prior_topic = conv_state.active_entities[0]
             prior_name = prior_name or prior_topic.replace("_", " ")
-        prior_personal = continuing and (
+        # A topic switch drops the old topic but stays in the member's own data:
+        # "and my ferritin?" after a personal question is still a personal lookup.
+        prior_personal = conv_state.turn_type.value != "NEW_QUESTION" and (
             self.memory.prior_was_personal(conv)
             or conv_state.prior_personal
-            or conv_state.turn_type.value != "NEW_QUESTION"
+            or continuing
         )
         previous_user_message = self.memory.last_user_message(conv) if continuing else None
         previous_intent = self.memory.last_user_intent(conv) if continuing else None

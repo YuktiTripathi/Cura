@@ -266,6 +266,8 @@ def test_jev_unavailable_still_selects_deterministic_tier(monkeypatch):
 
 def test_standard_model_failure_falls_back_to_deep(monkeypatch):
     monkeypatch.setattr(settings, "enable_llm", True)
+    # The fallback only helps when the deep tier uses a different model than standard.
+    monkeypatch.setattr(settings, "answer_model_deep_medical", "openai/gpt-4o-mini")
     calls = []
 
     def complete(self, messages, json_mode=False):
@@ -366,7 +368,8 @@ def test_answer_models_use_openrouter_key_only():
     assert not hasattr(settings, "anthropic_api_key")
 
 
-def test_pricing_is_separate_from_routing():
+def test_pricing_is_separate_from_routing(monkeypatch):
+    monkeypatch.setattr(settings, "answer_model_deep_medical", "anthropic/claude-sonnet-5")
     prices = model_pricing()
     assert prices[settings.answer_model_fast_reasoning].input_per_1m == 0.25
     assert prices[settings.answer_model_standard_medical].output_per_1m == 3.75
@@ -511,3 +514,9 @@ def test_question_specific_context_is_compact():
     assert len(payload["markers"]) <= 12
     assert "scenario" not in payload
     assert payload["meta"]["minimal_context"] is True
+
+
+def test_shared_model_is_priced_at_the_cheaper_tier(monkeypatch):
+    monkeypatch.setattr(settings, "answer_model_deep_medical", settings.answer_model_standard_medical)
+    price = model_pricing()[settings.answer_model_standard_medical]
+    assert (price.input_per_1m, price.output_per_1m) == (0.75, 3.75)

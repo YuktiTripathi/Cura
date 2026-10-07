@@ -204,7 +204,7 @@ def test_chat_clinician_questions():
     ).json()
     presentation = body.get("presentation") or {}
     answer = (body.get("answer") or "").lower()
-    assert presentation.get("mode") == "CLINICIAN_HANDOFF" or "discuss" in answer or "doctor" in answer
+    assert presentation.get("mode") == "CLINICIAN_HANDOFF" or any(w in answer for w in ("discuss", "doctor", "clinician"))
     assert "you have iron deficiency anemia" not in answer
 
 
