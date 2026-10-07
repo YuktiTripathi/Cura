@@ -45,6 +45,7 @@ class ReasoningResult:
     flags: list[str] = field(default_factory=list)
     model_escalated: bool = False
     escalation_reason: str | None = None
+    first_token_ms: int | None = None
 
 
 class ReasoningService:
@@ -306,6 +307,13 @@ class ReasoningService:
             return None
         if is_high_risk_topic(message):
             return None
+        first_token: list[int] = []
+
+        def _timed(delta: str) -> None:
+            if not first_token:
+                first_token.append(int((time.perf_counter() - started) * 1000))
+            on_token(delta)
+
         try:
             client = get_llm_client(
                 model_tier=(plan.answer_model_tier or AnswerModelTier.standard_medical).value,
@@ -314,7 +322,7 @@ class ReasoningService:
             )
             text = client.stream_text(
                 [*messages, {"role": "user", "content": "Reply in plain text, not JSON."}],
-                on_token,
+                _timed,
             )
         except Exception:  # noqa: BLE001 - fall back to the normal, non-streamed answer
             logger.warning("answer_stream status=fallback")
@@ -326,6 +334,7 @@ class ReasoningService:
             llm_mode=settings.resolved_llm_provider(),
             answer_client=client,
             latency_ms=int((time.perf_counter() - started) * 1000),
+            first_token_ms=first_token[0] if first_token else None,
         )
 
 

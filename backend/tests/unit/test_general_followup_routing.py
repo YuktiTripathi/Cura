@@ -59,7 +59,9 @@ def test_personal_examples_require_records():
         assert plan.knowledge_scope == KnowledgeScope.personal, msg
 
 
-def test_hdl_ldl_then_lifestyle_followup_stays_general():
+def test_hdl_ldl_then_personal_lifestyle_followup_uses_member_data():
+    # "...lower MY LDL levels?" asks for advice for this member: the semantic planner marks
+    # personalization REQUIRED (same answer would differ per member), so records are read.
     first = client.post("/api/v1/chat", headers=H, json={"message": "What is the difference between HDL and LDL?"})
     body = first.json()
     assert body["meta"]["intent"] == "general_health_question"
@@ -74,11 +76,9 @@ def test_hdl_ldl_then_lifestyle_followup_stays_general():
             "message": "What lifestyle changes can help lower my LDL levels?",
         },
     ).json()
-    assert second["meta"]["intent"] == "general_health_question"
-    assert second["meta"]["requires_personal_data"] is False
-    assert second["meta"]["supershyft_called"] is False
+    assert second["meta"]["requires_personal_data"] is True
+    assert second["meta"]["supershyft_called"] is True
     assert PERSONAL_DATA_UNAVAILABLE not in second["answer"]
-    assert second["meta"].get("sources_used") == ["general"]
 
 
 def test_my_ldl_then_how_can_i_lower_it_can_stay_personal():
@@ -123,7 +123,9 @@ def test_why_it_high_after_general_stays_general():
     assert not plan.needs_personal_data
 
 
-def test_improve_hdl_after_general_difference_is_general():
+def test_improve_my_hdl_after_general_difference_is_personal():
+    # Advice on improving the member's own HDL is personalized (spec: same question,
+    # different useful answer per member). The earlier general turn does not force it general.
     first = client.post("/api/v1/chat", headers=H, json={"message": "What is the difference between HDL and LDL?"})
     cid = first.json()["conversation_id"]
     second = client.post(
@@ -131,6 +133,5 @@ def test_improve_hdl_after_general_difference_is_general():
         headers=H,
         json={"conversation_id": cid, "message": "How can I improve my HDL?"},
     ).json()
-    assert second["meta"]["intent"] == "general_health_question"
-    assert second["meta"]["requires_personal_data"] is False
+    assert second["meta"]["requires_personal_data"] is True
     assert PERSONAL_DATA_UNAVAILABLE not in second["answer"]

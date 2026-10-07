@@ -220,6 +220,51 @@ _REASONING_DEPTH = {
 }
 
 
+_REASONING_GOAL = {
+    "type": "choice",
+    "instructions": (
+        "What is the user trying to accomplish? Judge the task, not the topic or exact wording. "
+        "Pick the goal that should shape the reply."
+    ),
+    "criteria": {
+        "LOOKUP": "Wants a stored fact or value (a result, a score, what they reported).",
+        "EXPLAIN": "Wants the meaning of something, or how two facts fit together.",
+        "CAUSES": "Wants possible reasons or explanations (why).",
+        "ASSESS": "Wants a judgment: is it enough, okay, concerning, good or bad.",
+        "COMPARE": "Wants change or difference over time or between reports.",
+        "PRIORITIZE": "Wants a ranking: what matters most or what to do first.",
+        "ACTION": "Wants next steps or how to improve something.",
+        "SYNTHESIZE": "Wants an overall picture combining several findings or sources.",
+        "RISK": "Wants implications or whether to worry.",
+        "GENERAL_EDUCATION": "Wants general knowledge that does not depend on this user's data.",
+        "DOCUMENT_LOOKUP": "Asks about an uploaded or selected document.",
+        "FOLLOW_UP": "Depends on the previous turn to make sense.",
+    },
+}
+
+_PERSONALIZATION = {
+    "type": "choice",
+    "instructions": "Does a useful answer depend on this user's own health data or reported habits?",
+    "criteria": {
+        "NONE": "General knowledge fully answers it.",
+        "OPTIONAL": "General knowledge answers it; personal data could add context.",
+        "REQUIRED": "The answer is about this user (their results, habits, priorities or situation).",
+    },
+}
+
+_TEMPORAL = {
+    "type": "choice",
+    "instructions": "What time span of personal data does the answer need?",
+    "criteria": {
+        "NONE": "No personal data.",
+        "CURRENT": "Only the latest data.",
+        "HISTORICAL": "An older report or value.",
+        "TREND": "Direction over several reports.",
+        "COMPARISON": "A difference between two points in time.",
+    },
+}
+
+
 class JevDecisionsClient:
     def __init__(
         self,
@@ -263,6 +308,9 @@ class JevDecisionsClient:
                 "complexity": _COMPLEXITY,
                 "model_tier": _MODEL_TIER,
                 "reasoning_depth": _REASONING_DEPTH,
+                "reasoning_goal": _REASONING_GOAL,
+                "personalization": _PERSONALIZATION,
+                "temporal_requirement": _TEMPORAL,
                 **_BOOLEAN_QUESTIONS,
             },
         }
@@ -345,6 +393,9 @@ class JevDecisionsClient:
             reasoning_depth=parse_reasoning_depth(_choice_text(answers, "reasoning_depth")),
             reasoning_required=_optional_noul(answers, "reasoning_required"),
             pdf_analysis_required=_optional_noul(answers, "pdf_analysis_required"),
+            reasoning_goal=_allowed(answers, "reasoning_goal", _REASONING_GOAL["criteria"]),
+            personalization=_allowed(answers, "personalization", _PERSONALIZATION["criteria"]),
+            temporal_requirement=_allowed(answers, "temporal_requirement", _TEMPORAL["criteria"]),
         )
 
 
@@ -393,3 +444,9 @@ def _optional_choice(answers: dict[str, Any], key: str, enum_type):
         return enum_type(answer.choice)
     except ValueError:
         return None
+
+
+def _allowed(answers: dict[str, Any], key: str, criteria: dict) -> str | None:
+    """An optional choice restricted to the offered options; anything else is dropped."""
+    text = _choice_text(answers, key)
+    return text if text in criteria else None

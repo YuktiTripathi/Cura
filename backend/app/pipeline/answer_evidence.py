@@ -17,6 +17,13 @@ from dataclasses import dataclass, field
 from app.contracts.common import IntentType, MarkerFlag
 from app.contracts.health_context import HealthContext
 from app.pipeline.health_domains import domain_for_entity
+from app.pipeline.health_topics import (
+    TopicMatch,
+    concept_spec,
+    evidence_markers_for,
+    is_behavioural_only,
+    questionnaire_keys_for,
+)
 from app.pipeline.questionnaire_relevance import (
     LEVER,
     SUPPORTIVE,
@@ -32,6 +39,9 @@ OVERVIEW = "HEALTH_OVERVIEW"
 TREND = "TREND"
 QUESTIONNAIRE_LOOKUP = "QUESTIONNAIRE_LOOKUP"
 BIO_AI = "BIO_AI_INTERPRETATION"
+ASSESSMENT = "PERSONALIZED_ASSESSMENT"
+CAUSES = "POSSIBLE_EXPLANATIONS"
+RISK = "RISK_EXPLANATION"
 
 
 @dataclass(frozen=True)
@@ -55,6 +65,40 @@ BUDGETS: dict[str, InformationBudget] = {
     TREND: InformationBudget(1, 1, 0, 1, 1, 1, 1, (60, 150)),
     QUESTIONNAIRE_LOOKUP: InformationBudget(0, 0, 0, 0, 0, 0, 0, (30, 90)),
     OVERVIEW: InformationBudget(12, 0, 5, 3, 1, 3, 1, (180, 350)),
+    ASSESSMENT: InformationBudget(1, 2, 4, 1, 1, 2, 1, (60, 160)),
+    CAUSES: InformationBudget(2, 2, 3, 1, 1, 2, 1, (80, 180)),
+    RISK: InformationBudget(1, 2, 2, 1, 1, 2, 1, (80, 180)),
+}
+
+# Semantic response shape -> evidence mode.
+_SHAPE_MODE = {
+    "DIRECT_FACT": LOOKUP,
+    "EXPLANATION": EXPLANATION,
+    "POSSIBLE_EXPLANATIONS": CAUSES,
+    "PERSONALIZED_ASSESSMENT": ASSESSMENT,
+    "COMPARISON": TREND,
+    "PRIORITIZATION": PRIORITIZATION,
+    "ACTION_PLAN": ACTION_PLAN,
+    "OVERVIEW": OVERVIEW,
+    "RISK_EXPLANATION": RISK,
+}
+
+# How the reply should be shaped for each reasoning goal (the answer model writes it).
+GOAL_GUIDANCE = {
+    LOOKUP: "Give the value and its status first, then at most one sentence of meaning.",
+    EXPLANATION: "Explain what it means for this member, using the listed evidence only.",
+    CAUSES: (
+        "Open by acknowledging that this can have many causes. Name the most relevant possibilities that the "
+        "listed evidence supports or rules out. If nothing listed explains it, say so plainly. Never present a "
+        "possibility as the cause and never diagnose."
+    ),
+    ASSESSMENT: "Give a clear judgment in the first sentence, then the personal evidence behind it and brief context.",
+    TREND: "State previous versus current, the direction, then what it means.",
+    PRIORITIZATION: "Name the single top priority and why, then at most two secondary items.",
+    ACTION_PLAN: "One-sentence assessment, then at most three personalized actions. Skip what the member already does.",
+    OVERVIEW: "Overall picture first, then 3-5 themes and the one priority.",
+    RISK: "Calibrated explanation of what this could mean, the personal evidence, and when to see a clinician.",
+    BIO_AI: "Explain the Bio-AI result as a risk estimate, not a diagnosis, alongside the measured results.",
 }
 
 _ABNORMAL = {"low", "high", "critical"}
@@ -71,6 +115,15 @@ def response_mode_for(context: HealthContext, message: str) -> str:
     """Which kind of answer the member is asking for. Drives budgets and presentation."""
     intent = context.intent
     text = message or ""
+    semantic = getattr(context, "semantic_plan", None) or {}
+    if semantic.get("personalization") == "REQUIRED" and intent not in {IntentType.questionnaire_lookup}:
+        mode = _SHAPE_MODE.get(semantic.get("response_shape") or "")
+        if mode == EXPLANATION and (semantic.get("bio_ai") and not semantic.get("markers")):
+            return BIO_AI
+        if mode == PRIORITIZATION and "overall_health" in (semantic.get("health_topics") or []) and semantic.get("primary_goal") == "SYNTHESIZE":
+            return OVERVIEW
+        if mode:
+            return mode
     if intent == IntentType.questionnaire_lookup:
         return QUESTIONNAIRE_LOOKUP
     if intent in {IntentType.health_scenario, IntentType.broad_health_summary} or "overall_health" in (context.domains or []):
@@ -144,15 +197,26 @@ class AnswerEvidence:
     already_explained: list[str] = field(default_factory=list)
     questionnaire: QuestionnaireSelection | None = None
     trace: dict = field(default_factory=dict)
+    reasoning_goal: str | None = None
+    secondary_goals: list[str] = field(default_factory=list)
+    topics: list[str] = field(default_factory=list)
+    premise_check: dict | None = None
+    checked_without_concern: list[str] = field(default_factory=list)
 
     def payload(self) -> dict:
         """What the answering model receives instead of the full health record."""
         out = {
             "question": self.question,
+            "reasoning_goal": self.reasoning_goal,
+            "also_address": self.secondary_goals,
+            "topics": self.topics,
             "response_mode": self.response_mode,
+            "how_to_answer": GOAL_GUIDANCE.get(self.response_mode),
+            "premise_check": self.premise_check,
             "conversation_goal": self.conversation_goal,
             "primary_facts": self.primary_facts,
             "supporting_facts": self.supporting_facts,
+            "checked_and_within_range": self.checked_without_concern,
             "trend": self.trend_facts,
             "uncertainty": self.uncertainty_facts,
             "questionnaire_context": self.questionnaire_facts,
@@ -232,6 +296,16 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         requested.append(context.resolved_topic)
     requested = list(dict.fromkeys(requested))
 
+    semantic = getattr(context, "semantic_plan", None) or {}
+    topics = _semantic_topics(semantic)
+    if semantic:
+        evidence.reasoning_goal = semantic.get("primary_goal")
+        evidence.secondary_goals = list(semantic.get("secondary_goals") or [])
+        evidence.topics = [t for t in semantic.get("health_topics") or [] if not t.endswith(("_health", "_context")) and t != "lifestyle_recovery"][:4]
+        requested = list(dict.fromkeys([*topics.markers, *topics.bio_ai, *requested]))
+    topic_markers = [k for k in evidence_markers_for(topics) if k not in topics.markers] if topics.concepts else []
+    behavioural = bool(semantic) and is_behavioural_only(topics)
+
     goal = (context.personalization.primary_health_goal if context.personalization else None) or next(
         (g.goal_code for g in context.goals or [] if getattr(g, "status", "active") == "active"), None)
 
@@ -249,6 +323,33 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         evidence.primary_facts = [_risk_fact(r) for r in wanted[: budget.primary]]
         related = [m for m in markers if _flag(m) in _ABNORMAL]
         evidence.supporting_facts = [_marker_fact(m) for m in related[: budget.supporting]]
+    elif mode == TREND and not requested:
+        # "What changed / what got worse?" across the record: the markers that moved.
+        moved = [b for b in context.baselines or [] if b.previous is not None and b.latest is not None and b.latest != b.previous]
+        moved.sort(key=lambda b: abs(b.percentage_change or 0), reverse=True)
+        codes = [b.entity for b in moved[:3]]
+        evidence.primary_facts = [_marker_fact(m) for m in markers if m.key in codes]
+        evidence.trend_facts = [
+            {"code": b.entity, "previous": b.previous, "latest": b.latest, "direction": b.direction}
+            for b in moved[:3]
+        ]
+    elif behavioural and mode != QUESTIONNAIRE_LOOKUP:
+        # "Am I active enough?" / "what habit first?": the habit answers are the primary
+        # evidence (questionnaire_context); the member's notable findings give the
+        # "for my health situation" context.
+        notable = prioritize_findings(markers, context.bio_ai_risks or [], goal)
+        evidence.supporting_facts = [_marker_fact(m) for m in notable[: budget.supporting]]
+        if len(evidence.supporting_facts) < budget.supporting:
+            room = budget.supporting - len(evidence.supporting_facts)
+            evidence.supporting_facts += [_risk_fact(r) for r in (context.bio_ai_risks or []) if _elevated(r)][:room]
+    elif topic_markers and not topics.markers and mode != QUESTIONNAIRE_LOOKUP:
+        # Symptom-style topics ("why am I tired?"): check the markers that may hold context.
+        # They are possibilities to look at, never causes.
+        relevant = [m for m in markers if m.key in topic_markers]
+        flagged = [m for m in relevant if _flag(m) in _ABNORMAL]
+        evidence.primary_facts = [_marker_fact(m) for m in flagged[: budget.primary]]
+        evidence.checked_without_concern = [m.name or m.key for m in relevant if _flag(m) not in _ABNORMAL][:5]
+        evidence.supporting_facts = [_marker_fact(m) for m in flagged[budget.primary: budget.primary + budget.supporting]]
     elif mode != QUESTIONNAIRE_LOOKUP:
         named = [m for m in markers if m.key in requested]
         cap = min(3, max(budget.primary, len({m.key for m in named}))) if named else budget.primary
@@ -268,7 +369,7 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             evidence.supporting_facts += [_risk_fact(r) for r in aligned[:room]]
 
     # ---- trend for the primary fact
-    if budget.trend:
+    if budget.trend and not evidence.trend_facts:
         primary_codes = {f.get("code") for f in evidence.primary_facts}
         for base in context.baselines or []:
             if base.entity in primary_codes and base.previous is not None and base.observations >= 2:
@@ -290,14 +391,21 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     selection = QuestionnaireSelection()
     if budget.questionnaire and (context.questionnaire or context.questionnaire_instances or _recent(context)):
         entity_codes = [f.get("code") for f in [*evidence.primary_facts, *evidence.supporting_facts] if f.get("code")]
+        planned_keys = questionnaire_keys_for(topics) if (topics.concepts or topics.markers or topics.bio_ai) else []
+        subject_keys = (
+            [k for c in topics.concepts for k in (concept_spec(c).questionnaire_keys if concept_spec(c) else ())]
+            if behavioural else []
+        )
         selection = select_questionnaire_context(
             message,
             entities=entity_codes,
             domains=list(context.domains or []),
             questionnaire=context.questionnaire_instances or context.questionnaire,
-            review=mode in {OVERVIEW, PRIORITIZATION},
+            review=mode in {OVERVIEW, PRIORITIZATION} and not planned_keys,
             recent_messages=_recent(context),
             budget=budget.questionnaire,
+            keys=planned_keys or None,
+            subject_keys=subject_keys,
         )
         evidence.questionnaire_facts = [s.for_model() for s in selection.signals]
     evidence.questionnaire = selection
@@ -325,6 +433,9 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             if signal.stance == SUPPORTIVE and signal.label not in evidence.already_doing:
                 evidence.already_doing.append(signal.label)
 
+    # ---- the user's premise versus the measured record
+    evidence.premise_check = _premise_check(semantic.get("premise"), markers, context.bio_ai_risks or [])
+
     # ---- observability (developer trace only)
     retrieved_facts = len(context.markers or []) + len(context.bio_ai_risks or []) + len(context.facts or [])
     selected = len(evidence.primary_facts) + len(evidence.supporting_facts) + len(evidence.trend_facts)
@@ -342,6 +453,45 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         "already_doing": evidence.already_doing,
     }
     return evidence
+
+
+def _semantic_topics(semantic: dict) -> TopicMatch:
+    return TopicMatch(
+        markers=list(semantic.get("markers") or []),
+        bio_ai=list(semantic.get("bio_ai") or []),
+        concepts=list(semantic.get("concepts") or []),
+        domains=list(semantic.get("domains") or []),
+    )
+
+
+def _premise_check(premise: dict | None, markers, risks) -> dict | None:
+    """Reconcile what the member assumed ("why is my HbA1c high") with the measurement."""
+    if not premise:
+        return None
+    code, claimed = premise.get("topic"), premise.get("claimed")
+    marker = next((m for m in markers if m.key == code), None)
+    if marker is not None:
+        status = _flag(marker) or "unknown"
+        holds = (claimed == "high" and status in {"high", "critical"}) or (claimed == "low" and status == "low") or (
+            claimed == "abnormal" and status in _ABNORMAL)
+        if holds or status == "unknown":
+            return None
+        return {
+            "user_assumed": f"{marker.name or code} is {claimed}",
+            "latest_measurement": _marker_fact(marker),
+            "instruction": (
+                "The latest measurement does not match the user's assumption. Say so first and kindly, with the "
+                "value, then offer to compare with an older report if that is what they meant. Do not explain "
+                "causes of a result the member does not have."
+            ),
+        }
+    if code and not any(r.code == code for r in risks):
+        return {
+            "user_assumed": f"{code.replace('_', ' ')} is {claimed}",
+            "latest_measurement": None,
+            "instruction": "This result was not found in the member's records. Say that, and do not guess a value.",
+        }
+    return None
 
 
 def _recent(context: HealthContext) -> list[str]:
@@ -385,7 +535,13 @@ def uses_answer_evidence(context: HealthContext) -> bool:
         return False
     if "PREPARE_CLINICIAN_DISCUSSION" in (context.operations or []):
         return False
-    return bool(context.markers or context.bio_ai_risks)
+    if context.markers or context.bio_ai_risks:
+        return True
+    # Habit questions ("am I active enough?") can be answered from questionnaire data alone.
+    semantic = getattr(context, "semantic_plan", None) or {}
+    return semantic.get("personalization") == "REQUIRED" and bool(
+        context.questionnaire or context.questionnaire_instances
+    )
 
 
 # Health goals -> the domains they make more important when ranking priorities.

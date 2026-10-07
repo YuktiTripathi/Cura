@@ -135,6 +135,10 @@ class JevDecision(BaseModel):
     reasoning_depth: ReasoningDepth | None = None
     reasoning_required: bool = False
     pdf_analysis_required: bool = False
+    # Semantic plan answers (same Jev call). Validated enum strings; None when absent.
+    reasoning_goal: str | None = None
+    personalization: str | None = None
+    temporal_requirement: str | None = None
 
     @property
     def requires_retrieval(self) -> bool:

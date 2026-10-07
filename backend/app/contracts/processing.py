@@ -51,6 +51,9 @@ class ProcessingEvent(BaseModel):
 
 class TimingReport(BaseModel):
     planning_ms: int | None = None
+    semantic_planning_ms: int | None = None
+    first_token_ms: int | None = None
+    execution_path: str | None = None
     database_retrieval_ms: int | None = None
     context_build_ms: int | None = None
     document_retrieval_ms: int | None = None

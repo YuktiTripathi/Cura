@@ -243,7 +243,7 @@ def stance_for(key: str, value: str, entities: list[str] | None = None) -> str:
 
 _RECENT_PATTERNS: tuple[tuple[str, re.Pattern[str], str], ...] = (
     ("physical_activity_frequency",
-     re.compile(r"\b(?:i\s+)?(?:now\s+)?(?:work ?out|exercise|go to the gym|train|run|walk|cycle|swim)\w*\b.{0,30}"
+     re.compile(r"\b(?:i\s+)?(?:now\s+)?(?:work ?out|exercis|go to the gym|train|run|walk|cycl|swim|gym)\w*\b.{0,40}"
                 r"\b(?:\d|two|three|four|five|six|seven|daily|every day|most days|regularly)\b", re.I),
      SUPPORTIVE),
     ("physical_activity_frequency",
@@ -298,6 +298,8 @@ def select_questionnaire_context(
     review: bool = False,
     recent_messages: list[str] | None = None,
     budget: int | None = None,
+    keys: list[str] | None = None,
+    subject_keys: list[str] | None = None,
 ) -> QuestionnaireSelection:
     """Return only the questionnaire answers that would change this answer.
 
@@ -306,7 +308,11 @@ def select_questionnaire_context(
     step, it is not personalization and does not reach the model.
     """
     answers = _answers(questionnaire)
-    candidates = list(REVIEW_KEYS) if review else relevant_questionnaire_keys(entities, domains)
+    # ``keys``: candidates chosen by the semantic evidence planner for the question's topics.
+    # ``subject_keys``: the habit the question is ABOUT ("am I active enough?"); its answer is
+    # kept even when neutral, because it is the fact being judged.
+    candidates = list(keys) if keys else list(REVIEW_KEYS) if review else relevant_questionnaire_keys(entities, domains)
+    subject = set(subject_keys or [])
     selection = QuestionnaireSelection(retrieved_keys=[a.question_key for a in answers], considered_keys=candidates)
     if not candidates:
         return selection
@@ -334,8 +340,10 @@ def select_questionnaire_context(
             )
         else:
             continue
-        if signal.stance == NEUTRAL:
+        if signal.stance == NEUTRAL and key not in subject:
             continue
+        if signal.stance == NEUTRAL:
+            signal = QuestionnaireSignal(signal.key, signal.label, signal.value, CONTEXT, signal.source, signal.recorded_at)
         if any(p.label == signal.label for p in picked):
             continue
         picked.append(signal)

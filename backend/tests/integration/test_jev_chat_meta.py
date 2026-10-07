@@ -110,7 +110,9 @@ def test_general_question_and_ldl_advice_never_call_supershyft(monkeypatch):
         headers=H,
         json={
             "conversation_id": first["conversation_id"],
-            "message": "What lifestyle changes can help lower my LDL?",
+            # No "my": general lifestyle education. ("...lower MY LDL?" is personalized advice
+            # under the semantic planner and is covered in test_semantic_planner.)
+            "message": "What lifestyle changes can help lower LDL?",
         },
     ).json()
     assert calls == []

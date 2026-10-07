@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from datetime import date, datetime
 
-from app.contracts.common import IntentType, MarkerFlag
+from app.contracts.common import IntentType, KnowledgeScope, MarkerFlag
 from app.contracts.health_context import HealthContext
 from app.contracts.presentation import PresentedFinding, ResponseMode, StructuredResponse, SummaryStyle
 from app.contracts.query import QueryPlan
@@ -200,6 +200,9 @@ def infer_response_mode(plan: QueryPlan, context: HealthContext, message: str | 
         return ResponseMode.clinician_handoff
     if "ASSESS_GOAL_PROGRESS" in ops or plan.intent == IntentType.health_goal_progress:
         return ResponseMode.goal_progress
+    semantic_mode = _semantic_mode(context)
+    if semantic_mode is not None:
+        return semantic_mode
     domains = list(plan.domains or context.domains or [])
     selectors = {str(item).upper() for item in (plan.selectors or [])}
     wants_meaning = bool(_MEANING.search(text) or _SYNTHESIS.search(text))
@@ -231,6 +234,33 @@ def infer_response_mode(plan: QueryPlan, context: HealthContext, message: str | 
     if len(display) > 1 or len(markers) > 1 or len(risks) > 1:
         return ResponseMode.result_list
     return ResponseMode.single_value
+
+
+_FOCUSED_SHAPES = {
+    "EXPLANATION",
+    "POSSIBLE_EXPLANATIONS",
+    "PERSONALIZED_ASSESSMENT",
+    "ACTION_PLAN",
+    "RISK_EXPLANATION",
+    "PRIORITIZATION",
+}
+
+
+def _semantic_mode(context: HealthContext) -> ResponseMode | None:
+    """Response shape follows the user's reasoning goal, not the routed intent label.
+
+    Only focused personal answers are decided here; lookups, comparisons, overviews and
+    every special mode keep the existing rules.
+    """
+    semantic = getattr(context, "semantic_plan", None) or {}
+    shape = semantic.get("response_shape")
+    if shape not in _FOCUSED_SHAPES or semantic.get("personalization") != "REQUIRED":
+        return None
+    if "overall_health" in (semantic.get("health_topics") or []):
+        return None
+    if context.knowledge_scope != KnowledgeScope.personal:
+        return None
+    return ResponseMode.interpretation
 
 
 def display_entity_codes(plan: QueryPlan, context: HealthContext) -> list[str]:

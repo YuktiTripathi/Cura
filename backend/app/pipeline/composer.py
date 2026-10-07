@@ -178,6 +178,10 @@ class ResponseComposer:
             text = f"{response_plan.direct_answer} {response_plan.summary}{highlight}".strip()
         if not text:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
+        change_line = _change_summary(context)
+        if change_line and not any(name.lower() in text.lower() for name in change_line[1]):
+            # A comparison question is answered with what moved, before any wider summary.
+            text = f"{change_line[0]} {text}".strip()
         if testing_option:
             presentation.testing_option = testing_option
             if is_explicit_catalog_lookup(plan.raw_message or ""):
@@ -230,3 +234,26 @@ def _related_findings(context: HealthContext, experience: ConversationExperience
                 )
             )
     return rows
+
+
+def _change_summary(context) -> tuple[str, list[str]] | None:
+    """'Since your previous report: LDL 145 -> 138 mg/dL (down).' Values exactly as stored."""
+    semantic = getattr(context, "semantic_plan", None) or {}
+    if semantic.get("primary_goal") != "COMPARE":
+        return None
+    names = {m.key: (m.name or m.key) for m in getattr(context, "markers", None) or []}
+    moved = [
+        b for b in getattr(context, "baselines", None) or []
+        if b.previous is not None and b.latest is not None and b.latest != b.previous
+    ]
+    if not moved:
+        return None
+    moved.sort(key=lambda b: abs(b.percentage_change or 0), reverse=True)
+    parts, labels = [], []
+    for b in moved[:3]:
+        label = names.get(b.entity, b.entity.replace("_", " "))
+        unit = f" {b.unit}" if b.unit else ""
+        direction = "up" if b.latest > b.previous else "down"
+        parts.append(f"{label} {b.previous:g} -> {b.latest:g}{unit} ({direction})")
+        labels.append(label)
+    return "Since your previous report: " + "; ".join(parts) + ".", labels

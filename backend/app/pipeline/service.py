@@ -55,6 +55,8 @@ from app.memory.conversation import FollowUpMemory
 from app.pipeline.conversation_state import ConversationStateResolver, persistable_state
 from app.contracts.conversation_state import ExpectedReplyType
 from app.pipeline.context_builder import ContextBuilder
+from app.pipeline.evidence_planner import reconcile_query_plan
+from app.pipeline.semantic_plan import build_semantic_plan
 from app.pipeline.context_merger import ContextMerger, attach_medical_evidence
 from app.pipeline.personalized_followups import PersonalizedFollowUpEngine, build_inventory
 from app.pipeline.prompt_builder import PromptBuilder
@@ -71,6 +73,16 @@ from concurrent.futures import ThreadPoolExecutor
 
 from app.pipeline.safety_classifier import HeuristicMultilingualClassifier, model_safety_classifier_active
 from app.pipeline.stages import RouteStage, SafetyStage
+
+# Clarification is a last resort: only when the meaning is missing and the conversation
+# cannot supply it (see semantic_plan). Never a generic "general, latest or comparison?".
+_SEMANTIC_CLARIFICATIONS = {
+    "number_without_measure": (
+        "Which test is that number from (for example fasting glucose, LDL or blood pressure)? "
+        "Tell me and I will check it against its usual range."
+    ),
+    "unresolved_reference": "Which result or topic do you mean? You can name it, for example HbA1c, sleep or your Bio-AI report.",
+}
 
 _SAFETY_POOL = ThreadPoolExecutor(max_workers=16, thread_name_prefix="cura-safety")
 from app.pipeline.observability import ProgressEmitter
@@ -358,6 +370,42 @@ class ChatService:
             eval_turn["pre_safety"] = pre_safety
             if pre_safety.blocked:
                 return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety, conv=conv)
+        # Semantic plan: goal x topics x personalization x time need. Deterministic, built on
+        # the Jev answers when present (same routing call, no extra model call). It corrects
+        # needless clarification and personal questions routed as general, then retrieval
+        # follows the routed plan as before.
+        semantic_started = time.perf_counter()
+        decision = jev_trace.decision if jev_trace and not jev_trace.fallback else None
+        semantic = build_semantic_plan(
+            routing_message,
+            conversation_entities=list(conv_state.active_entities or []) if continuing else None,
+            prior_personal=prior_personal,
+            has_documents=bool(payload.document_ids),
+            jev_goal=getattr(decision, "reasoning_goal", None),
+            jev_personalization=getattr(decision, "personalization", None),
+            jev_temporal=getattr(decision, "temporal_requirement", None),
+        )
+        plan, semantic_changes = reconcile_query_plan(plan, semantic)
+        if semantic.clarification_needed and plan.intent.value == "general_health_question" and not continuing:
+            plan = plan.model_copy(update={"intent": IntentType.ambiguous_clarification})
+        eval_turn["semantic_plan"] = semantic
+        eval_turn["semantic_changes"] = semantic_changes
+        self._progress.timing.marks["semantic"] = int((time.perf_counter() - semantic_started) * 1000)
+        self._progress.timing.execution_path = semantic.execution_path.value
+        logger.info(
+            "semantic_plan goal=%s secondary=%s topics=%s personalization=%s temporal=%s required=%s optional=%s "
+            "path=%s clarify=%s changes=%s",
+            semantic.primary_goal.value,
+            [g.value for g in semantic.secondary_goals],
+            semantic.health_topics[:6],
+            semantic.personalization.value,
+            semantic.temporal_requirement.value,
+            [s.value for s in semantic.required_sources],
+            [s.value for s in semantic.optional_sources],
+            semantic.execution_path.value,
+            semantic.clarification_reason,
+            semantic_changes,
+        )
         from app.pipeline.dev_trace import trace
 
         trace(
@@ -486,7 +534,8 @@ class ChatService:
                 "HbA1c",
             ]
             question = (
-                (jev_trace.decision.clarification_question if jev_trace.decision else None)
+                _SEMANTIC_CLARIFICATIONS.get(semantic.clarification_reason or "")
+                or (jev_trace.decision.clarification_question if jev_trace.decision else None)
                 or "I can look at "
                 + ", ".join(metrics[:-1])
                 + f", or {metrics[-1]}. Which would you like me to use?"
@@ -898,6 +947,7 @@ class ChatService:
         ][-4:]
         eval_turn["medical"] = medical_hits
         eval_turn["context"] = context
+        context.semantic_plan = semantic.model_dump(mode="json") | {"markers": semantic.markers, "bio_ai": semantic.bio_ai, "concepts": semantic.concepts, "domains": semantic.domains}
 
         routing_note = None
         if jev_trace.decision:
@@ -944,6 +994,8 @@ class ChatService:
         answer_client = reasoned.answer_client
         model_fallback_used = reasoned.model_fallback_used
         medical_llm_latency_ms = reasoned.latency_ms
+        if getattr(reasoned, "first_token_ms", None) is not None:
+            self._progress.timing.marks["first_token"] = reasoned.first_token_ms
         eval_turn["model_escalated"] = reasoned.model_escalated
         eval_turn["escalation_reason"] = reasoned.escalation_reason
         if llm_result and getattr(llm_result, "parse_error", None):
@@ -1771,8 +1823,6 @@ class ChatService:
         self._progress.emit(ProcessingStage.complete)
         medical = turn.get("medical") or []
         trace_context = turn.get("context")
-        if settings.is_development and trace_context is not None and getattr(trace_context, "answer_evidence_trace", None):
-            meta.debug = {**(meta.debug or {}), "answer_evidence": trace_context.answer_evidence_trace}
         jev_trace = turn.get("jev_trace")
         if medical and not plan.needs_personal_data:
             # Cite only passages that support a claim in the answer (plan 4.7).
@@ -1963,6 +2013,11 @@ class ChatService:
                 "time_operation": plan.time_operation,
                 "user_message": (payload.message or "")[:160],
             }
+            semantic_debug = _semantic_trace(turn, plan, meta, response, context, payload.message)
+            if semantic_debug:
+                meta.debug["semantic_plan"] = semantic_debug
+            if context is not None and getattr(context, "answer_evidence_trace", None):
+                meta.debug["answer_evidence"] = context.answer_evidence_trace
         refs = []
         for item in response.evidence or []:
             refs.append(
@@ -2027,3 +2082,40 @@ class ChatService:
         self.repo.add_health_fact_refs(fact_rows)
         return response
 
+
+
+def _semantic_trace(turn: dict, plan, meta, response, context, message: str) -> dict | None:
+    """Developer-only trace of planning -> retrieval -> selection -> response (never sent in production)."""
+    semantic = turn.get("semantic_plan")
+    if semantic is None:
+        return None
+    evidence = getattr(context, "answer_evidence_trace", None) or {}
+    retrieved = [
+        name
+        for name, present in (
+            ("blood", bool(getattr(context, "markers", None))),
+            ("bio_ai", bool(getattr(context, "bio_ai_risks", None))),
+            ("questionnaire", bool(getattr(context, "questionnaire", None))),
+            ("profile", bool(getattr(context, "profile", None))),
+        )
+        if present
+    ]
+    timing = meta.timing or {}
+    return {
+        "raw_query": (message or "")[:200],
+        **semantic.trace(),
+        "plan_corrections": list(turn.get("semantic_changes") or []),
+        "retrieved_sources": retrieved,
+        "retrieved_fact_count": len(getattr(context, "facts", None) or []),
+        "selected_fact_count": evidence.get("selected_answer_fact_count"),
+        "questionnaire_fields_selected": evidence.get("questionnaire_selected_keys"),
+        "response_mode": response.presentation.mode.value if getattr(response, "presentation", None) else None,
+        "latency_ms": {
+            "planner": (timing.get("planning_ms") or 0) + (timing.get("semantic_planning_ms") or 0),
+            "jev": meta.jev_latency_ms,
+            "retrieval": timing.get("database_retrieval_ms"),
+            "first_token": timing.get("first_token_ms"),
+            "generation": meta.medical_llm_latency_ms,
+            "total": timing.get("total_ms"),
+        },
+    }

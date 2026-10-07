@@ -32,6 +32,13 @@ class CompositeHealthScenarioProvider:
             knowledge_scope=KnowledgeScope.personal,
             needs_lifestyle=True,
         )
+        if plan.semantic_scoped:
+            # Narrowed by the evidence planner: read only what can change this answer.
+            return ScenarioContext(
+                blood_reports=self.blood.query(principal, blood_plan) if plan.needs_blood else [],
+                bio_ai_reports=self.bio_ai.query(principal, bio_plan) if plan.needs_bio_ai else [],
+                lifestyle=self.lifestyle.query(principal, lifestyle_plan) if (plan.needs_lifestyle or plan.needs_profile) else None,
+            )
         return ScenarioContext(
             blood_reports=self.blood.query(principal, blood_plan),
             bio_ai_reports=self.bio_ai.query(principal, bio_plan),

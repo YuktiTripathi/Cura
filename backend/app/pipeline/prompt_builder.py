@@ -109,6 +109,9 @@ class PromptBuilder:
                 "SOURCE BOUNDARIES: each fact carries its source. Measured blood results are the only lab values. "
                 "Bio-AI items are risk assessments, not diagnoses. questionnaire_context is self-reported lifestyle "
                 "context, never a lab value and never proof of cause. Never merge conflicting sources.\n"
+                "Shape the reply with how_to_answer. If premise_check is present, address it in the first sentence. "
+                "checked_and_within_range lists results that were looked at and are in range; use them to rule "
+                "things out, not to list values.\n"
                 f"Data source: {context.data_source}\n"
                 + f"ANSWER EVIDENCE JSON:\n{compact_json(evidence.payload())}\n"
                 + _medical_block(context, user_message)

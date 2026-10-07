@@ -69,6 +69,9 @@ class QueryPlan(BaseModel):
     operations_hint: list[str] = Field(default_factory=list)
     conversation_entities: list[str] = Field(default_factory=list)
     conversation_turn: str | None = None
+    # True when the semantic evidence planner scoped the sources; providers then fetch
+    # only the flagged sources instead of their broad defaults.
+    semantic_scoped: bool = False
 
     @property
     def personal_data_required(self) -> bool:

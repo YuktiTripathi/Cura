@@ -148,6 +148,8 @@ class ProgressEmitter:
     def finish(self, *, llm_calls: int = 0, input_tokens: int | None = None, output_tokens: int | None = None) -> TimingReport:
         self.timing.total_ms = int((time.perf_counter() - self._started) * 1000)
         self.timing.planning_ms = self.timing.marks.get("planning")
+        self.timing.semantic_planning_ms = self.timing.marks.get("semantic")
+        self.timing.first_token_ms = self.timing.marks.get("first_token")
         self.timing.database_retrieval_ms = self.timing.marks.get("retrieval")
         self.timing.context_build_ms = self.timing.marks.get("context")
         self.timing.document_retrieval_ms = self.timing.marks.get("document")
