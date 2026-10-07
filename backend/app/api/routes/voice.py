@@ -17,6 +17,7 @@ async def run_transcribe(
     language_mode: str,
 ) -> TranscribeResponse:
     request_controls.check_rate_limit(principal.subject_id)
+    request_controls.check_voice_limit(principal.subject_id)
     data = await audio.read()
     result = VoiceService().transcribe(
         audio=data,

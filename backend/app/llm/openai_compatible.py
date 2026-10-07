@@ -259,6 +259,19 @@ class OpenAICompatibleLLMClient:
             return self.complete(messages)
 
     def complete_structured(self, messages: list[dict[str, str]]) -> LLMStructuredOutput:
+        from app.llm.answer_cache import answer_cache_get, answer_cache_put
+
+        cached = answer_cache_get(messages, self.model)
+        if cached is not None:
+            # Identical prompt (same data, question and context): no tokens spent.
+            self.last_usage = {}
+            self.last_finish_reason = cached.finish_reason or ""
+            return cached
+        result = self._complete_structured_uncached(messages)
+        answer_cache_put(messages, self.model, result)
+        return result
+
+    def _complete_structured_uncached(self, messages: list[dict[str, str]]) -> LLMStructuredOutput:
         want_schema = bool(settings.llm_json_schema_output or settings.assistant_quality_v2)
         raw = self._complete_with_mode(messages, want_schema)
         parsed = parse_llm_structured(raw)

@@ -15,6 +15,10 @@ settings.supershyft_database_url = ""
 settings.voice_enabled = False
 settings.stt_provider = "none"
 settings.rate_limit_requests = 10000
+settings.ip_rate_limit = 100000
+settings.upload_rate_limit = 10000
+settings.voice_rate_limit = 10000
+settings.answer_cache_ttl_seconds = 0
 jev_breaker.reset()
 openrouter_breaker.reset()
 supershyft_breaker.reset()

@@ -6,6 +6,7 @@ from app.auth.models import AuthenticatedPrincipal
 from app.db.session import get_db
 from app.documents.contracts import DocumentFactsOut, DocumentListOut, DocumentOut, DocumentPageOut
 from app.core.config import settings
+from app.core.request_controls import request_controls
 from app.documents.jobs import enqueue_document_job, run_document_job
 from app.documents.service import DocumentService
 
@@ -20,6 +21,7 @@ async def upload_document(
     file: UploadFile = File(...),
     conversation_id: str | None = Form(default=None),
 ) -> DocumentOut:
+    request_controls.check_upload_limit(principal.subject_id)
     data = await file.read()
     out = DocumentService(db).upload(
         user_id=principal.subject_id,

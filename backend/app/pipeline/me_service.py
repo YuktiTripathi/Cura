@@ -9,6 +9,7 @@ from app.core.errors import ProviderUnavailableError
 from app.pipeline.starters import build_starters, collect_snapshot
 from app.providers.registry import ProviderRegistry
 from app.voice.providers import voice_input_available
+from app.core.log_ids import subject_ref
 
 logger = logging.getLogger("cura.me")
 
@@ -42,7 +43,7 @@ def build_me_response(
     except ProviderUnavailableError:
         logger.warning(
             "supershyft_db operation=get_profile status=unavailable user_id=%s",
-            principal.subject_id,
+            subject_ref(principal.subject_id),
         )
         starters = build_starters(principal, registry, language, profile_available=False)
         return MeResponse(

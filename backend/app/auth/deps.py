@@ -8,6 +8,7 @@ from app.auth.models import AuthenticatedPrincipal
 from app.core.config import settings
 from app.core.errors import ForbiddenError
 from app.providers.registry import get_registry
+from app.core.log_ids import subject_ref
 
 logger = logging.getLogger("cura.auth")
 
@@ -39,7 +40,7 @@ def get_principal(
         logger.info(
             "auth_ok provider=%s subject_id=%s",
             (settings.auth_provider or "mock").strip().lower(),
-            principal.subject_id,
+            subject_ref(principal.subject_id),
         )
     return principal
 

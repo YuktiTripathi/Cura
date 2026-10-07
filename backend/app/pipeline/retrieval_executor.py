@@ -19,6 +19,7 @@ from app.pipeline.health_gateway import HealthDataGateway
 from app.providers.registry import ProviderRegistry
 from app.retrieval.result import HealthRetrievalResult
 from app.retrieval.router import HealthRetrievalRouter
+from app.core.log_ids import subject_ref
 
 logger = logging.getLogger("cura.retrieval")
 
@@ -90,7 +91,7 @@ def audit_request(
     success: bool,
 ) -> None:
     user_id = authenticated_user_id(principal)
-    logged_user = user_id if settings.is_development else "hashed"
+    logged_user = subject_ref(user_id)
     logger.info(
         "cura_audit user=%s conversation_id=%s sources=%s records=%s model_tier=%s success=%s",
         logged_user,

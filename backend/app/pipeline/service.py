@@ -81,6 +81,7 @@ from app.pipeline.renderer import (
     render_missing_blood_marker,
     render_provenance,
 )
+from app.core.log_ids import subject_ref
 from app.retrieval.medical import passage_label
 from app.pipeline.translation import target_language, translate_answer
 from app.pipeline.safety_messages import emergency_contacts, see_doctor_soon_message
@@ -1095,7 +1096,7 @@ class ChatService:
         )
 
         latency = int((time.perf_counter() - started) * 1000)
-        subject_hash = hashlib.sha256(principal.subject_id.encode()).hexdigest()[:12]
+        subject_hash = subject_ref(principal.subject_id)
         from app.pipeline.retrieval_executor import audit_request
 
         audit_request(
@@ -1111,7 +1112,7 @@ class ChatService:
                 "chat_dev auth_provider=%s subject_id=%s model_tier=%s model=%s jev_intent=%s "
                 "supershyft_called=%s request_id=%s",
                 (settings.auth_provider or "mock").strip().lower(),
-                principal.subject_id,
+                subject_hash,
                 plan.answer_model_tier.value if plan.answer_model_tier else None,
                 (
                     answer_client.model

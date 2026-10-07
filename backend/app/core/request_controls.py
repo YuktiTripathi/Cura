@@ -57,24 +57,49 @@ class RequestControlStore:
         return hashlib.sha256(subject_id.encode()).hexdigest()[:24]
 
     def check_rate_limit(self, subject_id: str) -> None:
-        subject = self._subject_key(subject_id)
-        window = max(1, settings.rate_limit_window_seconds)
+        self.check_limit(
+            "rate",
+            self._subject_key(subject_id),
+            settings.rate_limit_requests,
+            settings.rate_limit_window_seconds,
+        )
+
+    def check_limit(self, scope: str, key: str, limit: int, window_seconds: int, message: str | None = None) -> None:
+        """Fixed-window counter shared through Redis (in-process fallback in development)."""
+        window = max(1, int(window_seconds))
         bucket = int(time.time() // window)
-        key = f"cura:rate:{subject}:{bucket}"
+        counter_key = f"cura:{scope}:{key}:{bucket}"
         client = self._client()
         if client:
-            count = client.incr(key)
+            count = client.incr(counter_key)
             if count == 1:
-                client.expire(key, window + 1)
+                client.expire(counter_key, window + 1)
         else:
             now = time.time()
             with self._lock:
                 self._prune(now)
-                entry = self._memory.get(key)
+                entry = self._memory.get(counter_key)
                 count = int(entry.value) + 1 if entry else 1
-                self._memory[key] = _Entry(now + window + 1, str(count))
-        if count > max(1, settings.rate_limit_requests):
-            raise RateLimitedError("Too many requests. Please try again shortly.")
+                self._memory[counter_key] = _Entry(now + window + 1, str(count))
+        if count > max(1, int(limit)):
+            raise RateLimitedError(message or "Too many requests. Please try again shortly.")
+
+    def check_upload_limit(self, subject_id: str) -> None:
+        self.check_limit(
+            "upload", self._subject_key(subject_id), settings.upload_rate_limit, settings.upload_rate_window_seconds,
+            "You've uploaded a lot of documents recently. Please try again later.",
+        )
+
+    def check_voice_limit(self, subject_id: str) -> None:
+        self.check_limit(
+            "voice", self._subject_key(subject_id), settings.voice_rate_limit, settings.voice_rate_window_seconds,
+            "Too many voice messages in a short time. Please wait a moment or type your message.",
+        )
+
+    def check_ip_limit(self, ip: str) -> None:
+        if not ip or int(settings.ip_rate_limit) <= 0:
+            return
+        self.check_limit("ip", self._subject_key(ip), settings.ip_rate_limit, settings.ip_rate_window_seconds)
 
     def _budget_key(self, subject_id: str) -> str:
         day = time.strftime("%Y%m%d", time.gmtime())

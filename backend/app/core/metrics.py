@@ -18,6 +18,7 @@ STAGE_LATENCY = Histogram("cura_stage_seconds", "Pipeline stage latency", ["stag
 CHAT_OUTCOMES = Counter("cura_chat_total", "Chat answers by outcome", ["status", "tier", "fallback"])
 SAFETY_FLAGS = Counter("cura_safety_flags_total", "Safety flags raised", ["flag"])
 TOKENS = Counter("cura_llm_tokens_total", "Model tokens", ["kind", "tier"])
+ANSWER_CACHE = Counter("cura_answer_cache_total", "Model answer cache lookups", ["result"])
 COST = Counter("cura_llm_cost_usd_total", "Estimated model cost in USD", ["tier"])
 
 _KNOWN_FLAGS_LIMIT = 64

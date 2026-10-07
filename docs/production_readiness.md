@@ -47,6 +47,14 @@ Tracks the Cura Production Readiness Plan (Oct 6, 2026). "Code" means the change
 | 6 lever 3 Prompt caching | Code: stable text and member data come first and the question last. **Owner action: confirm cache hits in the provider usage report** |
 | 6.7 (part) Budgets | Code: each member has a daily model token budget (`MEMBER_DAILY_TOKEN_BUDGET`, default 200,000) and gets a clear message when it runs out. The monthly spend alert is still open |
 
+## P2 items done
+
+| Plan item | Status |
+| --- | --- |
+| 1.9 Smaller hardening | Code: member ids are hashed in every log line. Per-member limits on uploads (20 an hour) and voice (30 per 10 min), and a per-IP limit on all API routes (300 a minute; `X-Forwarded-For` is trusted only with `TRUST_PROXY_HEADERS`). Uploads with JavaScript, launch actions, embedded files or XFA are refused, as are encrypted PDFs and PDFs over the page cap. An optional ClamAV scan refuses the upload if the scanner can't be reached. **Owner action: run clamd and set `DOCUMENT_CLAMAV_HOST`; red-team prompt injection through uploaded reports** |
+| 5.9 Client resilience | Code: the web client sends an `Idempotency-Key` on every chat and keeps it across retries. It retries network failures, 429 (honouring `Retry-After`) and 502 to 504, and reconnects a dropped stream once, getting the finished answer rather than a second run. Flutter is not in this repository |
+| 6 lever 5 Cache validated explanations | Code: a model answer is reused for an identical prompt (same member data, question, context and model) for 24 h, shared through Redis. Grounding, safety review and translation still run each time. A cache hit costs no tokens; `cura_answer_cache_total` shows the hit rate |
+
 ## Still open
 
 These need separate work or owner input: 1.8, 1.9, 2.8, 2.9, 3.7, 3.8, 4.1, 4.2, 4.5, 4.7, 4.8, sections 5 and 6, and the answers to the open questions in the plan.

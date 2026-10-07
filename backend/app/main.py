@@ -17,6 +17,7 @@ from app.api.routes.chat import compat_router as chat_compat_router
 from app.api.routes.voice import compat_router as voice_compat_router
 from app.core.config import settings
 from app.core.metrics import HTTP_LATENCY, HTTP_REQUESTS
+from app.core.request_controls import request_controls
 from app.core.metrics import render as render_metrics
 from app.core.errors import CuraError, cura_error_handler, http_error_handler
 from app.core.invariants import assert_production_config, assert_safe_auth_health_pairing
@@ -35,6 +36,15 @@ try:
         drain_pending_document_jobs()
 except Exception:
     logging.getLogger("cura").warning("pending_document_job_drain_failed")
+
+def client_ip(request: Request) -> str:
+    """Client address; X-Forwarded-For is honoured only when TRUST_PROXY_HEADERS is set."""
+    if settings.trust_proxy_headers:
+        forwarded = request.headers.get("X-Forwarded-For", "")
+        if forwarded:
+            return forwarded.split(",")[0].strip()
+    return request.client.host if request.client else ""
+
 
 @asynccontextmanager
 async def lifespan(_app):
@@ -84,6 +94,11 @@ async def unhandled_error(_request: Request, exc: Exception):
 async def request_id_middleware(request: Request, call_next):
     started = time.perf_counter()
     request.state.request_id = request.headers.get("X-Request-Id") or str(uuid.uuid4())
+    if request.url.path.startswith(("/api/", "/cura/")):
+        try:
+            request_controls.check_ip_limit(client_ip(request))
+        except CuraError as exc:
+            return await cura_error_handler(request, exc)
     try:
         response = await call_next(request)
     except Exception:

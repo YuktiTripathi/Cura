@@ -146,12 +146,57 @@ export async function transcribeVoice(
   };
 }
 
-export async function sendChat(
+const CONSENT_REQUIRED_EN = "Cura needs your consent before it can answer health questions.";
+const RETRY_STATUSES = new Set([429, 502, 503, 504]);
+const MAX_ATTEMPTS = 3;
+
+class ServerStreamError extends Error {}
+
+function sleep(ms: number): Promise<void> {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+function retryDelayMs(res: Response | null, attempt: number): number {
+  const header = res?.headers.get("Retry-After");
+  const seconds = header ? Number(header) : NaN;
+  if (Number.isFinite(seconds) && seconds >= 0) return Math.min(seconds, 10) * 1000;
+  return Math.min(500 * 2 ** attempt, 4000) + Math.floor(Math.random() * 250);
+}
+
+/**
+ * POST with safe retries (readiness plan 5.9). The same Idempotency-Key is sent on every
+ * attempt, so a retry after a dropped connection returns the original answer instead of
+ * running the question twice. Retries network failures, 429 and 502-504.
+ */
+async function postWithRetry(url: string, init: RequestInit): Promise<Response> {
+  let lastError: unknown = null;
+  for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt += 1) {
+    let res: Response | null = null;
+    try {
+      res = await fetchWithConsent(url, init);
+    } catch (error) {
+      if (error instanceof Error && error.message === t("consent.required", CONSENT_REQUIRED_EN)) throw error;
+      lastError = error;
+    }
+    if (res && !RETRY_STATUSES.has(res.status)) return res;
+    if (attempt === MAX_ATTEMPTS - 1) {
+      if (res) return res;
+      break;
+    }
+    await sleep(retryDelayMs(res, attempt));
+  }
+  void lastError;
+  throw new Error(
+    "Can't reach the Cura API. Check your connection and try again."
+  );
+}
+
+function chatPayload(
   message: string,
   conversationId: string | null,
-  documentIds: string[] = [],
+  documentIds: string[],
   contextRef?: ContextRef
-): Promise<ChatResponse> {
+): Record<string, unknown> {
   const payload: Record<string, unknown> = {
     message,
     conversation_id: conversationId,
@@ -159,21 +204,23 @@ export async function sendChat(
   };
   if (documentIds.length) payload.document_ids = documentIds;
   if (contextRef) payload.context_ref = contextRef;
-  let res: Response;
-  try {
-    res = await fetchWithConsent(`${API}/api/v1/chat`, {
-      method: "POST",
-      headers: authHeaders(),
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === t("consent.required", "Cura needs your consent before it can answer health questions.")) throw error;
-    throw new Error(
-      "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
-    );
-  }
+  return payload;
+}
 
+export async function sendChat(
+  message: string,
+  conversationId: string | null,
+  documentIds: string[] = [],
+  contextRef?: ContextRef
+): Promise<ChatResponse> {
+  const headers = authHeaders() as Record<string, string>;
+  headers["Idempotency-Key"] = crypto.randomUUID();
+  const res = await postWithRetry(`${API}/api/v1/chat`, {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body: JSON.stringify(chatPayload(message, conversationId, documentIds, contextRef)),
+  });
   const data = await parseJson(res);
   if (!res.ok) {
     const err = data.error as { message?: string } | undefined;
@@ -192,36 +239,43 @@ export async function streamChat(
   onPreview?: (preview: AnswerPreview) => void,
   onExperienceBlock?: (block: ExperienceBlock) => void
 ): Promise<ChatResponse> {
-  const payload: Record<string, unknown> = {
-    message,
-    conversation_id: conversationId,
-    ...languageFields(),
-  };
-  if (documentIds.length) payload.document_ids = documentIds;
-  if (contextRef) payload.context_ref = contextRef;
   const headers = authHeaders() as Record<string, string>;
   headers.Accept = "text/event-stream";
+  // One key for every attempt: a reconnect gets the finished answer, never a second run.
   headers["Idempotency-Key"] = crypto.randomUUID();
-  let res: Response;
-  try {
-    res = await fetchWithConsent(`${API}/api/v1/chat/stream`, {
-      method: "POST",
-      headers,
-      credentials: "include",
-      body: JSON.stringify(payload),
-    });
-  } catch (error) {
-    if (error instanceof Error && error.message === t("consent.required", "Cura needs your consent before it can answer health questions.")) throw error;
-    throw new Error(
-      "Can't reach the Cura API. Start the backend (`uvicorn app.main:app --port 8000`) and retry."
-    );
+  const init: RequestInit = {
+    method: "POST",
+    headers,
+    credentials: "include",
+    body: JSON.stringify(chatPayload(message, conversationId, documentIds, contextRef)),
+  };
+  for (let attempt = 0; attempt < 2; attempt += 1) {
+    const res = await postWithRetry(`${API}/api/v1/chat/stream`, init);
+    if (!res.ok || !res.body) {
+      const data = await parseJson(res);
+      const err = data.error as { message?: string } | undefined;
+      throw new Error(err?.message || "Streaming request failed");
+    }
+    try {
+      const completed = await readChatStream(res.body, onToken, onProgress, onPreview, onExperienceBlock);
+      if (completed) return completed;
+    } catch (error) {
+      if (error instanceof ServerStreamError) throw new Error(error.message);
+      // Connection dropped mid-stream: reconnect once with the same key.
+    }
+    if (attempt === 0) await sleep(retryDelayMs(null, 0));
   }
-  if (!res.ok || !res.body) {
-    const data = await parseJson(res);
-    const err = data.error as { message?: string } | undefined;
-    throw new Error(err?.message || "Streaming request failed");
-  }
-  const reader = res.body.getReader();
+  throw new Error("The connection dropped before the answer arrived. Please try again.");
+}
+
+async function readChatStream(
+  body: ReadableStream<Uint8Array>,
+  onToken: (text: string) => void,
+  onProgress?: (event: import("./processingMessages").ProcessingEvent) => void,
+  onPreview?: (preview: AnswerPreview) => void,
+  onExperienceBlock?: (block: ExperienceBlock) => void
+): Promise<ChatResponse | null> {
+  const reader = body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
   let completed: ChatResponse | null = null;
@@ -240,11 +294,10 @@ export async function streamChat(
       if (event === "progress" && onProgress) onProgress(data);
       if (event === "preview" && onPreview) onPreview(data as AnswerPreview);
       if (event === "experience_block" && onExperienceBlock) onExperienceBlock(data as ExperienceBlock);
-      if (event === "error") throw new Error(data.message || "Streaming request failed");
+      if (event === "error") throw new ServerStreamError(data.message || "Streaming request failed");
       if (event === "complete" || event === "answer") completed = data as ChatResponse;
     }
   }
-  if (!completed) throw new Error("The response stream ended unexpectedly.");
   return completed;
 }
 

@@ -46,6 +46,10 @@ class Settings(BaseSettings):
     llm_max_retries: int = 1
     llm_max_output_tokens: int = 800
     # Reasoning models (plan 6.6): effort and the output cap that includes hidden reasoning.
+    # Reuse a model answer for an identical prompt (same data, question and context). 0 disables.
+    answer_cache_ttl_seconds: int = 86400
+    # Bump to invalidate every cached answer, for example after a prompt or model change.
+    answer_cache_version: str = "1"
     llm_reasoning_effort: str = "low"
     llm_reasoning_output_cap: int = 1200
     enable_llm: bool = False
@@ -149,6 +153,15 @@ class Settings(BaseSettings):
     redis_url: str = ""
     redis_required: bool = False
     rate_limit_requests: int = 30
+    # Per-endpoint and per-IP limits (plan 1.9). IP limits count every /api request.
+    upload_rate_limit: int = 20
+    upload_rate_window_seconds: int = 3600
+    voice_rate_limit: int = 30
+    voice_rate_window_seconds: int = 600
+    ip_rate_limit: int = 300
+    ip_rate_window_seconds: int = 60
+    # Trust X-Forwarded-For only behind a known load balancer.
+    trust_proxy_headers: bool = False
     # Model tokens (input + output) a member may use per UTC day. 0 disables the budget.
     member_daily_token_budget: int = 200_000
     rate_limit_window_seconds: int = 60
@@ -192,6 +205,9 @@ class Settings(BaseSettings):
     document_s3_endpoint_url: str = ""
     document_s3_kms_key_id: str = ""
     document_max_upload_bytes: int = 20_000_000
+    # Optional clamd for upload malware scanning; refuses uploads if set but unreachable.
+    document_clamav_host: str = ""
+    document_clamav_port: int = 3310
     # "inline": the web process extracts uploads (development). "external": the web
     # process only enqueues and scripts/document_worker.py does the work (production).
     document_worker_mode: str | None = None
