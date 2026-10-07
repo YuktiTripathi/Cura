@@ -9,7 +9,14 @@ from __future__ import annotations
 from app.contracts.bio_ai import BioAIReport, BioAIRisk
 from app.contracts.blood import BloodMarker, BloodReport
 from app.contracts.query import QueryPlan
-from app.pipeline.lab_parameters import DERIVED_ENTITY_KEYS, FAMILY_QUERY_KEYS, display_name_for, expand_requested_keys, is_lab_key
+from app.pipeline.lab_parameters import (
+    DERIVED_ENTITY_KEYS,
+    FAMILY_QUERY_KEYS,
+    canonicalize_marker_name,
+    display_name_for,
+    expand_requested_keys,
+    is_lab_key,
+)
 
 
 def wanted_metric_keys(plan: QueryPlan) -> list[str]:
@@ -49,6 +56,25 @@ def _usable_marker(marker: BloodMarker) -> bool:
     return marker.value is not None
 
 
+def _marker_matches(marker: BloodMarker, key: str, reports: list[BloodReport]) -> bool:
+    """Alias match without copying a value from a chemically different test.
+
+    BUN and urea share a family, but if both are stored they stay separate.
+    A BUN-only report still answers a BUN / blood-urea-nitrogen question.
+    """
+    if marker.key == key:
+        return True
+    wanted = canonicalize_marker_name(key)
+    stored = canonicalize_marker_name(marker.key) or canonicalize_marker_name(marker.name or "")
+    if wanted == stored:
+        return True
+    bun_family = {"bun", "urea"}
+    if wanted in bun_family and stored in bun_family and wanted != stored:
+        keys_present = {canonicalize_marker_name(item.key) for report in reports for item in report.markers}
+        return stored in keys_present and wanted not in keys_present
+    return False
+
+
 def select_latest_markers(
     reports: list[BloodReport],
     keys: list[str],
@@ -60,7 +86,7 @@ def select_latest_markers(
         found = None
         for report in reversed(ordered):
             marker = next(
-                (item for item in report.markers if item.key == key and _usable_marker(item)),
+                (item for item in report.markers if _marker_matches(item, key, reports) and _usable_marker(item)),
                 None,
             )
             if marker is None:
@@ -90,7 +116,7 @@ def select_previous_markers(
         hits: list[BloodMarker] = []
         for report in ordered:
             marker = next(
-                (item for item in report.markers if item.key == key and _usable_marker(item)),
+                (item for item in report.markers if _marker_matches(item, key, reports) and _usable_marker(item)),
                 None,
             )
             if marker is None:

@@ -76,8 +76,11 @@ _SYSTEM_PROMPT = (
     "anaphylaxis, poisoning or overdose, very high or low sugar with symptoms, infant fever or lethargy).\n"
     "- self_harm: any direct or indirect thought of suicide, self harm, or not wanting to live.\n"
     "- medication_misuse: asking whether to start, stop, skip, change, double, or combine a medicine, or about a dose.\n"
-    "- urgent_soon: should see a doctor within a day but not an emergency.\n"
-    "- diagnosis_request: asks to be diagnosed.\n"
+    "- urgent_soon: symptoms that should be seen within a day (fever for several days, blood in urine or stool, "
+    "inability to keep fluids down, very high blood pressure with symptoms, jaundice). "
+    "An out-of-range lab result, or a question about what a result means, is none.\n"
+    "- diagnosis_request: asks to be diagnosed or to be told they have a disease "
+    "(\"do I have diabetes\", \"diagnose me\"). Asking what a lab result means is none.\n"
     "- none: anything else, including negated symptoms (\"no chest pain\") and fitness talk (\"chest day\").\n"
     'Reply with JSON only: {"category": "<one of the above>", "confidence": <0..1>}'
 )

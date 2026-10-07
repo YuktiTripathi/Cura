@@ -40,6 +40,17 @@ def apply_source_routing(
     ids = document_ids or []
     text = plan.raw_message or ""
     upload_cue = bool(_UPLOAD.search(text))
+    # "this report" without an uploaded file means the member's health report, not a missing PDF.
+    report_phrase_only = bool(re.search(r"\b(?:this|the) report\b", text, re.I)) and not bool(
+        re.search(r"\b(?:upload(?:ed)?|pdf|document)\b", text, re.I)
+    )
+    if report_phrase_only and uploaded_document_count == 0 and not ids:
+        upload_cue = False
+        plan.needs_blood = True
+        plan.needs_bio_ai = True
+        plan.needs_questionnaire = True
+        plan.knowledge_scope = KnowledgeScope.personal
+        plan.source = QuerySource.supershyft
     ss_cue = bool(_SS.search(text))
     compare_cue = bool(_COMPARE.search(text))
     cues = mixed_personal_cues(text)
@@ -51,7 +62,10 @@ def apply_source_routing(
     needs_user_uploaded = False
     needs_cross = False
 
-    if educational and not compare_cue and not upload_cue and not plan.explicit_source_ref and not ids:
+    if report_phrase_only and uploaded_document_count == 0 and not ids:
+        needs_supershyft = True
+        needs_general = False
+    if educational and not report_phrase_only and not compare_cue and not upload_cue and not plan.explicit_source_ref and not ids:
         plan.needs_general = True
         plan.needs_supershyft = False
         plan.needs_user_uploaded = False

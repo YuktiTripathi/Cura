@@ -29,3 +29,4 @@ frontend/.env
 *.p12
 credentials.json
 backend/tests/fixtures/eval_runs/
+evaluation/cura_golden_dataset/.local/

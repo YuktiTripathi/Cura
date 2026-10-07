@@ -15,14 +15,7 @@ let current: Locale = detectLocale();
 const listeners = new Set<(locale: Locale) => void>();
 
 function detectLocale(): Locale {
-  try {
-    const saved = window.localStorage.getItem(STORAGE_KEY) as Locale | null;
-    if (saved && LOCALES.includes(saved)) return saved;
-  } catch {
-    // Storage can be unavailable (private mode); fall through to the browser language.
-  }
-  const nav = typeof navigator !== "undefined" ? (navigator.language || "").toLowerCase() : "";
-  return nav.startsWith("hi") ? "hi" : "en";
+  return "en";
 }
 
 /** The locale the member picked themselves, or null if Cura is following the browser. */

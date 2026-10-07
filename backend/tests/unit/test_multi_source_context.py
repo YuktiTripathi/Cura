@@ -276,16 +276,10 @@ def test_explicit_document_id_takes_precedence(tmp_path, monkeypatch):
     assert "160" not in body["answer"]
 
 
-def test_no_document_selected_asks_to_clarify():
+def test_no_document_selected_uses_personal_records():
     plan = build_query_plan("What is my LDL in this report?")
-    assert plan.needs_user_uploaded
-    body = client.post(
-        "/api/v1/chat",
-        headers=H,
-        json={"message": "What is my LDL in this report?"},
-    ).json()
-    assert body["meta"]["status"] in {"document_missing", "document_ambiguous"}
-    assert "uploaded report" in body["answer"].lower()
+    assert plan.needs_user_uploaded is False
+    assert plan.needs_blood is True
 
 
 def test_jev_unavailable_uses_deterministic_fallback(monkeypatch):

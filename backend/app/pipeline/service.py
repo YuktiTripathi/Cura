@@ -952,9 +952,11 @@ class ChatService:
         routing_note = None
         if jev_trace.decision:
             routing_note = jev_trace.decision.model_dump_json()
-        diagnosis_restraint = (
-            getattr(pre_safety, "category", None) == "diagnosis_request" and settings.assistant_quality_v2
-        )
+        from app.pipeline.safety import explicit_diagnosis_request
+
+        # The classifier sometimes labels "what does this result mean?" as a diagnosis request.
+        # Replace the answer only when the user actually asks to be diagnosed.
+        diagnosis_restraint = settings.assistant_quality_v2 and explicit_diagnosis_request(payload.message)
         if plan.history:
             self._progress.emit(ProcessingStage.analyzing_trends, plan=plan)
         elif plan.needs_cross_source:
