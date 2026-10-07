@@ -192,7 +192,15 @@ PARAMETERS: tuple[LabParameter, ...] = (
         ("estimated glomerular filtration rate", "estimated gfr", "gfr estimated", "egfr", "e-gfr", "gfr"),
         "kidney",
     ),
-    LabParameter("urea", "Urea", ("blood urea nitrogen", "blood urea", "urea", "bun"), "kidney"),
+    # Urea and BUN are different measurements (urea is about 2.14 x BUN in mg/dL): never
+    # merged, never converted. Each question reads the marker the report actually names.
+    LabParameter("urea", "Urea", ("blood urea", "serum urea", "urea"), "kidney"),
+    LabParameter(
+        "bun",
+        "Blood Urea Nitrogen (BUN)",
+        ("blood urea nitrogen", "bun urea nitrogen", "urea nitrogen", "bun"),
+        "kidney",
+    ),
     LabParameter("uric_acid", "Uric Acid", ("uric acid",), "kidney"),
     LabParameter(
         "sodium",
@@ -277,7 +285,7 @@ FAMILY_MEMBERS = {
     "glucose": ("fasting_blood_glucose", "postprandial_glucose", "glucose"),
     "cholesterol": ("ldl", "hdl", "cholesterol"),
     "blood_pressure": ("systolic", "diastolic"),
-    "kidney": ("creatinine", "egfr", "urea", "uric_acid"),
+    "kidney": ("creatinine", "egfr", "urea", "bun", "uric_acid"),
     "electrolyte": ("sodium", "chloride", "potassium"),
     "thyroid_labs": ("tsh", "t3", "t4"),
     "liver": ("alt", "ast", "bilirubin"),
@@ -351,9 +359,11 @@ _SLUG_ALIASES = {
     "e_gfr": "egfr",
     "egfr": "egfr",
     "gfr": "egfr",
-    "blood_urea_nitrogen": "urea",
+    "blood_urea_nitrogen": "bun",
+    "bun_urea_nitrogen": "bun",
+    "urea_nitrogen": "bun",
     "blood_urea": "urea",
-    "bun": "urea",
+    "bun": "bun",
     "serum_sodium": "sodium",
     "na": "sodium",
     "serum_chloride": "chloride",
@@ -618,6 +628,15 @@ def family_for(key: str | None) -> str | None:
     if key in _BY_KEY:
         return _BY_KEY[key].family
     return None
+
+
+# Different measurements that people confuse (BUN vs urea). Retrieved alongside so a
+# "not on your report" answer can say what IS there; never selected, merged or converted.
+DISTINCT_NEIGHBOURS = {"bun": frozenset({"urea"}), "urea": frozenset({"bun"})}
+
+
+def distinct_neighbours(key: str | None) -> set[str]:
+    return set(DISTINCT_NEIGHBOURS.get(key or "", ()))
 
 
 def related_keys(key: str | None) -> set[str]:

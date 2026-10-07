@@ -57,17 +57,17 @@ class InformationBudget:
 
 
 BUDGETS: dict[str, InformationBudget] = {
-    LOOKUP: InformationBudget(1, 0, 0, 0, 1, 0, 1, (40, 100)),
+    LOOKUP: InformationBudget(1, 0, 0, 0, 1, 0, 1, (50, 120)),
     EXPLANATION: InformationBudget(1, 2, 2, 1, 1, 2, 1, (80, 180)),
-    BIO_AI: InformationBudget(3, 2, 2, 0, 1, 2, 1, (80, 180)),
-    ACTION_PLAN: InformationBudget(1, 2, 3, 1, 1, 3, 1, (80, 180)),
-    PRIORITIZATION: InformationBudget(3, 2, 3, 0, 1, 3, 1, (80, 200)),
-    TREND: InformationBudget(1, 1, 0, 1, 1, 1, 1, (60, 150)),
+    BIO_AI: InformationBudget(3, 2, 2, 0, 1, 2, 1, (150, 300)),
+    ACTION_PLAN: InformationBudget(1, 2, 3, 1, 1, 3, 1, (120, 250)),
+    PRIORITIZATION: InformationBudget(3, 2, 3, 1, 1, 3, 1, (150, 300)),
+    TREND: InformationBudget(1, 1, 0, 1, 1, 1, 1, (80, 180)),
     QUESTIONNAIRE_LOOKUP: InformationBudget(0, 0, 0, 0, 0, 0, 0, (30, 90)),
-    OVERVIEW: InformationBudget(12, 0, 5, 3, 1, 3, 1, (180, 350)),
-    ASSESSMENT: InformationBudget(1, 2, 4, 1, 1, 2, 1, (60, 160)),
-    CAUSES: InformationBudget(2, 2, 3, 1, 1, 2, 1, (80, 180)),
-    RISK: InformationBudget(1, 2, 2, 1, 1, 2, 1, (80, 180)),
+    OVERVIEW: InformationBudget(12, 0, 5, 3, 1, 3, 1, (200, 400)),
+    ASSESSMENT: InformationBudget(1, 2, 4, 1, 1, 2, 1, (80, 200)),
+    CAUSES: InformationBudget(2, 3, 3, 1, 1, 2, 1, (150, 300)),
+    RISK: InformationBudget(1, 2, 2, 1, 1, 2, 1, (120, 250)),
 }
 
 # Semantic response shape -> evidence mode.
@@ -84,22 +84,72 @@ _SHAPE_MODE = {
 }
 
 # How the reply should be shaped for each reasoning goal (the answer model writes it).
+# Response strategies. Each is a reasoning order (fact -> interpretation -> connection ->
+# action), not wording; the model writes the prose. Labels are never shown to the member.
 GOAL_GUIDANCE = {
-    LOOKUP: "Give the value and its status first, then at most one sentence of meaning.",
-    EXPLANATION: "Explain what it means for this member, using the listed evidence only.",
-    CAUSES: (
-        "Open by acknowledging that this can have many causes. Name the most relevant possibilities that the "
-        "listed evidence supports or rules out. If nothing listed explains it, say so plainly. Never present a "
-        "possibility as the cause and never diagnose."
+    LOOKUP: (
+        "Give the value, its unit and how it sits against THIS report's range in the first sentence, then one or "
+        "two sentences on what the marker reflects. Mention a related listed fact only if it changes the meaning."
     ),
-    ASSESSMENT: "Give a clear judgment in the first sentence, then the personal evidence behind it and brief context.",
-    TREND: "State previous versus current, the direction, then what it means.",
-    PRIORITIZATION: "Name the single top priority and why, then at most two secondary items.",
-    ACTION_PLAN: "One-sentence assessment, then at most three personalized actions. Skip what the member already does.",
-    OVERVIEW: "Overall picture first, then 3-5 themes and the one priority.",
-    RISK: "Calibrated explanation of what this could mean, the personal evidence, and when to see a clinician.",
-    BIO_AI: "Explain the Bio-AI result as a risk estimate, not a diagnosis, alongside the measured results.",
+    EXPLANATION: (
+        "FACT: the value against the report's own range. INTERPRETATION: what this marker reflects and what the "
+        "direction broadly means. CONNECTION: how the listed related findings or habits fit (only those listed). "
+        "ACTION: one reasonable next step."
+    ),
+    CAUSES: (
+        "Acknowledge in one sentence that this has several possible contributors. Then connect the listed evidence: "
+        "which listed findings or habits are consistent with it and which listed results argue against an "
+        "explanation. If nothing listed explains it, say so plainly. Never present a possibility as the cause and "
+        "never diagnose. End with the most useful next step."
+    ),
+    ASSESSMENT: (
+        "Give a clear judgment in the first sentence (for example 'below what is usually recommended'), then the "
+        "personal evidence behind it, then why it matters given the listed findings."
+    ),
+    TREND: (
+        "State previous value and date, latest value and date, and the numeric change from the trend facts. Then a "
+        "cautious interpretation: direction, whether it is still outside the report's range, and what would help "
+        "confirm it. Never just say 'improved' without the numbers."
+    ),
+    PRIORITIZATION: (
+        "Give at most three priorities in order. For each: what it is and why it ranks there (degree of "
+        "abnormality, related findings, Bio-AI risk, change over time, habits). Say this is a reasonable order to "
+        "work on, not a formal clinical ranking. Do not list every abnormal value."
+    ),
+    ACTION_PLAN: (
+        "One-sentence assessment, then at most three actions tied to the listed findings and habits. Skip what the "
+        "member already does; no medicines or doses."
+    ),
+    OVERVIEW: (
+        "Open with the overall picture in plain words, then the few areas that matter (connecting blood, Bio-AI "
+        "and habits where they point the same way), what looks reassuring, and the one priority."
+    ),
+    RISK: (
+        "Calibrated explanation of what this could mean, the personal evidence for and against concern, and when "
+        "seeing a clinician makes sense. No alarm unless a listed fact warrants it."
+    ),
+    BIO_AI: (
+        "Explain the Bio-AI result as a risk estimate built from several inputs, not a diagnosis and not one "
+        "biomarker. Connect it to the listed measured results and habits that point the same way, and note listed "
+        "results that are reassuring. Do not describe how the model works internally."
+    ),
 }
+
+# Variants chosen from the shape of the selected evidence.
+MULTI_MARKER_GUIDANCE = (
+    "Several markers are asked about. Do not write one paragraph per marker. Give each a short read against its own "
+    "range, then say whether they appear related and what common theme (if any) they share, what should NOT be "
+    "assumed from them together, and the single most useful next step."
+)
+CROSS_SOURCE_GUIDANCE = (
+    "Blood results and a Bio-AI risk are both listed. Explain that the Bio-AI risk reflects several inputs, so one "
+    "normal marker does not make the overall risk low and one abnormal marker does not make it high. Then reference "
+    "the member's actual listed values that point toward or away from the risk."
+)
+FOLLOW_UP_GUIDANCE = (
+    "This continues the previous turn. Do not restart: build on what was already said, refer back to it briefly, "
+    "do not repeat values already given, and keep it shorter than a first answer."
+)
 
 _ABNORMAL = {"low", "high", "critical"}
 _ACTION = re.compile(
@@ -202,6 +252,7 @@ class AnswerEvidence:
     topics: list[str] = field(default_factory=list)
     premise_check: dict | None = None
     checked_without_concern: list[str] = field(default_factory=list)
+    extra_guidance: list[str] = field(default_factory=list)
 
     def payload(self) -> dict:
         """What the answering model receives instead of the full health record."""
@@ -211,7 +262,7 @@ class AnswerEvidence:
             "also_address": self.secondary_goals,
             "topics": self.topics,
             "response_mode": self.response_mode,
-            "how_to_answer": GOAL_GUIDANCE.get(self.response_mode),
+            "how_to_answer": " ".join([GOAL_GUIDANCE.get(self.response_mode) or "", *self.extra_guidance]).strip(),
             "premise_check": self.premise_check,
             "conversation_goal": self.conversation_goal,
             "primary_facts": self.primary_facts,
@@ -291,7 +342,11 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         already_explained=list(dict.fromkeys([*(context.facts_already_explained or []), *(context.explained_entities or [])]))[:6],
     )
     markers = [m for m in context.markers or [] if m.value is not None]
-    requested = [c for c in [*(context.display_entity_codes or []), *(context.requested_entity_codes or [])] if c]
+    carried = set(_conversation_codes(context))
+    requested = [
+        c for c in [*(context.display_entity_codes or []), *(context.requested_entity_codes or [])]
+        if c and c not in carried
+    ]
     if context.resolved_topic:
         requested.append(context.resolved_topic)
     requested = list(dict.fromkeys(requested))
@@ -356,8 +411,10 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         primary = named[:cap] or ([m for m in markers if _flag(m) in _ABNORMAL] or markers)[: budget.primary]
         evidence.primary_facts = [_marker_fact(m) for m in primary]
         primary_keys = {m.key for m in primary}
-        supporting_codes = [c for c in (context.reasoning_context_codes or []) if c not in primary_keys]
-        supporting = [m for m in markers if m.key in supporting_codes and _flag(m) in _ABNORMAL]
+        supporting_codes = [c for c in [*carried, *(context.reasoning_context_codes or [])] if c not in primary_keys]
+        # Markers carried from the conversation are kept whatever their flag: they are what
+        # the follow-up is being compared with.
+        supporting = [m for m in markers if m.key in supporting_codes and (_flag(m) in _ABNORMAL or m.key in carried)]
         if not supporting:
             supporting = [m for m in markers if m.key not in primary_keys and _flag(m) in _ABNORMAL
                           and _same_domain(m.key, primary_keys)]
@@ -371,11 +428,16 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     # ---- trend for the primary fact
     if budget.trend and not evidence.trend_facts:
         primary_codes = {f.get("code") for f in evidence.primary_facts}
+        for row in context.comparisons or []:
+            if row.topic in primary_codes and row.previous_value is not None and row.current_value is not None:
+                evidence.trend_facts.append(_trend_fact(row))
+        seen = {t["code"] for t in evidence.trend_facts}
         for base in context.baselines or []:
-            if base.entity in primary_codes and base.previous is not None and base.observations >= 2:
+            if base.entity in primary_codes and base.entity not in seen and base.previous is not None and base.observations >= 2:
                 evidence.trend_facts.append({
                     "code": base.entity, "previous": base.previous, "latest": base.latest,
-                    "direction": base.direction,
+                    "change": round(base.latest - base.previous, 4) if base.latest is not None else None,
+                    "direction": base.direction, "unit": base.unit,
                 })
         evidence.trend_facts = evidence.trend_facts[: budget.trend]
 
@@ -433,6 +495,18 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             if signal.stance == SUPPORTIVE and signal.label not in evidence.already_doing:
                 evidence.already_doing.append(signal.label)
 
+    # ---- strategy variants from the shape of the selected evidence
+    marker_facts = [f for f in evidence.primary_facts if f.get("source") == "measured blood result"]
+    if len(marker_facts) >= 2 and mode in {EXPLANATION, CAUSES, ASSESSMENT, RISK, LOOKUP}:
+        evidence.extra_guidance.append(MULTI_MARKER_GUIDANCE)
+    facts = [*evidence.primary_facts, *evidence.supporting_facts]
+    if any(f.get("source", "").startswith("Bio-AI") for f in facts) and any(
+        f.get("source") == "measured blood result" for f in facts
+    ):
+        evidence.extra_guidance.append(CROSS_SOURCE_GUIDANCE)
+    if getattr(context, "conversation_turn", None) in _FOLLOW_UP_TURNS:
+        evidence.extra_guidance.append(FOLLOW_UP_GUIDANCE)
+
     # ---- the user's premise versus the measured record
     evidence.premise_check = _premise_check(semantic.get("premise"), markers, context.bio_ai_risks or [])
 
@@ -453,6 +527,30 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         "already_doing": evidence.already_doing,
     }
     return evidence
+
+
+_FOLLOW_UP_TURNS = {"FOLLOW_UP_QUESTION", "REFERENCE_RESOLUTION", "CORRECTION", "ANSWER_TO_ASSISTANT", "CLARIFICATION"}
+
+
+def _conversation_codes(context: HealthContext) -> list[str]:
+    semantic = getattr(context, "semantic_plan", None) or {}
+    return list(semantic.get("conversation_markers") or [])
+
+
+def _trend_fact(row) -> dict:
+    """Previous -> latest with dates and the exact numeric change (no rounding of stored values)."""
+    change = row.absolute_delta if row.absolute_delta is not None else round(row.current_value - row.previous_value, 4)
+    fact = {
+        "code": row.topic,
+        "previous": row.previous_value,
+        "previous_date": str(row.previous_date) if row.previous_date else None,
+        "latest": row.current_value,
+        "latest_date": str(row.current_date) if row.current_date else None,
+        "change": change,
+        "percent_change": round(row.percentage_change, 1) if row.percentage_change is not None else None,
+        "direction": row.direction or ("up" if change > 0 else "down" if change < 0 else "unchanged"),
+    }
+    return {k: v for k, v in fact.items() if v is not None}
 
 
 def _semantic_topics(semantic: dict) -> TopicMatch:

@@ -121,6 +121,8 @@ class SemanticHealthPlan(BaseModel):
     clarification_reason: str | None = None
     premise: dict | None = None  # {"topic": "hba1c", "claimed": "high"} - checked later against data
     planner: str = "deterministic"  # deterministic | jev+deterministic
+    # False when no goal cue was found and the goal is only the neutral default.
+    goal_from_cue: bool = Field(default=True, exclude=True)
 
     # Internal detail kept off the wire contract.
     markers: list[str] = Field(default_factory=list, exclude=True)
@@ -162,7 +164,7 @@ _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
         _rx(r"\b(?:increased|decreased|dropped|rose|risen|fallen|trend|over time|than before|than last time|from last time)\b"),
     ),
     ReasoningGoal.prioritize: (
-        _rx(r"\b(?:first|firstly|priorit\w*|most important|matters? most|biggest|top|main thing|start with|where (?:do|should) i start|which one|only (?:change|do|fix) one|one thing|pehle|sabse)\b"),
+        _rx(r"\b(?:focus(?:ing)? on|fix first|work on first|first|firstly|priorit\w*|most important|matters? most|biggest|top|main thing|start with|where (?:do|should) i start|which one|only (?:change|do|fix) one|one thing|pehle|sabse)\b"),
         _rx(r"\b(?:most|really) (?:matters?|important|relevant|useful)\b"),
         _rx(r"\bwhich (?:of my|habit|change|result|thing)\w*\b.*\b(?:most|first)\b"),
     ),
@@ -182,7 +184,7 @@ _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
         _rx(r"\b(?:what (?:should|can|do) i do|what to do|how (?:can|do|should|to) (?:i )?(?:improve|lower|reduce|raise|increase|fix|manage|control|bring|get|boost|change)|improve|lower|reduce|raise|boost|fix|tips?|steps?|plan|recommend\w*|suggest\w*|advice|advise|work on|change|changes|what else|kaise|kya karu|kya karna)\b"),
     ),
     ReasoningGoal.synthesize: (
-        _rx(r"\b(?:overall|overview|big picture|in general how|how am i doing|fit together|together|all my|everything|whole|complete|summar\w*|both|combined?)\b"),
+        _rx(r"\b(?:pay attention to|stand(?:s)? out|anything (?:in|on|from) my|anything i should|what do my (?:reports|results) (?:say|show)|overall|overview|big picture|in general how|how am i doing|fit together|together|all my|everything|whole|complete|summar\w*|both|combined?)\b"),
     ),
     ReasoningGoal.explain: (
         _rx(r"\b(?:mean|means|meaning|explain|interpret\w*|understand|what does|what do|tell me about|how can both|both be true|makes? sense|matlab)\b"),
@@ -226,6 +228,8 @@ _DIRECTION = _rx(
     r"(high|higher|elevated|raised|low|lower|abnormal|bad|out of range)\b"
 )
 _STILL_HIGH = _rx(r"\b(?:still|so)\s+(high|low|elevated)\b")
+# "this result", "my report": the member's own record even when no marker is named.
+_RECORD_NOUN = _rx(r"\b(?:result|results|report|reports|values|numbers|labs?|blood ?work|test results)\b")
 _IMPLICITLY_PERSONAL = {ReasoningGoal.prioritize, ReasoningGoal.compare, ReasoningGoal.synthesize}
 _DEFINITION = _rx(r"^\s*(?:what (?:is|are) (?:a|an|the)?\s*\w+\??$|define|meaning of)")
 _NEEDS_SUBJECT = {
@@ -264,7 +268,7 @@ def infer_goals(message: str) -> tuple[ReasoningGoal, list[ReasoningGoal]]:
     elif every:
         primary = every[0]
     else:
-        primary = ReasoningGoal.explain
+        primary = ReasoningGoal.explain  # no cue: a neutral default, see goal_from_cue
     # Lookup only wins when nothing richer is asked of the value.
     if primary == ReasoningGoal.lookup and len(primary_candidates) > 1:
         primary = primary_candidates[1]
@@ -351,6 +355,7 @@ def build_semantic_plan(
         personalization == Personalization.required
         and topics.empty
         and not (referring and conversation_entities)
+        and not _RECORD_NOUN.search(text)
         and primary in {ReasoningGoal.explain, ReasoningGoal.causes, ReasoningGoal.risk, ReasoningGoal.lookup}
     ):
         # "I was sick when I took this test, does that matter?" - a question about a
@@ -406,6 +411,7 @@ def build_semantic_plan(
         clarification_reason=clarification_reason,
         premise=_premise(text, topics) if personalization == Personalization.required else None,
         planner=planner,
+        goal_from_cue=bool(_goals_in(text)) or planner != "deterministic",
         markers=topics.markers,
         bio_ai=topics.bio_ai,
         concepts=topics.concepts,

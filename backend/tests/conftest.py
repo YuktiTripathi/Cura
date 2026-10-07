@@ -11,6 +11,8 @@ settings.allow_mock_header_override = False
 settings.enable_llm = False
 settings.llm_provider = "openrouter"
 settings.jev_enabled = False
+# Jev-mechanics tests force Jev on; the fast path is exercised by its own tests.
+settings.jev_fast_path = False
 settings.supershyft_database_url = ""
 settings.voice_enabled = False
 settings.stt_provider = "none"

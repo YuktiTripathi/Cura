@@ -87,6 +87,11 @@ def resolve_plan(
     )
     if not settings.jev_enabled:
         return deterministic, JevTrace(called=False, fallback=False)
+    if settings.jev_fast_path and _obvious_request(deterministic, message, conversation_state, document_ids or []):
+        # "What is my HbA1c?" / "What is HbA1c?": the deterministic planner is certain and a
+        # router round trip would only add latency. Anything ambiguous still goes to Jev.
+        logger.info("jev_skipped reason=fast_path intent=%s", deterministic.intent.value)
+        return deterministic, JevTrace(called=False, fallback=False, fallback_reason="fast_path")
 
     state = JevRoutingState(
         current_message=message,
@@ -303,3 +308,31 @@ def _maybe_demote_personal(
         return plan
     logger.info("routing_guard demoted_personal_to_general intent=%s topic=%s", plan.intent.value, plan.topic)
     return force_general_plan(plan)
+
+
+_FAST_LOOKUP = re.compile(
+    r"^\s*(?:what(?:'s| is| was)|show(?: me)?|tell me)\s+(?:my\s+)?(?:latest\s+|current\s+|last\s+)?"
+    r"[a-z0-9 \-]{2,40}?\s*(?:value|level|result|score)?\s*\??\s*$",
+    re.I,
+)
+
+
+def _obvious_request(plan: QueryPlan, message: str, conversation_state, document_ids: list[str]) -> bool:
+    """Single-value personal lookups and short definitions that need no router judgment."""
+    if document_ids or plan.needs_user_uploaded:
+        return False
+    if conversation_state is not None and conversation_state.turn_type.value in _CONTINUING_TURNS:
+        return False
+    text = (message or "").strip()
+    if len(text.split()) > 8 or not _FAST_LOOKUP.match(text):
+        return False
+    from app.pipeline.semantic_plan import ReasoningGoal, build_semantic_plan
+
+    semantic = build_semantic_plan(text)
+    if semantic.secondary_goals or semantic.clarification_needed:
+        return False
+    if plan.intent.value == "latest_result" and semantic.primary_goal == ReasoningGoal.lookup:
+        return len(plan.requested_metrics or ([plan.topic] if plan.topic else [])) == 1
+    if plan.intent.value == "general_health_question" and semantic.primary_goal == ReasoningGoal.general_education:
+        return bool(semantic.markers or semantic.bio_ai)
+    return False

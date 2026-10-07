@@ -70,5 +70,6 @@
       {"code": "dyslipidemia", "name": "Dyslipidemia", "score": 12, "status": "low", "percentile": 18, "lifestyle_contribution": 15},
       {"code": "cardiac_health", "name": "Cardiac health", "score": 16, "status": "low", "percentile": 24, "lifestyle_contribution": 18}
     ]
-  }
+  },
+  {"subject_id": "eval-user-metabolic", "report_id": "met-bioai-1", "report_date": "2026-09-20", "source_line": "bio_ai", "metabolic_age": 46, "metabolic_score": 38, "risks": [{"code": "type_2_diabetes", "name": "Type 2 diabetes", "score": 68, "status": "high", "percentile": 82, "lifestyle_contribution": 55}, {"code": "cardiac_health", "name": "Cardiac health", "score": 61, "status": "high", "percentile": 78, "lifestyle_contribution": 50}, {"code": "obesity", "name": "Obesity", "score": 57, "status": "elevated", "percentile": 70, "lifestyle_contribution": 60}, {"code": "thyroid", "name": "Thyroid", "score": 12, "status": "low", "percentile": 20, "lifestyle_contribution": 10}]}
 ]

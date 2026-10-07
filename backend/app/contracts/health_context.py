@@ -55,6 +55,9 @@ class MissingItem(BaseModel):
     report_id: str | None = None
     report_date: date | None = None
     scope: str | None = None
+    # A different but related measurement on the same report (e.g. Urea when BUN was asked).
+    # Shown as-is; never converted into the missing marker.
+    related_available: str | None = None
 
 
 class DisambiguationCandidate(BaseModel):
@@ -177,3 +180,5 @@ class HealthContext(BaseModel):
     answer_evidence_trace: dict | None = None
     # Semantic plan for this turn (goal x topics x personalization). Internal only.
     semantic_plan: dict | None = None
+    # Conversation turn type (NEW_QUESTION, FOLLOW_UP_QUESTION ...). Internal only.
+    conversation_turn: str | None = None

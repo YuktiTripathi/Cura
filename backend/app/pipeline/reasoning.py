@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 import re
 import time
+
+from app.core import perf
 from dataclasses import dataclass, field
 
 from app.contracts.common import AnswerModelTier, IntentType, KnowledgeScope
@@ -46,6 +48,16 @@ class ReasoningResult:
     model_escalated: bool = False
     escalation_reason: str | None = None
     first_token_ms: int | None = None
+
+
+def _deep_is_different_model() -> bool:
+    """Escalating to "deep" only helps when it is a different model; otherwise it repeats the call."""
+    from app.llm.registry import model_id_for_tier
+
+    try:
+        return model_id_for_tier(AnswerModelTier.deep_medical_reasoning) != model_id_for_tier(AnswerModelTier.standard_medical)
+    except Exception:  # noqa: BLE001 - unknown configuration: keep the existing behaviour
+        return True
 
 
 class ReasoningService:
@@ -162,9 +174,11 @@ class ReasoningService:
                     llm_mode="medical_corpus_definition",
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
-            messages = self.prompts.build(
-                context, conversation_summary, message, response_lang, routing_note=routing_note
-            )
+            with perf.stage("prompt_build"):
+                messages = self.prompts.build(
+                    context, conversation_summary, message, response_lang, routing_note=routing_note
+                )
+            perf.count("prompt_chars", sum(len(m.get("content") or "") for m in messages))
             streamed = self._stream_low_risk(message, plan, messages, on_token, started)
             if streamed is not None:
                 return streamed
@@ -196,9 +210,11 @@ class ReasoningService:
         if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (
             plan_needs_reasoning(plan) or not lookup or (explain_bio and context.bio_ai_risks)
         ):
-            messages = self.prompts.build(
-                context, conversation_summary, message, response_lang, routing_note=routing_note
-            )
+            with perf.stage("prompt_build"):
+                messages = self.prompts.build(
+                    context, conversation_summary, message, response_lang, routing_note=routing_note
+                )
+            perf.count("prompt_chars", sum(len(m.get("content") or "") for m in messages))
             try:
                 llm_result, answer_client, used_tier, fallback = completer(messages, plan, budget=budget)
                 answer = llm_result.answer
@@ -208,7 +224,11 @@ class ReasoningService:
                     from app.routing.model_tier import _keep_on_flash
 
                     gate = review_answer(answer, plan, context)
-                    if not _keep_on_flash(plan) and should_escalate_to_deep(gate.flags, plan, context, answer, llm_result):
+                    if (
+                        not _keep_on_flash(plan)
+                        and _deep_is_different_model()
+                        and should_escalate_to_deep(gate.flags, plan, context, answer, llm_result)
+                    ):
                         deep_plan = plan.model_copy(update={
                             "answer_model_tier": AnswerModelTier.deep_medical_reasoning,
                             "model_tier": AnswerModelTier.deep_medical_reasoning,

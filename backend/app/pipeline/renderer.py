@@ -54,10 +54,14 @@ def render_missing_blood_marker(context: HealthContext) -> str:
         if scope in {"latest blood report", "the reports checked"}:
             caption = user_source_caption("blood_report", item.report_date, latest=True)
             scope = caption or scope
+        if label and item.related_available:
+            return (
+                f"I don't see {label} in {scope}. It does list {item.related_available}, which is a "
+                "related kidney marker but a different measurement, so I won't treat one as the other."
+            )
         if label:
             return (
-                f"{label} is not available in {scope}. "
-                "I will not invent a value or list unrelated results."
+                f"I don't see {label} in {scope}, so that value is not available to me and I won't guess it."
             )
         return f"That biomarker is not available in {scope}. I will not invent a value."
     if label:
@@ -257,14 +261,7 @@ class DeterministicRenderer:
                     context.premise.note
                     + " I will not explain a change that is not present in the retrieved reports."
                 )
-            c = context.comparisons[0]
-            name = context.resolved_topic_name or c.topic
-            return (
-                f"{name} changed from {c.previous_value} ({format_user_date(c.previous_date)}) "
-                f"to {c.current_value} ({format_user_date(c.current_date)}). "
-                f"Absolute change: {c.absolute_delta}. Percentage change: {c.percentage_change}%. "
-                f"Direction: {c.direction}."
-            )
+            return render_trend_sentence(context, context.comparisons[0])
         if context.intent.value == "blood_marker_explanation" and context.markers:
             extra = _derived_and_stated(context) + _iron_pattern_note(context)
             if len(context.markers) > 1:
@@ -468,3 +465,65 @@ def render_provenance(context: HealthContext) -> str:
             "It is an assessment, not a diagnosis."
         )
     return "I do not have a stored personal value for that follow-up, so I cannot name a source."
+
+
+def _fmt(value) -> str:
+    """Stored values exactly as stored (18.0 stays 18.0)."""
+    return str(value)
+
+
+def _fmt_delta(value: float) -> str:
+    """A computed difference: rounded only to remove float noise (6.1 - 6.2 = 0.1)."""
+    return f"{round(abs(value), 4):g}"
+
+
+def render_trend_sentence(context: HealthContext, c) -> str:
+    """Previous -> latest with dates, the exact change, and where it sits against the report range.
+
+    Direction words come from the report's own range (closer to / further from / back within),
+    never from a guess about whether higher or lower is better for that marker.
+    """
+    name = context.resolved_topic_name or c.topic
+    marker = next((m for m in context.markers or [] if m.key == c.topic), None)
+    unit = (marker.unit or "") if marker else ""
+    pct_unit = unit.strip() == "%"
+    unit_text = "%" if pct_unit else (f" {unit}" if unit else "")
+    prev = f"{_fmt(c.previous_value)}{unit_text}"
+    latest = f"{_fmt(c.current_value)}{unit_text}"
+    delta = c.absolute_delta if c.absolute_delta is not None else round(c.current_value - c.previous_value, 4)
+    if delta == 0:
+        return (
+            f"Your {name} was {latest} on {format_user_date(c.current_date)}, the same as on "
+            f"{format_user_date(c.previous_date)}."
+        )
+    verb = "decreased" if delta < 0 else "increased"
+    size = f"{_fmt_delta(delta)} percentage points" if pct_unit else f"{_fmt_delta(delta)}{(' ' + unit) if unit else ''}"
+    pct = f" (about {abs(c.percentage_change):.1f}%)" if c.percentage_change is not None and not pct_unit else ""
+    text = (
+        f"Your {name} {verb} from {prev} on {format_user_date(c.previous_date)} to {latest} on "
+        f"{format_user_date(c.current_date)}, a change of {size}{pct}."
+    )
+    if marker is None or (marker.reference_low is None and marker.reference_high is None):
+        return text
+
+    def outside(value: float) -> float:
+        if marker.reference_high is not None and value > marker.reference_high:
+            return value - marker.reference_high
+        if marker.reference_low is not None and value < marker.reference_low:
+            return marker.reference_low - value
+        return 0.0
+
+    before, after = outside(c.previous_value), outside(c.current_value)
+    ref = f"{_fmt(marker.reference_low)}–{_fmt(marker.reference_high)}{unit_text}"
+    if after == 0 and before > 0:
+        text += f" That brings it back within your report's range ({ref})."
+    elif after == 0:
+        text += f" Both readings sit within your report's range ({ref})."
+    elif after < before:
+        text += (
+            f" That is movement toward your report's range ({ref}), although the latest result is still "
+            f"flagged {getattr(marker.flag, 'value', marker.flag)}."
+        )
+    else:
+        text += f" That moves it further from your report's range ({ref}), so it is worth keeping an eye on."
+    return text

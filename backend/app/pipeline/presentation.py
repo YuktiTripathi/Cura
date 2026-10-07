@@ -663,6 +663,24 @@ def attach_presentation_personalization(
     return presentation
 
 
+def _norm_text(text: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^\w%./ ]+", " ", (text or "").lower())).strip()
+
+
+def _repeats(candidate: str, parts: list[str]) -> bool:
+    """True when ``candidate`` says what an earlier part already says (no duplicate paragraphs)."""
+    cand = _norm_text(candidate)
+    if not cand:
+        return True
+    for part in parts:
+        existing = _norm_text(part)
+        if not existing:
+            continue
+        if cand in existing or existing in cand or cand[:80] == existing[:80]:
+            return True
+    return False
+
+
 def flatten_structured_response(presentation: StructuredResponse, *, raw_answer: str = "") -> str:
     if presentation.mode == ResponseMode.clinician_handoff and presentation.summary:
         return sanitize_internal_ids(presentation.summary)
@@ -686,38 +704,45 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
             extras.append(" ".join(presentation.next_steps))
         return sanitize_internal_ids(_CONTEXT_LEAK.sub("", "\n\n".join([text, *extras] if text else extras))).strip()
     parts: list[str] = []
-    if presentation.headline and presentation.mode not in {ResponseMode.single_value}:
-        parts.append(presentation.headline)
-    if presentation.summary:
-        parts.append(presentation.summary)
-    if presentation.mode != ResponseMode.single_value:
-        lines = []
-        for item in presentation.findings:
-            unit = f" {item.unit}" if item.unit else ""
-            status = f" · {item.status.replace('_', ' ')}" if item.status else ""
-            value = item.value if item.value is not None else "not available"
-            lines.append(f"{item.label}: {value}{unit}{status}".strip())
-        parts.append("\n".join(lines))
-    if presentation.interpretation:
-        text = presentation.interpretation.strip()
-        if presentation.summary and text.lower().startswith(presentation.summary.lower()[:24]):
-            parts.append(text)
-        elif text:
-            parts.append(text)
-    elif raw_answer and presentation.mode in {
+    prose_modes = {
         ResponseMode.interpretation,
         ResponseMode.comparison,
         ResponseMode.trend,
         ResponseMode.health_overview,
         ResponseMode.safety,
-    }:
-        parts.append(raw_answer.strip())
+        ResponseMode.personal_interpretation,
+    }
+    prose = (presentation.summary or "").strip()
+    if prose and presentation.mode in prose_modes:
+        # A written explanation exists: the chat text is that explanation. The values are
+        # already on the finding cards, so they are not repeated as raw lines in between.
+        parts.append(prose)
+        for extra in (presentation.interpretation, raw_answer):
+            if extra and not _repeats(extra, parts):
+                parts.append(extra.strip())
+    else:
+        if presentation.headline and presentation.mode not in {ResponseMode.single_value}:
+            parts.append(presentation.headline)
+        if prose:
+            parts.append(prose)
+        if presentation.mode != ResponseMode.single_value:
+            lines = []
+            for item in presentation.findings:
+                unit = f" {item.unit}" if item.unit else ""
+                status = f" · {item.status.replace('_', ' ')}" if item.status else ""
+                value = item.value if item.value is not None else "not available"
+                lines.append(f"{item.label}: {value}{unit}{status}".strip())
+            parts.append("\n".join(lines))
+        if presentation.interpretation and not _repeats(presentation.interpretation, parts):
+            parts.append(presentation.interpretation.strip())
+        elif raw_answer and presentation.mode in prose_modes and not _repeats(raw_answer, parts):
+            parts.append(raw_answer.strip())
     if presentation.uncertainties:
         note = " ".join(presentation.uncertainties)
         blob = " ".join(parts).lower()
         if note.lower() not in blob:
             parts.append(note)
-    if presentation.next_steps:
+    if presentation.next_steps and not _repeats(" ".join(presentation.next_steps), parts):
         parts.append(" ".join(presentation.next_steps))
     captions = list(dict.fromkeys(item.source_label for item in presentation.findings if item.source_label))
     if captions and presentation.mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary}:

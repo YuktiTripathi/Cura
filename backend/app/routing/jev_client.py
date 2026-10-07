@@ -330,7 +330,9 @@ class JevDecisionsClient:
             try:
                 response = client.post(self.endpoint, headers=headers, json=payload, timeout=self.timeout)
             except httpx.HTTPError as exc:
-                if attempt + 1 >= attempts:
+                # A timed-out router call is not retried: the deterministic planner is the
+                # fallback and costs milliseconds, a second attempt costs the full timeout.
+                if attempt + 1 >= attempts or isinstance(exc, httpx.TimeoutException):
                     jev_breaker.record_failure()
                     raise LLMUnavailableError("Jev Decisions request failed") from exc
                 time.sleep(0.1 * (attempt + 1))

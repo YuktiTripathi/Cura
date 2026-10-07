@@ -44,6 +44,13 @@ _PERSONAL = {
     HealthSource.history,
     HealthSource.uploaded_document,
 }
+_EXPLAINING = {
+    ReasoningGoal.explain,
+    ReasoningGoal.causes,
+    ReasoningGoal.assess,
+    ReasoningGoal.risk,
+    ReasoningGoal.action,
+}
 _EVALUATIVE = {
     ReasoningGoal.assess,
     ReasoningGoal.action,
@@ -238,6 +245,15 @@ def reconcile_query_plan(plan: QueryPlan, semantic: SemanticHealthPlan) -> tuple
         plan.needs_lifestyle = plan.needs_questionnaire and HealthSource.profile in wanted
         if plan.history and plan.time_scope in {None, "", "none"}:
             plan.time_scope = "previous"
+    elif (
+        plan.intent == IntentType.latest_result
+        and semantic.primary_goal in _EXPLAINING
+        and semantic.goal_from_cue
+        and semantic.markers
+    ):
+        # "Help me understand my HbA1c result" asks for meaning, not just the number.
+        changes.append("lookup_to_explanation")
+        plan = plan.model_copy(update={"intent": IntentType.blood_marker_explanation, "answer_depth": plan.answer_depth})
     else:
         added = []
         flag_for = {
@@ -248,7 +264,11 @@ def reconcile_query_plan(plan: QueryPlan, semantic: SemanticHealthPlan) -> tuple
             HealthSource.goals: "needs_goals",
             HealthSource.history: "history",
         }
-        for source in semantic.required_sources:
+        extra = list(semantic.required_sources)
+        if semantic.execution_path != ExecutionPath.fast and HealthSource.questionnaire in semantic.optional_sources:
+            # Habits can change advice and the questionnaire read runs concurrently: fetch it.
+            extra.append(HealthSource.questionnaire)
+        for source in extra:
             attr = flag_for.get(source)
             if attr and not getattr(plan, attr):
                 setattr(plan, attr, True)

@@ -16,11 +16,10 @@ from app.pipeline.intent import (
 
 logger = logging.getLogger("cura.pipeline")
 
-_UPLOAD = re.compile(
-    r"\b(upload(?:ed)?|pdf|this (?:whole |entire )?document|the document|"
-    r"this (?:whole |entire )?report|the report)\b",
-    re.I,
-)
+_UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|this (?:whole |entire )?document|the document)\b", re.I)
+# "the report" means an uploaded file only when one exists; otherwise it is the member's
+# SuperShyft report and must not switch SuperShyft off.
+_REPORT_REF = re.compile(r"\b(this (?:whole |entire )?report|the report)\b", re.I)
 _SS = re.compile(r"\bsupershyft\b", re.I)
 _COMPARE = re.compile(
     r"\b(compare|comparison|difference|differ(?:ent)?|between (?:these|the|my)|"
@@ -39,7 +38,9 @@ def apply_source_routing(
 ) -> QueryPlan:
     ids = document_ids or []
     text = plan.raw_message or ""
-    upload_cue = bool(_UPLOAD.search(text))
+    upload_cue = bool(_UPLOAD.search(text)) or bool(
+        _REPORT_REF.search(text) and (uploaded_document_count > 0 or ids)
+    )
     ss_cue = bool(_SS.search(text))
     compare_cue = bool(_COMPARE.search(text))
     cues = mixed_personal_cues(text)

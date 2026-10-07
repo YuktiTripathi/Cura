@@ -38,7 +38,8 @@ def test_vitamin_d_changed():
     assert "12.6" in body["answer"]
     assert "18.0" in body["answer"]
     assert "decreased" in body["answer"]
-    assert "-5.4" in body["answer"] or "absolute" in body["answer"].lower()
+    # The exact change is stated (conversational trend sentence, not "Absolute change: -5.4").
+    assert "5.4" in body["answer"]
 
 
 def test_cardiac_score_ambiguous_and_retrieved():

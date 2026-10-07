@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+from app.core import perf
+
 from sqlalchemy.orm import Session
 
 from app.auth.models import AuthenticatedPrincipal
@@ -67,25 +69,25 @@ class HealthRetrievalRouter:
         result.invoked = True
         jobs = []
         if wants_ihr:
-            jobs.append(("ihr", lambda: self._retrieve_ihr(principal, plan, result)))
+            jobs.append(("ihr", lambda: self._timed("ihr_fetch", self._retrieve_ihr, principal, plan, result)))
         if wants_questionnaire:
-            jobs.append(("questionnaire", lambda: self._retrieve_questionnaire(principal, plan, result)))
+            jobs.append(("questionnaire", lambda: self._timed("questionnaire_fetch", self._retrieve_questionnaire, principal, plan, result)))
         if jobs and wants_docs and db is not None:
             with ThreadPoolExecutor(max_workers=min(2, len(jobs))) as pool:
-                futures = [pool.submit(fn) for _, fn in jobs]
+                futures = [perf.submit_with_context(pool, fn) for _, fn in jobs]
                 self._retrieve_documents(principal, plan, result, db, document_ids or [])
                 for future in as_completed(futures):
                     future.result()
         elif len(jobs) > 1:
             with ThreadPoolExecutor(max_workers=2) as pool:
-                futures = [pool.submit(fn) for _, fn in jobs]
+                futures = [perf.submit_with_context(pool, fn) for _, fn in jobs]
                 for future in as_completed(futures):
                     future.result()
         else:
             if wants_ihr:
-                self._retrieve_ihr(principal, plan, result)
+                self._timed("ihr_fetch", self._retrieve_ihr, principal, plan, result)
             if wants_questionnaire:
-                self._retrieve_questionnaire(principal, plan, result)
+                self._timed("questionnaire_fetch", self._retrieve_questionnaire, principal, plan, result)
             if wants_docs and db is not None:
                 self._retrieve_documents(principal, plan, result, db, document_ids or [])
         result.finalize_status()
@@ -140,6 +142,11 @@ class HealthRetrievalRouter:
         )
         return result
 
+    @staticmethod
+    def _timed(stage_name, fn, *args, **kwargs):
+        with perf.stage(stage_name):
+            return fn(*args, **kwargs)
+
     def _retrieve_ihr(
         self,
         principal: AuthenticatedPrincipal,
@@ -152,26 +159,43 @@ class HealthRetrievalRouter:
             from app.core.errors import ProviderUnavailableError
             from integrations.supershyft.ihr import IhrRepository
 
+            lifestyle_future = None
+            if plan.needs_lifestyle or plan.needs_profile:
+                # Lifestyle/preferences do not depend on the IHR rows: read them concurrently.
+                lifestyle_future = perf.submit_with_context(
+                    _IO_POOL, self._timed, "lifestyle_fetch", self.registry.lifestyle.query, principal, plan
+                )
             try:
-                bundle = IhrRepository().get_ihr_data_for_query(principal, plan)
+                with perf.stage("blood_bioai_fetch"):
+                    bundle = IhrRepository().get_ihr_data_for_query(principal, plan)
             except ProviderUnavailableError as exc:
                 result.status = "provider_unavailable"
                 result.error_reason = getattr(exc, "reason", None) or "provider_unavailable"
+                if lifestyle_future is not None:
+                    lifestyle_future.cancel()
                 raise
             if plan.needs_blood:
                 result.blood_reports = bundle.blood_reports
             if plan.needs_bio_ai:
                 result.bio_ai_reports = bundle.bio_ai_reports
-            if plan.needs_lifestyle or plan.needs_profile:
-                result.lifestyle = self.registry.lifestyle.query(principal, plan)
+            if lifestyle_future is not None:
+                result.lifestyle = lifestyle_future.result()
             result.source_names.append("ihr")
             return
+        # Independent provider reads run concurrently; errors propagate as before.
+        futures = {}
         if plan.needs_blood:
-            result.blood_reports = self.registry.blood.query(principal, plan)
+            futures["blood"] = perf.submit_with_context(_IO_POOL, self._timed, "blood_fetch", self.registry.blood.query, principal, plan)
         if plan.needs_bio_ai:
-            result.bio_ai_reports = self.registry.bio_ai.query(principal, plan)
+            futures["bio_ai"] = perf.submit_with_context(_IO_POOL, self._timed, "bioai_fetch", self.registry.bio_ai.query, principal, plan)
         if plan.needs_lifestyle or plan.needs_profile:
-            result.lifestyle = self.registry.lifestyle.query(principal, plan)
+            futures["lifestyle"] = perf.submit_with_context(_IO_POOL, self._timed, "lifestyle_fetch", self.registry.lifestyle.query, principal, plan)
+        if "blood" in futures:
+            result.blood_reports = futures["blood"].result()
+        if "bio_ai" in futures:
+            result.bio_ai_reports = futures["bio_ai"].result()
+        if "lifestyle" in futures:
+            result.lifestyle = futures["lifestyle"].result()
         result.source_names.append("ihr")
 
     def _retrieve_questionnaire(
@@ -211,3 +235,7 @@ class HealthRetrievalRouter:
         result.reparsed_pdf = False
         if evidence:
             result.source_names.append("uploaded_document")
+
+
+# Shared pool for independent provider reads (blood, Bio-AI, lifestyle) within one request.
+_IO_POOL = ThreadPoolExecutor(max_workers=16, thread_name_prefix="cura-io")

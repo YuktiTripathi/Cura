@@ -276,16 +276,17 @@ def test_explicit_document_id_takes_precedence(tmp_path, monkeypatch):
     assert "160" not in body["answer"]
 
 
-def test_no_document_selected_asks_to_clarify():
-    plan = build_query_plan("What is my LDL in this report?")
-    assert plan.needs_user_uploaded
+def test_this_report_without_uploads_means_the_supershyft_report():
+    # Nothing uploaded: "this report" is the member's SuperShyft report, so CURA answers
+    # from structured data instead of "I don't have an uploaded report".
     body = client.post(
         "/api/v1/chat",
-        headers=H,
+        headers={"X-Cura-User-Id": "eval-user-metabolic"},  # no uploads
         json={"message": "What is my LDL in this report?"},
     ).json()
-    assert body["meta"]["status"] in {"document_missing", "document_ambiguous"}
-    assert "uploaded report" in body["answer"].lower()
+    assert body["meta"]["status"] not in {"document_missing", "document_ambiguous"}
+    assert "uploaded report" not in body["answer"].lower()
+    assert "96" in body["answer"]  # latest LDL on the SuperShyft report
 
 
 def test_jev_unavailable_uses_deterministic_fallback(monkeypatch):

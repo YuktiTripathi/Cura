@@ -6,12 +6,18 @@ import json
 
 import httpx
 
+from app.core import perf
+
 from app.core.circuit_breaker import CircuitOpenError, openrouter_breaker
 from app.core.config import settings
 from app.core.errors import LLMUnavailableError
 from app.core.http import get_http_client
 from app.llm.models import LLMStructuredOutput
 from app.llm.structured import parse_llm_structured
+
+# Errors a different response_format can fix. Everything else (timeouts, provider errors,
+# truncation) would only repeat the same wait, so it is raised straight away.
+_FORMAT_ERRORS = {"LLM request format was rejected", "Unexpected LLM response", "LLM returned an empty answer"}
 
 logger = logging.getLogger("cura.llm")
 
@@ -100,6 +106,14 @@ class OpenAICompatibleLLMClient:
         self.personal_health = personal_health
         self.last_usage: dict[str, int] = {}
         self.last_finish_reason: str = ""
+        self._deadline: float | None = None
+
+    def _remaining(self) -> float:
+        if self._deadline is None:
+            return self.timeout
+        left = self._deadline - time.perf_counter()
+        # A fresh budget passes the configured timeout unchanged.
+        return self.timeout if left >= float(self.timeout) - 0.05 else left
 
     def complete(self, messages: list[dict[str, str]], json_mode: bool = False) -> str:
         if not self.api_key:
@@ -119,20 +133,32 @@ class OpenAICompatibleLLMClient:
             raise LLMUnavailableError("LLM provider is temporarily unavailable") from exc
         formats = self._format_fallbacks(json_mode)
         last_error: LLMUnavailableError | None = None
-        for index, fmt in enumerate(formats):
-            try:
-                return self._post_once(messages, fmt)
-            except LLMUnavailableError as exc:
-                last_error = exc
-                if index + 1 >= len(formats):
-                    raise
-                logger.warning(
-                    "llm_format_fallback model=%s from=%s reason=%s",
-                    self.model,
-                    fmt,
-                    str(exc),
-                )
-        raise last_error or LLMUnavailableError("LLM request failed")
+        own_deadline = self._deadline is None
+        if own_deadline:
+            # One wall-clock budget for every attempt of this call (formats, HTTP retries,
+            # repair): the tier timeout is the most this answer may take, not per attempt.
+            self._deadline = time.perf_counter() + float(self.timeout)
+        try:
+            for index, fmt in enumerate(formats):
+                try:
+                    return self._post_once(messages, fmt)
+                except LLMUnavailableError as exc:
+                    last_error = exc
+                    # Another output format only helps when the format was the problem.
+                    # Timeouts, provider errors and truncation would just repeat the wait.
+                    if index + 1 >= len(formats) or str(exc) not in _FORMAT_ERRORS:
+                        raise
+                    perf.count("retry_count")
+                    logger.warning(
+                        "llm_format_fallback model=%s from=%s reason=%s",
+                        self.model,
+                        fmt,
+                        str(exc),
+                    )
+            raise last_error or LLMUnavailableError("LLM request failed")
+        finally:
+            if own_deadline:
+                self._deadline = None
 
     def _format_fallbacks(self, json_mode: bool) -> list[str]:
         formats: list[str] = []
@@ -196,8 +222,15 @@ class OpenAICompatibleLLMClient:
         client = get_http_client()
         started = time.perf_counter()
         for attempt in range(attempts):
+            timeout = self._remaining()
+            if timeout < 0.5:
+                openrouter_breaker.record_failure()
+                raise LLMUnavailableError("LLM time budget exhausted")
+            if attempt:
+                perf.count("retry_count")
+            perf.count("provider_attempts")
             try:
-                response = client.post(url, headers=headers, json=payload, timeout=self.timeout)
+                response = client.post(url, headers=headers, json=payload, timeout=timeout)
             except httpx.HTTPError as exc:
                 if attempt + 1 >= attempts:
                     openrouter_breaker.record_failure()
@@ -230,6 +263,8 @@ class OpenAICompatibleLLMClient:
             "input_tokens": int(usage.get("prompt_tokens") or 0),
             "output_tokens": int(usage.get("completion_tokens") or 0),
         }
+        perf.count("prompt_tokens", self.last_usage["input_tokens"])
+        perf.count("completion_tokens", self.last_usage["output_tokens"])
         try:
             message = data["choices"][0]["message"]
             finish_reason = data["choices"][0].get("finish_reason")
@@ -263,14 +298,22 @@ class OpenAICompatibleLLMClient:
     def complete_structured(self, messages: list[dict[str, str]]) -> LLMStructuredOutput:
         from app.llm.answer_cache import answer_cache_get, answer_cache_put
 
-        cached = answer_cache_get(messages, self.model)
+        cached = answer_cache_get(messages, self.model) if settings.answer_cache_enabled else None
         if cached is not None:
+            perf.mark("cache_hit", True)
             # Identical prompt (same data, question and context): no tokens spent.
             self.last_usage = {}
             self.last_finish_reason = cached.finish_reason or ""
             return cached
-        result = self._complete_structured_uncached(messages)
-        answer_cache_put(messages, self.model, result)
+        perf.count("llm_calls")
+        self._deadline = time.perf_counter() + float(self.timeout)
+        try:
+            with perf.stage("llm"):
+                result = self._complete_structured_uncached(messages)
+        finally:
+            self._deadline = None
+        if settings.answer_cache_enabled:
+            answer_cache_put(messages, self.model, result)
         return result
 
     def _complete_structured_uncached(self, messages: list[dict[str, str]]) -> LLMStructuredOutput:
@@ -284,6 +327,7 @@ class OpenAICompatibleLLMClient:
                     "content": "Your previous output was not valid. Return only the JSON object with a string 'answer' field.",
                 }
             ]
+            perf.count("retry_count")
             try:
                 raw = self._complete_with_mode(repair, True)
                 parsed = parse_llm_structured(raw)

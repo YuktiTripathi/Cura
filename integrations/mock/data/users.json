@@ -38,5 +38,6 @@
     "display_name": "Sam",
     "age_band": "26-35",
     "sex": "female"
-  }
+  },
+  {"subject_id": "eval-user-metabolic", "first_name": "Sam", "last_name": null, "display_name": "Sam", "age_band": "36-45", "sex": "male"}
 ]

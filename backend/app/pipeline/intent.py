@@ -38,6 +38,8 @@ MARKER_ALIASES = {
     "systolic": "systolic",
     "diastolic": "diastolic",
     "urea": "urea",
+    "bun": "bun",
+    "blood urea nitrogen": "bun",
     "uric acid": "uric_acid",
     "esr": "esr",
 }
@@ -89,6 +91,7 @@ NAMES = {
     "mch": "MCH",
     "iron": "Iron",
     "urea": "Urea",
+    "bun": "Blood Urea Nitrogen (BUN)",
     "uric_acid": "Uric Acid",
     "esr": "ESR",
     "systolic": "Systolic pressure",

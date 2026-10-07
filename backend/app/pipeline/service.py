@@ -55,8 +55,10 @@ from app.memory.conversation import FollowUpMemory
 from app.pipeline.conversation_state import ConversationStateResolver, persistable_state
 from app.contracts.conversation_state import ExpectedReplyType
 from app.pipeline.context_builder import ContextBuilder
+from app.core import perf
 from app.pipeline.evidence_planner import reconcile_query_plan
 from app.pipeline.semantic_plan import build_semantic_plan
+from app.pipeline.urgency_guard import strip_unsupported_urgency
 from app.pipeline.context_merger import ContextMerger, attach_medical_evidence
 from app.pipeline.personalized_followups import PersonalizedFollowUpEngine, build_inventory
 from app.pipeline.prompt_builder import PromptBuilder
@@ -76,6 +78,8 @@ from app.pipeline.stages import RouteStage, SafetyStage
 
 # Clarification is a last resort: only when the meaning is missing and the conversation
 # cannot supply it (see semantic_plan). Never a generic "general, latest or comparison?".
+_EXPLICIT_UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|document|attachment|attached|file)\b", re.I)
+
 _SEMANTIC_CLARIFICATIONS = {
     "number_without_measure": (
         "Which test is that number from (for example fasting glucose, LDL or blood pressure)? "
@@ -206,8 +210,15 @@ class ChatService:
     ) -> ChatResponse:
         eval_turn = {"principal": principal, "payload": payload, "request_id": request_id}
         self._progress = progress or ProgressEmitter()
-        response = self._execute_chat(principal, payload, request_id, eval_turn)
-        return self._record_evaluation(response, eval_turn)
+        request_perf = perf.begin(request_id)
+        try:
+            response = self._execute_chat(principal, payload, request_id, eval_turn)
+            with perf.stage("persistence"):
+                response = self._record_evaluation(response, eval_turn)
+            _attach_perf(response, eval_turn, request_perf)
+            return response
+        finally:
+            perf.end()
 
     def _emit_plan_stages(self, plan, *, follow_up: bool) -> None:
         if follow_up:
@@ -289,7 +300,8 @@ class ChatService:
             if not pre_safety.blocked:
                 classifier_future = _SAFETY_POOL.submit(SafetyStage().run, payload.message)
         else:
-            pre_safety = SafetyStage().run(payload.message)
+            with perf.stage("safety_precheck"):
+                pre_safety = SafetyStage().run(payload.message)
         eval_turn["pre_safety"] = pre_safety
         from app.pipeline.dev_trace import trace
 
@@ -346,20 +358,21 @@ class ChatService:
         self._progress.follow_up = follow_up
         self._progress.emit(ProcessingStage.planning)
         self._progress.mark("planning")
-        routed = RouteStage().run(
-            routing_message,
-            conversation_summary="",
-            previous_user_message=previous_user_message,
-            previous_intent=previous_intent,
-            follow_up_topic=prior_topic,
-            follow_up_name=prior_name,
-            prior_personal=prior_personal,
-            document_ids=payload.document_ids,
-            uploaded_document_count=len(completed_docs),
-            prior_source_mode=getattr(conv, "last_source_mode", None),
-            context_ref=payload.context_ref,
-            conversation_state=conv_state,
-        )
+        with perf.stage("intent"):
+            routed = RouteStage().run(
+                routing_message,
+                conversation_summary="",
+                previous_user_message=previous_user_message,
+                previous_intent=previous_intent,
+                follow_up_topic=prior_topic,
+                follow_up_name=prior_name,
+                prior_personal=prior_personal,
+                document_ids=payload.document_ids,
+                uploaded_document_count=len(completed_docs),
+                prior_source_mode=getattr(conv, "last_source_mode", None),
+                context_ref=payload.context_ref,
+                conversation_state=conv_state,
+            )
         plan, jev_trace = routed.plan, routed.jev_trace
         if classifier_future is not None:
             # Join the model classifier before any personal data is fetched.
@@ -388,6 +401,12 @@ class ChatService:
         plan, semantic_changes = reconcile_query_plan(plan, semantic)
         if semantic.clarification_needed and plan.intent.value == "general_health_question" and not continuing:
             plan = plan.model_copy(update={"intent": IntentType.ambiguous_clarification})
+        # Carry earlier markers only when the new turn reasons about them ("but my fasting
+        # glucose is normal?"), never into a plain lookup ("what about my creatinine?").
+        carrying = (continuing or bool(_CONTRAST_OPENER.match(payload.message or ""))) and (
+            semantic.goal_from_cue and semantic.primary_goal.value not in {"LOOKUP", "GENERAL_EDUCATION"}
+        )
+        plan = _carry_conversation_markers(plan, conv_state, carrying, _previous_entities(conv))
         eval_turn["semantic_plan"] = semantic
         eval_turn["semantic_changes"] = semantic_changes
         self._progress.timing.marks["semantic"] = int((time.perf_counter() - semantic_started) * 1000)
@@ -602,6 +621,23 @@ class ChatService:
                         knowledge_scope="user_uploaded" if not plan.needs_cross_source else None,
                     ),
                 )
+            if attached.status == "missing" and not plan.needs_cross_source and not _EXPLICIT_UPLOAD.search(payload.message or ""):
+                # No uploaded file, and the member did not name one: answer from their
+                # structured SuperShyft data instead of "I don't have an uploaded report".
+                plan = plan.model_copy(
+                    update={
+                        "needs_user_uploaded": False,
+                        "needs_supershyft": True,
+                        "needs_blood": True,
+                        "needs_bio_ai": True,
+                        "knowledge_scope": KnowledgeScope.personal,
+                        "intent": plan.intent if plan.intent != IntentType.general_health_question else IntentType.health_scenario,
+                        "history": True,
+                    }
+                )
+                import dataclasses
+
+                attached = dataclasses.replace(attached, status="not_needed")
             if attached.status == "missing":
                 answer = (
                     "I don't have an uploaded report to compare with SuperShyft."
@@ -865,19 +901,20 @@ class ChatService:
             try:
                 self._progress.mark("retrieval")
                 self._progress.mark("context")
-                context = self.builder.build(
-                    principal,
-                    plan,
-                    db=self.db,
-                    document_ids=(
-                        plan.document_ids or attached.document_ids or payload.document_ids
-                        if plan.needs_user_uploaded
-                        else []
-                    ),
-                    conversation_report_id=getattr(conv, "current_report_id", None),
-                    message=payload.message,
-                    conversation_state=conv_state,
-                )
+                with perf.stage("context_build"):
+                    context = self.builder.build(
+                        principal,
+                        plan,
+                        db=self.db,
+                        document_ids=(
+                            plan.document_ids or attached.document_ids or payload.document_ids
+                            if plan.needs_user_uploaded
+                            else []
+                        ),
+                        conversation_report_id=getattr(conv, "current_report_id", None),
+                        message=payload.message,
+                        conversation_state=conv_state,
+                    )
                 self._progress.measure("retrieval")
                 self._progress.measure("context")
                 if context.personalization or context.health_story:
@@ -917,26 +954,28 @@ class ChatService:
                 )
         else:
             self._progress.mark("context")
-            context = self.builder.build(
-                principal,
-                plan,
-                db=self.db,
-                document_ids=(
-                    plan.document_ids or attached.document_ids or payload.document_ids
-                    if plan.needs_user_uploaded
-                    else []
-                ),
-                conversation_report_id=getattr(conv, "current_report_id", None),
-                message=payload.message,
-                conversation_state=conv_state,
-            )
+            with perf.stage("context_build"):
+                context = self.builder.build(
+                    principal,
+                    plan,
+                    db=self.db,
+                    document_ids=(
+                        plan.document_ids or attached.document_ids or payload.document_ids
+                        if plan.needs_user_uploaded
+                        else []
+                    ),
+                    conversation_report_id=getattr(conv, "current_report_id", None),
+                    message=payload.message,
+                    conversation_state=conv_state,
+                )
             self._progress.measure("context")
 
         medical_hits = []
         if getattr(plan, "medical_evidence_required", False) or general_only:
             # Three passages by default, five for broader "what should I do" questions (plan 4.5).
             limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
-            medical_hits = self.medical_knowledge.query(payload.message, plan.topic, limit=limit)
+            with perf.stage("knowledge_lookup"):
+                medical_hits = self.medical_knowledge.query(payload.message, plan.topic, limit=limit)
             context.medical_passages = [passage_label(doc) for doc in medical_hits]
             attach_medical_evidence(context, medical_hits)
             ContextMerger().merge_into(context, plan, principal.subject_id)
@@ -947,7 +986,16 @@ class ChatService:
         ][-4:]
         eval_turn["medical"] = medical_hits
         eval_turn["context"] = context
-        context.semantic_plan = semantic.model_dump(mode="json") | {"markers": semantic.markers, "bio_ai": semantic.bio_ai, "concepts": semantic.concepts, "domains": semantic.domains}
+        context.conversation_turn = conv_state.turn_type.value if conv_state else None
+        context.semantic_plan = semantic.model_dump(mode="json") | {
+            "markers": semantic.markers,
+            "bio_ai": semantic.bio_ai,
+            "concepts": semantic.concepts,
+            "domains": semantic.domains,
+            "conversation_markers": [
+                k for k in (plan.conversation_entities or []) if k not in set(plan.display_entities or [])
+            ] if carrying else [],
+        }
 
         routing_note = None
         if jev_trace.decision:
@@ -972,20 +1020,21 @@ class ChatService:
         self._progress.set_context(plan, follow_up=follow_up)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
-        reasoned = self.reasoner.run(
-            message=payload.message,
-            plan=plan,
-            context=context,
-            conversation_summary=conversation_summary,
-            response_lang=response_lang,
-            routing_note=routing_note,
-            medical_hits=medical_hits,
-            general_only=general_only,
-            diagnosis_restraint=diagnosis_restraint,
-            budget=eval_turn.get("budget"),
-            complete_answer=self._complete_answer,
-            on_token=getattr(self._progress, "token_callback", None),
-        )
+        with perf.stage("reasoner"):
+            reasoned = self.reasoner.run(
+                message=payload.message,
+                plan=plan,
+                context=context,
+                conversation_summary=conversation_summary,
+                response_lang=response_lang,
+                routing_note=routing_note,
+                medical_hits=medical_hits,
+                general_only=general_only,
+                diagnosis_restraint=diagnosis_restraint,
+                budget=eval_turn.get("budget"),
+                complete_answer=self._complete_answer,
+                on_token=getattr(self._progress, "token_callback", None),
+            )
         self._progress.measure("reasoner")
         answer = reasoned.answer
         llm_result = reasoned.llm_result
@@ -1020,15 +1069,16 @@ class ChatService:
 
         self._progress.emit(ProcessingStage.checking_safety, plan=plan)
         self._progress.mark("validation")
-        answer, flags, grounding_flags = self.validator.validate(
-            answer,
-            message=payload.message,
-            plan=plan,
-            context=context,
-            medical_hits=medical_hits,
-            llm_called=llm_called,
-            pre_safety=pre_safety,
-        )
+        with perf.stage("safety"):
+            answer, flags, grounding_flags = self.validator.validate(
+                answer,
+                message=payload.message,
+                plan=plan,
+                context=context,
+                medical_hits=medical_hits,
+                llm_called=llm_called,
+                pre_safety=pre_safety,
+            )
 
         critical_flags, critical_escalation = self.safety.scan_critical_context(context)
         if critical_escalation:
@@ -1036,6 +1086,13 @@ class ChatService:
         if getattr(pre_safety, "escalation", None) and not escalation:
             escalation = pre_safety.escalation
         flags.extend(critical_flags)
+        if not escalation and not critical_flags and getattr(pre_safety, "category", None) not in {
+            "emergency", "self_harm", "urgent_soon", "medication_misuse",
+        }:
+            # No red flag anywhere: same-day / emergency wording from the model is unsupported.
+            answer, trimmed = strip_unsupported_urgency(answer)
+            if trimmed:
+                flags.append("unsupported_urgency_removed")
         if llm_result:
             flags.extend(llm_result.safety_flags)
         flags = list(dict.fromkeys(flags))
@@ -1058,17 +1115,19 @@ class ChatService:
             "urgent_soon",
         }:
             allowed_packages = False
-        testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
-            message=payload.message,
-            context=context,
-            plan=plan,
-            conversation_state=conv_state,
-            package_suggestion_allowed=allowed_packages,
-        )
+        with perf.stage("recommendation"):
+            testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
+                message=payload.message,
+                context=context,
+                plan=plan,
+                conversation_state=conv_state,
+                package_suggestion_allowed=allowed_packages,
+            )
         eval_turn["diagnostics"] = diagnostics_trace
 
         inventory = build_inventory(principal, self.registry, plan, conv, context)
-        suggestions = self.followups.generate(plan, answer, context, inventory)
+        with perf.stage("recommendation"):
+            suggestions = self.followups.generate(plan, answer, context, inventory)
         experience = build_experience_plan(
             payload.message,
             plan,
@@ -1089,17 +1148,18 @@ class ChatService:
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
-        answer, suggestions, presentation = self.composer.compose(
-            answer,
-            plan=plan,
-            context=context,
-            follow_ups=suggestions,
-            llm_follow_ups=llm_follow,
-            llm_result=llm_result,
-            testing_option=testing_option,
-            experience=experience,
-            conversation_turn=conv_state.turn_type.value,
-        )
+        with perf.stage("composition"):
+            answer, suggestions, presentation = self.composer.compose(
+                answer,
+                plan=plan,
+                context=context,
+                follow_ups=suggestions,
+                llm_follow_ups=llm_follow,
+                llm_result=llm_result,
+                testing_option=testing_option,
+                experience=experience,
+                conversation_turn=conv_state.turn_type.value,
+            )
         self._progress.measure("compose")
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
@@ -1110,7 +1170,8 @@ class ChatService:
             answer = f"{safety_caution}\n\n{answer}"
         # Checked English answer -> member's language, only if every number survives.
         reply_language = target_language(payload.message, payload.language, payload.language_mode)
-        answer, response_language, translation_flags = translate_answer(answer, reply_language)
+        with perf.stage("translation"):
+            answer, response_language, translation_flags = translate_answer(answer, reply_language)
         flags.extend(translation_flags)
         # A critical lab value is answered with escalation first, in the member's language.
         critical_first = self.safety.critical_notice(context, reply_language)
@@ -2119,3 +2180,75 @@ def _semantic_trace(turn: dict, plan, meta, response, context, message: str) -> 
             "total": timing.get("total_ms"),
         },
     }
+
+
+def _attach_perf(response, eval_turn: dict, request_perf) -> None:
+    """User-facing latency for this request, by stage. Numbers and labels only (no PHI)."""
+    plan = eval_turn.get("plan")
+    semantic = eval_turn.get("semantic_plan")
+    meta = getattr(response, "meta", None)
+    stages = request_perf.snapshot()
+    ctx_total = stages.get("context_build_ms", 0)
+    if ctx_total:
+        stages["context_only_ms"] = max(0, ctx_total - stages.get("retrieval_ms", 0))
+    stages.update(
+        {
+            "intent": getattr(getattr(plan, "intent", None), "value", None),
+            "goal": getattr(getattr(semantic, "primary_goal", None), "value", None),
+            "execution_path": getattr(getattr(semantic, "execution_path", None), "value", None),
+            "jev_called": bool(getattr(meta, "jev_called", False)),
+            "jev_ms": getattr(meta, "jev_latency_ms", None),
+            "llm_called": bool(getattr(meta, "llm_called", False)),
+            "status": getattr(meta, "status", None),
+        }
+    )
+    perf.emit({k: v for k, v in stages.items() if k != "request_id"})
+    if meta is not None:
+        timing = dict(meta.timing or {})
+        timing["stages"] = stages
+        meta.timing = timing
+
+
+_CONTRAST_OPENER = re.compile(r"^\s*(?:but|and|so|though|however|then|also|what about|how about|ok(?:ay)?,? but)\b", re.I)
+
+
+def _previous_entities(conv) -> list[str]:
+    """Entities discussed on the previous turn (from the stored conversation state)."""
+    raw = getattr(conv, "conversation_state_json", None)
+    found: list[str] = []
+    if raw:
+        try:
+            data = json.loads(raw)
+            found = list(data.get("active_entities") or [])
+        except (ValueError, TypeError, AttributeError):
+            found = []
+    marker = getattr(conv, "current_marker_code", None)
+    if marker and marker not in found:
+        found.append(marker)
+    return found
+
+
+def _carry_conversation_markers(plan, conv_state, continuing: bool, previous: list[str] | None = None):
+    """Follow-ups keep the markers already under discussion as supporting context.
+
+    "Why is my HbA1c high?" -> "But my fasting glucose is normal?": the answer needs the
+    HbA1c as well as the glucose. The earlier markers are read with the new ones but stay
+    off the answer cards (display_entities) and are supporting, not primary, evidence.
+    """
+    from app.pipeline.lab_parameters import is_lab_key
+
+    if not continuing or conv_state is None or not plan.needs_personal_data:
+        return plan
+    current = list(plan.requested_metrics or ([plan.topic] if plan.topic else []))
+    candidates = [*(previous or []), *(conv_state.active_entities or [])]
+    prior = [k for k in dict.fromkeys(candidates) if is_lab_key(k) and k not in current][:3]
+    if not prior or not current:
+        return plan
+    return plan.model_copy(
+        update={
+            "requested_metrics": list(dict.fromkeys([*current, *prior])),
+            "display_entities": list(plan.display_entities or current),
+            "conversation_entities": list(dict.fromkeys([*(plan.conversation_entities or []), *prior])),
+            "needs_blood": True,
+        }
+    )

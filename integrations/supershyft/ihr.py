@@ -15,7 +15,7 @@ from app.contracts.blood import BloodReport
 from app.contracts.common import IntentType
 from app.contracts.query import QueryPlan
 from app.core.errors import ProviderUnavailableError
-from app.pipeline.lab_parameters import related_keys
+from app.pipeline.lab_parameters import related_keys, distinct_neighbours
 from app.pipeline.ontology import retrieval_metric_keys
 from app.pipeline.personal_selection import retain_blood_reports
 from integrations.supershyft.db import DB_QUERY_FAILED, run_readonly
@@ -125,7 +125,7 @@ class IhrRepository:
         if wanted_keys:
             wanted = set(wanted_keys)
             for key in wanted_keys:
-                wanted |= related_keys(key)
+                wanted |= related_keys(key) | distinct_neighbours(key)
             if plan.topic in {"ldl", "hdl", "cholesterol", "triglycerides"} or any(
                 key in {"ldl", "hdl", "cholesterol", "triglycerides"} for key in wanted_keys
             ):

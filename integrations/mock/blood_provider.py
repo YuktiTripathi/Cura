@@ -1,7 +1,7 @@
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.blood import BloodReport
 from app.contracts.query import QueryPlan
-from app.pipeline.lab_parameters import related_keys
+from app.pipeline.lab_parameters import related_keys, distinct_neighbours
 from app.pipeline.ontology import retrieval_metric_keys
 from app.pipeline.personal_selection import retain_blood_reports
 from integrations.mock.loader import load_json
@@ -21,7 +21,7 @@ class MockBloodProvider:
         if wanted_keys:
             wanted = set(wanted_keys)
             for key in wanted_keys:
-                wanted |= related_keys(key)
+                wanted |= related_keys(key) | distinct_neighbours(key)
             reports = retain_blood_reports(reports, wanted)
         if plan.time_operation == "latest_report" and reports:
             return reports[-1:]

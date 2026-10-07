@@ -380,7 +380,7 @@ def test_fatigue_checks_relevant_markers_without_claiming_cause():
     _, evidence = _evidence("Why do I feel tired in the afternoon?")
     codes = {f["code"] for f in evidence.primary_facts}
     assert codes <= {"hemoglobin", "ferritin", "vitamin_b12", "vitamin_d", "tsh", "fasting_blood_glucose"}
-    assert "many causes" in evidence.payload()["how_to_answer"]
+    assert "several possible contributors" in evidence.payload()["how_to_answer"]
 
 
 @pytest.mark.parametrize(

@@ -16,5 +16,6 @@
     "activity_level": "light",
     "sleep_quality": "fair",
     "notes": ["Mostly vegetarian meals"]
-  }
+  },
+  {"subject_id": "eval-user-metabolic", "activity_level": "low", "sleep_quality": "fair", "notes": ["Desk job"]}
 ]

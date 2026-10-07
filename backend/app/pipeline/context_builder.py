@@ -1,4 +1,7 @@
+from concurrent.futures import ThreadPoolExecutor
 from uuid import uuid4
+
+from app.core import perf
 
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.bio_ai import BioAIRisk
@@ -108,6 +111,34 @@ class ContextBuilder:
         self.registry = registry
         self.retrieval = PersonalDataService(registry)
 
+    def _timed_profile(self, principal):
+        with perf.stage("profile_fetch"):
+            return self.registry.users.get_profile(principal)
+
+    def _scenario_input(self, principal, plan, retrieval):
+        """Reuse reports this turn already retrieved instead of reading them a second time."""
+        from app.contracts.scenario import ScenarioContext
+
+        if (
+            retrieval is not None
+            and retrieval.ihr_called
+            and plan.history
+            and plan.needs_blood
+            and plan.needs_bio_ai
+            and retrieval.status not in {"provider_unavailable", "unauthorized"}
+        ):
+            lifestyle = retrieval.lifestyle
+            if lifestyle is None and not plan.semantic_scoped:
+                lifestyle = self.registry.lifestyle.query(principal, plan)
+            perf.count("scenario_refetch_avoided")
+            return ScenarioContext(
+                blood_reports=list(retrieval.blood_reports),
+                bio_ai_reports=list(retrieval.bio_ai_reports),
+                lifestyle=lifestyle,
+            )
+        with perf.stage("scenario_fetch"):
+            return self.registry.scenarios.query(principal, plan)
+
     def build(
         self,
         principal: AuthenticatedPrincipal,
@@ -125,12 +156,17 @@ class ContextBuilder:
             subject_id=principal.subject_id,
             display_name=principal.display_name or "",
         )
+        profile_future = None
         if personal:
-            profile = self.registry.users.get_profile(principal)
+            # The profile read is independent of report retrieval: run them side by side.
+            profile_future = perf.submit_with_context(_PROFILE_POOL, self._timed_profile, principal)
         if retrieval is None and (personal or plan.needs_user_uploaded):
-            retrieval = self.retrieval.retrieve(
-                principal, plan, db=db, document_ids=document_ids or plan.document_ids or []
-            )
+            with perf.stage("retrieval"):
+                retrieval = self.retrieval.retrieve(
+                    principal, plan, db=db, document_ids=document_ids or plan.document_ids or []
+                )
+        if profile_future is not None:
+            profile = profile_future.result()
         ctx = HealthContext(
             intent=plan.intent,
             answer_depth=plan.answer_depth,
@@ -156,7 +192,7 @@ class ContextBuilder:
             return ctx
 
         if plan.intent == IntentType.health_scenario:
-            scenario_input = self.registry.scenarios.query(principal, plan)
+            scenario_input = self._scenario_input(principal, plan, retrieval)
             ctx.scenario = HealthScenarioEngine().build(
                 scenario_input.blood_reports,
                 scenario_input.bio_ai_reports,
@@ -501,6 +537,7 @@ class ContextBuilder:
                         report_id=latest.report_id if latest else None,
                         report_date=latest.report_date if latest else None,
                         scope="optional" if key.lower() in optional else "latest blood report",
+                        related_available=_related_available(key, latest),
                     )
                 )
             if not keys and not ctx.missing:
@@ -529,6 +566,7 @@ class ContextBuilder:
                     report_id=latest.report_id if latest else None,
                     report_date=latest.report_date if latest else None,
                     scope="optional" if key.lower() in optional else "latest blood report",
+                    related_available=_related_available(key, latest),
                 )
             )
         for marker in selected:
@@ -948,3 +986,21 @@ class ContextBuilder:
             ctx.missing.append(
                 MissingItem(key="questionnaire", name="questionnaire", reason="no_questionnaire_responses")
             )
+
+
+# Related but distinct measurements. Mentioned when the asked one is absent; never converted.
+_RELATED_MARKERS = {"bun": ("urea",), "urea": ("bun",)}
+
+
+def _related_available(key: str, latest) -> str | None:
+    if latest is None:
+        return None
+    for other in _RELATED_MARKERS.get(key, ()):
+        marker = next((m for m in latest.markers if m.key == other and m.value is not None), None)
+        if marker is not None:
+            unit = f" {marker.unit}" if marker.unit else ""
+            return f"{marker.name or other} {marker.value}{unit}"
+    return None
+
+
+_PROFILE_POOL = ThreadPoolExecutor(max_workers=8, thread_name_prefix="cura-profile")
