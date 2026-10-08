@@ -16,7 +16,7 @@ from app.contracts.common import (
     parse_model_tier,
 )
 from app.contracts.query import QueryPlan
-from app.pipeline.lab_parameters import match_lab_keys
+from app.pipeline.lab_parameters import is_lab_key, match_lab_keys
 from app.pipeline.operations import named_personal_sources
 from app.routing.schemas import JevDecision
 
@@ -316,7 +316,7 @@ def infer_answer_model_routing(plan: QueryPlan) -> _Inference:
 
 def uses_medical_answer_llm(tier: AnswerModelTier | str | None) -> bool:
     parsed = parse_model_tier(tier) if not isinstance(tier, AnswerModelTier) else tier
-    return parsed in {AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning}
+    return parsed in {AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning}
 
 
 _REASONING_OPS = {
@@ -396,44 +396,272 @@ def _constrain_tier(
 
 
 def promote_for_retrieved_complexity(plan: QueryPlan, context) -> QueryPlan:
-    """Promote clearly complex personal-health turns before the first answer-model call.
+    """Promote one tier before the single answer call when retrieval reveals more than the
+    router could see (conflicting sources, cross-source evidence). Never a second call.
 
-    Initial routing happens before retrieval. Once trusted context is available we can see
-    conflicts, breadth and cross-source density that were impossible to know at route time.
-    Promoting here avoids paying for STANDARD_MEDICAL and then a second DEEP call.
+    Breadth alone (a whole report read so a lookup can say "this is a minor finding") is
+    not complexity: the question decides the tier, not how many rows were fetched.
     """
-    if plan.answer_model_tier != AnswerModelTier.standard_medical:
+    tier = plan.answer_model_tier
+    if tier not in {AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical}:
         return plan
-    if _keep_on_flash(plan):
+    if forced_answer_tier() is not None or _keep_on_flash(plan):
         return plan
-
-    ops = {str(item).upper() for item in (plan.operations or [])}
-    if plan.operation:
-        ops.add(plan.operation.upper())
     marker_count = len(getattr(context, "markers", None) or [])
     risk_count = len(getattr(context, "bio_ai_risks", None) or [])
-    domain_count = len(plan.domains or [])
     conflicts = len(getattr(context, "source_conflicts", None) or [])
     comparisons = len(getattr(context, "comparisons", None) or [])
 
     reason = None
     if conflicts:
         reason = "retrieved_source_conflict"
-    elif plan.needs_cross_source and (comparisons or marker_count + risk_count >= 3):
+    elif tier == AnswerModelTier.standard_medical and plan.needs_cross_source and (comparisons or marker_count + risk_count >= 3) and risk_count:
         reason = "retrieved_cross_source_complexity"
-    elif plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary} and marker_count + risk_count >= 5:
-        reason = "retrieved_whole_health_breadth"
-    elif domain_count >= 2 and marker_count + risk_count >= 4:
-        reason = "retrieved_multi_domain_breadth"
-    elif ops & {"CORRELATE", "IDENTIFY_PATTERN", "IDENTIFY_GAPS", "PRIORITIZE"} and marker_count + risk_count >= 4:
-        reason = "retrieved_reasoning_breadth"
-
+    elif tier == AnswerModelTier.fast_reasoning and plan.needs_cross_source and risk_count and marker_count:
+        reason = "retrieved_cross_source_context"
     if not reason:
         return plan
-    plan.answer_model_tier = AnswerModelTier.deep_medical_reasoning
-    plan.model_tier = AnswerModelTier.deep_medical_reasoning
-    plan.complexity = AnswerComplexity.high
-    plan.reasoning_depth = ReasoningDepth.deep
-    plan.reasoning_required = True
-    plan.model_selection_reasons = list(dict.fromkeys([*(plan.model_selection_reasons or []), reason, "pre_generation_deep_promotion"]))
-    return plan
+    target = AnswerModelTier.standard_medical if tier == AnswerModelTier.fast_reasoning else AnswerModelTier.deep_medical_reasoning
+    promoted = _set_tier(plan, target)
+    promoted.initial_answer_tier = plan.initial_answer_tier or tier
+    promoted.model_selection_reasons = list(dict.fromkeys([
+        *(plan.model_selection_reasons or []), reason,
+        "pre_generation_deep_promotion" if target == AnswerModelTier.deep_medical_reasoning else "pre_generation_promotion",
+    ]))
+    return promoted
+
+
+# ---------------------------------------------------------------- answer-tier policy
+#
+# One policy decides which answer model writes a turn, per turn, from reasoning
+# requirements (not clinical severity, not intent alone):
+#
+#   FAST      straightforward: a value, a range check, a low-risk definition
+#   STANDARD  personal interpretation: meaning, causes, a simple trend, lifestyle links
+#   DEEP      synthesis: blood + Bio-AI, conflicting findings, whole-record comparison or
+#             prioritisation, several interacting markers
+#
+# Inputs are cheap and known before retrieval: the semantic plan (goal, named markers,
+# Bio-AI, lifestyle concepts, sources, time need), the message's wording and the
+# conversation state. Retrieval may still promote one step (promote_for_retrieved_complexity)
+# before the single answer call.
+
+FAST_MAX_SCORE = 2
+STANDARD_MAX_SCORE = 5
+
+_GOAL_WEIGHT = {
+    "LOOKUP": 0,
+    "GENERAL_EDUCATION": 0,
+    "DOCUMENT_LOOKUP": 1,
+    "ASSESS": 3,  # reduced to 1 for a plain range check on one value
+    "EXPLAIN": 3,
+    "RISK": 3,
+    "ACTION": 3,
+    "CAUSES": 3,
+    "COMPARE": 3,
+    "PRIORITIZE": 4,
+    "SYNTHESIZE": 4,
+}
+_CONTRAST = re.compile(
+    r"\b(?:even though|even if|although|though|despite|in spite of|doesn'?t match|does not match|"
+    r"don'?t match|contradict\w*|conflict\w*|why (?:is|are|would|does) .{0,40}\bif\b|"
+    r"yet|whereas|while my|but (?:my|the|it|i|then|still|why)|how can both|both be true|makes? no sense)\b",
+    re.I,
+)
+_BREADTH = re.compile(
+    r"\b(?:across|all (?:of )?my (?:reports?|data|results|tests)|overall|whole|big(?:ger)? picture|everything|"
+    r"fit together|tie together|tell the same story|same story|all of (?:that|this|it)|"
+    r"together|in combination|connect(?:ed)? (?:to each other|together))\b",
+    re.I,
+)
+_NUANCED_PRIORITY = re.compile(r"\b(?:minor|matter(?:s)? less|least|not (?:a )?(?:big )?(?:deal|worry)|can (?:ignore|wait)|actually matters)\b", re.I)
+_UNCERTAIN = re.compile(r"\b(?:not sure|unclear|uncertain|confus\w*|missing|don'?t understand|no idea)\b", re.I)
+_RELATION = re.compile(r"\b(?:related|relate|connected|linked|because of|due to|affect\w*|contribut\w*|cause\w*)\b", re.I)
+_SOURCE_WORDS = {
+    "blood": re.compile(r"\b(?:blood|lab|report|hba1c|glucose|cholesterol|ldl|hdl|triglycerides?|marker)", re.I),
+    "bio_ai": re.compile(r"\bbio[\s-]?ai\b|\brisk score|\b(?:diabetes|cardiac|metabolic|heart) risk\b", re.I),
+    "lifestyle": re.compile(r"\b(?:lifestyle|questionnaire|exercis\w*|diet|sleep\w*|stress|activity|active|walk\w*|eat\w*|smok\w*|alcohol|weight loss)\b", re.I),
+}
+_TIER_NAME = {
+    AnswerModelTier.fast_reasoning: "fast",
+    AnswerModelTier.standard_medical: "standard",
+    AnswerModelTier.deep_medical_reasoning: "deep",
+}
+_FORCE = {"fast": AnswerModelTier.fast_reasoning, "standard": AnswerModelTier.standard_medical, "deep": AnswerModelTier.deep_medical_reasoning}
+
+
+class TierAssessment:
+    __slots__ = ("score", "tier", "reasons")
+
+    def __init__(self, score: int, tier: AnswerModelTier, reasons: list[str]):
+        self.score = score
+        self.tier = tier
+        self.reasons = reasons
+
+    def as_dict(self) -> dict:
+        return {"complexity_score": self.score, "answer_tier": tier_name(self.tier), "routing_reason": list(self.reasons)}
+
+
+def tier_name(tier: AnswerModelTier | str | None) -> str | None:
+    parsed = tier if isinstance(tier, AnswerModelTier) else parse_model_tier(tier)
+    return _TIER_NAME.get(parsed) if parsed else None
+
+
+def tier_for_score(score: int) -> AnswerModelTier:
+    if score <= FAST_MAX_SCORE:
+        return AnswerModelTier.fast_reasoning
+    if score <= STANDARD_MAX_SCORE:
+        return AnswerModelTier.standard_medical
+    return AnswerModelTier.deep_medical_reasoning
+
+
+def assess_answer_complexity(
+    message: str,
+    semantic,
+    plan: QueryPlan | None = None,
+    *,
+    conversation_markers: list[str] | None = None,
+    continuing: bool = False,
+) -> TierAssessment:
+    """Score how much reasoning the answer needs. Pure function of cheap signals."""
+    text = message or ""
+    goal = getattr(getattr(semantic, "primary_goal", None), "value", None) or "EXPLAIN"
+    secondary = {getattr(g, "value", g) for g in getattr(semantic, "secondary_goals", None) or []}
+    markers = [m for m in (getattr(semantic, "markers", None) or []) if m != "bio_ai"]
+    carried = [m for m in (conversation_markers or []) if m not in markers and is_lab_key(m)]
+    bio_named = bool(getattr(semantic, "bio_ai", None)) or "bio_ai" in (getattr(semantic, "markers", None) or [])
+    concepts = list(getattr(semantic, "concepts", None) or [])
+    sources = {getattr(s, "value", s) for s in getattr(semantic, "required_sources", None) or []}
+    temporal = getattr(getattr(semantic, "temporal_requirement", None), "value", None)
+    reasons: list[str] = []
+    score = 0
+
+    weight = _GOAL_WEIGHT.get(goal, 3)
+    reasoning_goal = weight >= 3
+    if not getattr(semantic, "goal_from_cue", True) and not (_CONTRAST.search(text) or _RELATION.search(text) or _BREADTH.search(text)):
+        # No reasoning cue at all ("Is my HDL within range?", "And my HDL?"): the neutral
+        # default goal is not evidence that the answer needs interpretation.
+        weight, reasoning_goal = 1, False
+        reasons.append("no_reasoning_cue")
+    elif goal == "ASSESS" and len(markers) <= 1 and not concepts and not bio_named and not _CONTRAST.search(text):
+        weight, reasoning_goal = 1, False  # "is my TSH normal?" is a range check
+        reasons.append("range_check")
+    elif weight:
+        reasons.append(f"goal:{goal.lower()}")
+    score += weight
+
+    # Biomarkers the answer has to reason about together (named now or carried from the
+    # conversation). One marker adds nothing; each further one adds reasoning load.
+    involved = len(markers) + (len(carried) if reasoning_goal else 0)
+    if involved >= 2:
+        score += min(3, involved - 1)
+        reasons.append(f"multi_marker:{involved}")
+
+    # Data sources the answer must combine.
+    # Only what the member actually brings into the question counts; the sources a
+    # synthesis question may optionally read are not, by themselves, extra reasoning.
+    used = set()
+    if markers or carried or _SOURCE_WORDS["blood"].search(text):
+        used.add("blood")
+    if bio_named or _SOURCE_WORDS["bio_ai"].search(text):
+        used.add("bio_ai")
+    lifestyle = bool(concepts) or bool(_SOURCE_WORDS["lifestyle"].search(text))
+    if lifestyle:
+        used.add("lifestyle")
+    if {"blood", "bio_ai"} <= used and reasoning_goal:
+        score += 3
+        reasons.append("blood+bioai")
+    elif "bio_ai" in used and reasoning_goal:
+        score += 1
+        reasons.append("bioai")
+    if lifestyle and reasoning_goal:
+        score += 1
+        reasons.append("lifestyle_personalization")
+
+    if reasoning_goal and _CONTRAST.search(text):
+        score += 3
+        reasons.append("conflicting_findings")
+    if reasoning_goal and _BREADTH.search(text):
+        score += 3
+        reasons.append("whole_record_synthesis")
+    if goal == "COMPARE" and not markers:
+        score += 3
+        reasons.append("cross_report_comparison")
+    elif goal != "COMPARE" and (temporal in {"TREND", "HISTORICAL", "COMPARISON"} or "COMPARE" in secondary) and reasoning_goal:
+        score += 1
+        reasons.append("trend_and_current_state")
+    if goal == "PRIORITIZE" and _NUANCED_PRIORITY.search(text):
+        score += 2
+        reasons.append("nuanced_prioritization")
+    # "How are X, Y and Z connected?": the number of things to relate drives the load.
+    things = len(markers) + len(concepts) + len([d for d in getattr(semantic, "domains", None) or [] if not markers])
+    if reasoning_goal and things >= 2 and _RELATION.search(text):
+        bonus = 2 if things >= 3 else 1
+        score += bonus
+        reasons.append(f"relationship_between_findings:{things}")
+    if reasoning_goal and _UNCERTAIN.search(text):
+        score += 1
+        reasons.append("uncertainty")
+    if continuing and reasoning_goal:
+        score += 1
+        reasons.append("follow_up_needs_prior_context")
+    route_reasons = set((plan.model_selection_reasons if plan is not None else None) or [])
+    if "uploaded_report_analysis" in route_reasons:
+        score += 3
+        reasons.append("uploaded_document_analysis")
+
+    return TierAssessment(score, tier_for_score(score), reasons)
+
+
+def select_answer_tier(plan: QueryPlan, assessment: TierAssessment) -> QueryPlan:
+    """Apply the policy to a plan that will be answered by a model (deterministic stays so)."""
+    reasoning_turn = any(r.startswith("goal:") and r not in {"goal:lookup", "goal:general_education", "goal:document_lookup"} for r in assessment.reasons)
+    if not uses_medical_answer_llm(plan.answer_model_tier):
+        # A route-time "lookup" that in fact asks for reasoning about the member's own data
+        # ("compare my reports and explain what matters") is answered by a model.
+        if not (plan.needs_personal_data and reasoning_turn and assessment.score > FAST_MAX_SCORE):
+            return plan
+    if reasoning_turn and plan.needs_personal_data:
+        # The answer interprets, so no structured value template may short-circuit it.
+        plan = plan.model_copy(update={"operations": list(dict.fromkeys([*(plan.operations or []), "INTERPRET"]))})
+    tier = assessment.tier
+    reasons = list(assessment.reasons)
+    forced = forced_answer_tier()
+    if forced is not None:
+        tier = forced
+        reasons.append(f"forced:{tier_name(forced)}")
+    return _set_tier(plan.model_copy(update={
+        "complexity_score": assessment.score,
+        "initial_answer_tier": tier,
+        "model_selection_reasons": list(dict.fromkeys([*(plan.model_selection_reasons or []), *reasons])),
+    }), tier)
+
+
+def forced_answer_tier() -> AnswerModelTier | None:
+    """CURA_FORCE_ANSWER_TIER, honoured outside production only."""
+    from app.core.config import settings
+
+    value = (settings.cura_force_answer_tier or "").strip().lower()
+    if not value or not settings.is_development:
+        return None
+    return _FORCE.get(value)
+
+
+def _set_tier(plan: QueryPlan, tier: AnswerModelTier) -> QueryPlan:
+    depth = {
+        AnswerModelTier.fast_reasoning: ReasoningDepth.none,
+        AnswerModelTier.standard_medical: ReasoningDepth.standard,
+        AnswerModelTier.deep_medical_reasoning: ReasoningDepth.deep,
+    }[tier]
+    complexity = {
+        AnswerModelTier.fast_reasoning: AnswerComplexity.low,
+        AnswerModelTier.standard_medical: AnswerComplexity.medium,
+        AnswerModelTier.deep_medical_reasoning: AnswerComplexity.high,
+    }[tier]
+    return plan.model_copy(update={
+        "answer_model_tier": tier,
+        "model_tier": tier,
+        "reasoning_depth": depth,
+        "complexity": complexity,
+        "reasoning_required": True,
+    })

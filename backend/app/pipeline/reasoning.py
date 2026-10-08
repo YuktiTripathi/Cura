@@ -17,7 +17,7 @@ from app.core.copy import general_knowledge_unavailable
 from app.core.errors import LLMUnavailableError
 from app.llm.factory import get_llm_client
 from app.llm.models import LLMStructuredOutput
-from app.llm.registry import fallback_tiers, uses_answer_llm
+from app.llm.registry import answer_timeout_for_tier, fallback_tiers, uses_answer_llm
 from app.pipeline.planner import plan_needs_reasoning
 from app.pipeline.quality_gate import review_answer, should_escalate_to_deep
 from app.pipeline.prompt_builder import PromptBuilder
@@ -35,6 +35,12 @@ from app.retrieval.medical import is_servable, render_medical_evidence_answer
 logger = logging.getLogger("cura.reasoning")
 
 
+DEEP_UNAVAILABLE_MESSAGE = (
+    "I couldn't work through this one properly just now, and I'd rather not give you a partial answer "
+    "to a question that connects several of your results. Please try again in a minute."
+)
+
+
 @dataclass
 class ReasoningResult:
     answer: str
@@ -48,16 +54,17 @@ class ReasoningResult:
     model_escalated: bool = False
     escalation_reason: str | None = None
     first_token_ms: int | None = None
+    answer_tier: AnswerModelTier | None = None  # tier that actually wrote the answer
 
 
-def _deep_is_different_model() -> bool:
-    """Escalating to "deep" only helps when it is a different model; otherwise it repeats the call."""
+def _is_different_model(current: AnswerModelTier, target: AnswerModelTier) -> bool:
+    """Escalating only helps when the target tier is a different model; otherwise it repeats the call."""
     from app.llm.registry import model_id_for_tier
 
     try:
-        return model_id_for_tier(AnswerModelTier.deep_medical_reasoning) != model_id_for_tier(AnswerModelTier.standard_medical)
-    except Exception:  # noqa: BLE001 - unknown configuration: keep the existing behaviour
-        return True
+        return model_id_for_tier(target) != model_id_for_tier(current)
+    except Exception:  # noqa: BLE001 - unknown configuration: do not repeat the call
+        return False
 
 
 class ReasoningService:
@@ -123,7 +130,8 @@ class ReasoningService:
         ):
             return ReasoningResult(answer="Score not available in this report.", llm_mode="structured_bio_ai")
         response_plan = build_response_plan(message, plan, context)
-        if response_plan.kind == "report_overview" and context.markers:
+        interpret_turn = "INTERPRET" in {str(op).upper() for op in plan.operations or []}
+        if response_plan.kind == "report_overview" and context.markers and not interpret_turn:
             highlights = [
                 m for m in context.markers
                 if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}
@@ -221,29 +229,36 @@ class ReasoningService:
                 answer = llm_result.answer
                 escalated = False
                 escalation_reason = None
-                if used_tier == AnswerModelTier.standard_medical:
-                    from app.routing.model_tier import _keep_on_flash
+                next_tier = {
+                    AnswerModelTier.fast_reasoning: AnswerModelTier.standard_medical,
+                    AnswerModelTier.standard_medical: AnswerModelTier.deep_medical_reasoning,
+                }.get(used_tier)
+                if next_tier is not None and not fallback:
+                    from app.routing.model_tier import _keep_on_flash, forced_answer_tier
 
                     gate = review_answer(answer, plan, context)
                     if (
-                        not _keep_on_flash(plan)
-                        and _deep_is_different_model()
-                        and should_escalate_to_deep(gate.flags, plan, context, answer, llm_result)
+                        forced_answer_tier() is None
+                        and not _keep_on_flash(plan)
+                        and _is_different_model(used_tier, next_tier)
+                        and should_escalate_to_deep(gate.flags, plan.model_copy(update={"answer_model_tier": used_tier}), context, answer, llm_result)
                     ):
-                        deep_plan = plan.model_copy(update={
-                            "answer_model_tier": AnswerModelTier.deep_medical_reasoning,
-                            "model_tier": AnswerModelTier.deep_medical_reasoning,
+                        # Controlled escalation: one more call, one tier up, only when the
+                        # answer could not reconcile the evidence or produced no usable output.
+                        up_plan = plan.model_copy(update={
+                            "answer_model_tier": next_tier,
+                            "model_tier": next_tier,
+                            "complexity_score": max(plan.complexity_score or 0, 9),  # no downgrade fallback
                         })
                         try:
-                            llm_result, answer_client, used_tier, _deep_fallback = completer(
-                                messages, deep_plan, budget=budget
+                            llm_result, answer_client, used_tier, _up_fallback = completer(
+                                messages, up_plan, budget=budget
                             )
                             answer = llm_result.answer
                             escalated = True
                             escalation_reason = ", ".join(gate.flags[:4]) or "quality_gate"
-                            fallback = True
                         except LLMUnavailableError:
-                            logger.warning("deep_medical_escalation_unavailable")
+                            logger.warning("answer_escalation_unavailable tier=%s", next_tier.value)
                 if llm_result.parse_error and not answer:
                     answer = self.renderer.render(message, context)
                 return ReasoningResult(
@@ -256,9 +271,18 @@ class ReasoningService:
                     latency_ms=int((time.perf_counter() - started) * 1000),
                     model_escalated=escalated,
                     escalation_reason=escalation_reason,
+                    answer_tier=used_tier,
                 )
             except LLMUnavailableError:
-                logger.warning("llm_unavailable")
+                logger.warning("llm_unavailable tier=%s", plan.answer_model_tier.value if plan.answer_model_tier else None)
+                if plan.answer_model_tier == AnswerModelTier.deep_medical_reasoning:
+                    # A complex question is not answered by a template that looks equivalent.
+                    return ReasoningResult(
+                        answer=DEEP_UNAVAILABLE_MESSAGE,
+                        llm_called=True,
+                        llm_mode="answer_model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
                 return ReasoningResult(
                     answer=self.renderer.render(message, context),
                     llm_called=True,
@@ -284,13 +308,8 @@ class ReasoningService:
         openrouter_policy().assert_privacy_for_health(personal_health=bool(plan.needs_personal_data))
         last_error = None
         remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
-        for index, tier in enumerate(fallback_tiers(plan.answer_model_tier)):
-            tier_cap = {
-                AnswerModelTier.standard_medical.value: 18.0,
-                AnswerModelTier.deep_medical_reasoning.value: 28.0,
-                AnswerModelTier.fast_reasoning.value: 12.0,
-            }.get(tier.value, 20.0)
-            timeout = min(float(settings.llm_timeout_seconds), remaining, tier_cap)
+        for index, tier in enumerate(fallback_tiers(plan.answer_model_tier, plan.complexity_score)):
+            timeout = min(float(settings.llm_timeout_seconds), remaining, answer_timeout_for_tier(tier))
             if budget is not None:
                 timeout = budget.timeout_for(timeout)
             if timeout < 0.5:

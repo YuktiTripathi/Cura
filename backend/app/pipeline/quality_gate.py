@@ -19,14 +19,11 @@ _GENERIC = re.compile(
     r"\b(it depends|in general|many people|typically|as a whole|overall health is (?:good|fine))\b",
     re.I,
 )
+# A second answer call costs a full model round trip, so only failures a stronger model
+# can actually fix trigger one: unreconciled findings across sources, or no usable output.
+# Wording issues (a marker not named, generic phrasing) are handled by the validator.
 _ESCALATE_FLAGS = {
-    "entity_unmentioned",
-    "entity_undisclosed",
-    "multi_source_gap_undisclosed",
-    "generic_despite_personal",
     "contradictions_unaddressed",
-    "reasoning_incomplete",
-    "unsupported_personal_numbers",
     "backend_leak",
     "structured_output_failed",
 }
@@ -97,13 +94,11 @@ def review_answer(answer: str, plan: QueryPlan, context: HealthContext) -> Quali
 
 
 def should_escalate_to_deep(flags: list[str], plan: QueryPlan, context: HealthContext, answer: str, llm_result=None) -> bool:
-    if plan.answer_model_tier != AnswerModelTier.standard_medical:
+    if plan.answer_model_tier not in {AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical}:
         return False
     reasons = set(flags or [])
     if llm_result is not None and getattr(llm_result, "parse_error", None):
         reasons.add("structured_output_failed")
-    if "unsupported_personal_numbers" in (getattr(context, "grounding_flags", None) or []):
-        reasons.add("unsupported_personal_numbers")
     return bool(reasons & _ESCALATE_FLAGS)
 
 

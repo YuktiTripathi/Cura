@@ -52,6 +52,10 @@ class QueryPlan(BaseModel):
     model_tier: AnswerModelTier | None = None
     reasoning_depth: ReasoningDepth | None = None
     model_selection_reasons: list[str] = Field(default_factory=list)
+    # Answer-tier routing (app/routing/model_tier.select_answer_tier): reasoning complexity
+    # of this turn and the tier chosen before any retrieval-time promotion.
+    complexity_score: int | None = None
+    initial_answer_tier: AnswerModelTier | None = None
     reasoning_required: bool = False
     pdf_analysis_required: bool = False
     operation: str = "LOOKUP"

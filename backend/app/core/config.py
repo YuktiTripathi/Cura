@@ -1,7 +1,7 @@
 from pathlib import Path
 
 from dotenv import load_dotenv
-from pydantic import model_validator
+from pydantic import AliasChoices, Field, model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Cura's backend/.env must win over inherited SuperShyft DATABASE_URL values.
@@ -68,15 +68,32 @@ class Settings(BaseSettings):
     allow_mock_auth_with_real_health: bool = False
     mock_user_id: str = ""
     allow_mock_header_override: bool = False
-    answer_model_fast_reasoning: str = "openai/gpt-5.6-luna"
-    answer_model_standard_medical: str = "google/gemini-3.8-flash"
-    answer_model_deep_medical: str = "google/gemini-3.8-flash"
+    # The three answer tiers (one place). CURA_FAST_MODEL / CURA_STANDARD_MODEL /
+    # CURA_DEEP_MODEL are accepted as well as the older ANSWER_MODEL_* names.
+    answer_model_fast_reasoning: str = Field(
+        "google/gemini-3.8-flash", validation_alias=AliasChoices("CURA_FAST_MODEL", "ANSWER_MODEL_FAST_REASONING", "answer_model_fast_reasoning")
+    )
+    answer_model_standard_medical: str = Field(
+        "openai/gpt-5-mini", validation_alias=AliasChoices("CURA_STANDARD_MODEL", "ANSWER_MODEL_STANDARD_MEDICAL", "answer_model_standard_medical")
+    )
+    answer_model_deep_medical: str = Field(
+        "openai/gpt-5.6-luna", validation_alias=AliasChoices("CURA_DEEP_MODEL", "ANSWER_MODEL_DEEP_MEDICAL", "answer_model_deep_medical")
+    )
+    # Development only (ignored in production): force every model answer onto one tier
+    # (fast | standard | deep) to compare models on the same questions.
+    cura_force_answer_tier: str = ""
+    # Development only: log a readable routing decision and add it to meta.debug.
+    cura_model_routing_debug: bool = False
+    # Per-tier answer-call caps (seconds); always bounded by the request budget.
+    answer_timeout_fast_seconds: float = 10.0
+    answer_timeout_standard_seconds: float = 18.0
+    answer_timeout_deep_seconds: float = 25.0
     answer_model_nano: str = "openai/gpt-5.6-luna"
     answer_model_standard: str = "google/gemini-3.8-flash"
     answer_model_advanced: str = "google/gemini-3.8-flash"
     llm_allowed_providers: str = "openrouter"
     llm_allowed_models: str = (
-        "openai/gpt-5.6-luna,google/gemini-3.8-flash,"
+        "openai/gpt-5.6-luna,openai/gpt-5-mini,google/gemini-3.8-flash,"
         "openai/gpt-4o-mini,typesafe/jev-1.13"
     )
     assistant_quality_v2: bool = True
@@ -143,12 +160,14 @@ class Settings(BaseSettings):
     model_price_standard_output_per_1m: float = 3.75
     model_price_advanced_input_per_1m: float = 3.00
     model_price_advanced_output_per_1m: float = 15.00
-    model_price_fast_reasoning_input_per_1m: float = 0.25
-    model_price_fast_reasoning_output_per_1m: float = 2.00
-    model_price_standard_medical_input_per_1m: float = 0.75
-    model_price_standard_medical_output_per_1m: float = 3.75
-    model_price_deep_medical_input_per_1m: float = 3.00
-    model_price_deep_medical_output_per_1m: float = 15.00
+    # Placeholder list prices (USD per 1M tokens) for cost estimates; set the real
+    # contracted prices through the environment.
+    model_price_fast_reasoning_input_per_1m: float = 0.10
+    model_price_fast_reasoning_output_per_1m: float = 0.40
+    model_price_standard_medical_input_per_1m: float = 0.25
+    model_price_standard_medical_output_per_1m: float = 2.00
+    model_price_deep_medical_input_per_1m: float = 1.25
+    model_price_deep_medical_output_per_1m: float = 10.00
 
     # SuperShyft read-only Postgres (never used for Cura conversation tables)
     supershyft_database_url: str = ""

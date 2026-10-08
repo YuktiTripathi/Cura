@@ -52,18 +52,62 @@ def estimate_cost_usd(model_id: str, input_tokens: int, output_tokens: int) -> f
     return round(cost, 8)
 
 
-def fallback_tiers(tier: AnswerModelTier | str | None) -> list[AnswerModelTier]:
-    """Upgrade-only availability fallback. Deep never drops, except during a configured
-    spend spike, when it tries standard first and keeps deep as the fallback (plan 6.7)."""
+# Above this complexity a DEEP question is not answered by a smaller model on failure:
+# a temporary-service message is more honest than a weaker answer presented as equivalent.
+DEEP_FALLBACK_MAX_SCORE = 8
+# At or below this a STANDARD question is straightforward enough for the FAST model.
+STANDARD_TO_FAST_MAX_SCORE = 4
+
+
+def fallback_tiers(tier: AnswerModelTier | str | None, complexity_score: int | None = None) -> list[AnswerModelTier]:
+    """Tiers to try, in order, when a model is unavailable (one call each, one shared budget).
+
+    FAST      -> STANDARD (a stronger model is always safe)
+    STANDARD  -> FAST for straightforward questions, otherwise DEEP
+    DEEP      -> STANDARD only while the question is still answerable by it; otherwise none
+    During a configured spend spike DEEP tries STANDARD first and keeps DEEP as the fallback.
+    """
     selected = _as_tier(tier)
-    if selected is None or selected in {AnswerModelTier.deterministic, AnswerModelTier.fast_reasoning}:
+    if selected is None or selected == AnswerModelTier.deterministic:
         return []
+    return _distinct_models(_fallback_order(selected, complexity_score))
+
+
+def _distinct_models(tiers: list[AnswerModelTier]) -> list[AnswerModelTier]:
+    """Never retry the same model under another tier name: that repeats the failed call."""
+    seen: set[str] = set()
+    out: list[AnswerModelTier] = []
+    for item in tiers:
+        model = model_id_for_tier(item)
+        if model in seen:
+            continue
+        seen.add(model)
+        out.append(item)
+    return out
+
+
+def _fallback_order(selected: AnswerModelTier, complexity_score: int | None) -> list[AnswerModelTier]:
+    score = complexity_score if complexity_score is not None else 5
+    if selected == AnswerModelTier.fast_reasoning:
+        return [AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical]
     if selected == AnswerModelTier.standard_medical:
+        if score <= STANDARD_TO_FAST_MAX_SCORE:
+            return [AnswerModelTier.standard_medical, AnswerModelTier.fast_reasoning]
         return [AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning]
     if _spend_spike():
-        # Spend spike (plan 6.7): try standard first; deep stays as the fallback.
         return [AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning]
+    if score <= DEEP_FALLBACK_MAX_SCORE:
+        return [AnswerModelTier.deep_medical_reasoning, AnswerModelTier.standard_medical]
     return [AnswerModelTier.deep_medical_reasoning]
+
+
+def answer_timeout_for_tier(tier: AnswerModelTier | str | None) -> float:
+    selected = _as_tier(tier)
+    return {
+        AnswerModelTier.fast_reasoning: settings.answer_timeout_fast_seconds,
+        AnswerModelTier.standard_medical: settings.answer_timeout_standard_seconds,
+        AnswerModelTier.deep_medical_reasoning: settings.answer_timeout_deep_seconds,
+    }.get(selected, settings.answer_timeout_standard_seconds)
 
 
 def _spend_spike() -> bool:
@@ -81,7 +125,7 @@ def _spend_spike() -> bool:
 
 def uses_answer_llm(tier: AnswerModelTier | str | None) -> bool:
     selected = _as_tier(tier)
-    return selected in {AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning}
+    return selected in {AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning}
 
 
 def provider_for_model(model_id: str | None) -> str | None:

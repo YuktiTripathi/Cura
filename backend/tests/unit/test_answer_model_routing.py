@@ -97,9 +97,9 @@ def _assert_tier(messages, expected: AnswerModelTier, *, reasons_any=None):
 def test_registry_maps_capability_tiers_to_configured_models():
     registry = model_registry()
     assert "DETERMINISTIC" not in registry
-    assert registry["FAST_REASONING"] == settings.answer_model_fast_reasoning == "openai/gpt-5.6-luna"
-    assert registry["STANDARD_MEDICAL"] == settings.answer_model_standard_medical == "google/gemini-3.8-flash"
-    assert registry["DEEP_MEDICAL_REASONING"] == settings.answer_model_deep_medical == "google/gemini-3.8-flash"
+    assert registry["FAST_REASONING"] == settings.answer_model_fast_reasoning == "google/gemini-3.8-flash"
+    assert registry["STANDARD_MEDICAL"] == settings.answer_model_standard_medical == "openai/gpt-5-mini"
+    assert registry["DEEP_MEDICAL_REASONING"] == settings.answer_model_deep_medical == "openai/gpt-5.6-luna"
     assert model_id_for_tier("DETERMINISTIC") == ""
     assert model_id_for_tier("FAST_REASONING") == settings.answer_model_fast_reasoning
     client = get_llm_client(model_tier="STANDARD_MEDICAL")
@@ -107,7 +107,7 @@ def test_registry_maps_capability_tiers_to_configured_models():
     assert client.provider == "openrouter"
     assert client.api_key == settings.active_llm_api_key()
     assert not uses_answer_llm(AnswerModelTier.deterministic)
-    assert not uses_answer_llm(AnswerModelTier.fast_reasoning)
+    assert uses_answer_llm(AnswerModelTier.fast_reasoning)
     assert uses_answer_llm(AnswerModelTier.standard_medical)
 
 
@@ -264,16 +264,14 @@ def test_jev_unavailable_still_selects_deterministic_tier(monkeypatch):
     assert plan.answer_model_tier == AnswerModelTier.deterministic
 
 
-def test_standard_model_failure_falls_back_to_deep(monkeypatch):
+def test_fast_model_failure_falls_back_to_standard(monkeypatch):
     monkeypatch.setattr(settings, "enable_llm", True)
-    # The fallback only helps when the deep tier uses a different model than standard.
-    monkeypatch.setattr(settings, "answer_model_deep_medical", "openai/gpt-4o-mini")
     calls = []
 
     def complete(self, messages, json_mode=False):
         calls.append(self.model)
-        if self.model == settings.answer_model_standard_medical:
-            raise LLMUnavailableError("standard down")
+        if self.model == settings.answer_model_fast_reasoning:
+            raise LLMUnavailableError("fast down")
         return (
             '{"answer":"LDL stands for low-density lipoprotein.",'
             '"claims":[],"recommendation_candidates":[],"follow_up_questions":[],'
@@ -289,19 +287,27 @@ def test_standard_model_failure_falls_back_to_deep(monkeypatch):
         headers={"X-Cura-User-Id": "demo-user-001"},
         json={"message": "What does LDL stand for?"},
     ).json()
-    assert settings.answer_model_standard_medical in calls
-    assert settings.answer_model_deep_medical in calls
-    assert settings.answer_model_fast_reasoning not in calls
+    assert calls == [settings.answer_model_fast_reasoning, settings.answer_model_standard_medical]
     assert body["meta"]["model_fallback_used"] is True
-    assert body["meta"]["answer_model"] == settings.answer_model_deep_medical
+    assert body["meta"]["answer_model"] == settings.answer_model_standard_medical
     assert "low-density lipoprotein" in body["answer"].lower()
 
 
-def test_deep_does_not_downgrade():
-    assert fallback_tiers(AnswerModelTier.deep_medical_reasoning) == [AnswerModelTier.deep_medical_reasoning]
-    assert AnswerModelTier.standard_medical not in fallback_tiers(AnswerModelTier.deep_medical_reasoning)
+def test_fallback_policy_never_silently_downgrades_complex_reasoning():
+    fast, standard, deep = (AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical, AnswerModelTier.deep_medical_reasoning)
+    assert fallback_tiers(fast, 1) == [fast, standard]
+    assert fallback_tiers(standard, 3) == [standard, fast]  # straightforward enough for FAST
+    assert fallback_tiers(standard, 5) == [standard, deep]  # not straightforward: go up, not down
+    assert fallback_tiers(deep, 7) == [deep, standard]  # still answerable by STANDARD
+    assert fallback_tiers(deep, 12) == [deep]  # too complex: honest unavailable message instead
     assert fallback_tiers(AnswerModelTier.deterministic) == []
-    assert fallback_tiers(AnswerModelTier.fast_reasoning) == []
+
+
+def test_fallback_never_retries_the_same_model(monkeypatch):
+    monkeypatch.setattr(settings, "answer_model_deep_medical", settings.answer_model_standard_medical)
+    assert fallback_tiers(AnswerModelTier.deep_medical_reasoning, 6) == [AnswerModelTier.deep_medical_reasoning]
+
+    assert not hasattr(settings, "anthropic_api_key")
 
 
 def test_jev_typed_payload_uses_provider_independent_tiers(monkeypatch):
@@ -371,11 +377,11 @@ def test_answer_models_use_openrouter_key_only():
 def test_pricing_is_separate_from_routing(monkeypatch):
     monkeypatch.setattr(settings, "answer_model_deep_medical", "anthropic/claude-sonnet-5")
     prices = model_pricing()
-    assert prices[settings.answer_model_fast_reasoning].input_per_1m == 0.25
-    assert prices[settings.answer_model_standard_medical].output_per_1m == 3.75
-    assert prices[settings.answer_model_deep_medical].input_per_1m == 3.00
+    assert prices[settings.answer_model_fast_reasoning].input_per_1m == settings.model_price_fast_reasoning_input_per_1m
+    assert prices[settings.answer_model_standard_medical].output_per_1m == settings.model_price_standard_medical_output_per_1m
+    assert prices[settings.answer_model_deep_medical].input_per_1m == settings.model_price_deep_medical_input_per_1m
     cost = estimate_cost_usd(settings.answer_model_fast_reasoning, 1_000_000, 1_000_000)
-    assert cost == 2.25
+    assert cost == round(settings.model_price_fast_reasoning_input_per_1m + settings.model_price_fast_reasoning_output_per_1m, 8)
 
 
 def test_chat_contract_keeps_existing_fields():
@@ -445,7 +451,7 @@ def test_production_hides_routing_debug():
     assert Settings(app_env="test").is_development is True
 
 
-def test_quality_gate_escalates_generic_personal_answers():
+def test_quality_gate_does_not_pay_a_second_call_for_wording():
     plan = QueryPlan(
         intent=IntentType.blood_marker_explanation,
         knowledge_scope=KnowledgeScope.personal,
@@ -467,7 +473,10 @@ def test_quality_gate_escalates_generic_personal_answers():
     )
     gate = review_answer(generic, plan, context)
     assert "generic_despite_personal" in gate.flags or "entity_unmentioned" in gate.flags
-    assert should_escalate_to_deep(gate.flags, plan, context, generic)
+    # Wording issues are the validator's job; a second model call is reserved for answers
+    # that could not reconcile the evidence or produced no usable output.
+    assert not should_escalate_to_deep(gate.flags, plan, context, generic)
+    assert should_escalate_to_deep(["contradictions_unaddressed"], plan, context, generic)
     long_ok = "Your creatinine is 1.4 mg/dL, which the report flags above the reference range."
     ok_gate = review_answer(long_ok, plan, context)
     assert not should_escalate_to_deep(ok_gate.flags, plan, context, long_ok)
@@ -519,4 +528,5 @@ def test_question_specific_context_is_compact():
 def test_shared_model_is_priced_at_the_cheaper_tier(monkeypatch):
     monkeypatch.setattr(settings, "answer_model_deep_medical", settings.answer_model_standard_medical)
     price = model_pricing()[settings.answer_model_standard_medical]
-    assert (price.input_per_1m, price.output_per_1m) == (0.75, 3.75)
+    cheaper = (settings.model_price_standard_medical_input_per_1m, settings.model_price_standard_medical_output_per_1m)
+    assert (price.input_per_1m, price.output_per_1m) == cheaper

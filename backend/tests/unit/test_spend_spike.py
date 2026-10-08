@@ -23,7 +23,9 @@ def store(monkeypatch):
 
 def test_deep_stays_deep_below_the_threshold(store):
     store.record_spend(0.40)
-    assert fallback_tiers(AnswerModelTier.deep_medical_reasoning) == [AnswerModelTier.deep_medical_reasoning]
+    # Deep is tried first; a very complex question has no smaller-model fallback.
+    assert fallback_tiers(AnswerModelTier.deep_medical_reasoning, 12) == [AnswerModelTier.deep_medical_reasoning]
+    assert fallback_tiers(AnswerModelTier.deep_medical_reasoning, 6)[0] == AnswerModelTier.deep_medical_reasoning
 
 
 def test_deep_tries_standard_first_during_a_spike(store):

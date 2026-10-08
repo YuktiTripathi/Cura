@@ -49,7 +49,7 @@ from integrations.supershyft.db import DB_NO_RECORDS, DB_PROVIDER_NOT_CALLED
 from app.core.errors import LLMUnavailableError, ProviderUnavailableError
 from app.db.repositories import ConversationRepository
 from app.llm.factory import get_llm_client
-from app.llm.registry import estimate_cost_usd, fallback_tiers, model_id_for_tier, provider_for_model, uses_answer_llm
+from app.llm.registry import answer_timeout_for_tier, estimate_cost_usd, fallback_tiers, model_id_for_tier, provider_for_model, uses_answer_llm
 from app.llm.structured import looks_like_structured_json, public_answer_text
 from app.memory.conversation import FollowUpMemory
 from app.pipeline.conversation_state import ConversationStateResolver, persistable_state
@@ -134,7 +134,7 @@ from app.pipeline.testing_option import TestingOptionService
 from app.pipeline.grounding import GroundingChecker
 from app.pipeline.recommendation_engine import RecommendationEngine
 from app.providers.registry import ProviderRegistry
-from app.routing.model_tier import promote_for_retrieved_complexity
+from app.routing.model_tier import assess_answer_complexity, promote_for_retrieved_complexity, select_answer_tier, tier_name
 
 logger = logging.getLogger("cura.pipeline")
 
@@ -169,13 +169,8 @@ class ChatService:
         policy.assert_privacy_for_health(personal_health=bool(plan.needs_personal_data))
         last_error = None
         remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
-        for index, tier in enumerate(fallback_tiers(plan.answer_model_tier)):
-            tier_cap = {
-                "STANDARD_MEDICAL": 18.0,
-                "DEEP_MEDICAL_REASONING": 28.0,
-                "FAST_REASONING": 12.0,
-            }.get(tier.value, 20.0)
-            timeout = min(float(settings.llm_timeout_seconds), remaining, tier_cap)
+        for index, tier in enumerate(fallback_tiers(plan.answer_model_tier, plan.complexity_score)):
+            timeout = min(float(settings.llm_timeout_seconds), remaining, answer_timeout_for_tier(tier))
             if budget is not None:
                 timeout = budget.timeout_for(timeout)
             if timeout < 0.5:
@@ -232,6 +227,7 @@ class ChatService:
             with perf.stage("persistence"):
                 response = self._record_evaluation(response, eval_turn)
             _attach_perf(response, eval_turn, request_perf)
+            _record_model_routing(response, eval_turn)
             return response
         finally:
             perf.end()
@@ -468,6 +464,17 @@ class ChatService:
         )
         plan = _carry_conversation_markers(plan, conv_state, carrying, _previous_entities(conv))
         plan, related_codes = _add_related_markers(plan, semantic)
+        # One answer-tier decision per turn, from reasoning requirements (FAST / STANDARD /
+        # DEEP), recomputed every turn; deterministic answers stay deterministic.
+        tier_assessment = assess_answer_complexity(
+            routing_message,
+            semantic,
+            plan,
+            conversation_markers=list(plan.conversation_entities or []),
+            continuing=bool(continuing),
+        )
+        plan = select_answer_tier(plan, tier_assessment)
+        eval_turn["tier_assessment"] = tier_assessment
         eval_turn["semantic_plan"] = semantic
         eval_turn["semantic_changes"] = semantic_changes
         self._progress.timing.marks["semantic"] = int((time.perf_counter() - semantic_started) * 1000)
@@ -1081,6 +1088,7 @@ class ChatService:
         # Promote before the first answer-model call so clearly complex turns do not
         # pay for STANDARD_MEDICAL and then a second DEEP generation.
         plan = promote_for_retrieved_complexity(plan, context)
+        eval_turn["routing_plan"] = plan
         self._progress.set_context(plan, follow_up=follow_up)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
@@ -1118,6 +1126,8 @@ class ChatService:
         if getattr(reasoned, "first_token_ms", None) is not None:
             self._progress.timing.marks["first_token"] = reasoned.first_token_ms
         eval_turn["model_escalated"] = reasoned.model_escalated
+        eval_turn["final_tier"] = getattr(reasoned, "answer_tier", None)
+        eval_turn["model_fallback_used"] = bool(reasoned.model_fallback_used)
         eval_turn["escalation_reason"] = reasoned.escalation_reason
         if llm_result and getattr(llm_result, "parse_error", None):
             logger.error(
@@ -2315,6 +2325,58 @@ def _previous_entities(conv) -> list[str]:
     if marker and marker not in found:
         found.append(marker)
     return found
+
+
+def model_routing_record(response, eval_turn) -> dict | None:
+    """Structured routing telemetry for one turn: no message text, values or identifiers."""
+    plan = eval_turn.get("routing_plan")
+    assessment = eval_turn.get("tier_assessment")
+    if plan is None:
+        return None
+    meta = response.meta
+    stages = ((getattr(meta, "timing", None) or {}) if isinstance(getattr(meta, "timing", None), dict) else {}).get("stages") or {}
+    initial = plan.initial_answer_tier or plan.answer_model_tier
+    final = eval_turn.get("final_tier") or (plan.answer_model_tier if meta.llm_called else None)
+    return {
+        "intent": plan.intent.value if plan.intent else None,
+        "complexity_score": plan.complexity_score if plan.complexity_score is not None else (assessment.score if assessment else None),
+        "initial_tier": tier_name(initial) or (initial.value.lower() if initial else None),
+        "answer_tier": tier_name(final) if meta.llm_called else "deterministic",
+        "answer_model": meta.answer_model if meta.llm_called else None,
+        "routing_reason": list(dict.fromkeys([
+            *(assessment.reasons if assessment else []),
+            *(r for r in plan.model_selection_reasons or [] if r.startswith(("retrieved_", "forced:"))),
+        ])),
+        "answer_model_ms": meta.medical_llm_latency_ms,
+        "total_ms": stages.get("total_ms"),
+        "input_tokens": meta.input_tokens,
+        "output_tokens": meta.output_tokens,
+        "estimated_cost_usd": meta.estimated_cost_usd,
+        "escalated": bool(eval_turn.get("model_escalated")) or (initial is not None and final is not None and initial != final),
+        "escalation_reason": eval_turn.get("escalation_reason")
+        or next((r for r in plan.model_selection_reasons or [] if r.startswith("retrieved_")), None),
+        "fallback_used": bool(eval_turn.get("model_fallback_used")),
+    }
+
+
+def _record_model_routing(response, eval_turn) -> None:
+    try:
+        record = model_routing_record(response, eval_turn)
+    except Exception:  # noqa: BLE001 - telemetry never breaks a chat
+        logger.debug("model_routing_record_failed", exc_info=True)
+        return
+    if record is None:
+        return
+    logger.info("cura_model_routing %s", json.dumps(record, sort_keys=True))
+    if settings.cura_model_routing_debug and settings.is_development:
+        logger.info(
+            "MODEL ROUTING tier=%s model=%s score=%s reasons=%s escalated=%s",
+            record["answer_tier"], record["answer_model"], record["complexity_score"],
+            ", ".join(record["routing_reason"]), record["escalated"],
+        )
+        debug = dict(response.meta.debug or {})
+        debug["model_routing"] = record
+        response.meta.debug = debug
 
 
 def _carry_conversation_markers(plan, conv_state, continuing: bool, previous: list[str] | None = None):
