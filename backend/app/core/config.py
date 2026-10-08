@@ -53,6 +53,9 @@ class Settings(BaseSettings):
     # CURA_RESPONSE_MODE: "rich" (cards, tables, chips) or "plain" (the conversational answer
     # only). Plain mode debugs answer quality separately from presentation.
     cura_response_mode: str = "rich"
+    # Plain mode: value lookups ("what is my LDL?") are answered by the model at minimal
+    # density so the reply can say how much the value matters. False keeps the template.
+    plain_lookups_use_model: bool = True
     # Skip the Jev router call for unambiguous single-value lookups and short definitions.
     jev_fast_path: bool = True
     # Answer plain definition questions from a reviewed passage without a model (cost lever 4).

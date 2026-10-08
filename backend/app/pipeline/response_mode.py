@@ -100,7 +100,7 @@ def plain_answer(answer: str, path: str | None, context) -> str:
     return text
 
 
-def apply_response_mode(response):
+def apply_response_mode(response, model_follow_ups: list[str] | None = None):
     """Strip presentation widgets in plain mode. Rich mode returns the response unchanged."""
     if response is None or getattr(response, "meta", None) is None:
         return response
@@ -112,5 +112,11 @@ def apply_response_mode(response):
     response.experience = None
     response.testing_option = None
     response.recommendations = []
-    response.follow_ups = []
+    # Suggestions are the model's own, specific to this conversation (0-3); nothing generic.
+    from app.contracts.followup import FollowUpSuggestion
+
+    response.follow_ups = [
+        FollowUpSuggestion(text=text, category="suggested", handling_path="CONTINUE_INTERPRETATION")
+        for text in (model_follow_ups or [])[:3]
+    ]
     return response

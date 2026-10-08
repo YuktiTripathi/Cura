@@ -44,6 +44,22 @@ QUESTIONS: list[list[str]] = [
     ["What is my HbA1c?"],
 ]
 
+# One conversation, in order: does the shape of each answer follow the wording of the question?
+VALIDATION: list[list[str]] = [[
+    "What is my HbA1c?",
+    "What does my HbA1c mean?",
+    "Is it serious?",
+    "Why are my triglycerides high?",
+    "Is that related to my sugar?",
+    "What are the top 3 things I should work on?",
+    "What looks reassuring?",
+    "What changed from my previous report?",
+    "Could my lifestyle be contributing?",
+    "Give me the short version.",
+    "Explain my overall health picture.",
+    "Why is my Bio-AI risk high even though some markers are normal?",
+]]
+
 STAND_IN = (
     "STAND-IN MODEL ANSWER. This paragraph is what the answer model wrote; anything else in the final "
     "answer was added by the pipeline after the model."
@@ -95,6 +111,30 @@ def _configure(args) -> None:
         OpenAICompatibleLLMClient.complete_structured = _spy
 
 
+def _evidence_summary(prompt) -> str:
+    """What the model was given, in one line: primary/supporting facts, patterns, reassuring areas."""
+    content = prompt[1]["content"] if len(prompt) > 1 else ""
+    start = content.find("ANSWER EVIDENCE JSON:")
+    if start < 0:
+        return "(model given no personal evidence)"
+    try:
+        payload = json.loads(content[start + 22: content.find("\n", start + 23)])
+    except ValueError:
+        return "(unparsed)"
+    names = lambda key: [f.get("code") for f in payload.get(key) or []]
+    parts = [f"primary={names('primary_facts')}", f"supporting={names('supporting_facts')}"]
+    if payload.get("patterns"):
+        parts.append(f"patterns={[p.get('pattern') for p in payload['patterns']]}")
+    if payload.get("other_notable_findings"):
+        parts.append(f"other_notable={payload['other_notable_findings']}")
+    reassuring = payload.get("reassuring_systems") or payload.get("reassuring_groups") or []
+    if reassuring:
+        parts.append(f"reassuring={[r.get('system') or r.get('area') for r in reassuring]}")
+    if payload.get("trend"):
+        parts.append(f"changes={[(t['code'], t['previous'], t['latest']) for t in payload['trend']]}")
+    return "; ".join(parts)
+
+
 def _redact(text: str, user: str) -> str:
     return (text or "").replace(user, "<subject>")
 
@@ -105,6 +145,7 @@ def main() -> int:
     parser.add_argument("--offline", action="store_true")
     parser.add_argument("--mode", choices=["plain", "rich"], default="plain")
     parser.add_argument("--out", default=None)
+    parser.add_argument("--set", choices=["quality", "validation"], default="quality")
     args = parser.parse_args()
     _configure(args)
     from fastapi.testclient import TestClient
@@ -113,7 +154,7 @@ def main() -> int:
 
     client = TestClient(app)
     rows = []
-    for turns in QUESTIONS:
+    for turns in (VALIDATION if args.set == "validation" else QUESTIONS):
         conversation_id = None
         for question in turns:
             _CAPTURE.clear()
@@ -134,6 +175,7 @@ def main() -> int:
                     "primary_goal", "secondary_goals", "health_topics", "required_sources", "plan_corrections")},
                 "path": stages.get("path"),
                 "model_tier": stages.get("model_tier"),
+                "evidence": _evidence_summary(prompt),
                 "selected_context": _redact(prompt[1]["content"], args.user) if len(prompt) > 1 else None,
                 "raw_prompt_chars": sum(len(m.get("content") or "") for m in prompt),
                 "raw_llm_answer": stages.get("raw_llm_answer"),
@@ -159,6 +201,7 @@ def main() -> int:
             added = " — FINAL DIFFERS FROM MODEL ANSWER"
         md += [f"## {r['question']}", "",
                f"intent `{r['intent']}` · goal `{r['semantic'].get('primary_goal')}` · path `{r['path']}` · tier `{r['model_tier']}`{added}",
+               "", f"Selected context: {r['evidence']}", f"Response time: {r['latency_ms'].get('total_ms')} ms",
                "", "**Final visible answer**", "", "```", (r["final_answer"] or "").strip(), "```", "",
                f"Extras sent to the frontend: {r['frontend_extras']}", ""]
     Path(out.with_suffix(".md")).write_text("\n".join(md))

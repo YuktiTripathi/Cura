@@ -71,18 +71,19 @@ def test_personalized_single_marker_answer_uses_report_range_and_explains():
     # Patient-specific report range, exactly as stored.
     assert fact["reference_low"] == 4.4 and fact["reference_high"] == 5.7
     payload = evidence.payload()
-    assert "FACT" in payload["how_to_answer"] and "CONNECTION" in payload["how_to_answer"]
+    _assert_purpose_not_template(payload["how_to_answer"])
     system = prompt[0]["content"]
     assert "reference range printed on the member's own report" in system
     assert "Explain, do not just retrieve" in system
+    assert "RESPONSE PLANNING" in system and "not a fixed template" in system
 
 
 def test_multi_marker_reasoning_does_not_concatenate_templates():
     _, evidence, _ = _evidence("What do my HbA1c and triglycerides mean?")
     assert {"hba1c", "triglycerides"} <= _codes(evidence.primary_facts)
     how = evidence.payload()["how_to_answer"]
-    assert "Do not write one paragraph per marker" in how
-    assert "common theme" in how and "should NOT be assumed" in how
+    _assert_purpose_not_template(how)
+    assert "synthesise how they relate" in how and "should not be assumed" in how
 
 
 def test_blood_and_bio_ai_reasoning_connects_sources():
@@ -91,7 +92,9 @@ def test_blood_and_bio_ai_reasoning_connects_sources():
     sources = {f.get("source", "") for f in facts}
     assert any(s.startswith("Bio-AI") for s in sources)
     assert "measured blood result" in sources
-    assert "several inputs" in evidence.payload()["how_to_answer"]
+    how = evidence.payload()["how_to_answer"]
+    assert "one normal marker does not make the overall risk low" in how
+    _assert_purpose_not_template(how)
 
 
 def test_cross_report_normal_cholesterol_but_high_cardiac_risk():
@@ -113,7 +116,8 @@ def test_priority_response_prioritizes_with_multiple_sources():
     assert areas & {"physical activity", "sitting time", "food choices"}
     assert any(f.get("source", "").startswith("Bio-AI") for f in evidence.supporting_facts)
     how = evidence.payload()["how_to_answer"]
-    assert "Prioritize by PATTERN" in how and "not a formal risk ranking" in how
+    _assert_purpose_not_template(how)
+    assert "not a formal clinical ranking" in how and "outranks a minor finding" in how
 
 
 def test_questionnaire_personalization_uses_reported_habits_without_inventing():
@@ -153,7 +157,7 @@ def test_multi_turn_follow_up_keeps_previous_marker_in_context():
     )
     assert "fasting_blood_glucose" in _codes(evidence.primary_facts)
     assert "hba1c" in _codes(evidence.supporting_facts)
-    assert "Do not restart" in evidence.payload()["how_to_answer"]
+    assert "rather than starting over" in evidence.payload()["how_to_answer"]
 
 
 def test_follow_up_through_chat_carries_previous_marker():
@@ -359,3 +363,13 @@ def test_ambiguous_question_still_uses_the_router(monkeypatch):
     monkeypatch.setattr(JevDecisionsClient, "decide", decide)
     _chat("My cholesterol looks okay, so why is my cardiac risk high?")
     assert called
+
+
+_FORMAT_DIRECTIVES = ("FACT:", "INTERPRETATION:", "CONNECTION:", "ACTION:", "numbered", "bullet", "heading",
+                      "paragraph per", "open with", "one-sentence", "then at most")
+
+
+def _assert_purpose_not_template(how: str) -> None:
+    """Guidance states what the answer must achieve; the model chooses the format."""
+    for directive in _FORMAT_DIRECTIVES:
+        assert directive.lower() not in how.lower(), directive

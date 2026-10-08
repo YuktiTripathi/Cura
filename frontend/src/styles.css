@@ -1023,3 +1023,12 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
   .follow-up-chips button { animation: none !important; transition: none !important; }
   .experience-working > span:first-child::after { width: 100%; opacity: 0.55; transform: none; }
 }
+/* Plain response mode: the model's Markdown answer, rendered as written. */
+.markdown-answer p { margin: 0 0 0.6em; }
+.markdown-answer p:last-child { margin-bottom: 0; }
+.markdown-answer h3, .markdown-answer h4 { margin: 0.8em 0 0.3em; font-size: 1em; font-weight: 600; }
+.markdown-answer ul, .markdown-answer ol { margin: 0.2em 0 0.6em; padding-left: 1.4em; }
+.markdown-answer li { margin: 0.2em 0; }
+.markdown-answer table { border-collapse: collapse; margin: 0.4em 0 0.8em; font-size: 0.95em; }
+.markdown-answer th, .markdown-answer td { border: 1px solid var(--border, #d9dde3); padding: 0.3em 0.6em; text-align: left; }
+.markdown-answer th { font-weight: 600; }

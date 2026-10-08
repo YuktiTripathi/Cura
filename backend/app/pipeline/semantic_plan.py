@@ -159,7 +159,7 @@ def _rx(pattern: str) -> re.Pattern[str]:
 # small, generic and multilingual (English, Indian English, romanized Hindi).
 _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
     ReasoningGoal.compare: (
-        _rx(r"\b(?:(?:has|have|what'?s|what has|anything)\s+(?:[\w-]+\s+){0,3}changed|changed since|improved|improving|worse|worsened|worsening|since|compared?|comparison|versus|vs\.?|better than|worse than|become (?:better|worse))\b"),
+        _rx(r"\b(?:(?:has|have|what'?s|what has|what|anything)\s+(?:[\w-]+\s+){0,3}changed|changed (?:since|from)|improved|improving|worse|worsened|worsening|since|compared?|comparison|versus|vs\.?|better than|worse than|become (?:better|worse))\b"),
         _rx(r"\b(?:went|gone|going|got|has|have)\s+(?:up|down|higher|lower|better|worse)\b"),
         _rx(r"\b(?:increased|decreased|dropped|rose|risen|fallen|trend|over time|than before|than last time|from last time)\b"),
     ),
@@ -185,7 +185,7 @@ _CUES: dict[ReasoningGoal, tuple[re.Pattern[str], ...]] = {
         _rx(r"\b(?:what (?:should|can|do) i do|what to do|how (?:can|do|should|to) (?:i )?(?:improve|lower|reduce|raise|increase|fix|manage|control|bring|get|boost|change)|improve|lower|reduce|raise|boost|fix|tips?|steps?|plan|recommend\w*|suggest\w*|advice|advise|work on|change|changes|what else|kaise|kya karu|kya karna)\b"),
     ),
     ReasoningGoal.synthesize: (
-        _rx(r"\b(?:pay attention to|stand(?:s)? out|anything (?:in|on|from) my|anything i should|what do my (?:reports|results) (?:say|show)|overall|overview|big picture|in general how|how am i doing|fit together|together|all my|everything|whole|complete|summar\w*|both|combined?)\b"),
+        _rx(r"\b(?:pay attention to|stand(?:s)? out|reassuring|good news|(?:looks?|is|are) (?:fine|okay|ok|good) in my|anything (?:in|on|from) my|anything i should|what do my (?:reports|results) (?:say|show)|overall|overview|big picture|in general how|how am i doing|fit together|together|all my|everything|whole|complete|summar\w*|both|combined?)\b"),
     ),
     ReasoningGoal.explain: (
         _rx(r"\b(?:because of|due to|caused by|related to|linked to|connected (?:to|with)|is that why|is it from|has to do with)\b"),

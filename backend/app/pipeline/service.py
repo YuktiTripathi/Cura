@@ -81,6 +81,20 @@ from app.pipeline.stages import RouteStage, SafetyStage
 # cannot supply it (see semantic_plan). Never a generic "general, latest or comparison?".
 _EXPLICIT_UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|document|attachment|attached|file)\b", re.I)
 
+_STYLE_REQUEST = re.compile(
+    r"^\s*(?:(?:can|could) you |please |just )?(?:give me |tell me |make it |keep it |say it |explain (?:it|that|this) )?"
+    r"(?:the |a )?(?:short(?:er)?|brief|quick|tl;?dr|simple|simpler|plain|summary|in short|in brief|"
+    r"in (?:more )?detail|more detail(?:ed)?|detailed|deeper|longer|step by step|like i'?m \d+|"
+    r"in simple (?:words|terms|language)|simply|again|differently)"
+    r"(?:\s+(?:version|answer|summary|explanation|form))?(?:,?\s+please)?\s*[.!?]*\s*$",
+    re.I,
+)
+
+# Follow-ups that fit any answer ("any new symptoms?") are noise; only conversation-specific ones are kept.
+_GENERIC_FOLLOW_UP = re.compile(
+    r"\b(?:any (?:new )?(?:symptoms|medications?)|anything else|other questions?|how (?:are|do) you feel)\b", re.I
+)
+
 _SEMANTIC_CLARIFICATIONS = {
     "number_without_measure": (
         "Which test is that number from (for example fasting glucose, LDL or blood pressure)? "
@@ -214,7 +228,7 @@ class ChatService:
         request_perf = perf.begin(request_id)
         try:
             response = self._execute_chat(principal, payload, request_id, eval_turn)
-            response = apply_response_mode(response)
+            response = apply_response_mode(response, eval_turn.get("model_follow_ups"))
             with perf.stage("persistence"):
                 response = self._record_evaluation(response, eval_turn)
             _attach_perf(response, eval_turn, request_perf)
@@ -331,6 +345,14 @@ class ChatService:
         # Biomarker names written in an Indic script ("एलडीएल", "विटामिन डी") → the names routing matches.
         # Only planning sees this; storage, language detection and safety keep the user's own text.
         routing_message = canonicalize_biomarker_terms(payload.message)
+        style_request = bool(_STYLE_REQUEST.match(payload.message or ""))
+        if style_request:
+            # "Give me the short version" / "explain it in detail": the same question in a
+            # different style. Plan the previous question; the model sees the actual request.
+            previous_question = self.memory.last_user_message(conv) if conv is not None else None
+            if previous_question:
+                routing_message = canonicalize_biomarker_terms(previous_question)
+                eval_turn["style_request"] = True
         prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
         conv_state = ConversationStateResolver().resolve(routing_message, conv)
         eval_turn["conversation_state"] = conv_state
@@ -401,9 +423,20 @@ class ChatService:
             jev_temporal=getattr(decision, "temporal_requirement", None),
         )
         plan, semantic_changes = reconcile_query_plan(plan, semantic)
+        conversational_lookup = (
+            plain_mode()
+            and settings.enable_llm
+            and settings.plain_lookups_use_model
+            and semantic.primary_goal.value == "LOOKUP"
+            and bool(semantic.markers or semantic.bio_ai)
+            and plan.intent.value in {"latest_result", "bio_ai_score"}
+        )
         if (
-            semantic.primary_goal.value not in {"LOOKUP", "GENERAL_EDUCATION"}
-            and semantic.goal_from_cue
+            (
+                (semantic.primary_goal.value not in {"LOOKUP", "GENERAL_EDUCATION"} and semantic.goal_from_cue)
+                or conversational_lookup
+                or eval_turn.get("style_request")
+            )
             and plan.needs_personal_data
             and plan.answer_model_tier in {None, AnswerModelTier.deterministic}
         ):
@@ -415,6 +448,15 @@ class ChatService:
                 "operations": list(dict.fromkeys([*(plan.operations or []), "INTERPRET"])),
                 "reasoning_required": True,
             })
+            if conversational_lookup and semantic.markers:
+                # Read the whole latest report so the answer can say whether this value is a
+                # major or a minor part of the picture; the asked value stays the only card.
+                plan = plan.model_copy(update={
+                    "display_entities": list(plan.display_entities or semantic.markers),
+                    "requested_metrics": [],
+                    "topic": None,
+                    "selectors": list(dict.fromkeys([*(plan.selectors or []), "ALL"])),
+                })
             semantic_changes.append("tier_to_model")
         if semantic.clarification_needed and plan.intent.value == "general_health_question" and not continuing:
             plan = plan.model_copy(update={"intent": IntentType.ambiguous_clarification})
@@ -1176,6 +1218,7 @@ class ChatService:
                 ):
                     continue
                 llm_follow.append(text)
+        eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)][:3]
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")

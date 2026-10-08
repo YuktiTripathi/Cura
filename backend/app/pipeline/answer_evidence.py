@@ -11,6 +11,8 @@ they are: never rounded, converted or merged.
 
 from __future__ import annotations
 
+import dataclasses
+
 import re
 from dataclasses import dataclass, field
 
@@ -85,77 +87,51 @@ _SHAPE_MODE = {
 }
 
 # How the reply should be shaped for each reasoning goal (the answer model writes it).
-# Response strategies. Each is a reasoning order (fact -> interpretation -> connection ->
-# action), not wording; the model writes the prose. Labels are never shown to the member.
+# What a good answer to each kind of question must achieve. These are PURPOSES, not
+# formats: the answer model decides the shape (one line, prose, bullets, a numbered list,
+# a comparison, rarely a small table) from the wording of the question and the evidence.
 GOAL_GUIDANCE = {
     LOOKUP: (
-        "Give the value, its unit and how it sits against THIS report's range in the first sentence, then one or "
-        "two sentences on what the marker reflects. Mention a related listed fact only if it changes the meaning."
+        "The member wants a value. Give it with its unit and where it sits against their report's range, and, "
+        "if it helps, how much it matters relative to the rest of their results (other_notable_findings)."
     ),
-    EXPLANATION: (
-        "FACT: the value against the report's own range. INTERPRETATION: what this marker reflects and what the "
-        "direction broadly means. CONNECTION: how the listed related findings or habits fit (only those listed). "
-        "ACTION: one reasonable next step."
-    ),
+    EXPLANATION: "The member wants to understand what this result means for them, in the light of their related findings.",
     CAUSES: (
-        "Acknowledge in one sentence that this has several possible contributors. Then connect the listed evidence: "
-        "which listed findings or habits are consistent with it and which listed results argue against an "
-        "explanation. If nothing listed explains it, say so plainly. Never present a possibility as the cause and "
-        "never diagnose. End with the most useful next step."
+        "The member wants possible reasons. Connect the listed evidence that fits or argues against each "
+        "possibility; say plainly if nothing listed explains it. Never present a possibility as the cause."
     ),
-    ASSESSMENT: (
-        "Give a clear judgment in the first sentence (for example 'below what is usually recommended'), then the "
-        "personal evidence behind it, then why it matters given the listed findings."
-    ),
+    ASSESSMENT: "The member wants a judgment (is it enough, okay, serious). Give the judgment plainly, with the evidence behind it.",
     TREND: (
-        "State previous value and date, latest value and date, and the numeric change from the trend facts. Then a "
-        "cautious interpretation: direction, whether it is still outside the report's range, and what would help "
-        "confirm it. Never just say 'improved' without the numbers."
+        "The member wants to know how things changed. Use the exact previous and latest values, dates and change "
+        "from the trend facts; never say 'improved' without the numbers."
     ),
     PRIORITIZATION: (
-        "Prioritize by PATTERN, not by marker: use the ranked 'patterns' (e.g. glucose regulation, blood fats, iron "
-        "and red cells). Give at most three numbered priorities. For each: the pattern in plain words, the one or two "
-        "values that show it, why it ranks there (how far outside range, several markers agreeing, Bio-AI risk, "
-        "change since the last report, habits). Do not rank a minor finding above a clearly significant pattern. "
-        "Mention one reassuring system if listed. Say it is a sensible order to work on, not a formal risk ranking. "
-        "Never list every abnormal value."
+        "The member wants to know what matters most. Decide the order from the evidence: how far outside range, "
+        "several markers agreeing (patterns), Bio-AI support, change over time, habits and history. A clearly "
+        "significant pattern outranks a minor finding. This is a sensible order, not a formal clinical ranking."
     ),
-    ACTION_PLAN: (
-        "One-sentence assessment, then at most three actions tied to the listed findings and habits. Skip what the "
-        "member already does; no medicines or doses."
-    ),
-    OVERVIEW: (
-        "Open with the overall picture in one or two sentences. Then the two or three patterns that matter most "
-        "(connect the markers within each pattern and any Bio-AI risk or habit pointing the same way), then what is "
-        "reassuring from 'reassuring_systems', then the one thing to focus on first. Do not walk through every "
-        "result; minor findings can be summarised in one clause."
-    ),
-    RISK: (
-        "Calibrated explanation of what this could mean, the personal evidence for and against concern, and when "
-        "seeing a clinician makes sense. No alarm unless a listed fact warrants it."
-    ),
+    ACTION_PLAN: "The member wants to know what to do. Tie actions to their findings and habits, skip what they already do, no medicines or doses.",
+    OVERVIEW: "The member wants the overall picture: what matters most, what is reassuring, and what to focus on.",
+    RISK: "The member wants to know whether to worry. Be calibrated: evidence for and against concern, and when a clinician visit makes sense.",
     BIO_AI: (
-        "Explain why the Bio-AI risk is elevated as a synthesis: it is a risk estimate built from several inputs, "
-        "not a diagnosis and not one biomarker. Name the strongest measured signals from the 'patterns' that point in "
-        "the same direction (with their values), the habits that fit, and what is reassuring. End with which pattern "
-        "to focus on first. Do not list every Bio-AI score and do not describe the model's internals."
+        "The member wants to understand their Bio-AI risk. It is an estimate from several inputs, not a diagnosis "
+        "and not one marker; connect it to the measured patterns and habits that point the same way and to what is "
+        "reassuring. Do not describe the model's internals."
     ),
 }
 
-# Variants chosen from the shape of the selected evidence.
+# Context notes chosen from the shape of the selected evidence (still purposes, not formats).
 MULTI_MARKER_GUIDANCE = (
-    "Several markers are asked about. Do not write one paragraph per marker. Give each a short read against its own "
-    "range, then say whether they appear related and what common theme (if any) they share, what should NOT be "
-    "assumed from them together, and the single most useful next step."
+    "Several markers are involved: synthesise how they relate (a shared theme, or not) and what should not be "
+    "assumed from them together, rather than describing each one separately."
 )
 CROSS_SOURCE_GUIDANCE = (
-    "Blood results and a Bio-AI risk are both listed. Explain that the Bio-AI risk reflects several inputs, so one "
-    "normal marker does not make the overall risk low and one abnormal marker does not make it high. Then reference "
-    "the member's actual listed values that point toward or away from the risk."
+    "Blood results and a Bio-AI risk are both listed: one normal marker does not make the overall risk low and one "
+    "abnormal marker does not make it high; reference the member's actual values that point toward or away from it."
 )
 FOLLOW_UP_GUIDANCE = (
-    "This continues the previous turn. Do not restart: build on what was already said, refer back to it briefly, "
-    "do not repeat values already given, and keep it shorter than a first answer."
+    "This continues the previous turn: build on what was already said rather than starting over, and do not "
+    "repeat values already given."
 )
 
 _ABNORMAL = {"low", "high", "critical"}
@@ -177,6 +153,8 @@ def response_mode_for(context: HealthContext, message: str) -> str:
         mode = _SHAPE_MODE.get(semantic.get("response_shape") or "")
         if mode == EXPLANATION and (semantic.get("bio_ai") and not semantic.get("markers")):
             return BIO_AI
+        if set(semantic.get("markers") or []) == {"bio_ai"} and mode not in {TREND, ACTION_PLAN, PRIORITIZATION, OVERVIEW}:
+            return BIO_AI  # "my Bio-AI risk": the assessment as a whole
         if mode == PRIORITIZATION and "overall_health" in (semantic.get("health_topics") or []) and semantic.get("primary_goal") == "SYNTHESIZE":
             return OVERVIEW
         if mode:
@@ -262,6 +240,7 @@ class AnswerEvidence:
     extra_guidance: list[str] = field(default_factory=list)
     patterns: list[dict] = field(default_factory=list)
     reassuring: list[dict] = field(default_factory=list)
+    other_notable: list[str] = field(default_factory=list)
 
     def payload(self) -> dict:
         """What the answering model receives instead of the full health record."""
@@ -287,11 +266,8 @@ class AnswerEvidence:
             "patterns": self.patterns,
             "reassuring_systems": self.reassuring,
             "already_explained_in_this_conversation": self.already_explained,
-            "answer_budget": {
-                "target_words": f"{self.budget.words[0]}-{self.budget.words[1]}",
-                "max_next_steps": self.budget.next_actions,
-                "max_follow_up_questions": 1,
-            },
+            "answer_budget": {"max_next_steps": self.budget.next_actions},
+            "other_notable_findings": self.other_notable,
         }
         return {k: v for k, v in out.items() if v not in (None, [], {})}
 
@@ -364,6 +340,15 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
 
     semantic = getattr(context, "semantic_plan", None) or {}
     topics = _semantic_topics(semantic)
+    if "bio_ai" in topics.markers and context.bio_ai_risks:
+        # "my Bio-AI risk" names the whole assessment, not one score: use its elevated risks.
+        elevated = [r.code for r in context.bio_ai_risks if str(r.status or "").lower() in {"high", "very high", "elevated", "moderate"}]
+        topics = dataclasses.replace(
+            topics,
+            markers=[m for m in topics.markers if m != "bio_ai"],
+            bio_ai=list(dict.fromkeys([*topics.bio_ai, *(elevated or [r.code for r in context.bio_ai_risks])])),
+        )
+        requested = [c for c in requested if c != "bio_ai"]
     if semantic:
         evidence.reasoning_goal = semantic.get("primary_goal")
         evidence.secondary_goals = list(semantic.get("secondary_goals") or [])
@@ -457,6 +442,14 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             room = budget.supporting - len(evidence.supporting_facts)
             evidence.supporting_facts += [_risk_fact(r) for r in aligned[:room]]
 
+    if mode == LOOKUP and (context.report_patterns or patterns):
+        patterns_all = context.report_patterns or patterns
+        # Enough to say whether this value is a major or a minor part of the picture.
+        asked = {f.get("code") for f in evidence.primary_facts}
+        evidence.other_notable = [
+            p["pattern"] for p in patterns_all
+            if not asked & {f["code"] for f in p["out_of_range"]}
+        ][:3]
     whole_picture = mode in {OVERVIEW, PRIORITIZATION, BIO_AI} or "overall_health" in (semantic.get("health_topics") or [])
     if whole_picture:
         evidence.patterns = patterns[:5]
@@ -493,7 +486,7 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         for item in context.missing or []:
             # Only a gap in what was actually asked, and not when a sibling measurement answers
             # it (fasting glucose missing but glucose present).
-            if item.key not in asked or (_family(item.key) & present):
+            if item.key not in asked or (_family(item.key) & present) or (item.key == "bio_ai" and context.bio_ai_risks):
                 continue
             evidence.uncertainty_facts.append({"code": item.key, "name": item.name, "reason": item.reason})
             break
@@ -651,6 +644,8 @@ def _premise_check(premise: dict | None, markers, risks) -> dict | None:
                 "causes of a result the member does not have."
             ),
         }
+    if code == "bio_ai" and risks:
+        return None  # the assessment exists; its elevated risks are in the evidence
     if code and not any(r.code == code for r in risks):
         return {
             "user_assumed": f"{code.replace('_', ' ')} is {claimed}",

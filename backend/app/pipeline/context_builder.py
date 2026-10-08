@@ -341,7 +341,8 @@ class ContextBuilder:
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}
         selectors = {str(item).upper() for item in (plan.selectors or [])}
-        if not keys and ops & {"SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"}:
+        if not keys and (ops & {"SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"} or plan.topic == "bio_ai"):
+            # "my Bio-AI risk" as a whole: the blood picture behind it is the whole latest report.
             operation = "latest_report"
         if selectors & {"HIGH", "LOW", "ABNORMAL", "ALL", "NORMAL"} and (
             not keys or operation == "latest_report" or "overall_health" in (plan.domains or [])
@@ -577,7 +578,8 @@ class ContextBuilder:
         if not reports:
             ctx.missing.append(MissingItem(key=plan.topic or "bio_ai", name=plan.topic_name or "Bio-AI", reason="no_reports"))
             return
-        codes = [key for key in (plan.requested_metrics or ([plan.topic] if plan.topic else [])) if key]
+        # "my Bio-AI risk" names the report, not one score: read all of its risks.
+        codes = [key for key in (plan.requested_metrics or ([plan.topic] if plan.topic else [])) if key and key != "bio_ai"]
         codes = [
             code
             for code in codes
@@ -882,6 +884,12 @@ class ContextBuilder:
 
         goal = infer_conversation_goal(message or plan.raw_message or "", plan, conversation_state)
         depth = infer_response_depth(message or plan.raw_message or "", plan, goal, conversation_state)
+        if plan.intent == IntentType.latest_result and "ALL" in {str(s).upper() for s in plan.selectors or []}:
+            from app.pipeline.health_patterns import find_patterns
+
+            full = latest_report(blood_reports or [])
+            if full:
+                ctx.report_patterns = find_patterns([m for m in full.markers if m.value is not None], ctx.bio_ai_risks or [])[0]
         selector = RelevantContextSelector()
         relevant = selector.select(
             ctx, plan, reports=blood_reports or [], goal=goal, depth=depth

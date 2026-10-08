@@ -9,6 +9,7 @@ import { groupEvidence } from "../lib/sources";
 import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
 import { DoctorSummary } from "./DoctorSummary";
 import { InsightNote } from "./messages/InsightNote";
+import { MarkdownAnswer } from "./messages/MarkdownAnswer";
 import { displayAssistantText } from "../types/chat";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
 import { PreviewAnswer } from "./messages/PreviewAnswer";
@@ -92,7 +93,7 @@ export function MessageList({
           <article key={i} className={m.role}>
             {m.role === "assistant" ? (
               <AssistantIdentity
-                label={assistantContextLabel(m.provenance?.type, Boolean(m.experienceBlocks?.length && !m.presentation))}
+                label={isPlain(m) ? "CURA" : assistantContextLabel(m.provenance?.type, Boolean(m.experienceBlocks?.length && !m.presentation))}
                 busy={Boolean(m.experienceBlocks?.length && !m.presentation)}
               />
             ) : null}
@@ -105,9 +106,7 @@ export function MessageList({
               />
             ) : m.role === "assistant" && isPlain(m) ? (
               // Plain response mode: the conversational answer only (no cards, tables or widgets).
-              <p>
-                <AssistantBody content={m.content} />
-              </p>
+              <MarkdownAnswer content={m.content} />
             ) : m.role === "assistant" && m.presentation ? (
               <PresentedAnswer
                 presentation={m.presentation}
@@ -150,8 +149,12 @@ export function MessageList({
                 onDoctorSummary={!isPlain(m) && readHandoff(m.presentation?.clinician_handoff) ? () => setHandoffIndex(i) : undefined}
               />
             )}
-            {m.role === "assistant" && !isPlain(m) ? (
-              <FollowUpChips items={mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])} onPick={onFollowUp} />
+            {m.role === "assistant" ? (
+              // Plain mode: only the model's own conversation-specific suggestions (0-3).
+              <FollowUpChips
+                items={isPlain(m) ? mergeSuggestions(m.followUps || [], []) : mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])}
+                onPick={onFollowUp}
+              />
             ) : null}
           </article>
         );

@@ -180,5 +180,8 @@ class HealthContext(BaseModel):
     answer_evidence_trace: dict | None = None
     # Semantic plan for this turn (goal x topics x personalization). Internal only.
     semantic_plan: dict | None = None
+    # Patterns across the whole latest report (names only), so a single-value answer can say
+    # whether the value is a major or a minor part of the picture.
+    report_patterns: list[dict] = Field(default_factory=list)
     # Conversation turn type (NEW_QUESTION, FOLLOW_UP_QUESTION ...). Internal only.
     conversation_turn: str | None = None

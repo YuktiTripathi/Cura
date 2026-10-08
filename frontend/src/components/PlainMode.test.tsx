@@ -3,7 +3,7 @@ import { describe, expect, it, vi } from "vitest";
 import { MessageList } from "./MessageList";
 
 describe("plain response mode", () => {
-  it("renders only the conversational answer: no cards, chips or recommendations", () => {
+  it("renders only the conversational answer and the model's own follow-ups", () => {
     const answer = "Your glucose control is the main thing to focus on first.";
     const { container } = render(
       <MessageList
@@ -20,8 +20,9 @@ describe("plain response mode", () => {
               interpretation: null,
               uncertainties: ["What's still unclear"],
               next_steps: [],
+              suggestion_chips: ["Generic card chip"],
             },
-            followUps: ["What can I do about it?"],
+            followUps: ["How does this relate to my triglycerides?"],
             recommendations: [{ text: "Walk daily", category: "activity" }] as never,
           },
         ]}
@@ -33,7 +34,9 @@ describe("plain response mode", () => {
     expect(screen.getByText(answer)).toBeTruthy();
     expect(container.textContent).not.toContain("Card summary that must not render");
     expect(container.textContent).not.toContain("What's still unclear");
-    expect(container.textContent).not.toContain("What can I do about it?");
+    expect(container.textContent).toContain("How does this relate to my triglycerides?");
+    expect(container.textContent).not.toContain("Generic card chip");
+    expect(container.textContent).not.toContain("Using your health context");
     expect(container.textContent).not.toContain("Walk daily");
   });
 
