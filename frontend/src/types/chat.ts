@@ -1,3 +1,4 @@
+import type { SemanticResponse } from "./semantic";
 export type EvidenceItem = {
   evidence_id: string;
   report_id: string;
@@ -218,6 +219,8 @@ export type ChatResponse = {
   presentation?: StructuredResponse | null;
   experience?: TurnExperience | null;
   testing_option?: TestingOption | null;
+  /** CURA_RESPONSE_MODE=semantic: summary + optional blocks; `answer` stays the full Markdown. */
+  semantic?: SemanticResponse | null;
 };
 
 export type EmergencyContact = { kind: string; label: string; number: string };

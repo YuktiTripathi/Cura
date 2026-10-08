@@ -10,6 +10,9 @@ import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
 import { DoctorSummary } from "./DoctorSummary";
 import { InsightNote } from "./messages/InsightNote";
 import { MarkdownAnswer } from "./messages/MarkdownAnswer";
+import { SemanticAnswer } from "./messages/SemanticAnswer";
+import { debugMode } from "./messages/debug";
+import type { SemanticResponse } from "../types/semantic";
 import { displayAssistantText } from "../types/chat";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
 import { PreviewAnswer } from "./messages/PreviewAnswer";
@@ -104,6 +107,10 @@ export function MessageList({
                 onSave={saveEdit}
                 onCancel={() => setEditingIndex(null)}
               />
+            ) : m.role === "assistant" && isSemantic(m) && m.semantic ? (
+              // Semantic mode: CURA's summary plus the optional blocks it chose; values come
+              // from the backend. Dev builds can flip to the raw answer for comparison.
+              <SemanticOrRaw semantic={m.semantic} raw={m.content} />
             ) : m.role === "assistant" && isPlain(m) ? (
               // Plain response mode: the conversational answer only (no cards, tables or widgets).
               <MarkdownAnswer content={m.content} />
@@ -179,5 +186,24 @@ export function MessageList({
 
 /** Plain response mode (CURA_RESPONSE_MODE=plain): render the answer as ordinary chat text. */
 export function isPlain(m: { role: string; meta?: { response_mode?: string | null } | null }): boolean {
-  return m.role === "assistant" && m.meta?.response_mode === "plain";
+  return m.role === "assistant" && (m.meta?.response_mode === "plain" || m.meta?.response_mode === "semantic");
+}
+
+export function isSemantic(m: { role: string; meta?: { response_mode?: string | null } | null }): boolean {
+  return m.role === "assistant" && m.meta?.response_mode === "semantic";
+}
+
+/** Structured rendering, with a development-only switch to the raw conversational answer. */
+function SemanticOrRaw({ semantic, raw }: { semantic: SemanticResponse; raw: string }) {
+  const [showRaw, setShowRaw] = useState(false);
+  return (
+    <>
+      {showRaw ? <MarkdownAnswer content={raw} /> : <SemanticAnswer response={semantic} />}
+      {debugMode() ? (
+        <button type="button" className="sem-toggle sem-debug-toggle" onClick={() => setShowRaw((v) => !v)}>
+          {showRaw ? "Show structured view" : "Show raw answer"}
+        </button>
+      ) : null}
+    </>
+  );
 }

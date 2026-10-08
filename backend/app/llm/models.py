@@ -26,3 +26,7 @@ class LLMStructuredOutput(BaseModel):
     truncated: bool = False
     overall_summary: str | None = None
     themes: list[dict] = Field(default_factory=list)
+    # Semantic response (same call): a short standalone summary and optional blocks that
+    # reference evidence keys; the backend resolves values (app/pipeline/semantic_blocks.py).
+    summary: str | None = None
+    blocks: list[dict] = Field(default_factory=list)

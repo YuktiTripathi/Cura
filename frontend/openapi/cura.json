@@ -199,6 +199,48 @@
         "title": "BioAIRisk",
         "type": "object"
       },
+      "BlockItem": {
+        "properties": {
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "title": "BlockItem",
+        "type": "object"
+      },
       "BloodMarker": {
         "properties": {
           "category": {
@@ -1294,6 +1336,16 @@
             },
             "title": "Recommendations",
             "type": "array"
+          },
+          "semantic": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SemanticResponse"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "testing_option": {
             "anyOf": [
@@ -4472,6 +4524,227 @@
         "title": "ReportOverview",
         "type": "object"
       },
+      "ResolvedValue": {
+        "description": "A value the backend read from the member's record (never from model text).",
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "direction": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Direction"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "blood",
+              "bio_ai"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "previous": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous"
+          },
+          "previous_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Date"
+          },
+          "reference_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference High"
+          },
+          "reference_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Low"
+          },
+          "status": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "kind"
+        ],
+        "title": "ResolvedValue",
+        "type": "object"
+      },
+      "ResponseBlock": {
+        "properties": {
+          "collapsed": {
+            "default": false,
+            "title": "Collapsed",
+            "type": "boolean"
+          },
+          "evidence": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence",
+            "type": "array"
+          },
+          "increase": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Increase",
+            "type": "array"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/BlockItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "reduce": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Reduce",
+            "type": "array"
+          },
+          "text": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Text"
+          },
+          "title": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Title"
+          },
+          "type": {
+            "enum": [
+              "text",
+              "metric",
+              "metric_group",
+              "priority_list",
+              "risk",
+              "comparison",
+              "insight",
+              "reassurance",
+              "action_list",
+              "nutrition",
+              "warning"
+            ],
+            "title": "Type",
+            "type": "string"
+          },
+          "values": {
+            "items": {
+              "$ref": "#/components/schemas/ResolvedValue"
+            },
+            "title": "Values",
+            "type": "array"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ResponseBlock",
+        "type": "object"
+      },
       "ResponseMode": {
         "enum": [
           "SINGLE_VALUE",
@@ -4492,6 +4765,48 @@
         ],
         "title": "ResponseMode",
         "type": "string"
+      },
+      "ResponseSource": {
+        "properties": {
+          "date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date"
+          },
+          "label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Label"
+          },
+          "type": {
+            "enum": [
+              "blood_report",
+              "bio_ai",
+              "questionnaire",
+              "uploaded_document",
+              "medical_reference"
+            ],
+            "title": "Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "type"
+        ],
+        "title": "ResponseSource",
+        "type": "object"
       },
       "RewindRequest": {
         "properties": {
@@ -4540,6 +4855,40 @@
           "name"
         ],
         "title": "ScoreOverview",
+        "type": "object"
+      },
+      "SemanticResponse": {
+        "properties": {
+          "blocks": {
+            "items": {
+              "$ref": "#/components/schemas/ResponseBlock"
+            },
+            "title": "Blocks",
+            "type": "array"
+          },
+          "follow_ups": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Follow Ups",
+            "type": "array"
+          },
+          "sources": {
+            "items": {
+              "$ref": "#/components/schemas/ResponseSource"
+            },
+            "title": "Sources",
+            "type": "array"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "summary"
+        ],
+        "title": "SemanticResponse",
         "type": "object"
       },
       "SnapshotReport": {
@@ -5520,6 +5869,7 @@
     },
     "/api/v1/chat/stream": {
       "post": {
+        "description": "Server-sent events. The pipeline runs in one bounded worker-pool thread and its\nprogress reaches the client through an asyncio queue, so a stream no longer holds an\nextra raw thread plus a pool thread blocked on a queue (readiness plan 5.3).",
         "operationId": "chat_stream_api_v1_chat_stream_post",
         "parameters": [
           {

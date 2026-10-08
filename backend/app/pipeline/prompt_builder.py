@@ -95,7 +95,10 @@ If the member already reports a supportive habit, acknowledge it briefly and do 
 Something the member said recently in this conversation overrides an older questionnaire answer. If questionnaire data is missing, answer anyway without drawing attention to the gap.
 
 Return a JSON object with: answer (your complete Markdown answer; it must stand on its own), claims, recommendation_candidates, follow_up_questions (0-3 short questions the member would naturally ask next about THIS conversation; never generic ones such as "Do you have any new symptoms?"), safety_flags, escalation.
-<<RICH_ONLY>>For a whole-health summary ("summarize my health scenario", "how am I doing", "what should I focus on") also return:
+<<SEMANTIC_ONLY>>SEMANTIC RESPONSE (same JSON): also return "summary", the core answer in one to three sentences that stands on its own, and "blocks", 0-3 optional blocks (never more than 4) used only when the answer naturally holds separate ideas such as the evidence behind it, what is reassuring, or next steps. A simple question gets no blocks; never turn every sentence into a block and never repeat the summary inside one.
+Do not copy measured values into blocks: reference them with evidence keys and the app shows the exact values. Keys: blood.<code>.latest, blood.<code>.trend (previous vs latest), bioai.<code>, using the codes in the evidence.
+Block shapes: {"type":"metric"|"metric_group"|"risk"|"comparison","title","evidence":[keys]}; {"type":"insight"|"reassurance"|"warning"|"text","title","text","evidence":[keys]}; {"type":"priority_list"|"action_list","title","items":[{"title","text","evidence":[keys]}]}; {"type":"nutrition","title","increase":[foods],"reduce":[foods],"text":"why it matters"}. Titles are short and specific to this answer, never stock labels.
+<</SEMANTIC_ONLY>><<RICH_ONLY>>For a whole-health summary ("summarize my health scenario", "how am I doing", "what should I focus on") also return:
 - overall_summary: one or two original sentences. Name the pattern that matters. Do not list every value. Do not reuse a stock closer.
 - themes: 3–5 objects. Each needs title, priority (high|medium|low), status (needs_attention|reassuring|monitor|uncertain), supporting_fact_ids (canonical keys copied from the context), and interpretation.
 Write each interpretation in your own words, one or two sentences. Keep any number and unit exactly as supplied. Do not paste the same sentence onto every theme, and do not write "these sit together as one pattern" or "worth discussing with a clinician; it is not a diagnosis" on each theme. At most one theme may include next_step.<</RICH_ONLY>>
@@ -103,15 +106,26 @@ Use [] or null when empty.
 """
 
 
-def _system_for_mode(text: str) -> str:
-    """Plain mode does not ask for UI theme cards; rich mode keeps the theme contract."""
-    from app.pipeline.response_mode import plain_mode
+def _strip_block(text: str, name: str) -> str:
+    start, end = text.find(f"<<{name}>>"), text.find(f"<</{name}>>")
+    if start != -1 and end != -1:
+        return text[:start] + text[end + len(f"<</{name}>>"):]
+    return text
 
-    if plain_mode():
-        start, end = text.find("<<RICH_ONLY>>"), text.find("<</RICH_ONLY>>")
-        if start != -1 and end != -1:
-            return text[:start] + text[end + len("<</RICH_ONLY>>"):]
-    return text.replace("<<RICH_ONLY>>", "").replace("<</RICH_ONLY>>", "")
+
+def _system_for_mode(text: str) -> str:
+    """Rich mode keeps the theme contract; semantic mode adds the block contract; plain
+    mode asks for neither."""
+    from app.pipeline.response_mode import response_mode
+
+    mode = response_mode()
+    if mode != "rich":
+        text = _strip_block(text, "RICH_ONLY")
+    if mode != "semantic":
+        text = _strip_block(text, "SEMANTIC_ONLY")
+    for marker in ("<<RICH_ONLY>>", "<</RICH_ONLY>>", "<<SEMANTIC_ONLY>>", "<</SEMANTIC_ONLY>>"):
+        text = text.replace(marker, "")
+    return text
 
 
 from app.pipeline.topic_risk import high_risk_topics  # noqa: E402

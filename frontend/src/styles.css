@@ -1032,3 +1032,31 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .markdown-answer table { border-collapse: collapse; margin: 0.4em 0 0.8em; font-size: 0.95em; }
 .markdown-answer th, .markdown-answer td { border: 1px solid var(--border, #d9dde3); padding: 0.3em 0.6em; text-align: left; }
 .markdown-answer th { font-weight: 600; }
+
+/* Semantic response blocks: one quiet visual language for every block type. */
+.semantic-answer { display: flex; flex-direction: column; gap: 10px; }
+.sem-block { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 10px 12px; background: var(--surface); }
+.sem-title { margin: 0 0 6px; font-size: 0.95em; font-weight: 600; }
+.sem-tone-reassurance { background: var(--positive-bg); border-color: var(--positive-border); }
+.sem-tone-warning { background: var(--warning-bg); border-color: var(--warning); }
+.sem-tone-insight { background: var(--surface-subtle); }
+.sem-metrics, .sem-risks, .sem-compare, .sem-chips { list-style: none; margin: 0; padding: 0; }
+.sem-metric + .sem-metric { margin-top: 8px; padding-top: 8px; border-top: 1px solid var(--border-subtle); }
+.sem-metric-head, .sem-risks li, .sem-compare li { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 10px; }
+.sem-risks li + li, .sem-compare li + li { margin-top: 6px; }
+.sem-label { font-weight: 500; }
+.sem-muted { color: var(--text-muted); font-size: 0.9em; }
+.sem-pill { font-size: 0.8em; padding: 1px 8px; border-radius: 999px; border: 1px solid var(--border-subtle); background: var(--surface-muted); text-transform: capitalize; }
+.sem-status-high, .sem-status-very-high, .sem-status-low, .sem-status-critical { border-color: var(--attention-border); background: var(--attention-bg); }
+.sem-status-normal { border-color: var(--positive-border); background: var(--positive-bg); }
+.sem-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.sem-chip { font-size: 0.85em; padding: 2px 8px; border-radius: 999px; border: 1px solid var(--border-subtle); background: var(--surface-muted); }
+.sem-list { margin: 0; padding-left: 1.3em; }
+.sem-list li + li { margin-top: 6px; }
+.sem-nutrition { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 8px; }
+.sem-nutrition ul { margin: 2px 0 0; padding-left: 1.2em; }
+.sem-nutrition p { margin: 0; }
+.sem-toggle { align-self: flex-start; background: none; border: 0; padding: 2px 0; color: var(--link); cursor: pointer; font: inherit; }
+.sem-debug-toggle { font-size: 0.8em; opacity: 0.7; }
+.sem-sources { font-size: 0.85em; color: var(--text-muted); }
+.sem-sources ul { margin: 4px 0 0; padding-left: 1.2em; }

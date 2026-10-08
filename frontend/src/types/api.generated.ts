@@ -64,7 +64,12 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Chat Stream */
+        /**
+         * Chat Stream
+         * @description Server-sent events. The pipeline runs in one bounded worker-pool thread and its
+         *     progress reaches the client through an asyncio queue, so a stream no longer holds an
+         *     extra raw thread plus a pool thread blocked on a queue (readiness plan 5.3).
+         */
         post: operations["chat_stream_api_v1_chat_stream_post"];
         delete?: never;
         options?: never;
@@ -537,6 +542,17 @@ export interface components {
             /** Status */
             status?: string | null;
         };
+        /** BlockItem */
+        BlockItem: {
+            /** Evidence */
+            evidence?: string[];
+            /** Text */
+            text?: string | null;
+            /** Title */
+            title?: string | null;
+            /** Values */
+            values?: components["schemas"]["ResolvedValue"][];
+        };
         /** BloodMarker */
         BloodMarker: {
             /** Category */
@@ -849,6 +865,7 @@ export interface components {
             provenance?: components["schemas"]["UserProvenance"];
             /** Recommendations */
             recommendations?: components["schemas"]["ApprovedRecommendation"][];
+            semantic?: components["schemas"]["SemanticResponse"] | null;
             testing_option?: components["schemas"]["TestingOption"] | null;
         };
         /**
@@ -1814,10 +1831,82 @@ export interface components {
             title: string;
         };
         /**
+         * ResolvedValue
+         * @description A value the backend read from the member's record (never from model text).
+         */
+        ResolvedValue: {
+            /** Date */
+            date?: string | null;
+            /** Direction */
+            direction?: string | null;
+            /** Key */
+            key: string;
+            /**
+             * Kind
+             * @enum {string}
+             */
+            kind: "blood" | "bio_ai";
+            /** Label */
+            label: string;
+            /** Previous */
+            previous?: number | string | null;
+            /** Previous Date */
+            previous_date?: string | null;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
+            /** Status */
+            status?: string | null;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value?: number | string | null;
+        };
+        /** ResponseBlock */
+        ResponseBlock: {
+            /**
+             * Collapsed
+             * @default false
+             */
+            collapsed: boolean;
+            /** Evidence */
+            evidence?: string[];
+            /** Increase */
+            increase?: string[];
+            /** Items */
+            items?: components["schemas"]["BlockItem"][];
+            /** Reduce */
+            reduce?: string[];
+            /** Text */
+            text?: string | null;
+            /** Title */
+            title?: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "text" | "metric" | "metric_group" | "priority_list" | "risk" | "comparison" | "insight" | "reassurance" | "action_list" | "nutrition" | "warning";
+            /** Values */
+            values?: components["schemas"]["ResolvedValue"][];
+        };
+        /**
          * ResponseMode
          * @enum {string}
          */
         ResponseMode: "SINGLE_VALUE" | "RESULT_LIST" | "DOMAIN_SUMMARY" | "INTERPRETATION" | "COMPARISON" | "TREND" | "HEALTH_OVERVIEW" | "SAFETY" | "PERSONAL_INTERPRETATION" | "NARRATIVE_HEALTH_SUMMARY" | "GOAL_PROGRESS" | "CLINICIAN_HANDOFF" | "ACUTE_HEALTH_GUIDANCE" | "PACKAGE_RECOMMENDATION" | "QUIET_UPDATE";
+        /** ResponseSource */
+        ResponseSource: {
+            /** Date */
+            date?: string | null;
+            /** Label */
+            label?: string | null;
+            /**
+             * Type
+             * @enum {string}
+             */
+            type: "blood_report" | "bio_ai" | "questionnaire" | "uploaded_document" | "medical_reference";
+        };
         /** RewindRequest */
         RewindRequest: {
             /** Keep */
@@ -1831,6 +1920,17 @@ export interface components {
             score?: number | null;
             /** Status */
             status?: string | null;
+        };
+        /** SemanticResponse */
+        SemanticResponse: {
+            /** Blocks */
+            blocks?: components["schemas"]["ResponseBlock"][];
+            /** Follow Ups */
+            follow_ups?: string[];
+            /** Sources */
+            sources?: components["schemas"]["ResponseSource"][];
+            /** Summary */
+            summary: string;
         };
         /** SnapshotReport */
         SnapshotReport: {

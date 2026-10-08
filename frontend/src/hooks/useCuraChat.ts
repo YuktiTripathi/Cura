@@ -2,6 +2,7 @@ import { useState } from "react";
 import { rewindConversation, streamChat } from "../lib/api";
 import type { ConversationDetail } from "../lib/api";
 import type { ProcessingEvent } from "../lib/processingMessages";
+import type { SemanticResponse } from "../types/semantic";
 import type { ChatMeta, ContextRef, EvidenceItem, ExperienceBlock, FollowUp, PresentedFinding, Recommendation, StructuredResponse, TestingOption, TurnExperience, UserProvenance } from "../types/chat";
 
 export type ChatMessage = {
@@ -16,6 +17,7 @@ export type ChatMessage = {
   experience?: TurnExperience | null;
   experienceBlocks?: ExperienceBlock[];
   testingOption?: TestingOption | null;
+  semantic?: SemanticResponse | null;
   /** Values shown while the answer is still being written (SSE `preview`). */
   preview?: PresentedFinding[];
   /** User messages: what was attached when asked, so edit/regenerate ask the same thing. */
@@ -147,6 +149,7 @@ export function useCuraChat() {
           experience: res.experience || null,
           experienceBlocks: res.experience?.blocks || next[last].experienceBlocks,
           testingOption: res.testing_option || res.presentation?.testing_option || null,
+          semantic: res.semantic || null,
         };
         return next;
       });

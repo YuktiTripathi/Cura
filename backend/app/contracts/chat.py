@@ -1,3 +1,4 @@
+from app.contracts.semantic_response import SemanticResponse
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.contracts.diagnostics import TestingOption
@@ -157,6 +158,9 @@ class ChatResponse(BaseModel):
     presentation: StructuredResponse | None = None
     experience: TurnExperience | None = None
     testing_option: TestingOption | None = None
+    # CURA_RESPONSE_MODE=semantic: summary + optional blocks (values resolved by the backend).
+    # `answer` stays the full conversational Markdown, so both views share one answer.
+    semantic: SemanticResponse | None = None
 
 
 class ConversationSummary(BaseModel):

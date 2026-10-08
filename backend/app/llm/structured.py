@@ -87,6 +87,8 @@ def parse_llm_structured(payload: Any) -> LLMStructuredOutput:
         parse_error=parse_error,
         overall_summary=_parse_optional_text(obj.get("overall_summary")),
         themes=_parse_themes(obj.get("themes")),
+        summary=_parse_optional_text(obj.get("summary")),
+        blocks=[b for b in obj.get("blocks") or [] if isinstance(b, dict)][:8] if isinstance(obj.get("blocks"), list) else [],
     )
 
 

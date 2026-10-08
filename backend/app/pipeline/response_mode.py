@@ -13,8 +13,16 @@ from app.llm.structured import looks_like_structured_json, public_answer_text
 from app.pipeline.presentation import prefer_report_range, sanitize_internal_ids
 
 
+def response_mode() -> str:
+    """rich (default) | plain | semantic. Semantic is plain mode plus structured blocks:
+    the same conversational answer, so the two can be compared on one response."""
+    mode = (settings.cura_response_mode or "rich").strip().lower()
+    return mode if mode in {"rich", "plain", "semantic"} else "rich"
+
+
 def plain_mode() -> bool:
-    return (settings.cura_response_mode or "rich").strip().lower() == "plain"
+    """True for plain and semantic: no rich cards, composer or stock widgets."""
+    return response_mode() in {"plain", "semantic"}
 
 
 def _value(marker) -> str:
@@ -107,7 +115,7 @@ def apply_response_mode(response, model_follow_ups: list[str] | None = None):
     if not plain_mode():
         response.meta.response_mode = "rich"
         return response
-    response.meta.response_mode = "plain"
+    response.meta.response_mode = response_mode()  # plain | semantic
     response.presentation = None
     response.experience = None
     response.testing_option = None

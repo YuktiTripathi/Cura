@@ -33,6 +33,8 @@ _ANSWER_SCHEMA = {
             "additionalProperties": False,
             "properties": {
                 "answer": {"type": "string"},
+                "summary": {"type": "string"},
+                "blocks": {"type": "array", "items": {"type": "object"}},
                 "claims": {"type": "array", "items": {"type": "object"}},
                 "recommendation_candidates": {"type": "array"},
                 "follow_up_questions": {"type": "array", "items": {"type": "string"}},
