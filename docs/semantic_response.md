@@ -88,7 +88,7 @@ system prompt.
 {"type":"metric_group","title":"All 20 results","collapsed":true,"values":["… 20 resolved values …"]}
 {"type":"priority_list","title":"Your top 3","items":[{"title":"Bring blood sugar down","evidence":["blood.hba1c.latest"],"values":["…HbA1c 9.1 %…"]},{"title":"Lower triglycerides and LDL"},{"title":"Rebuild iron stores"}]}
 {"type":"risk","title":"Risk overview","values":[{"key":"bioai.type_2_diabetes","label":"Type 2 diabetes","kind":"bio_ai","value":78.0,"status":"high"},{"key":"bioai.dyslipidemia","label":"Dyslipidemia","kind":"bio_ai","value":71.0,"status":"high"}]}
-{"type":"comparison","title":"Since your last report","values":[{"key":"blood.hba1c.trend","label":"HbA1c","value":9.1,"unit":"%","previous":8.4,"previous_date":"2026-04-10","direction":"increased"}]}
+{"type":"comparison","title":"Since your last report","values":[{"key":"blood.hba1c.trend","label":"HbA1c","value":9.1,"unit":"%","previous":8.4,"previous_date":"2026-04-10","direction":"increased"}]}  // gitleaks:allow
 {"type":"insight","title":"Why this may be happening","text":"Your HbA1c, glucose and triglycerides are all above range and point the same way.","values":["…3 resolved values…"]}
 {"type":"reassurance","title":"Within range","text":"Liver enzymes, kidney function and thyroid markers are all within your report's ranges.","values":["…"]}
 {"type":"action_list","title":"A first step for each","items":[{"title":"A 10–15 minute walk after meals"},{"title":"Swap refined grains for whole grains"}]}

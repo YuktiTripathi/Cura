@@ -29,7 +29,7 @@ describe("SemanticAnswer", () => {
         { type: "metric", values: [hba1c] },
         { type: "metric_group", title: "Glucose control", values: [hba1c] },
         { type: "risk", title: "Risk overview", values: [t2d] },
-        { type: "comparison", title: "Since last time", values: [{ ...hba1c, key: "blood.hba1c.trend", previous: 8.4, direction: "increased" }] },
+        { type: "comparison", title: "Since last time", values: [{ ...hba1c, key: "blood.hba1c.trend", previous: 8.4, direction: "increased" }] }, // gitleaks:allow (evidence key, not a secret)
         { type: "insight", title: "Why", text: "These point the same way.", values: [hba1c] },
         { type: "reassurance", title: "Reassuring", text: "Liver and kidney look fine." },
         { type: "priority_list", title: "Top 3", items: [{ title: "Blood sugar" }, { title: "Lipids" }] },
