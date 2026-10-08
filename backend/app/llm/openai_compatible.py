@@ -217,6 +217,18 @@ class OpenAICompatibleLLMClient:
         if settings.openrouter_app_title:
             headers["X-Title"] = settings.openrouter_app_title
         payload = self._build_payload(messages, fmt)
+        from app.llm import prompt_inspector
+
+        audit = prompt_inspector.before_call(payload, fmt)  # dev-only; None otherwise
+        try:
+            text = self._send(url, headers, payload, fmt)
+        except LLMUnavailableError as exc:
+            prompt_inspector.after_call(audit, self.last_usage, error=str(exc))
+            raise
+        prompt_inspector.after_call(audit, self.last_usage)
+        return text
+
+    def _send(self, url: str, headers: dict, payload: dict, fmt: str) -> str:
         response = None
         attempts = max(1, int(settings.llm_max_retries) + 1)
         client = get_http_client()

@@ -84,6 +84,10 @@ class Settings(BaseSettings):
     cura_force_answer_tier: str = ""
     # Development only: log a readable routing decision and add it to meta.debug.
     cura_model_routing_debug: bool = False
+    # Development only: dump each answer-model request (components, sizes, tokens) to
+    # CURA_PROMPT_DEBUG_DIR. Contains health values; never active in production.
+    cura_prompt_debug: bool = False
+    cura_prompt_debug_dir: str = ".prompt_debug"
     # Per-tier answer-call caps (seconds); always bounded by the request budget.
     answer_timeout_fast_seconds: float = 10.0
     answer_timeout_standard_seconds: float = 18.0
