@@ -562,6 +562,9 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     selected = len(evidence.primary_facts) + len(evidence.supporting_facts) + len(evidence.trend_facts)
     evidence.trace = {
         "response_mode": mode,
+        "evidence_codes": list(dict.fromkeys(
+            f.get("code") for f in [*evidence.primary_facts, *evidence.supporting_facts] if f.get("code")
+        )),
         "conversation_goal": context.conversation_goal,
         "retrieved_fact_count": retrieved_facts,
         "selected_answer_fact_count": selected,

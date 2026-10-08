@@ -325,6 +325,11 @@ class ContextBuilder:
             conversation_state=conversation_state,
         )
         attach_source_status(ctx, plan, retrieval)
+        # A Bio-AI score that was found is never also "missing" because its code was looked
+        # up among blood markers ("cardiac health was not in reports").
+        risk_codes = {r.code for r in ctx.bio_ai_risks or [] if r.code}
+        if risk_codes:
+            ctx.missing = [m for m in ctx.missing or [] if not (m.key in risk_codes and m.reason in {"not_in_reports", "not_present"})]
         return ctx
 
     def _fill_blood(self, ctx, plan, reports, evidence):

@@ -82,7 +82,8 @@ def test_system_prompt_plans_format_dynamically(monkeypatch):
     ctx, _ = _evidence(COMPANION, "Why are my triglycerides high?")
     system = PromptBuilder().build(ctx, "", "Why are my triglycerides high?")[0]["content"]
     assert "RESPONSE PLANNING" in system and "not a fixed template" in system
-    assert "minimal" in system and "detailed" in system  # density chosen by the model
+    assert "compact" in system and "detailed" in system  # density chosen by the model
+    assert "shortest response that fully answers" in system
     assert "themes: 3" not in system  # plain mode does not ask for UI theme cards
     for heading in _TEMPLATE_HEADINGS:
         assert f"## {heading}" not in system

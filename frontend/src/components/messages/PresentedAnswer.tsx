@@ -7,6 +7,8 @@ import { ValueCard } from "./ValueCard";
 import { NextSteps } from "./NextSteps";
 import { t } from "../../i18n";
 
+const MAX_CONVERSATIONAL_FINDINGS = 4;
+
 function isScoreList(text: string): boolean {
   return /Bio-AI assessment shows|• \*\*/.test(text);
 }
@@ -30,7 +32,12 @@ export function PresentedAnswer({
     presentation.mode !== "SINGLE_VALUE" &&
     Boolean(presentation.headline) &&
     presentation.headline?.trim().toLowerCase() !== "nutrition";
-  const findings = availableFindings(presentation.findings || []);
+  // A results table is a report view. Under any other answer show only a few values; the
+  // backend selects which ones (the evidence behind the answer).
+  const findings = availableFindings(presentation.findings || []).slice(
+    0,
+    presentation.mode === "RESULT_LIST" ? undefined : MAX_CONVERSATIONAL_FINDINGS
+  );
   const relatedFindings = uniqueRelated(presentation.related_findings || [], findings);
   const gaps = (presentation.uncertainties || []).filter((item) => !isDisclaimer(item));
   const notes = (presentation.uncertainties || []).filter(isDisclaimer);

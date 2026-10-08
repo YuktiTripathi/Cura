@@ -196,7 +196,14 @@ def reconcile_query_plan(plan: QueryPlan, semantic: SemanticHealthPlan) -> tuple
     Returns the plan and the list of corrections applied (for tracing).
     """
     changes: list[str] = []
-    if plan.needs_user_uploaded or plan.document_ids or plan.intent == IntentType.casual_conversation:
+    if plan.document_ids or plan.intent == IntentType.casual_conversation:
+        return plan, changes
+    if plan.needs_user_uploaded:
+        # "My blood reports" can be routed as an uploaded-document question. With no
+        # document attached, the member's stored results must still be read.
+        if HealthSource.blood in semantic.required_sources and not plan.needs_blood:
+            plan = plan.model_copy(update={"needs_blood": True, "needs_supershyft": True, "knowledge_scope": KnowledgeScope.personal})
+            changes.append("added_required:blood")
         return plan, changes
     if semantic.clarification_needed:
         return plan, changes

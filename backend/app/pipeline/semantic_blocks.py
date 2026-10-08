@@ -30,7 +30,7 @@ from app.contracts.semantic_response import (
 
 MAX_BLOCKS = 4
 MAX_ITEMS = 6
-MAX_VALUES = 12
+MAX_VALUES = 4  # conversational blocks; the report view is built separately
 _KEY = re.compile(r"^(?:(blood|bioai|bio_ai)\.)?([a-z0-9_]+)(?:\.(latest|trend))?$")
 _VALUE_BLOCKS = {"metric", "metric_group", "risk", "comparison"}
 _TEXT_BLOCKS = {"text", "insight", "reassurance", "warning"}

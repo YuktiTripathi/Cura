@@ -60,6 +60,7 @@ from app.pipeline.evidence_planner import reconcile_query_plan
 from app.pipeline.semantic_plan import build_semantic_plan
 from app.pipeline.urgency_guard import strip_unsupported_urgency
 from app.pipeline.semantic_blocks import build_semantic_response
+from app.pipeline.visible_output import finalize_response
 from app.pipeline.response_mode import apply_response_mode, plain_answer, plain_mode, response_mode
 from app.pipeline.context_merger import ContextMerger, attach_medical_evidence
 from app.pipeline.personalized_followups import PersonalizedFollowUpEngine, build_inventory
@@ -235,6 +236,9 @@ class ChatService:
                     )
                 except Exception:  # noqa: BLE001 - the Markdown answer is always there
                     logger.warning("semantic_response_failed request_id=%s", request_id, exc_info=True)
+            # Last pass over everything visible: no em dashes, repeated disclaimers, duplicate
+            # paragraphs, "None to None" ranges, or full report tables under other answers.
+            response = finalize_response(response, payload.message, eval_turn.get("routing_plan"), eval_turn.get("context"))
             with perf.stage("persistence"):
                 response = self._record_evaluation(response, eval_turn)
             _attach_perf(response, eval_turn, request_perf)
