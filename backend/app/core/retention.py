@@ -62,9 +62,9 @@ def delete_conversation_derived(db: Session, conversation_id: str, subject_id: s
 
 
 def purge_expired(db: Session, *, now: datetime | None = None, store=None) -> dict[str, int]:
-    """Delete documents and conversations past their retention window."""
+    """Delete data covered by explicitly configured retention windows."""
     current = now or datetime.now(timezone.utc)
-    counts = {"documents": 0, "conversations": 0}
+    counts = {"documents": 0, "conversations": 0, "processing_jobs": 0, "audit_records": 0}
 
     doc_days = int(settings.document_retention_days or 0)
     if doc_days > 0:
@@ -91,6 +91,33 @@ def purge_expired(db: Session, *, now: datetime | None = None, store=None) -> di
             db.delete(conv)
             counts["conversations"] += 1
 
+    job_days = int(settings.processing_job_retention_days or 0)
+    if job_days > 0:
+        cutoff = current - timedelta(days=job_days)
+        result = db.execute(
+            delete(ProcessingJob).where(
+                ProcessingJob.status.in_(("completed", "failed")),
+                ProcessingJob.created_at < cutoff,
+            ).execution_options(synchronize_session=False)
+        )
+        counts["processing_jobs"] = int(result.rowcount or 0)
+
+    audit_days = int(settings.audit_record_retention_days or 0)
+    if audit_days > 0:
+        cutoff = current - timedelta(days=audit_days)
+        result = db.execute(
+            delete(AuditRecord)
+            .where(AuditRecord.created_at < cutoff)
+            .execution_options(synchronize_session=False)
+        )
+        counts["audit_records"] = int(result.rowcount or 0)
+
     db.commit()
-    logger.info("retention_purge documents=%s conversations=%s", counts["documents"], counts["conversations"])
+    logger.info(
+        "retention_purge documents=%s conversations=%s processing_jobs=%s audit_records=%s",
+        counts["documents"],
+        counts["conversations"],
+        counts["processing_jobs"],
+        counts["audit_records"],
+    )
     return counts

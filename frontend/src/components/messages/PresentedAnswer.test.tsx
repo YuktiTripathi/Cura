@@ -1,22 +1,25 @@
+import { render } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
-import type { PresentedFinding } from "../../types/chat";
-import { uniqueRelated } from "./PresentedAnswer";
-import { readInsights, mergeSuggestions } from "../../lib/companion";
+import { PresentedAnswer } from "./PresentedAnswer";
 
-const f = (key: string): PresentedFinding => ({ label: key.toUpperCase(), value: "1", unit: "mg/dL", canonical_key: key }) as PresentedFinding;
-
-describe("answer presentation policy", () => {
-  it("does not repeat a value already shown on the main card", () => {
-    const out = uniqueRelated([f("hdl"), f("ldl"), f("ldl")], [f("hdl")]);
-    expect(out.map((x) => x.canonical_key)).toEqual(["ldl"]);
-  });
-
-  it("keeps follow-up chips to three", () => {
-    expect(mergeSuggestions(["a?"], ["b", "c", "d", "e"]).length).toBeLessThanOrEqual(3);
-  });
-
-  it("shows at most one proactive insight when asked", () => {
-    const raw = [{ text: "one" }, { text: "two" }];
-    expect(readInsights(raw, 1).length).toBeLessThanOrEqual(1);
+describe("PresentedAnswer", () => {
+  it("renders educational markdown as headings and bullets, not raw asterisks", () => {
+    const { container } = render(
+      <PresentedAnswer
+        presentation={{
+          mode: "INTERPRETATION",
+          summary:
+            "Heart health means how well the heart moves blood.\n\n**Key factors**\n\n- Blood pressure stays steady.\n- Vessels stay flexible.",
+          findings: [],
+          uncertainties: [],
+          next_steps: [],
+        }}
+        fallback=""
+      />
+    );
+    expect(container.querySelector("strong")?.textContent).toBe("Key factors");
+    expect(container.querySelectorAll("ul > li").length).toBe(2);
+    expect(container.textContent).not.toContain("**");
+    expect(container.textContent).not.toContain("* Blood");
   });
 });

@@ -1,4 +1,5 @@
 import type { ExperienceBlock, PresentedFinding } from "../../types/chat";
+import { MarkdownAnswer } from "./MarkdownAnswer";
 import { availableFindings } from "./FindingsTable";
 import { ValueCard } from "./ValueCard";
 import { t } from "../../i18n";
@@ -55,9 +56,9 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
   return (
     <div className="streaming-experience" data-testid="streaming-experience" aria-live="polite">
       {view.direct ? (
-        <p className="streaming-lead experience-reveal" data-kind="direct_answer">
-          {view.direct}
-        </p>
+        <div className="streaming-lead experience-reveal" data-kind="direct_answer">
+          <MarkdownAnswer content={view.direct} />
+        </div>
       ) : null}
 
       {view.facts.length ? (
@@ -74,7 +75,7 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
       {view.interpretation ? (
         <section className="experience-segment experience-reveal" data-kind="interpretation">
           <div className="experience-segment-label">{t("ui.StreamingExperience.what_it_means", "What it means")}</div>
-          <p>{view.interpretation}</p>
+          <MarkdownAnswer content={view.interpretation} />
         </section>
       ) : null}
 

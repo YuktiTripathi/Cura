@@ -54,3 +54,9 @@ Set these from the load test (`scripts/load/chat_mix.js`, run with k6), not by g
 ## Scheduled jobs
 
 - Run `python scripts/purge_expired.py` daily.
+- Document and conversation retention use `DOCUMENT_RETENTION_DAYS` and
+  `CONVERSATION_RETENTION_DAYS`.
+- Terminal processing-job and operational-audit retention are disabled by
+  default. Set `PROCESSING_JOB_RETENTION_DAYS` or `AUDIT_RECORD_RETENTION_DAYS`
+  only after the applicable operational, medical-safety, and legal retention
+  policies are approved.

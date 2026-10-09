@@ -1,7 +1,7 @@
 from datetime import datetime, timezone
 from uuid import uuid4
 
-from sqlalchemy import select
+from sqlalchemy import delete, or_, select
 from sqlalchemy.orm import Session
 
 from app.core.errors import NotFoundError
@@ -53,16 +53,54 @@ class ConversationRepository:
         self.db.refresh(msg)
         return msg
 
+    def add_turn_messages(
+        self,
+        conversation: Conversation,
+        *,
+        user_content: str,
+        assistant_content: str,
+        intent: str | None = None,
+    ) -> tuple[Message, Message]:
+        """Persist the canonical user/assistant pair in one transaction."""
+        user_message = Message(
+            id=str(uuid4()),
+            conversation_id=conversation.id,
+            role="user",
+            content=user_content,
+            intent=intent,
+        )
+        assistant_message = Message(
+            id=str(uuid4()),
+            conversation_id=conversation.id,
+            role="assistant",
+            content=assistant_content,
+            intent=intent,
+        )
+        conversation.updated_at = datetime.now(timezone.utc)
+        self.db.add_all([user_message, assistant_message])
+        self.db.commit()
+        self.db.refresh(user_message)
+        self.db.refresh(assistant_message)
+        return user_message, assistant_message
+
     def update_language_preference(self, conversation: Conversation, language: str | None) -> None:
         conversation.language_preference = language
         conversation.updated_at = datetime.now(timezone.utc)
         self.db.commit()
 
-    def update_follow_up(self, conversation: Conversation, topic: str | None, name: str | None) -> None:
+    def update_follow_up(
+        self,
+        conversation: Conversation,
+        topic: str | None,
+        name: str | None,
+        *,
+        commit: bool = True,
+    ) -> None:
         conversation.follow_up_topic = topic
         conversation.follow_up_topic_name = name
         conversation.updated_at = datetime.now(timezone.utc)
-        self.db.commit()
+        if commit:
+            self.db.commit()
 
     def update_source_mode(
         self, conversation: Conversation, mode: str | None, document_id: str | None = None
@@ -80,6 +118,7 @@ class ConversationRepository:
         marker_code: str | None = None,
         report_id: str | None = None,
         summary: str | None = None,
+        commit: bool = True,
     ) -> None:
         if marker_code is not None:
             conversation.current_marker_code = marker_code
@@ -88,12 +127,20 @@ class ConversationRepository:
         if summary is not None:
             conversation.conversation_summary = summary[:2000]
         conversation.updated_at = datetime.now(timezone.utc)
-        self.db.commit()
+        if commit:
+            self.db.commit()
 
-    def update_conversation_state(self, conversation: Conversation, payload: str | None) -> None:
+    def update_conversation_state(
+        self,
+        conversation: Conversation,
+        payload: str | None,
+        *,
+        commit: bool = True,
+    ) -> None:
         conversation.conversation_state_json = payload
         conversation.updated_at = datetime.now(timezone.utc)
-        self.db.commit()
+        if commit:
+            self.db.commit()
 
     def delete_for_subject(self, conversation_id: str, subject_id: str) -> None:
         from app.core.retention import delete_conversation_derived
@@ -107,7 +154,32 @@ class ConversationRepository:
         conv = self.get_for_subject(conversation_id, subject_id)
         rows = sorted(conv.messages or [], key=lambda item: (item.created_at or item.id, item.id))
         kept = max(0, int(keep))
-        for row in rows[kept:]:
+        removed = rows[kept:]
+        removed_message_ids = [row.id for row in removed]
+        if removed_message_ids:
+            interaction_ids = list(
+                self.db.scalars(
+                    select(Interaction.id).where(
+                        Interaction.conversation_id == conversation_id,
+                        or_(
+                            Interaction.message_id.in_(removed_message_ids),
+                            Interaction.user_message_id.in_(removed_message_ids),
+                        ),
+                    )
+                )
+            )
+            if interaction_ids:
+                self.db.execute(
+                    delete(HealthFactRef).where(HealthFactRef.interaction_id.in_(interaction_ids))
+                )
+                self.db.execute(
+                    delete(Feedback).where(Feedback.interaction_id.in_(interaction_ids))
+                )
+                self.db.execute(delete(Interaction).where(Interaction.id.in_(interaction_ids)))
+            self.db.execute(
+                delete(Feedback).where(Feedback.message_id.in_(removed_message_ids))
+            )
+        for row in removed:
             self.db.delete(row)
         conv.updated_at = datetime.now(timezone.utc)
         self.db.commit()
@@ -163,19 +235,19 @@ class ConversationRepository:
         )
         return self.db.scalars(stmt).first()
 
-    def add_interaction(self, **kwargs) -> Interaction:
+    def add_interaction(self, *, commit: bool = True, **kwargs) -> Interaction:
         row = Interaction(id=str(uuid4()), **kwargs)
         self.db.add(row)
-        self.db.commit()
-        self.db.refresh(row)
+        if commit:
+            self.db.commit()
+            self.db.refresh(row)
         return row
 
-    def add_health_fact_refs(self, refs: list[dict]) -> None:
-        if not refs:
-            return
+    def add_health_fact_refs(self, refs: list[dict], *, commit: bool = True) -> None:
         for item in refs:
             self.db.add(HealthFactRef(id=str(uuid4()), **item))
-        self.db.commit()
+        if commit:
+            self.db.commit()
 
     def list_interactions_for_subject(self, subject_id: str, conversation_id: str | None = None) -> list[Interaction]:
         stmt = select(Interaction).where(Interaction.subject_id == subject_id)

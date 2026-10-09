@@ -50,6 +50,11 @@ class Settings(BaseSettings):
     answer_cache_ttl_seconds: int = 86400
     # Reuse an identical prompt's answer. Turn off for cold-latency measurement and evals.
     answer_cache_enabled: bool = True
+    answer_prompt_compact: bool = False
+    # legacy keeps the current system text. modular uses the compact core plus task modules.
+    cura_prompt_variant: str = "legacy"
+    # Diagnostic package cards and retest suggestions. Off until explicitly enabled.
+    cura_test_suggestions_enabled: bool = False
     # CURA_RESPONSE_MODE: "rich" (cards, tables, chips) or "plain" (the conversational answer
     # only). Plain mode debugs answer quality separately from presentation.
     cura_response_mode: str = "rich"
@@ -155,6 +160,10 @@ class Settings(BaseSettings):
     document_retention_days: int = 90
     # Conversations untouched for this many days are purged with their derived rows. 0 disables.
     conversation_retention_days: int = 365
+    # Disabled until operations/legal approve explicit policies. When enabled, only
+    # terminal document jobs and operational audit rows older than the window are removed.
+    processing_job_retention_days: int = 0
+    audit_record_retention_days: int = 0
     supershyft_pool_size: int = 5
     supershyft_max_overflow: int = 2
     store_health_fact_values: bool = False

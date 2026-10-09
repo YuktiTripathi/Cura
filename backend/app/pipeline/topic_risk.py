@@ -14,7 +14,7 @@ from app.pipeline.red_flags import normalize_text
 HIGH_RISK_TOPICS: dict[str, re.Pattern[str]] = {
     "medication": re.compile(
         r"\b(drug|drugs|medicine|medication|tablet|pill|dose|dosage|mg|side effects?|interaction\w*|"
-        r"antibiotic\w*|steroid\w*|insulin|statin\w*|supplement dose|dawai|goli)\b",
+        r"antibiotic\w*|steroid\w*|insulin(?! resistance)|statin\w*|supplement dose|dawai|goli)\b",
         re.I,
     ),
     "pregnancy": re.compile(r"\b(pregnan\w*|trimester|breastfeed\w*|lactat\w*|ivf|miscarriage|garbh\w*)\b", re.I),

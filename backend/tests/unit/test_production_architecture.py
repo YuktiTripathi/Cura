@@ -280,5 +280,82 @@ def test_alembic_bootstraps_cura_owned_database(tmp_path, monkeypatch):
         str(Path(__file__).resolve().parents[2] / "migrations"),
     )
     command.upgrade(config, "head")
-    tables = set(inspect(create_engine(url)).get_table_names())
+    inspector = inspect(create_engine(url))
+    tables = set(inspector.get_table_names())
     assert {"conversations", "messages", "documents", "audit_records"} <= tables
+    assert "prompt_versions" not in tables
+    interaction_columns = {column["name"]: column for column in inspector.get_columns("interactions")}
+    assert interaction_columns["user_query"]["nullable"] is True
+    assert interaction_columns["assistant_response"]["nullable"] is True
+    assert "user_message_id" in interaction_columns
+
+
+def test_alembic_0003_upgrade_preserves_historical_interaction_text(tmp_path, monkeypatch):
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import create_engine, inspect, text
+
+    url = f"sqlite:///{tmp_path / 'upgrade.db'}"
+    monkeypatch.setattr(settings, "database_url", url)
+    config = Config(str(Path(__file__).resolve().parents[2] / "alembic.ini"))
+    config.set_main_option("script_location", str(Path(__file__).resolve().parents[2] / "migrations"))
+    engine = create_engine(url)
+
+    command.upgrade(config, "0003_job_claims")
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "INSERT INTO conversations (id, subject_id) VALUES "
+                "('conversation-1', 'subject-1')"
+            )
+        )
+        connection.execute(
+            text(
+                "INSERT INTO interactions "
+                "(id, conversation_id, subject_id, user_query, assistant_response, "
+                "personal_data_required, retrieval_used, ihr_queried, documents_queried, fallback_used) "
+                "VALUES ('interaction-1', 'conversation-1', 'subject-1', 'question', 'answer', "
+                "0, 0, 0, 0, 0)"
+            )
+        )
+
+    command.upgrade(config, "head")
+    with engine.connect() as connection:
+        row = connection.execute(
+            text(
+                "SELECT user_query, assistant_response FROM interactions "
+                "WHERE id = 'interaction-1'"
+            )
+        ).one()
+    assert tuple(row) == ("question", "answer")
+    assert "prompt_versions" not in inspect(engine).get_table_names()
+
+
+def test_alembic_refuses_to_drop_nonempty_prompt_versions(tmp_path, monkeypatch):
+    from alembic import command
+    from alembic.config import Config
+    from sqlalchemy import create_engine, text
+
+    url = f"sqlite:///{tmp_path / 'nonempty-prompts.db'}"
+    monkeypatch.setattr(settings, "database_url", url)
+    config = Config(str(Path(__file__).resolve().parents[2] / "alembic.ini"))
+    config.set_main_option("script_location", str(Path(__file__).resolve().parents[2] / "migrations"))
+    engine = create_engine(url)
+    command.upgrade(config, "0003_job_claims")
+    with engine.begin() as connection:
+        connection.execute(
+            text(
+                "CREATE TABLE prompt_versions ("
+                "id VARCHAR(36) PRIMARY KEY, name VARCHAR(64), version VARCHAR(32), "
+                "body TEXT, created_at DATETIME)"
+            )
+        )
+        connection.execute(
+            text(
+                "INSERT INTO prompt_versions (id, name, version, body) "
+                "VALUES ('prompt-1', 'system', '1', 'body')"
+            )
+        )
+
+    with pytest.raises(RuntimeError, match="prompt_versions is not empty"):
+        command.upgrade(config, "head")

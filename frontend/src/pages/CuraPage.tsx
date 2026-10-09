@@ -29,6 +29,7 @@ export function CuraPage() {
     editAndResend,
     conversationId,
     conversationEpoch,
+    suggestions,
     newConversation,
     resumeConversation,
   } = useCuraChat();
@@ -116,7 +117,7 @@ export function CuraPage() {
       <CuraHeader onOpenSidebar={() => setDrawerOpen(true)} />
       <div className="main-scroll" ref={scrollRef}>
         {!started && (
-          <WelcomeExperience me={me} meLoading={meLoading} onSend={sendWithContext} inputRef={inputRef} />
+          <WelcomeExperience me={me} meLoading={meLoading} suggestions={suggestions} onSend={sendWithContext} inputRef={inputRef} />
         )}
         <DocumentPanel
           refreshKey={docTick}

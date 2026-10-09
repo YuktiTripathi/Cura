@@ -14,6 +14,8 @@ from app.pipeline.intent import (
     requires_personal_record,
 )
 
+from app.pipeline.task_contract import reapply_stored_contract
+
 logger = logging.getLogger("cura.pipeline")
 
 _UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|this (?:whole |entire )?document|the document)\b", re.I)
@@ -71,7 +73,7 @@ def apply_source_routing(
         plan.needs_supershyft = False
         plan.needs_user_uploaded = False
         plan.needs_cross_source = False
-        return annotate_plan(plan)
+        return annotate_plan(reapply_stored_contract(plan))
 
     if compare_cue and (upload_cue or ids or prior_source_mode == "cross"):
         needs_cross = True
@@ -173,7 +175,7 @@ def apply_source_routing(
         plan.needs_cross_source,
         plan.needs_personal_data,
     )
-    return annotate_plan(plan)
+    return annotate_plan(reapply_stored_contract(plan))
 
 
 def annotate_plan(plan: QueryPlan) -> QueryPlan:

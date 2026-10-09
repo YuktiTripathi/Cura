@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import time
 from dataclasses import dataclass, field
 
@@ -20,6 +21,8 @@ from app.pipeline.ontology import retrieval_metric_keys
 from app.pipeline.personal_selection import retain_blood_reports
 from integrations.supershyft.db import DB_QUERY_FAILED, run_readonly
 from integrations.supershyft.mapping import _as_date, bio_ai_from_row, blood_report_from_row
+
+logger = logging.getLogger("cura.integrations.supershyft")
 
 
 def _user_id(principal: AuthenticatedPrincipal) -> int:
@@ -93,6 +96,9 @@ class IhrRepository:
     def get_ihr_data_for_query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> IhrBundle:
         uid = _user_id(principal)
         rows = _sorted_ihr_rows(fetch_ihr_rows(principal))
+        started = time.perf_counter()
+        uid = _user_id(principal)
+        rows = _sorted_ihr_rows(fetch_ihr_rows(principal))
         blood: list[BloodReport] = []
         bio: list[BioAIReport] = []
         ids: list[str] = []
@@ -146,7 +152,33 @@ class IhrRepository:
                 pass
             elif bio:
                 bio = bio[-1:]
+        _log_retrieval(uid, len(rows), blood, bio, started)
         return IhrBundle(user_id=uid, blood_reports=blood, bio_ai_reports=bio, report_ids=ids)
+
+
+def _log_retrieval(uid: int, ihr_rows: int, blood: list[BloodReport], bio: list[BioAIReport], started: float) -> None:
+    from app.core.config import settings
+
+    if settings.app_env != "development":
+        return
+    import hashlib
+
+    member_ref = hashlib.sha256(str(uid).encode()).hexdigest()[:10]
+    database = ""
+    url = settings.supershyft_database_url or ""
+    if "/" in url:
+        database = url.rsplit("/", 1)[-1].split("?", 1)[0]
+    logger.info(
+        "ihr_retrieval member_ref=%s database=%s ihr_rows=%s blood_reports=%s markers=%s bio_reports=%s risks=%s duration_ms=%s",
+        member_ref,
+        database,
+        ihr_rows,
+        len(blood),
+        sum(len(report.markers) for report in blood),
+        len(bio),
+        sum(len(report.risks) for report in bio),
+        int((time.perf_counter() - started) * 1000),
+    )
 
 
 def _merge_blood_reports(ihr_blood: list[BloodReport], booking_blood: list[BloodReport]) -> list[BloodReport]:

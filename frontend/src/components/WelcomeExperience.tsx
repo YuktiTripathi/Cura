@@ -7,11 +7,13 @@ import { t } from "../i18n";
 export function WelcomeExperience({
   me,
   meLoading,
+  suggestions = [],
   onSend,
   inputRef,
 }: {
   me: MeResponse | null;
   meLoading: boolean;
+  suggestions?: Array<{ id: string; text: string }>;
   onSend: (text: string, documentIds?: string[], contextRef?: ContextRef) => void;
   inputRef: RefObject<HTMLInputElement>;
 }) {
@@ -75,6 +77,17 @@ export function WelcomeExperience({
           <span>{t("ui.WelcomeExperience.ask_a_health_question", "Ask a health question")}</span>
         </button>
       </div>
+      {suggestions.length > 0 ? (
+        <>
+          <p className="muted">Suggested questions</p>
+          <StarterChips
+            items={suggestions.map((q) => ({ id: q.id, label: q.text, prompt: q.text }))}
+            onPick={onSend}
+            onAsk={() => inputRef.current?.focus()}
+          />
+        </>
+      ) : (
+        <>
       {personal.length > 0 && (
         <>
           <p className="muted">{t("ui.WelcomeExperience.based_on_your_health", "Based on your health")}</p>
@@ -88,7 +101,9 @@ export function WelcomeExperience({
       {personalUnavailable && personal.length === 0 && (
         <p className="muted">{t("ui.WelcomeExperience.your_personal_health_questions_will_appe", "Your personal health questions will appear when your health data is available.")}</p>
       )}
-      {general.length > 0 && (
+        </>
+      )}
+      {suggestions.length === 0 && general.length > 0 && (
         <>
           <p className="muted">{t("ui.WelcomeExperience.learn_about_health", "Learn about health")}</p>
           <StarterChips

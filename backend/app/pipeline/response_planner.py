@@ -18,9 +18,10 @@ from app.pipeline.presentation import format_user_date
 
 _REPORT_LEVEL = re.compile(
     r"\b(?:"
-    r"show|open|view|see|display|give me|pull up|review|summar(?:ize|ise)"
-    r")\b.{0,36}\b(?:my )?(?:latest|current|most recent|last)?\s*(?:blood|lab)\s+(?:report|results?|tests?)\b"
-    r"|\b(?:my )?(?:latest|current|most recent|last)\s+(?:blood|lab)\s+(?:report|results?|tests?)\b",
+    r"show|open|view|see|display|give me|pull up|review|check|summar(?:ize|ise)"
+    r")\b.{0,48}\b(?:my )?(?:latest|current|most recent|last)?\s*(?:blood|lab)\s+(?:report|results?|tests?)\b"
+    r"|\b(?:my )?(?:latest|current|most recent|last)\s+(?:blood|lab)\s+(?:report|results?|tests?)\b"
+    r"|\b(?:which|what)\b.{0,40}\b(?:values?|results?|markers?)\b.{0,24}\b(?:outside|out of|abnormal|high or low)\b",
     re.I,
 )
 
@@ -104,8 +105,8 @@ def build_response_plan(message: str, plan: QueryPlan, context: HealthContext) -
     abnormal = [m for m in markers if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}]
     normal = [m for m in markers if getattr(m.flag, "value", str(m.flag)) == "normal"]
 
-    direct = "I found your latest blood report"
-    if date_text:
+    direct = "I found your latest blood report" if markers else "I looked for your blood report"
+    if date_text and markers:
         direct += f" from {date_text}"
     direct += "."
 
@@ -117,7 +118,7 @@ def build_response_plan(message: str, plan: QueryPlan, context: HealthContext) -
             pieces.append(f"{len(normal)} {'is' if len(normal) == 1 else 'are'} within range")
         summary = "; ".join(pieces) + "."
     else:
-        summary = "I can show the report once its measurements are available."
+        summary = "I don't have blood measurements from the records I can access for this question."
 
     actions = [
         "Show all results",

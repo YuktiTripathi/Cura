@@ -262,23 +262,9 @@ describe("MessageList narrative summary", () => {
         onFeedback={vi.fn()}
       />
     );
-    expect(screen.getByTestId("testing-option").textContent).toContain("Iron Studies with Ferritin");
-    expect(screen.getByText("A test that may help clarify this")).toBeTruthy();
-    expect(screen.getByText(/ferritin is not available/i)).toBeTruthy();
-    expect(screen.queryByText("View test group")).toBeNull();
-    expect(screen.queryByText(/catalog match/i)).toBeNull();
-    expect(screen.queryByTestId("package-details")).toBeNull();
-    expect(screen.queryByText("TIBC")).toBeNull();
-    const cta = screen.getByTestId("package-primary-cta");
-    expect(cta.tagName).toBe("BUTTON");
-    expect(cta.textContent).toBe("View Iron Studies with Ferritin");
-    fireEvent.click(cta);
-    expect(seen).toEqual([{ type: "cura:open_package", package_id: "31", kind: "test_group" }]);
-    fireEvent.click(screen.getByTestId("package-secondary-cta"));
-    expect(screen.getByTestId("package-details").textContent).toContain("Whether your iron stores are depleted");
-    expect(screen.getByTestId("package-details").textContent).toContain("24 Aug 2026");
-    expect(screen.getByText("TIBC")).toBeTruthy();
-    expect(screen.getByRole("button", { name: "View Iron Studies with Ferritin" })).toBeTruthy();
+    expect(screen.queryByTestId("testing-option")).toBeNull();
+    expect(screen.queryByText("A test that may help clarify this")).toBeNull();
+    expect(screen.queryByText("View Iron Studies with Ferritin")).toBeNull();
     window.removeEventListener("cura:open_package", onOpen);
   });
 

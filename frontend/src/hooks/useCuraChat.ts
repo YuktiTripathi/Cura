@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { rewindConversation, streamChat } from "../lib/api";
+import { useEffect, useState } from "react";
+import { rewindConversation, streamChat, createConversation, getConversation } from "../lib/api";
 import type { ConversationDetail } from "../lib/api";
 import type { ProcessingEvent } from "../lib/processingMessages";
 import type { SemanticResponse } from "../types/semantic";
@@ -36,6 +36,35 @@ export function useCuraChat() {
   // Every status shown during the current turn, in order, for the progress stepper.
   const [processingSteps, setProcessingSteps] = useState<ProcessingEvent[]>([]);
   const [conversationEpoch, setConversationEpoch] = useState(0);
+  const [suggestions, setSuggestions] = useState<Array<{ id: string; text: string; category: string }>>([]);
+
+  function applyDetail(detail: ConversationDetail) {
+    setConversationId(detail.id);
+    setSuggestions(detail.messages.length ? [] : detail.suggested_questions || []);
+    setMessages(
+      detail.messages.map((message) => ({
+        role: message.role,
+        content: message.content,
+      }))
+    );
+    window.sessionStorage.setItem("cura_conversation_id", detail.id);
+  }
+
+  useEffect(() => {
+    const saved = window.sessionStorage.getItem("cura_conversation_id");
+    if (!saved) {
+      void newConversation();
+      return;
+    }
+    void getConversation(saved)
+      .then(applyDetail)
+      .catch(() => {
+        window.sessionStorage.removeItem("cura_conversation_id");
+        void newConversation();
+      });
+    // Load or create the welcome conversation once.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   async function send(text: string, documentIds: string[] = [], contextRef?: ContextRef) {
     setLoading(true);
@@ -171,10 +200,20 @@ export function useCuraChat() {
     }
   }
 
-  function newConversation() {
-    setConversationId(null);
+  async function newConversation() {
     setMessages([]);
-    window.sessionStorage.removeItem("cura_conversation_id");
+    setError(null);
+    try {
+      const created = await createConversation();
+      setConversationId(created.id);
+      setSuggestions(created.suggested_questions || []);
+      window.sessionStorage.setItem("cura_conversation_id", created.id);
+    } catch (err) {
+      setConversationId(null);
+      setSuggestions([]);
+      window.sessionStorage.removeItem("cura_conversation_id");
+      setError(err instanceof Error ? err.message : "Could not start a conversation.");
+    }
     setConversationEpoch((n) => n + 1);
   }
 
@@ -196,14 +235,7 @@ export function useCuraChat() {
   }
 
   function resumeConversation(detail: ConversationDetail) {
-    setConversationId(detail.id);
-    setMessages(
-      detail.messages.map((message) => ({
-        role: message.role,
-        content: message.content,
-      }))
-    );
-    window.sessionStorage.setItem("cura_conversation_id", detail.id);
+    applyDetail(detail);
     setConversationEpoch((n) => n + 1);
   }
 
@@ -217,6 +249,7 @@ export function useCuraChat() {
     editAndResend,
     conversationId,
     conversationEpoch,
+    suggestions,
     newConversation,
     resumeConversation,
   };

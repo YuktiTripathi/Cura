@@ -15,13 +15,16 @@ Do not represent general information as the user's personal health result.
 Do not invent personal data.
 Do not diagnose the user.
 Do not prescribe medication or recommend medication changes.
+Do not suggest diagnostic tests, lab panels, retesting schedules, or healthcare packages unless the user explicitly asks what a named test measures.
 When a question requires personal health data, defer to the personal-data pipeline rather than guessing.
-Write in English. Keep medical terms and numbers unchanged.
+Write in English. Keep numbers unchanged. Use a medical term only after the everyday idea, and only when the user needs that term.
 
+Teach as if the reader has no medical background. Use everyday words first and start with what it does. One short everyday comparison is welcome when it truly helps. For a broad question, cover the main parts of the idea, not only one or two disease risks.
+Organize so the answer is easy to scan: short paragraphs, one meaningful bold heading, and concise bullets when there are several ideas. A simple follow-up or an emergency stays plain sentences, with the safety action first. No emoji.
+Answer the general concept first. If VERIFIED RELEVANT PERSONAL CONTEXT is supplied, add one brief connection only when it helps explain the concept. Use exact supplied values only. A Bio-AI score is a prediction, not a diagnosis or a probability. Never turn the answer into a report summary, imply causation, or mention unavailable personal data.
+Do not write "according to", "as noted by", or an organization name in the answer. The app shows sources separately. Keep an in-text source only when the claim would be misleading without it.
 Keep medical abbreviations unchanged: HbA1c, LDL, HDL, TSH, T3, T4, Vitamin D, Vitamin B12, CRP, ALT, AST.
 Follow-up questions must stay educational. Do not ask about this user's measured results, reports, or "your LDL".
-Prefer healthy ranges, lifestyle effects, and common causes.
-Use the shortest response that fully answers the question: usually two short paragraphs (roughly 40-120 words), not a lecture. Answer first. At most one short caveat, only if it matters.
 Never use the em dash character; use commas, full stops, colons or parentheses instead.
 If the question is about the user's own value ("my Vitamin D"), you may offer to explain their actual result.
 Return a JSON object with: answer, claims, recommendation_candidates,
@@ -82,14 +85,13 @@ RESPONSE PLANNING (decide yourself, every time)
 Answer the user's actual wording first. "Is this serious?" gets a severity judgment; "why?" gets reasons and connections; "what should I do?" gets actions; "what changed?" gets a comparison; "show me everything" or "show my report" gets a list or table; "short version" gets two or three sentences; "explain in detail" gets depth.
 Use the shortest response that fully answers the user's question. Personalized means choosing the few facts that change the answer, not mentioning more data. Do not explain everything you know.
 Choose the density silently (never print it): compact for a value, a yes/no or a simple marker question (roughly 40-100 words); standard for a normal personal explanation (roughly 80-180 words); detailed only for synthesis across several sources or genuinely difficult reasoning (roughly 150-300 words). These are soft targets. A lot of available context is never a reason to write more.
-The first one or two sentences answer the question. Keep paragraphs to one to three sentences; never write one long block. Use bullets only for several distinct items and a numbered list for priorities, a top N, a ranking or steps. Add headings only when they truly help.
+The first one or two sentences answer the question. Keep paragraphs to one to three sentences. For several ideas, use a meaningful bold heading and concise bullets, one idea each. A numbered list is for priorities or steps. A simple follow-up stays one or two sentences with no headings.
 Use at most one short safety qualifier, and only when it matters (for example "This is a risk estimate, not a diagnosis."). Do not repeat it in other words, and skip it for simple low-risk education.
 Never use the em dash character; use commas, full stops, colons or parentheses instead.
 Choose the shape that fits this answer, not a fixed template:
-- short prose for simple questions; one or two short paragraphs for explanations;
-- bullets only when listing several distinct items; a numbered list when ranking;
-- a comparison (previous vs current, with the numbers) for changes; a small table only when it truly helps a comparison, or when the user asks to see their results;
-- a short heading or a bold lead sentence only when it improves readability; most answers need none.
+- one or two sentences for a simple follow-up;
+- a bold heading and bullets when an explanation has several ideas;
+- a comparison (previous vs current, with the numbers) for changes; a small table only when the user asks to see results or a comparison needs it.
 Use Markdown (bold for key values, lists, rare small tables). Never use interface labels or stock section names such as "Health guidance", "Using your health context", "What this means", "What's still unclear" or "Related values". Do not repeat the same headings or opening pattern from turn to turn.
 If the message only asks to change the length or style of the previous answer ("short version", "in more detail", "explain like I'm 15"), re-answer the previous question in that style.
 End with a practical next step or an offer to go deeper only when it is useful.
@@ -150,7 +152,34 @@ class PromptBuilder:
     ) -> list[dict[str, str]]:
         personal = context.knowledge_scope == KnowledgeScope.personal
         depth = _depth_instruction(context)
-        if personal and uses_answer_evidence(context):
+        if personal and context.evidence_package:
+            contract = context.task_contract or {}
+            task = {
+                "response_type": contract.get("response_type"),
+                "operations": contract.get("operations") or [],
+                "required_sources": contract.get("required_sources") or [],
+            }
+            user = (
+                "Mode: PERSONAL_HEALTH\n"
+                "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
+                "VERIFIED PATIENT EVIDENCE is the only source of this member's measurements and scores. "
+                "Do not repeat those values from anywhere else, and do not add a value that is not listed. "
+                "Answer the response type in the task. Do not switch to a different topic or a different kind of answer.\n"
+                "Lead with the direct answer. Separate measured results from possible explanations. "
+                "If a source is listed under missing, say it is not on file. Do not tell the member to upload a report "
+                "when the status is NOT_PRESENT or NOT_RETRIEVED.\n"
+                "Do not print internal identifiers, routing, or the words task contract or evidence package.\n"
+                f"TASK:\n{compact_json(task)}\n"
+                f"VERIFIED PATIENT EVIDENCE:\n{compact_json(context.evidence_package)}\n"
+                + _medical_block(context, user_message)
+                + "Conversation focus (topic and follow-up only; never a source of current lab values): "
+                f"{(conversation_summary or '')[:500]}\n"
+                + f"Answer depth: {context.answer_depth.value}\n"
+                f"{depth}\n"
+                f"{_presentation_line(context, user_message)}"
+                f"User question: {user_message}\n"
+            )
+        elif personal and uses_answer_evidence(context):
             # Answer director: the model sees the few facts that answer this question, the
             # questionnaire answers that change the advice, and ranked next steps — not the record.
             evidence = build_answer_evidence(context, user_message)
@@ -179,6 +208,7 @@ class PromptBuilder:
                 + f"Answer depth: {context.answer_depth.value}\n"
                 f"{depth}\n"
                 f"{_adaptive_response_brief(context)}"
+                f"{_presentation_line(context, user_message)}"
                 f"User question: {user_message}\n"
             )
         elif personal:
@@ -202,27 +232,116 @@ class PromptBuilder:
                 f"{depth}\n"
                 f"{_adaptive_response_brief(context)}"
                 f"{_bio_explain_note(context, user_message)}"
+                f"{_presentation_line(context, user_message)}"
                 f"User question: {user_message}\n"
             )
         else:
             topic = context.resolved_topic_name or "the asked topic"
+            personal_context = _general_personal_context(context)
             user = (
                 "Mode: GENERAL_HEALTH\n"
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
                 "Answer from the retrieved medical evidence below when present. "
-                "Do not use or invent personal SuperShyft values. "
-                "Do not say 'your result' or 'your report'. "
+                "Do not invent personal SuperShyft values. "
                 "Do not name any organization that is not in the retrieved evidence. "
                 "Do not write a Source line.\n"
                 + _medical_block(context, user_message)
                 + f"Topic: {topic}\n"
-                f"User question: {user_message}\n"
+                + (
+                    "VERIFIED RELEVANT PERSONAL CONTEXT (optional; not the main answer):\n"
+                    f"{compact_json(personal_context)}\n"
+                    "Teach the concept first. Then, only if useful, add a short **How this relates to you** section. "
+                    "Do not list every fact, and do not say a habit or score caused a result.\n"
+                    if personal_context
+                    else "No relevant personal context is supplied. Explain the concept without mentioning this absence.\n"
+                )
+                + f"{_presentation_line(context, user_message)}"
+                + f"User question: {user_message}\n"
             )
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else _system_for_mode(SAFETY_INSTRUCTIONS)
+        from app.core.config import settings
+
+        if settings.cura_prompt_variant == "modular":
+            from app.pipeline.prompt_modules import compose_system, length_note, modules_for
+
+            system = compose_system(context, user_message)
+            note = length_note(user_message, modules_for(context, user_message))
+            if note:
+                user = note + user
+        elif personal and context.evidence_package and settings.answer_prompt_compact:
+                system = (
+                    "You are Cura. Answer in English using only VERIFIED PATIENT EVIDENCE. "
+                    "Do not invent values, units, dates, or risk categories. Do not diagnose or prescribe. "
+                    "Lead with the direct answer. If a source is missing, say it is not on file. "
+                    "Return JSON with answer, claims, recommendation_candidates, follow_up_questions, safety_flags, escalation."
+                )
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ]
+
+
+def _presentation_line(context: HealthContext, user_message: str) -> str:
+    from app.pipeline.answer_shape import presentation_note
+
+    kind = (context.task_contract or {}).get("response_type")
+    return presentation_note(user_message, kind)
+
+
+def _general_personal_context(context: HealthContext) -> dict:
+    """Small verified supplement for general education; never a record dump."""
+    if not context.general_personalization:
+        return {}
+    requested = set(context.requested_entity_codes or [])
+    markers = []
+    for marker in context.markers or []:
+        status = getattr(getattr(marker, "flag", None), "value", getattr(marker, "flag", None))
+        if marker.key not in requested:
+            continue
+        markers.append(
+            {
+                "name": marker.name,
+                "value": marker.value,
+                "unit": marker.unit,
+                "status": status,
+                "measured_at": str(marker.measured_at) if marker.measured_at else None,
+            }
+        )
+        if len(markers) >= 2:
+            break
+    risks = []
+    for risk in context.bio_ai_risks or []:
+        if risk.code not in requested:
+            continue
+        risks.append(
+            {
+                "name": risk.name,
+                "score": risk.score,
+                "category": risk.status,
+                "kind": "Bio-AI prediction, not a diagnosis",
+            }
+        )
+        if len(risks) >= 1:
+            break
+    wanted_questions = set(context.reasoning_context_codes or [])
+    questionnaire = [
+        {
+            "question": answer.question,
+            "answer": answer.value,
+            "unit": answer.unit,
+            "kind": "self-reported",
+        }
+        for answer in (context.questionnaire or [])
+        if answer.question_key in wanted_questions and answer.value not in (None, "")
+    ][:2]
+    payload = {}
+    if markers:
+        payload["blood_results"] = markers
+    if risks:
+        payload["bio_ai"] = risks
+    if questionnaire:
+        payload["lifestyle"] = questionnaire
+    return payload
 
 
 def _bio_explain_note(context: HealthContext, user_message: str) -> str:
@@ -256,8 +375,8 @@ def _medical_block(context: HealthContext, user_message: str = "") -> str:
             )
         return base + (
             "LOW RISK EDUCATION: you may answer from general knowledge. "
-            "Start with the answer itself. Do not label it \"General information\". "
-            "Keep it short and non-prescriptive.\n"
+            "Use everyday words first. Do not label it \"General information\". "
+            "Do not open with a list of diseases or name a guideline body in the answer.\n"
         )
     return (
         "RETRIEVED SOURCE POINTERS (title + URL). Accompanying notes are CURA topic index text, "

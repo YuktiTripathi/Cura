@@ -1,5 +1,6 @@
 import type { PresentedFinding, StructuredResponse, TestingOption } from "../../types/chat";
 import { AssistantBody } from "./AssistantBody";
+import { MarkdownAnswer } from "./MarkdownAnswer";
 import { availableFindings, FindingsTable, RawResultsDisclosure, RelatedResults } from "./FindingsTable";
 import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
@@ -57,7 +58,9 @@ export function PresentedAnswer({
       ) : null}
       {showHeadline ? <h3 className="answer-headline">{presentation.headline}</h3> : null}
       {presentation.overall_summary || presentation.summary ? (
-        <p className="answer-summary">{presentation.overall_summary || presentation.summary}</p>
+        <div className="answer-summary">
+          <MarkdownAnswer content={presentation.overall_summary || presentation.summary || ""} />
+        </div>
       ) : null}
       {presentation.personal_relevance ? (
         <aside className="personal-relevance" aria-label={t("ui.PresentedAnswer.why_this_matters_for_you", "Why this matters for you")}>
@@ -80,7 +83,9 @@ export function PresentedAnswer({
         )
       ) : null}
       {!narrative && presentation.interpretation && !isScoreList(presentation.interpretation) ? (
-        <p className="answer-summary">{presentation.interpretation}</p>
+        <div className="answer-summary">
+          <MarkdownAnswer content={presentation.interpretation} />
+        </div>
       ) : null}
       {!narrative && gaps.length > 0 ? (
         <section className="answer-section">

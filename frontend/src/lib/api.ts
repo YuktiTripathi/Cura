@@ -413,9 +413,14 @@ export type ConversationDetail = {
   id: string;
   title: string | null;
   messages: Array<{ id: string; role: "user" | "assistant"; content: string; created_at: string }>;
+  suggested_questions?: Array<{ id: string; text: string; category: string }>;
 };
 
-export async function listConversations(): Promise<ConversationSummary[]> {
+export async function createConversation(): Promise<ConversationDetail> {
+  const res = await fetch(`${API}/api/v1/conversations`, { method: "POST", headers: authHeaders() });
+  if (!res.ok) throw new Error("Could not start a conversation.");
+  return (await res.json()) as ConversationDetail;
+}
   const res = await fetch(`${API}/api/v1/conversations`, { headers: authHeaders() });
   if (!res.ok) return [];
   return (await res.json()) as ConversationSummary[];

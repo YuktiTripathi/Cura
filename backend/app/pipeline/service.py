@@ -269,6 +269,31 @@ class ChatService:
             self._progress.emit(ProcessingStage.fetching_bioai_data, plan=plan)
         elif plan.needs_questionnaire:
             self._progress.emit(ProcessingStage.fetching_questionnaire, plan=plan)
+        elif plan.general_personalization:
+            try:
+                self._progress.mark("retrieval")
+                self._progress.mark("context")
+                with perf.stage("context_build"):
+                    context = self.builder.build(
+                        principal,
+                        plan,
+                        db=self.db,
+                        message=payload.message,
+                        conversation_state=conv_state,
+                    )
+                self._progress.measure("retrieval")
+                self._progress.measure("context")
+            except ProviderUnavailableError:
+                # Personal context is optional for education. A provider problem must
+                # not replace the requested general explanation with an error.
+                context = HealthContext(
+                    intent=plan.intent,
+                    answer_depth=plan.answer_depth,
+                    knowledge_scope=KnowledgeScope.general,
+                    data_source="general",
+                    resolved_topic=plan.topic,
+                    resolved_topic_name=plan.topic_name,
+                )
         elif plan.needs_personal_data:
             self._progress.emit(ProcessingStage.fetching_personal_data, plan=plan)
 
@@ -1214,14 +1239,17 @@ class ChatService:
             "urgent_soon",
         }:
             allowed_packages = False
-        with perf.stage("recommendation"):
-            testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
-                message=payload.message,
-                context=context,
-                plan=plan,
-                conversation_state=conv_state,
-                package_suggestion_allowed=allowed_packages,
-            )
+        if not settings.cura_test_suggestions_enabled:
+            testing_option, diagnostics_trace = None, {}
+        else:
+            with perf.stage("recommendation"):
+                testing_option, diagnostics_trace, _test_need = self.testing_options.evaluate(
+                    message=payload.message,
+                    context=context,
+                    plan=plan,
+                    conversation_state=conv_state,
+                    package_suggestion_allowed=allowed_packages,
+                )
         eval_turn["diagnostics"] = diagnostics_trace
 
         inventory = build_inventory(principal, self.registry, plan, conv, context)
@@ -1311,12 +1339,19 @@ class ChatService:
             for block in turn_experience.blocks:
                 self._progress.experience_block(block)
 
-        self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
-        self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
+        user_message, assistant_message = self.repo.add_turn_messages(
+            conv,
+            user_content=payload.message,
+            assistant_content=answer,
+            intent=plan.intent.value,
+        )
+        eval_turn["user_message_id"] = user_message.id
+        eval_turn["assistant_message_id"] = assistant_message.id
         self.repo.update_follow_up(
             conv,
             context.resolved_topic or plan.topic,
             context.resolved_topic_name or plan.topic_name,
+            commit=False,
         )
         selected_report_id = None
         if context.status != "ambiguous":
@@ -1367,7 +1402,11 @@ class ChatService:
             explained_entities=list(experience.relevant.requested_keys),
             topic_summary=experience.topic_summary.text if experience.topic_summary else None,
         )
-        self.repo.update_conversation_state(conv, next_state.model_dump_json())
+        self.repo.update_conversation_state(
+            conv,
+            next_state.model_dump_json(),
+            commit=False,
+        )
         self.repo.update_context_state(
             conv,
             marker_code=context.resolved_topic or plan.topic,
@@ -1377,6 +1416,7 @@ class ChatService:
                 plan.intent.value,
                 context.resolved_topic_name or plan.topic_name,
             ),
+            commit=False,
         )
 
         latency = int((time.perf_counter() - started) * 1000)
@@ -1492,6 +1532,8 @@ class ChatService:
             )
         else:
             self.repo.update_source_mode(conv, "supershyft" if plan.needs_personal_data else "general")
+        usage = (getattr(answer_client, "last_usage", {}) or {}) if llm_called and answer_client else {}
+        reported = bool(usage.get("usage_reported"))
         return ChatResponse(
             conversation_id=conv.id,
             answer=answer,
@@ -1522,15 +1564,17 @@ class ChatService:
                 response_mode=presentation.mode.value if presentation else plan.response_mode,
                 model=(answer_client.model if answer_client and llm_called else None),
                 provider=settings.resolved_llm_provider() if llm_called else None,
-                input_tokens=(getattr(answer_client, "last_usage", {}) or {}).get("input_tokens") if llm_called and answer_client else None,
-                output_tokens=(getattr(answer_client, "last_usage", {}) or {}).get("output_tokens") if llm_called and answer_client else None,
+                input_tokens=usage.get("input_tokens") if reported else None,
+                output_tokens=usage.get("output_tokens") if reported else None,
+                cached_tokens=usage.get("cached_tokens") if reported else None,
+                token_usage="provider" if reported else ("unavailable" if llm_called else None),
                 estimated_cost_usd=(
                     estimate_cost_usd(
                         answer_client.model,
-                        int((getattr(answer_client, "last_usage", {}) or {}).get("input_tokens") or 0),
-                        int((getattr(answer_client, "last_usage", {}) or {}).get("output_tokens") or 0),
+                        int(usage.get("input_tokens") or 0),
+                        int(usage.get("output_tokens") or 0),
                     )
-                    if llm_called and answer_client
+                    if reported and answer_client
                     else None
                 ),
                 model_fallback_used=model_fallback_used if llm_called else None,
@@ -2208,12 +2252,10 @@ class ChatService:
                     "page": item.page_start,
                 }
             )
-        last = self.repo.latest_assistant_message(conv.id)
         row = self.repo.add_interaction(
+            commit=False,
             conversation_id=conv.id,
             subject_id=principal.subject_id,
-            user_query=payload.message,
-            assistant_response=response.answer,
             detected_intent=plan.intent.value,
             routing_decision=meta.router,
             personal_data_required=bool(plan.needs_personal_data),
@@ -2234,7 +2276,8 @@ class ChatService:
             fallback_used=bool(meta.fallback_used or meta.jev_fallback),
             error_status=None if meta.status in {"ok", "document_retrieved", "cross_source_comparison"} else meta.status,
             request_id=meta.request_id,
-            message_id=last.id if last else None,
+            user_message_id=turn.get("user_message_id"),
+            message_id=turn.get("assistant_message_id"),
         )
         fact_rows = []
         for item in response.evidence or []:

@@ -8,9 +8,11 @@ from app.pipeline.questionnaire_intent import explicit_questionnaire_request
 from app.pipeline.questionnaire_topics import questionnaire_topic
 from app.pipeline.source_routing import annotate_plan
 from app.pipeline.health_sources import sync_plan_sources
+from app.pipeline.general_personalization import attach_general_personalization
 from app.pipeline.operations import named_personal_sources
 from app.pipeline.planner import attach_task_plan
 from app.pipeline.response_planner import repair_report_level_plan
+from app.pipeline.task_contract import apply_task_contract
 from app.routing.model_tier import apply_answer_model_routing
 from app.routing.schemas import JevDecision, JevIntent, JevOperation, JevSource, JevTimeRange
 
@@ -155,7 +157,9 @@ def plan_from_jev(
     plan.data_sources = _data_sources(plan)
     plan = attach_task_plan(sync_plan_sources(plan), message, decision=decision)
     plan = repair_report_level_plan(plan, message)
-    return apply_answer_model_routing(sync_plan_sources(plan), decision=decision)
+    plan = sync_plan_sources(plan)
+    plan = attach_general_personalization(plan, message)
+    return apply_answer_model_routing(plan, decision=decision)
 
 def _time_operation(decision: JevDecision) -> str:
     if decision.operation == JevOperation.compare:

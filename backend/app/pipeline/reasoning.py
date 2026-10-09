@@ -144,6 +144,21 @@ class ReasoningService:
                 answer=f"{response_plan.direct_answer} {response_plan.summary}{detail}".strip(),
                 llm_mode="structured_report_overview",
             )
+        if (plan.task_contract or {}).get("response_type") == "ABNORMAL_LIST" and context.markers:
+            from app.pipeline.evidence_inventory import assemble_evidence
+
+            abnormal = assemble_evidence(plan, context)
+            if abnormal.measurements:
+                lines = [
+                    f"{row.get('name')}: {row.get('value')} {row.get('unit') or ''} ({row.get('flag')})".replace("  ", " ")
+                    for row in abnormal.measurements
+                ]
+                return ReasoningResult(
+                    answer="These results are outside the range on the report: " + "; ".join(lines) + ".",
+                    llm_called=False,
+                    llm_mode="verified_abnormal_list",
+                    latency_ms=int((time.perf_counter() - started) * 1000),
+                )
 
         if (
             lookup
@@ -219,6 +234,31 @@ class ReasoningService:
         if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (
             plan_needs_reasoning(plan) or not lookup or (explain_bio and context.bio_ai_risks)
         ):
+            from app.pipeline.evidence_inventory import assemble_evidence
+
+            package = assemble_evidence(plan, context)
+            if plan.task_contract:
+                context.evidence_package = package.prompt_payload()
+                if package.blocked_answer:
+                    return ReasoningResult(
+                        answer=package.blocked_answer,
+                        llm_called=False,
+                        llm_mode="evidence_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                if package.response_type == "MARKER_LOOKUP" and len(package.measurements) == 1:
+                    row = package.measurements[0]
+                    unit = row.get("unit") or ""
+                    answer = (
+                        f"{row.get('name')} is {row.get('value')} {unit}. "
+                        f"The report marks it {row.get('flag') or 'unknown'}."
+                    ).replace("  ", " ")
+                    return ReasoningResult(
+                        answer=answer.strip(),
+                        llm_called=False,
+                        llm_mode="verified_marker",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
             with perf.stage("prompt_build"):
                 messages = self.prompts.build(
                     context, conversation_summary, message, response_lang, routing_note=routing_note

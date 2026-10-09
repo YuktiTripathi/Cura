@@ -4,6 +4,7 @@ import math
 import re
 from dataclasses import dataclass
 
+from sqlalchemy import func, or_
 from sqlalchemy.orm import Session
 
 from app.core.config import settings
@@ -22,6 +23,25 @@ _EXPLANATORY = re.compile(
     re.I,
 )
 _TABLEISH = re.compile(r"\b(reference|range|result|test|investigation|method)\b", re.I)
+_SEARCH_STOPWORDS = {
+    "a",
+    "about",
+    "and",
+    "does",
+    "explain",
+    "for",
+    "from",
+    "how",
+    "is",
+    "mean",
+    "my",
+    "of",
+    "report",
+    "say",
+    "the",
+    "this",
+    "what",
+}
 
 
 @dataclass
@@ -48,26 +68,52 @@ class DocumentRetriever:
         document_ids: list[str] | None = None,
         limit: int | None = None,
     ) -> list[DocumentEvidence]:
-        if document_ids is not None:
-            for did in document_ids:
-                row = (
-                    self.db.query(Document)
-                    .filter(Document.id == did, Document.user_id == user_id, Document.upload_status != "deleted")
-                    .one_or_none()
-                )
-                if row is None:
-                    raise NotFoundError("Document not found.")
-        q = self.db.query(DocumentChunk, Document).join(Document, DocumentChunk.document_id == Document.id)
-        q = q.filter(DocumentChunk.user_id == user_id, Document.user_id == user_id)
-        if document_ids is not None:
-            q = q.filter(DocumentChunk.document_id.in_(document_ids))
-        rows = q.all()
-        scored: list[DocumentEvidence] = []
         q_tokens = _tokenize(query)
         if not q_tokens:
             return []
         params = normalize_lab_query(query)
         primary = primary_lab_key(query)
+        if document_ids is not None:
+            requested = set(document_ids)
+            owned = {
+                row[0]
+                for row in (
+                    self.db.query(Document.id)
+                    .filter(
+                        Document.id.in_(requested),
+                        Document.user_id == user_id,
+                        Document.upload_status != "deleted",
+                    )
+                    .all()
+                )
+            }
+            if owned != requested:
+                raise NotFoundError("Document not found.")
+        base = self.db.query(DocumentChunk, Document).join(
+            Document, DocumentChunk.document_id == Document.id
+        )
+        base = base.filter(DocumentChunk.user_id == user_id, Document.user_id == user_id)
+        if document_ids is not None:
+            base = base.filter(DocumentChunk.document_id.in_(document_ids))
+
+        # Fetch only a superset of chunks that can receive a positive score. The
+        # previous implementation transferred every chunk to Python even though
+        # chunks without a query token or recognized biomarker alias always scored
+        # zero. Keeping the total corpus count preserves the existing IDF formula.
+        search_terms = {
+            token for token in q_tokens if len(token) >= 2 and token not in _SEARCH_STOPWORDS
+        }
+        for parameter in params:
+            search_terms.update(_tokenize(parameter.key.replace("_", " ")))
+        if not search_terms:
+            search_terms = set(q_tokens)
+        lowered_text = func.lower(DocumentChunk.text)
+        candidates = base.filter(
+            or_(*(lowered_text.contains(term) for term in sorted(search_terms)))
+        )
+        n_docs = max(base.count(), 1)
+        rows = candidates.all()
+        scored: list[DocumentEvidence] = []
         df: dict[str, int] = {}
         texts = []
         for chunk, doc in rows:
@@ -75,7 +121,6 @@ class DocumentRetriever:
             texts.append((chunk, doc, toks, _tokenize(chunk.text)))
             for t in toks:
                 df[t] = df.get(t, 0) + 1
-        n_docs = max(len(texts), 1)
         for chunk, doc, uniq, all_toks in texts:
             score = 0.0
             tf: dict[str, int] = {}

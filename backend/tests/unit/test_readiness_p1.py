@@ -32,7 +32,7 @@ def _conversation(db, subject: str, *, updated_at: datetime | None = None) -> Co
     db.flush()
     db.add(Message(id=str(uuid.uuid4()), conversation_id=conv.id, role="user", content="hi"))
     db.add(HealthFactRef(id=str(uuid.uuid4()), subject_id=subject, conversation_id=conv.id, source="x", metric="hba1c"))
-    db.add(Interaction(id=str(uuid.uuid4()), conversation_id=conv.id, subject_id=subject, user_query="q", assistant_response="a"))
+    db.add(Interaction(id=str(uuid.uuid4()), conversation_id=conv.id, subject_id=subject))
     db.add(Feedback(id=str(uuid.uuid4()), conversation_id=conv.id, subject_id=subject, rating="up"))
     if updated_at:
         conv.updated_at = updated_at
@@ -84,6 +84,43 @@ def test_purge_removes_expired_documents_and_conversations(db, monkeypatch):
     assert _count(db, ProcessingJob, document_id=doc.id) == 0
     assert db.get(Conversation, old_conv.id) is None
     assert db.get(Conversation, fresh_conv.id) is not None
+
+
+def test_operational_retention_is_disabled_until_explicitly_configured(db, monkeypatch):
+    now = datetime.now(timezone.utc)
+    old_job = ProcessingJob(
+        id=str(uuid.uuid4()),
+        user_id="retention-user",
+        status="completed",
+        created_at=now - timedelta(days=60),
+    )
+    old_audit = AuditRecord(
+        id=str(uuid.uuid4()),
+        request_id=f"request-{uuid.uuid4()}",
+        subject_id_hash="hash",
+        created_at=now - timedelta(days=60),
+    )
+    db.add_all([old_job, old_audit])
+    db.commit()
+    old_job_id = old_job.id
+    old_audit_id = old_audit.id
+    monkeypatch.setattr(settings, "document_retention_days", 0)
+    monkeypatch.setattr(settings, "conversation_retention_days", 0)
+    monkeypatch.setattr(settings, "processing_job_retention_days", 0)
+    monkeypatch.setattr(settings, "audit_record_retention_days", 0)
+
+    purge_expired(db, now=now)
+    assert db.get(ProcessingJob, old_job_id) is not None
+    assert db.get(AuditRecord, old_audit_id) is not None
+
+    monkeypatch.setattr(settings, "processing_job_retention_days", 30)
+    monkeypatch.setattr(settings, "audit_record_retention_days", 30)
+    counts = purge_expired(db, now=now)
+    db.expire_all()
+    assert counts["processing_jobs"] >= 1
+    assert counts["audit_records"] >= 1
+    assert db.get(ProcessingJob, old_job_id) is None
+    assert db.get(AuditRecord, old_audit_id) is None
 
 
 def test_voice_refuses_when_zdr_required_but_not_configured(monkeypatch):

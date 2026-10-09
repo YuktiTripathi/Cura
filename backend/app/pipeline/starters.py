@@ -53,6 +53,7 @@ class HealthSnapshot:
     has_blood: bool = False
     has_bio: bool = False
     has_questionnaire: bool = False
+    lifestyle_topics: set[str] = field(default_factory=set)
 
 
 def collect_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegistry) -> HealthSnapshot:
@@ -109,8 +110,15 @@ def collect_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegist
         snap.has_bio = True
         latest_bio = sorted(bio, key=lambda r: (r.report_date, r.report_id))[-1]
         snap.bio_risks = list(latest_bio.risks or [])
-    if life and any("diet preference" in (n or "").lower() for n in (life.notes or [])):
-        snap.has_nutrition = True
+    if life and life.notes:
+        blob = " ".join(life.notes).lower()
+        if "diet" in blob or "nutrition" in blob:
+            snap.has_nutrition = True
+            snap.lifestyle_topics.add("diet")
+        if "sleep" in blob:
+            snap.lifestyle_topics.add("sleep")
+        if "activity" in blob or "exercise" in blob:
+            snap.lifestyle_topics.add("activity")
     try:
         provider = getattr(registry, "questionnaires", None)
         if provider is not None:

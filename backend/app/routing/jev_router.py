@@ -306,6 +306,10 @@ def _maybe_demote_personal(
             return plan
     if not plan.needs_personal_data:
         return plan
+    if plan.general_personalization:
+        # This is still a general-education task. The personal read is an optional,
+        # topic-scoped supplement and must survive the anti-misrouting guard.
+        return plan
     logger.info("routing_guard demoted_personal_to_general intent=%s topic=%s", plan.intent.value, plan.topic)
     return force_general_plan(plan)
 

@@ -7,6 +7,7 @@ from app.contracts.context_ref import ContextRef
 from app.pipeline.operations import apply_operation_metadata, named_personal_sources
 from app.pipeline.planner import attach_task_plan
 from app.pipeline.response_planner import repair_report_level_plan
+from app.pipeline.task_contract import apply_task_contract
 from app.pipeline.conversation_state import apply_to_query_plan
 from app.contracts.conversation_state import ConversationState
 from app.pipeline.lab_parameters import match_lab_keys, primary_lab_key
@@ -15,6 +16,7 @@ from app.pipeline.questionnaire_intent import (
     is_questionnaire_topic,
 )
 from app.pipeline.questionnaire_topics import questionnaire_topic
+from app.pipeline.general_personalization import attach_general_personalization
 
 
 def build_query_plan(
@@ -199,6 +201,7 @@ def build_query_plan(
         uploaded_document_count=uploaded_document_count,
         prior_source_mode=prior_source_mode,
     )
+    plan = attach_general_personalization(plan, message)
     if intent in {
         IntentType.blood_marker_explanation,
         IntentType.nutrition_guidance,
@@ -217,14 +220,13 @@ def build_query_plan(
     plan = apply_to_query_plan(plan, conversation_state)
     plan = attach_task_plan(plan, message)
     plan = repair_report_level_plan(plan, message)
+    plan = apply_task_contract(plan, message)
     if plan.needs_questionnaire and (plan.needs_blood or plan.needs_bio_ai or plan.needs_goals):
         plan.medical_evidence_required = True
         if plan.needs_blood or plan.needs_bio_ai:
             plan.source = QuerySource.mixed
             plan.needs_supershyft = True
     return plan
-
-
 def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:
     update: dict = {"report_id": ref.report_id, "explicit_source_ref": True}
     if ref.type == "blood_marker":

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, ForeignKey, Integer, String, Text, func
+from sqlalchemy import Boolean, DateTime, ForeignKey, Index, Integer, String, Text, func
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
@@ -10,6 +10,9 @@ class Base(DeclarativeBase):
 
 class Conversation(Base):
     __tablename__ = "conversations"
+    __table_args__ = (
+        Index("ix_conversations_subject_updated", "subject_id", "updated_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     subject_id: Mapped[str] = mapped_column(String(128), index=True)
@@ -23,6 +26,7 @@ class Conversation(Base):
     current_marker_code: Mapped[str | None] = mapped_column(String(128), nullable=True)
     conversation_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
     conversation_state_json: Mapped[str | None] = mapped_column(Text, nullable=True)
+    suggestions_json: Mapped[str | None] = mapped_column(Text, nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -32,6 +36,9 @@ class Conversation(Base):
 
 class Message(Base):
     __tablename__ = "messages"
+    __table_args__ = (
+        Index("ix_messages_conversation_created", "conversation_id", "created_at", "id"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     conversation_id: Mapped[str] = mapped_column(ForeignKey("conversations.id"), index=True)
@@ -57,15 +64,22 @@ class Feedback(Base):
 
 
 class Interaction(Base):
-    """One completed chat turn for evaluation. References reports; does not store IHR blobs."""
+    """Compact per-turn telemetry. Message rows are the canonical transcript."""
 
     __tablename__ = "interactions"
+    __table_args__ = (
+        Index("ix_interactions_conversation_subject_created", "conversation_id", "subject_id", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     conversation_id: Mapped[str] = mapped_column(String(36), index=True)
     subject_id: Mapped[str] = mapped_column(String(128), index=True)
-    user_query: Mapped[str] = mapped_column(Text)
-    assistant_response: Mapped[str] = mapped_column(Text)
+    # Historical rows retain these fields. New writes use message identifiers and leave
+    # the legacy text null so health/conversation text is stored only in messages.
+    legacy_user_query: Mapped[str | None] = mapped_column("user_query", Text, nullable=True)
+    legacy_assistant_response: Mapped[str | None] = mapped_column(
+        "assistant_response", Text, nullable=True
+    )
     detected_intent: Mapped[str | None] = mapped_column(String(64), nullable=True)
     routing_decision: Mapped[str | None] = mapped_column(String(32), nullable=True)
     personal_data_required: Mapped[bool] = mapped_column(Boolean, default=False)
@@ -84,6 +98,7 @@ class Interaction(Base):
     fallback_used: Mapped[bool] = mapped_column(Boolean, default=False)
     error_status: Mapped[str | None] = mapped_column(String(64), nullable=True)
     request_id: Mapped[str | None] = mapped_column(String(64), nullable=True, index=True)
+    user_message_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     message_id: Mapped[str | None] = mapped_column(String(36), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now(), index=True)
 
@@ -108,18 +123,11 @@ class HealthFactRef(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
 
 
-class PromptVersion(Base):
-    __tablename__ = "prompt_versions"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True)
-    name: Mapped[str] = mapped_column(String(64))
-    version: Mapped[str] = mapped_column(String(32))
-    body: Mapped[str] = mapped_column(Text)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
-
-
 class AuditRecord(Base):
     __tablename__ = "audit_records"
+    __table_args__ = (
+        Index("ix_audit_records_created", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     request_id: Mapped[str] = mapped_column(String(64), index=True)
@@ -136,6 +144,9 @@ class Document(Base):
     """User-uploaded medical document metadata. Stored in Cura SQLite only."""
 
     __tablename__ = "documents"
+    __table_args__ = (
+        Index("ix_documents_user_created", "user_id", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     user_id: Mapped[str] = mapped_column(String(128), index=True)
@@ -192,6 +203,9 @@ class UserProfileFact(Base):
 
 class DocumentChunk(Base):
     __tablename__ = "document_chunks"
+    __table_args__ = (
+        Index("ix_document_chunks_user_document_page", "user_id", "document_id", "page_start"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     document_id: Mapped[str] = mapped_column(ForeignKey("documents.id"), index=True)
@@ -208,6 +222,9 @@ class ProcessingJob(Base):
     """Durable document/work item. Survives process restart; workers claim by status."""
 
     __tablename__ = "processing_jobs"
+    __table_args__ = (
+        Index("ix_processing_jobs_kind_status_created", "kind", "status", "created_at"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     kind: Mapped[str] = mapped_column(String(32), default="document_extract")
@@ -225,6 +242,9 @@ class ConsentRecord(Base):
     """Versioned member consent before health data reaches third party model providers."""
 
     __tablename__ = "consent_records"
+    __table_args__ = (
+        Index("ix_consent_records_subject_created", "subject_id", "created_at", "id"),
+    )
 
     id: Mapped[str] = mapped_column(String(36), primary_key=True)
     subject_id: Mapped[str] = mapped_column(String(128), index=True)

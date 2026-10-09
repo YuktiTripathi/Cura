@@ -185,3 +185,7 @@ class HealthContext(BaseModel):
     report_patterns: list[dict] = Field(default_factory=list)
     # Conversation turn type (NEW_QUESTION, FOLLOW_UP_QUESTION ...). Internal only.
     conversation_turn: str | None = None
+    task_contract: dict | None = None
+    general_personalization: bool = False
+    # Normalized facts for the answer prompt. Report ids are omitted.
+    evidence_package: dict | None = None

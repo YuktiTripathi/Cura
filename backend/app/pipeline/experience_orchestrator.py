@@ -36,6 +36,15 @@ def _clean(text: str | None) -> str | None:
     return value or None
 
 
+def _keep_layout(text: str | None) -> str | None:
+    """Keep paragraph and list breaks. Collapse only spaces inside a line."""
+    if not text or not text.strip():
+        return None
+    lines = [re.sub(r"[ \t]+", " ", line).strip() for line in text.replace("\r\n", "\n").split("\n")]
+    value = "\n".join(lines).strip()
+    return value or None
+
+
 def _first_sentences(text: str | None, *, max_chars: int = 320) -> str | None:
     value = _clean(text)
     if not value:
@@ -98,10 +107,10 @@ class ExperienceOrchestrator:
                     findings.append(item)
                     seen.add(key)
 
-        direct = _clean((p.summary if p else None) or (p.overall_summary if p else None))
+        direct = _keep_layout((p.summary if p else None) or (p.overall_summary if p else None))
         if not direct:
             direct = _finding_text(findings) or _first_sentences(answer)
-        interpretation = _clean(p.interpretation if p else None)
+        interpretation = _keep_layout(p.interpretation if p else None)
         if interpretation and direct and interpretation.lower() == direct.lower():
             interpretation = None
 

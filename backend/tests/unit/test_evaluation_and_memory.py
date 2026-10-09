@@ -270,7 +270,10 @@ def test_interaction_and_feedback_persisted():
         interactions = db.query(Interaction).filter(Interaction.conversation_id == cid).all()
         assert interactions
         row = interactions[-1]
-        assert row.user_query == "What is my latest Vitamin D?"
+        assert row.legacy_user_query is None
+        assert row.legacy_assistant_response is None
+        assert row.user_message_id
+        assert row.message_id
         assert row.personal_data_required is True
         assert row.retrieval_status == SUCCESS
         assert row.ihr_queried is True
@@ -285,6 +288,10 @@ def test_interaction_and_feedback_persisted():
         facts = db.query(HealthFactRef).filter(HealthFactRef.conversation_id == cid).all()
         assert facts
         assert all(f.report_id and f.metric and f.subject_id == "demo-user-001" for f in facts)
+        ConversationRepository(db).rewind_for_subject(cid, "demo-user-001", 0)
+        assert db.query(Interaction).filter(Interaction.conversation_id == cid).count() == 0
+        assert db.query(HealthFactRef).filter(HealthFactRef.conversation_id == cid).count() == 0
+        assert db.query(Feedback).filter(Feedback.conversation_id == cid).count() == 0
     finally:
         db.close()
 

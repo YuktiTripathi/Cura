@@ -4,6 +4,7 @@ import type { PackageAction, TestingOption } from "../../types/chat";
 import { t } from "../../i18n";
 
 export function TestingOptionCard({ option }: { option: TestingOption }) {
+  if (import.meta.env.VITE_CURA_TEST_SUGGESTIONS_ENABLED !== "true") return null;
   const [detailsOpen, setDetailsOpen] = useState(false);
   const name = option.package?.name || option.display_name;
   const reason = option.reason || option.medical_rationale || "";

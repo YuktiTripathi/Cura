@@ -63,6 +63,8 @@ class ChatMeta(BaseModel):
     prompt_version: str = "cura-v1"
     input_tokens: int | None = None
     output_tokens: int | None = None
+    cached_tokens: int | None = None
+    token_usage: str | None = None
     jev_called: bool = False
     jev_fallback: bool = False
     jev_intent: str | None = None
@@ -176,10 +178,17 @@ class MessageOut(BaseModel):
     created_at: str
 
 
+class SuggestedQuestion(BaseModel):
+    id: str
+    text: str
+    category: str
+
+
 class ConversationDetail(BaseModel):
     id: str
     title: str | None = None
     messages: list[MessageOut]
+    suggested_questions: list[SuggestedQuestion] = Field(default_factory=list)
 
 
 class FeedbackRequest(BaseModel):

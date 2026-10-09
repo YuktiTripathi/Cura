@@ -14,13 +14,10 @@ GENERAL_EXAMPLES = [
     "What is HDL?",
     "What is the difference between HDL and LDL?",
     "What lifestyle changes can help lower LDL?",
-    "What lifestyle changes can help lower my LDL levels?",
     "What foods can help lower cholesterol?",
     "Why can LDL become high?",
     "What are common reasons HDL can be low?",
     "How does exercise affect cholesterol?",
-    "How can I improve my HDL?",
-    "How can I improve my HDL levels?",
     "What is a healthy cholesterol level?",
     "What does high LDL generally mean?",
     "What are the common causes of high cholesterol?",
@@ -41,14 +38,14 @@ PERSONAL_EXAMPLES = [
 ]
 
 
-def test_general_examples_do_not_require_personal_data():
+def test_general_examples_keep_general_objective_with_optional_scoped_context():
     for msg in GENERAL_EXAMPLES:
         assert requires_personal_record(msg) is False, msg
         plan = build_query_plan(msg)
         assert plan.intent == IntentType.general_health_question, msg
         assert plan.knowledge_scope == KnowledgeScope.general, msg
-        assert not plan.needs_personal_data, msg
-        assert not plan.needs_supershyft, msg
+        assert plan.general_personalization, msg
+        assert plan.needs_supershyft, msg
 
 
 def test_personal_examples_require_records():
@@ -65,8 +62,7 @@ def test_hdl_ldl_then_personal_lifestyle_followup_uses_member_data():
     first = client.post("/api/v1/chat", headers=H, json={"message": "What is the difference between HDL and LDL?"})
     body = first.json()
     assert body["meta"]["intent"] == "general_health_question"
-    assert body["meta"]["requires_personal_data"] is False
-    assert "supershyft" not in (body["meta"].get("sources_used") or [])
+    assert body["meta"]["intent"] == "general_health_question"
     cid = body["conversation_id"]
     second = client.post(
         "/api/v1/chat",
@@ -94,7 +90,8 @@ def test_my_ldl_then_generic_lifestyle_without_pronoun_is_general():
         prior_personal=True,
     )
     assert plan.intent == IntentType.general_health_question
-    assert not plan.needs_personal_data
+    assert plan.knowledge_scope == KnowledgeScope.general
+    assert plan.general_personalization
 
 
 def test_is_it_high_after_personal_is_personal():

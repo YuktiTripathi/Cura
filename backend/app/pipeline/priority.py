@@ -42,6 +42,7 @@ def theme_priority_score(
         domain_entities = list(domain.primary_entities) + list(domain.supporting_entities)
     goal_hit = 1 if goal and (goal & set(domain_entities)) else 0
     severity = max((_SEVERITY.get(str(flag), 0) for flag in flags), default=0)
+    clinical = 6 if code in {"glycemic_health", "red_cell_anaemia_health"} and severity >= 2 else 0
     change = 0
     for item in context.baselines or []:
         if item.entity in domain_entities and item.classification in {

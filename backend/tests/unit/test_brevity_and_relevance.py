@@ -98,7 +98,8 @@ def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
         assert "compact" in system and "40-100 words" in system
         assert "em dash" in system and EM not in system
         assert "at most one short safety qualifier" in system.lower()
-    assert "shortest response" in GENERAL_HEALTH_INSTRUCTIONS and EM not in GENERAL_HEALTH_INSTRUCTIONS
+    assert "everyday words" in GENERAL_HEALTH_INSTRUCTIONS and "short paragraphs" in GENERAL_HEALTH_INSTRUCTIONS
+    assert EM not in GENERAL_HEALTH_INSTRUCTIONS
 
 
 # ------------------------------------------------------------ relevance and rendering

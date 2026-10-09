@@ -200,6 +200,13 @@ class ResponseComposer:
         presentation.conversation_goal = experience.goal.value
         presentation.response_depth = experience.depth.value
         presentation.next_conversation_action = experience.next_action.value
+        from app.pipeline.answer_shape import separate_answer_layout
+
+        text = separate_answer_layout(text)
+        if presentation.summary:
+            presentation.summary = separate_answer_layout(presentation.summary)
+        if presentation.overall_summary:
+            presentation.overall_summary = separate_answer_layout(presentation.overall_summary)
         presentation.blocks = [item.model_dump(mode="json") for item in experience_blocks_from_answer(text, experience, context)]
         presentation.related_findings = _related_findings(context, experience)
         presentation.suggestion_chips = [item.text for item in chips]
@@ -216,6 +223,9 @@ class ResponseComposer:
                 presentation.summary = text
         from app.pipeline.presentation_policy import apply_presentation_policy
 
+        text = separate_answer_layout(text)
+        if presentation.summary:
+            presentation.summary = separate_answer_layout(presentation.summary)
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:
             context.answer_evidence_trace.update(policy_trace)

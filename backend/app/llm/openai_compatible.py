@@ -22,7 +22,7 @@ _FORMAT_ERRORS = {"LLM request format was rejected", "Unexpected LLM response", 
 logger = logging.getLogger("cura.llm")
 
 _THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
-_REASONING_MODEL_RE = re.compile(r"(gpt-5|o1|o3|o4)", re.I)
+_REASONING_MODEL_RE = re.compile(r"(gpt-5|o1|o3|o4|gemini-3)", re.I)
 _ANSWER_SCHEMA = {
     "type": "json_schema",
     "json_schema": {
@@ -273,9 +273,15 @@ class OpenAICompatibleLLMClient:
         except ValueError as exc:
             raise LLMUnavailableError("Unexpected LLM response") from exc
         usage = data.get("usage") or {}
+        details = usage.get("prompt_tokens_details") or {}
+        completion_details = usage.get("completion_tokens_details") or {}
+        cached = details.get("cached_tokens")
         self.last_usage = {
             "input_tokens": int(usage.get("prompt_tokens") or 0),
             "output_tokens": int(usage.get("completion_tokens") or 0),
+            "cached_tokens": int(cached or 0),
+            "reasoning_tokens": int(completion_details.get("reasoning_tokens") or usage.get("reasoning_tokens") or 0),
+            "usage_reported": bool(usage),
         }
         perf.count("prompt_tokens", self.last_usage["input_tokens"])
         perf.count("completion_tokens", self.last_usage["output_tokens"])
@@ -402,6 +408,8 @@ class OpenAICompatibleLLMClient:
         self.last_usage = {
             "input_tokens": int(usage.get("prompt_tokens") or 0),
             "output_tokens": int(usage.get("completion_tokens") or 0),
+            "cached_tokens": int((usage.get("prompt_tokens_details") or {}).get("cached_tokens") or 0),
+            "usage_reported": bool(usage),
         }
         text = strip_reasoning("".join(parts))
         if not text:

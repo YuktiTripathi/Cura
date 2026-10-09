@@ -76,6 +76,10 @@ class QueryPlan(BaseModel):
     # True when the semantic evidence planner scoped the sources; providers then fetch
     # only the flagged sources instead of their broad defaults.
     semantic_scoped: bool = False
+    # General education remains the task. Relevant, authorized personal facts may
+    # supplement the explanation without turning it into a report review.
+    general_personalization: bool = False
+    task_contract: dict | None = None
 
     @property
     def personal_data_required(self) -> bool:

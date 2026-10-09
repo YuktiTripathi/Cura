@@ -41,6 +41,10 @@ def observe_chat(meta) -> None:
         TOKENS.labels(kind="input", tier=tier).inc(meta.input_tokens)
     if getattr(meta, "output_tokens", None):
         TOKENS.labels(kind="output", tier=tier).inc(meta.output_tokens)
+    if getattr(meta, "jev_input_tokens", None):
+        TOKENS.labels(kind="jev_input", tier="jev").inc(meta.jev_input_tokens)
+    if getattr(meta, "jev_output_tokens", None):
+        TOKENS.labels(kind="jev_output", tier="jev").inc(meta.jev_output_tokens)
     if getattr(meta, "estimated_cost_usd", None):
         COST.labels(tier=tier).inc(meta.estimated_cost_usd)
 

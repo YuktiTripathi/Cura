@@ -182,6 +182,8 @@ class ContextBuilder:
             selectors=list(plan.selectors or []),
             display_entity_codes=list(plan.display_entities or []),
             reasoning_context_codes=list(plan.reasoning_context or []),
+            task_contract=plan.task_contract,
+            general_personalization=plan.general_personalization,
         )
         evidence: list[EvidenceRecord] = []
 
