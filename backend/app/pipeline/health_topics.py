@@ -130,46 +130,6 @@ CONCEPT_TOPICS: tuple[TopicSpec, ...] = (
     ),
 )
 
-# Domain -> evidence (markers, Bio-AI, questionnaire) for domain-level questions
-# ("metabolic health", "heart health"). Conservative, never diagnostic.
-DOMAIN_EVIDENCE: dict[str, dict[str, tuple[str, ...]]] = {
-    "metabolic_health": {
-        "markers": ("hba1c", "fasting_blood_glucose", "triglycerides", "hdl"),
-        "bio_ai": ("type_2_diabetes", "obesity", "nafld", "metabolic_score"),
-        "questionnaire": ("physical_activity_frequency", "exercise_frequency_week", "sitting_hours", "food_groups", "sleeping_hours"),
-    },
-    "glycemic_health": {
-        "markers": ("hba1c", "fasting_blood_glucose"),
-        "bio_ai": ("type_2_diabetes",),
-        "questionnaire": ("physical_activity_frequency", "sitting_hours", "food_groups"),
-    },
-    "lipid_health": {
-        "markers": ("ldl", "hdl", "triglycerides", "cholesterol"),
-        "bio_ai": ("dyslipidemia",),
-        "questionnaire": ("physical_activity_frequency", "food_groups", "alcohol_frequency", "tobacco_frequency"),
-    },
-    "cardiovascular_health": {
-        "markers": ("ldl", "hdl", "triglycerides", "fasting_blood_glucose"),
-        "bio_ai": ("cardiac_health", "hypertension"),
-        "questionnaire": ("tobacco_frequency", "physical_activity_frequency", "alcohol_frequency"),
-    },
-    "liver_health": {
-        "markers": ("alt", "ast", "ggt"),
-        "bio_ai": ("nafld",),
-        "questionnaire": ("alcohol_frequency", "food_groups", "physical_activity_frequency"),
-    },
-    "weight_body_composition": {
-        "markers": ("fasting_blood_glucose", "triglycerides"),
-        "bio_ai": ("obesity",),
-        "questionnaire": ("physical_activity_frequency", "sitting_hours", "food_groups", "sleeping_hours"),
-    },
-    "energy_fatigue_context": {
-        "markers": ("hemoglobin", "ferritin", "vitamin_b12", "vitamin_d", "tsh"),
-        "bio_ai": (),
-        "questionnaire": ("sleeping_hours",),
-    },
-}
-
 _BY_CODE = {spec.code: spec for spec in CONCEPT_TOPICS}
 
 
@@ -253,10 +213,7 @@ def questionnaire_keys_for(topics: TopicMatch, *, limit: int = 8) -> list[str]:
     keys: list[str] = []
     for code in topics.concepts:
         keys.extend(_BY_CODE[code].questionnaire_keys)
-    keys.extend(relevant_questionnaire_keys([*topics.markers, *topics.bio_ai]))
-    if not keys:
-        for domain in topics.domains:
-            keys.extend(DOMAIN_EVIDENCE.get(domain, {}).get("questionnaire", ()))
+    keys.extend(relevant_questionnaire_keys([*topics.markers, *topics.bio_ai], topics.domains))
     return list(dict.fromkeys(keys))[:limit]
 
 
@@ -266,8 +223,12 @@ def evidence_markers_for(topics: TopicMatch) -> list[str]:
     for code in topics.concepts:
         keys.extend(_BY_CODE[code].markers)
     if not keys:
+        from app.pipeline.health_domains import domain_for_code
+
         for domain in topics.domains:
-            keys.extend(DOMAIN_EVIDENCE.get(domain, {}).get("markers", ()))
+            spec = domain_for_code(domain)
+            if spec:
+                keys.extend((*spec.primary_entities, *spec.supporting_entities))
     return list(dict.fromkeys(keys))
 
 
@@ -275,8 +236,12 @@ def evidence_bio_ai_for(topics: TopicMatch) -> list[str]:
     keys = list(topics.bio_ai)
     for code in topics.concepts:
         keys.extend(_BY_CODE[code].bio_ai)
+    from app.pipeline.health_domains import domain_for_code
+
     for domain in topics.domains:
-        keys.extend(DOMAIN_EVIDENCE.get(domain, {}).get("bio_ai", ()))
+        spec = domain_for_code(domain)
+        if spec:
+            keys.extend(spec.bioai_domains)
     return list(dict.fromkeys(keys))
 
 

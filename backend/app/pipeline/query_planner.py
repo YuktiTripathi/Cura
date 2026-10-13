@@ -1,3 +1,5 @@
+import re
+
 from app.contracts.common import IntentType, KnowledgeScope, QuerySource
 from app.contracts.query import QueryPlan
 from app.pipeline.intent import BIO_KEYS, classify_intent, knowledge_scope_for
@@ -16,7 +18,7 @@ from app.pipeline.questionnaire_intent import (
     is_questionnaire_topic,
 )
 from app.pipeline.questionnaire_topics import questionnaire_topic
-from app.pipeline.general_personalization import attach_general_personalization
+from app.pipeline.general_personalization import attach_general_personalization, enforce_general_only_request
 
 
 def build_query_plan(
@@ -177,6 +179,14 @@ def build_query_plan(
     if intent == IntentType.report_explanation:
         plan.time_operation = "latest_report"
         plan.medical_evidence_required = True
+        if re.search(r"\bbio-?ai\b", message or "", re.I) and not re.search(
+            r"\b(?:blood|lab) report\b", message or "", re.I
+        ):
+            plan.needs_blood = False
+            plan.needs_questionnaire = False
+        elif re.search(r"\b(?:blood|lab) report\b", message or "", re.I):
+            plan.needs_bio_ai = False
+            plan.needs_questionnaire = False
     if intent in {
         IntentType.blood_marker_explanation,
         IntentType.nutrition_guidance,
@@ -226,7 +236,7 @@ def build_query_plan(
         if plan.needs_blood or plan.needs_bio_ai:
             plan.source = QuerySource.mixed
             plan.needs_supershyft = True
-    return plan
+    return enforce_general_only_request(plan, message)
 def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:
     update: dict = {"report_id": ref.report_id, "explicit_source_ref": True}
     if ref.type == "blood_marker":
@@ -244,12 +254,14 @@ def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:
         )
     elif ref.type == "blood_report":
         update.update(
-            intent=IntentType.broad_health_summary,
+            intent=IntentType.report_explanation,
             knowledge_scope=KnowledgeScope.personal,
             needs_blood=True,
             needs_bio_ai=False,
+            needs_questionnaire=False,
             needs_supershyft=ref.source == "supershyft",
             needs_general=False,
+            source=QuerySource.blood,
         )
     elif ref.type == "bio_ai_risk":
         update.update(
@@ -265,12 +277,14 @@ def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:
         )
     elif ref.type == "bio_ai_report":
         update.update(
-            intent=IntentType.bio_ai_score,
+            intent=IntentType.bio_ai_explanation,
             knowledge_scope=KnowledgeScope.personal,
             needs_blood=False,
             needs_bio_ai=True,
+            needs_questionnaire=False,
             needs_supershyft=True,
             needs_general=False,
+            source=QuerySource.bio_ai,
         )
     elif ref.type == "health_scenario":
         update.update(

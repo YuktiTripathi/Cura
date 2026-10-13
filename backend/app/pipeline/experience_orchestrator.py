@@ -159,8 +159,6 @@ class ExperienceOrchestrator:
         add(ExperienceBlockKind.personal_relevance, personal)
         if uncertainties:
             add(ExperienceBlockKind.uncertainty, uncertainties[0])
-        if next_steps:
-            add(ExperienceBlockKind.next_step, next_steps[0])
         add(ExperienceBlockKind.continuation, continuation)
 
         return TurnExperience(
@@ -171,7 +169,7 @@ class ExperienceOrchestrator:
             interpretation=interpretation,
             personal_relevance=personal,
             uncertainties=uncertainties,
-            next_steps=next_steps,
+            next_steps=[],
             continuation=continuation,
             blocks=blocks,
         )

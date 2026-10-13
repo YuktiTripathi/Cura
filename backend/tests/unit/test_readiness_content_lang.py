@@ -63,9 +63,10 @@ def test_content_files_are_loaded(tmp_path, monkeypatch):
     assert [d.name for d in hits] == ["ICMR"]
 
 
-def test_cura_paraphrase_is_never_labelled_as_a_quote():
-    assert passage_label(_doc()).startswith("Cura summary, not a quotation")
-    assert passage_label(_doc(content_kind="quoted_passage")).startswith("Quoted from ICMR")
+def test_model_evidence_text_does_not_expose_source_pointer_language():
+    assert passage_label(_doc()) == "Medical evidence: Vitamin D supports bone health."
+    assert "ICMR" not in passage_label(_doc(content_kind="quoted_passage"))
+    assert "source pointer" not in passage_label(_doc()).lower()
 
 
 def test_target_language_follows_script_and_enabled_list(monkeypatch):

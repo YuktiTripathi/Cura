@@ -95,10 +95,10 @@ def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
         system = _system_for_mode(SAFETY_INSTRUCTIONS)
         assert "shortest response that fully answers" in system
-        assert "compact" in system and "40-100 words" in system
+        assert "about 120 words" in system
         assert "em dash" in system and EM not in system
         assert "at most one short safety qualifier" in system.lower()
-    assert "everyday words" in GENERAL_HEALTH_INSTRUCTIONS and "short paragraphs" in GENERAL_HEALTH_INSTRUCTIONS
+    assert "everyday words" in GENERAL_HEALTH_INSTRUCTIONS and "3 to 5 Markdown bullets" in GENERAL_HEALTH_INSTRUCTIONS
     assert EM not in GENERAL_HEALTH_INSTRUCTIONS
 
 

@@ -131,7 +131,14 @@ class HybridMedicalKnowledgeProvider:
         semantic = self.embedder.scores(normalized, docs) if self.embedder else [0.0] * len(docs)
         ranked: list[tuple[float, int, int, MedicalEvidenceDoc]] = []
         for index, doc in enumerate(docs):
-            ontology = 3.0 * len(topics & set(doc.topics))
+            topic_overlap = topics & set(doc.topics)
+            keyword_match = any(keyword.lower() in normalized for keyword in doc.keywords)
+            # Generic words such as "health" occur throughout the corpus. A passage
+            # must share a recognized topic or an explicit indexed phrase with the
+            # question before BM25/embeddings are allowed to rank it.
+            if not topic_overlap and not keyword_match and semantic[index] <= 0:
+                continue
+            ontology = 3.0 * len(topic_overlap)
             score = lexical[index] + ontology + 4.0 * semantic[index]
             if score >= self.min_score:
                 ranked.append((score, -doc.tier, -index, doc))

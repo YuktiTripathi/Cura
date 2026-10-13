@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { PresentedFinding, StructuredResponse, TestingOption } from "../../types/chat";
 import { AssistantBody } from "./AssistantBody";
 import { MarkdownAnswer } from "./MarkdownAnswer";
@@ -5,7 +6,6 @@ import { availableFindings, FindingsTable, RawResultsDisclosure, RelatedResults 
 import { TestingOptionCard } from "./TestingOptionCard";
 import { ThemeList } from "./ThemeCards";
 import { ValueCard } from "./ValueCard";
-import { NextSteps } from "./NextSteps";
 import { t } from "../../i18n";
 
 const MAX_CONVERSATIONAL_FINDINGS = 4;
@@ -35,14 +35,20 @@ export function PresentedAnswer({
     presentation.headline?.trim().toLowerCase() !== "nutrition";
   // A results table is a report view. Under any other answer show only a few values; the
   // backend selects which ones (the evidence behind the answer).
-  const findings = availableFindings(presentation.findings || []).slice(
-    0,
-    presentation.mode === "RESULT_LIST" ? undefined : MAX_CONVERSATIONAL_FINDINGS
-  );
+  const available = availableFindings(presentation.findings || []);
+  const bioFindings = available.filter((item) => item.source_type === "bio_ai_report");
+  const bloodFindings = available.filter((item) => item.source_type !== "bio_ai_report");
+  const bioReport = bioFindings.length > 0 && bloodFindings.length !== available.length;
+  const findings = bioReport
+    ? bioFindings
+    : available.slice(0, presentation.mode === "RESULT_LIST" ? undefined : MAX_CONVERSATIONAL_FINDINGS);
   const relatedFindings = uniqueRelated(presentation.related_findings || [], findings);
   const gaps = (presentation.uncertainties || []).filter((item) => !isDisclaimer(item));
   const notes = (presentation.uncertainties || []).filter(isDisclaimer);
-  const useCards = findings.length > 0 && findings.length <= 3 && presentation.mode !== "SINGLE_VALUE";
+  const [showAllAssessments, setShowAllAssessments] = useState(false);
+  const previewCount = bioReport ? 4 : findings.length;
+  const visibleFindings = bioReport && !showAllAssessments ? findings.slice(0, previewCount) : findings;
+  const useCards = visibleFindings.length > 0 && (bioReport || visibleFindings.length <= 3) && presentation.mode !== "SINGLE_VALUE";
   // A single value is stated in the summary sentence; the card adds where it sits in its range.
   const singleWithRange =
     !narrative &&
@@ -69,18 +75,40 @@ export function PresentedAnswer({
         </aside>
       ) : null}
       {singleWithRange ? <ValueCard finding={findings[0]} compact /> : null}
-      {narrative ? <ThemeList themes={presentation.themes || []} /> : null}
+      {narrative && (presentation.themes || []).length > 0 ? <ThemeList themes={presentation.themes || []} /> : null}
+      {narrative && visibleFindings.length > 0 ? (
+        <div className="value-cards">
+          {visibleFindings.map((item, index) => (
+            <ValueCard key={`${item.label}-${index}`} finding={item} />
+          ))}
+        </div>
+      ) : null}
       {narrative ? <RawResultsDisclosure findings={presentation.raw_findings || []} /> : null}
-      {!narrative && findings.length > 0 && presentation.mode !== "SINGLE_VALUE" ? (
+      {!narrative && visibleFindings.length > 0 && presentation.mode !== "SINGLE_VALUE" ? (
         useCards ? (
           <div className="value-cards">
-            {findings.map((item, index) => (
+            {visibleFindings.map((item, index) => (
               <ValueCard key={`${item.label}-${index}`} finding={item} />
             ))}
           </div>
         ) : (
-          <FindingsTable findings={findings} />
+          <FindingsTable findings={visibleFindings} />
         )
+      ) : null}
+      {bioReport && findings.length > previewCount ? (
+        <button type="button" className="text-button" onClick={() => setShowAllAssessments((open) => !open)}>
+          {showAllAssessments ? "Hide extra assessments" : `View all ${findings.length} Bio-AI assessments`}
+        </button>
+      ) : null}
+      {bioReport && bloodFindings.length > 0 ? (
+        <section className="related-results">
+          <h4>Related blood results</h4>
+          <div className="value-cards">
+            {bloodFindings.slice(0, 3).map((item, index) => (
+              <ValueCard key={`${item.label}-blood-${index}`} finding={item} />
+            ))}
+          </div>
+        </section>
       ) : null}
       {!narrative && presentation.interpretation && !isScoreList(presentation.interpretation) ? (
         <div className="answer-summary">
@@ -102,7 +130,6 @@ export function PresentedAnswer({
           {item}
         </p>
       ))}
-      <NextSteps items={presentation.next_steps || []} />
       {!presentation.summary && !presentation.overall_summary && !findings.length && !presentation.interpretation && !narrative ? (
         <p>
           <AssistantBody content={fallback} />

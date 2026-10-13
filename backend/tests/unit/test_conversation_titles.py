@@ -9,9 +9,13 @@ H = {"X-Cura-User-Id": "demo-user-001"}
 
 def test_conversation_titles_are_useful():
     assert conversation_title("What is my HbA1c and why is it high compared to last year?") == "Understanding my HbA1c"
-    assert conversation_title("Show me my latest blood report") == "Blood report review"
-    assert conversation_title("Explain my cholesterol and LDL") == "My cholesterol questions"
-    assert conversation_title("Explain my latest Bio-AI report") == "Bio-AI risk explanation"
+    assert conversation_title("Show me my latest blood report") == "My Blood Report"
+    assert conversation_title("Help me understand my latest blood report") == "My Blood Report"
+    assert conversation_title("What is LDL cholesterol?") == "Understanding LDL"
+    assert conversation_title("How is my heart health?") == "My Heart Health"
+    assert conversation_title("What does my chloride result mean?") == "My Chloride Result"
+    assert conversation_title("Explain my cholesterol and LDL") == "Understanding LDL"
+    assert conversation_title("Explain my latest Bio-AI report") == "My Bio-AI Report"
     assert conversation_title("What should I know about my nutrition?") == "Nutrition guidance"
     assert conversation_title("What is my sugar level?") == "My blood sugar questions"
 

@@ -42,7 +42,21 @@ def list_conversations(
     principal: AuthenticatedPrincipal = Depends(get_principal),
     db: Session = Depends(get_db),
 ):
-    rows = ConversationRepository(db).list_for_subject(principal.subject_id)
+    repo = ConversationRepository(db)
+    rows = repo.list_for_subject(principal.subject_id)
+    from app.pipeline.conversation_title import GENERIC_TITLES, conversation_title
+
+    changed = False
+    for row in rows:
+        if row.title and row.title not in GENERIC_TITLES:
+            continue
+        first = next((message.content for message in row.messages if message.role == "user" and message.content), "")
+        if not first:
+            continue
+        row.title = conversation_title(first)
+        changed = True
+    if changed:
+        db.commit()
     return [
         ConversationSummary(id=r.id, title=r.title, updated_at=r.updated_at.isoformat() if r.updated_at else "")
         for r in rows

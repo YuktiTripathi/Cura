@@ -214,6 +214,28 @@ def test_jev_disabled_uses_deterministic(monkeypatch):
     assert plan.needs_supershyft
 
 
+@pytest.mark.parametrize(
+    "message",
+    [
+        "Why is my LDL high?",
+        "What does my HbA1c mean?",
+        "Is my Vitamin D low?",
+    ],
+)
+def test_clear_single_marker_interpretation_skips_jev(monkeypatch, message):
+    from app.core.config import settings
+
+    monkeypatch.setattr(settings, "jev_enabled", True)
+    monkeypatch.setattr(settings, "jev_fast_path", True)
+
+    plan, trace = resolve_plan(message)
+
+    assert trace.called is False
+    assert trace.fallback_reason == "fast_path"
+    assert plan.needs_blood is True
+    assert plan.needs_personal_data is True
+
+
 def test_jev_timeout_falls_back_safely(monkeypatch):
     from app.core.config import settings
 
@@ -226,6 +248,30 @@ def test_jev_timeout_falls_back_safely(monkeypatch):
     plan, trace = resolve_plan("What is insulin resistance?")
     assert trace.fallback
     assert not plan.needs_personal_data
+
+
+def test_accepted_jev_plan_preserves_the_user_task_contract(monkeypatch):
+    from app.core.config import settings
+
+    decision = _decision(
+        intent=JevIntent.bio_ai_report_interpretation,
+        source=JevSource.bio_ai_report,
+        operation=JevOperation.retrieve_and_explain,
+        requires_personal_data=True,
+        time_range=JevTimeRange.latest,
+        requested_metrics=["cardiac_health"],
+        confidence=0.95,
+    )
+    monkeypatch.setattr(settings, "jev_enabled", True)
+    monkeypatch.setattr(settings, "jev_fast_path", False)
+    monkeypatch.setattr(JevDecisionsClient, "decide", lambda *_: (decision, _response()))
+
+    plan, trace = resolve_plan("Why is my cardiac health risk high?")
+
+    assert trace.validated and not trace.fallback
+    assert plan.task_contract["response_type"] == "PERSONAL_RISK_EXPLANATION"
+    assert set(plan.task_contract["required_sources"]) == {"blood_report", "bio_ai"}
+    assert plan.needs_blood and plan.needs_bio_ai
 
 
 def test_invalid_personal_decision_falls_back_to_personal_deterministic_plan(monkeypatch):
@@ -320,6 +366,7 @@ def test_general_lifestyle_question_stays_general():
     )
     plan = plan_from_jev(decision, "How can lifestyle affect blood pressure?")
     assert plan.knowledge_scope == KnowledgeScope.general
+    assert plan.general_personalization is False
     assert plan.needs_personal_data is False
     assert plan.needs_supershyft is False
     assert plan.medical_evidence_required is True

@@ -168,6 +168,7 @@ BIO_CODE_VARIANTS = {
     "type_2_diabetes": ("type_2_diabetes", "diabetes", "t2dm"),
     "cardiac_health": ("cardiac_health", "cardiac", "heart"),
     "nafld": ("nafld", "fatty_liver"),
+    "metabolic_syndrome": ("metabolic_syndrome", "metabolic_syndrome_risk", "mets"),
 }
 
 

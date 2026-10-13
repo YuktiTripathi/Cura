@@ -97,16 +97,6 @@ export function StreamingExperience({ blocks }: { blocks: ExperienceBlock[] }) {
         </section>
       ) : null}
 
-      {view.nextSteps.length ? (
-        <section className="experience-segment experience-next experience-reveal" data-kind="next_step">
-          <div className="experience-segment-label">{t("ui.StreamingExperience.a_useful_next_step", "A useful next step")}</div>
-          <ul>
-            {view.nextSteps.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </section>
-      ) : null}
 
       <div className="experience-working" role="status">
         <span aria-hidden="true" />

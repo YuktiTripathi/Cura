@@ -26,8 +26,7 @@ _NOTES = {
         "List the verified scores and categories. Do not turn a score into a disease probability."
     ),
     "PERSONAL_RISK_EXPLANATION": (
-        "Start with the risk finding. Then a short heading for what it means, what the evidence shows, "
-        "and what it does not prove."
+        "Start with what the risk finding means in everyday words. Do not add lifestyle advice unless asked."
     ),
     "CROSS_SOURCE_EXPLANATION": (
         "Show the two findings first. Then explain why they can differ. Keep facts separate from possibilities."
@@ -39,7 +38,7 @@ _NOTES = {
         "Use a short numbered list. Give one reason per item. Separate urgent issues from longer-term risk."
     ),
     "DIRECT_ANSWER": (
-        "Begin with the direct answer. When there are several ideas, use a meaningful bold heading and concise bullets."
+        "If the answer is one idea, use one short paragraph. If it has several findings, reasons, or factors, use 2 to 4 Markdown bullets written as plain sentences, without bold labels. Never open with Direct answer, Short answer, Measured results, Possible explanations, or What that means. "
     ),
 }
 
@@ -53,7 +52,7 @@ def presentation_note(message: str | None, response_type: str | None = None) -> 
     elif _NUTRITION.search(text):
         hint = "Answer the food question first. Use bullets for helpful choices and for what to limit. Do not lead with unrelated labs."
     elif _LIFESTYLE.search(text) and response_type in {None, "", "DIRECT_ANSWER"}:
-        hint = "Start with the habit the user asked about. Use a short heading and bullets only for the practical points."
+        hint = "Start with the habit the user asked about. Use 3 to 5 plain bullet sentences for the practical points, without bold labels."
     else:
         hint = _NOTES.get(response_type or "DIRECT_ANSWER", _NOTES["DIRECT_ANSWER"])
     return f"PRESENTATION: {hint} No emojis.\n"
@@ -61,11 +60,15 @@ def presentation_note(message: str | None, response_type: str | None = None) -> 
 
 _GLUED_HEADING = re.compile(r"([.!?])\s+(\*\*[^*\n]{2,80}\*\*)")
 _LIST_ITEM = re.compile(r"^\s*[-*•]\s+")
+_INLINE_BULLET = re.compile(r"(?<=\S)[ \t]+([-*•])[ \t]+")
 
 
 def separate_answer_layout(text: str) -> str:
     """Put a bold label and a following list on their own lines. Does not rewrite words."""
-    if not text or "**" not in text and "\n*" not in text and "\n-" not in text:
+    if not text:
+        return text
+    text = _INLINE_BULLET.sub(r"\n\1 ", text)
+    if "**" not in text and "\n*" not in text and "\n-" not in text:
         return text
     text = _GLUED_HEADING.sub(r"\1\n\n\2", text)
     text = re.sub(r"(\*\*[^*\n]+\*\*)\s+(\*\s+)", r"\1\n\n\2", text)

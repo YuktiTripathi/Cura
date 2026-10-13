@@ -77,12 +77,12 @@ def test_missing_questionnaire_data_is_handled():
     assert any(item.key == "questionnaire" for item in ctx.missing)
 
 
-def test_general_medical_questions_do_not_query_questionnaires():
+def test_general_ldl_definition_may_use_related_questionnaire_context():
     plan = build_query_plan("What is LDL?")
-    assert plan.needs_questionnaire is False
+    assert plan.knowledge_scope == KnowledgeScope.general
+    assert plan.general_personalization is True
     result = _retrieve(U001, plan)
-    assert result.questionnaire_called is False
-    assert result.skipped_reason == "general_no_personal_data"
+    assert result.skipped_reason != "general_no_personal_data"
 
 
 def test_explicit_questionnaire_questions_do_query():

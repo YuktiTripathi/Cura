@@ -358,6 +358,33 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
     reasoning = set(reasoning_context_codes(plan)) | _PROFILE_CONTEXT
     markers = list(context.markers or [])
     markers = dedupe_markers(markers)
+    spec = plan.task_contract or {}
+    card_keys = set(spec.get("card_keys") or [])
+    if not spec.get("broad_summary") and spec.get("goal") in {"advise", "explain", "interpret", "lookup"}:
+        if card_keys:
+            scoped = [m for m in markers if m.key in card_keys or canonical_marker_key(m) in card_keys]
+            return (scoped[:3] if spec.get("personal_context") == "optional" else scoped[:6])
+        if len(markers) > 6:
+            return []
+    if plan.intent == IntentType.report_explanation and spec.get("goal") == "interpret":
+        abnormal = [
+            marker
+            for marker in markers
+            if getattr(getattr(marker, "flag", None), "value", getattr(marker, "flag", "")) in {"low", "high", "critical"}
+        ]
+        if abnormal:
+            from app.pipeline.health_domains import domain_for_entity
+
+            grouped: dict[str, list] = {}
+            for marker in abnormal:
+                domain = domain_for_entity(marker.key)
+                grouped.setdefault(domain.code if domain else "other", []).append(marker)
+            chosen = []
+            for group in grouped.values():
+                chosen.append(group[0])
+                if len(chosen) >= 6:
+                    break
+            return chosen[:6]
     if not wanted:
         return [m for m in markers if canonical_marker_key(m) not in reasoning]
     matched = [m for m in markers if m.key in wanted or canonical_marker_key(m) in wanted]
@@ -383,18 +410,18 @@ def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:
     display = set(display_entity_codes(plan, context))
     present = {canonical_marker_key(marker) for marker in context.markers or []}
     rows: list[str] = []
+    # A gap is announced only for a marker the question actually asked to see.
+    # An empty display list must not turn every unretrieved marker into "unavailable".
+    if not display:
+        return []
     for item in dedupe_missing(list(context.missing or []), present):
+        if item.key not in display or item.scope == "optional":
+            continue
         if item.key in (plan.reasoning_context or []) or item.key in DOMAIN_CODES or item.key in FAMILY_QUERY_KEYS:
-            if item.key not in display:
-                continue
+            continue
         if item.reason in {"not_in_reports", "not_present", "no_reports"}:
             label = item.name or display_name_for(item.key)
-            if display and item.key not in display and item.key not in {m.key for m in context.markers}:
-                if item.scope == "optional":
-                    rows.append(f"{label} was not in this report.")
-                    continue
-            if item.key in display or not display:
-                rows.append(f"{label} was not available in the retrieved report.")
+            rows.append(f"{label} was not available in the retrieved report.")
     return list(dict.fromkeys(rows))[:4]
 
 
@@ -449,15 +476,22 @@ def build_structured_response(
         raw = [labeled.get(item.canonical_key or "", item) for item in raw]
         for theme in themes:
             theme.related_findings = [labeled.get(item.canonical_key or "", item) for item in theme.related_findings]
+        card_findings = []
+        if not themes and (plan.task_contract or {}).get("primary_source") in {"blood_report", "bio_ai"}:
+            card_findings = [
+                _finding_from_marker(marker, latest=True)
+                for marker in _visible_markers(plan, context)
+                if _has_measured_value(marker)
+            ]
         return StructuredResponse(
             mode=ResponseMode.health_overview,
             headline=None,
             summary=overall,
             overall_summary=overall,
-            findings=[],
+            findings=card_findings,
             interpretation=None,
             uncertainties=[],
-            next_steps=[next_action] if next_action else [],
+            next_steps=[],
             follow_up=follow_up,
             display_entities=list(
                 dict.fromkeys(
@@ -536,6 +570,18 @@ def build_structured_response(
                     source_label=user_source_caption("bio_ai_report", getattr(risk, "measured_at", None), source_line=getattr(risk, "source_line", None)),
                 )
             )
+    def _attention(status: str | None) -> int:
+        value = (status or "").lower()
+        if value in {"critical", "very high", "high"}:
+            return 0
+        if value in {"moderate", "elevated", "medium"}:
+            return 1
+        return 2
+
+    risks = [item for item in findings if item.source_type == "bio_ai_report"]
+    others = [item for item in findings if item.source_type != "bio_ai_report"]
+    if risks:
+        findings = sorted(risks, key=lambda item: _attention(item.status)) + others
     if (
         mode == ResponseMode.single_value
         and len(findings) > 1
@@ -569,8 +615,13 @@ def build_structured_response(
     if bio_report:
         interpretation = None
     summary = None
+    goal = (plan.task_contract or {}).get("goal") or ""
+    keep_explanation = goal not in {"", "lookup"}
     if mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary} and findings:
-        if mode == ResponseMode.single_value and findings:
+        if mode == ResponseMode.single_value and findings and keep_explanation:
+            summary = sanitize_internal_ids(answer or "") or None
+            interpretation = None
+        elif mode == ResponseMode.single_value and findings:
             item = findings[0]
             unit = f" {item.unit}" if item.unit else ""
             status = f" ({item.status.replace('_', ' ')})" if item.status and item.status not in {"unknown"} else ""
@@ -583,14 +634,14 @@ def build_structured_response(
             interpretation = None
         elif mode == ResponseMode.result_list:
             prose = sanitize_internal_ids(answer or "")
-            if asks_explanation and prose and not _score_dump(prose):
+            if (asks_explanation or keep_explanation) and prose and not _score_dump(prose):
                 summary = prose
             else:
                 summary = f"{headline} from your retrieved records."
             interpretation = None
         else:
             prose = sanitize_internal_ids(answer or "")
-            if asks_explanation and prose and not _score_dump(prose):
+            if (asks_explanation or keep_explanation) and prose and not _score_dump(prose):
                 summary = prose
                 interpretation = None
             else:
@@ -604,12 +655,13 @@ def build_structured_response(
             summary = prose or None
             interpretation = None
     uncertainties = _uncertainties(plan, context)
+    if plan.intent in {IntentType.bio_ai_score, IntentType.bio_ai_explanation} or context.intent in {
+        IntentType.bio_ai_score,
+        IntentType.bio_ai_explanation,
+    }:
+        # A missing thyroid blood test is not a missing Bio-AI thyroid assessment.
+        uncertainties = []
     next_steps: list[str] = []
-    if mode == ResponseMode.safety:
-        next_steps = ["Seek in-person medical care if this is urgent."]
-    bio_note = "These scores are from your Bio-AI assessment and are not a medical diagnosis."
-    if context.intent == IntentType.bio_ai_score and context.bio_ai_risks and bio_note not in uncertainties:
-        uncertainties.append(bio_note)
     return StructuredResponse(
         mode=mode,
         headline=headline,
@@ -647,9 +699,14 @@ def attach_presentation_personalization(
         re.I,
     ))
     if context.proactive_insights and not report_overview_request:
-        presentation.proactive_insights = [
-            item.model_dump(mode="json") for item in context.proactive_insights[:3]
-        ]
+        insights = list(context.proactive_insights)
+        if (plan.task_contract or {}).get("goal") == "interpret":
+            insights = [
+                item
+                for item in insights
+                if "missing" not in str(getattr(getattr(item, "trigger", None), "value", getattr(item, "trigger", ""))).lower()
+            ]
+        presentation.proactive_insights = [item.model_dump(mode="json") for item in insights[:3]]
     if context.health_journey:
         presentation.health_journey = context.health_journey.model_dump(mode="json")
     if perso and perso.primary_health_goal:
@@ -775,8 +832,6 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
     if presentation.uncertainties:
         note = " ".join(presentation.uncertainties)
         blob = " ".join(parts).lower()
-        if note.lower() not in blob:
-            parts.append(note)
     if presentation.next_steps and not _repeats(" ".join(presentation.next_steps), parts):
         parts.append(" ".join(presentation.next_steps))
     captions = list(dict.fromkeys(item.source_label for item in presentation.findings if item.source_label))

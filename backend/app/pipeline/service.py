@@ -270,30 +270,7 @@ class ChatService:
         elif plan.needs_questionnaire:
             self._progress.emit(ProcessingStage.fetching_questionnaire, plan=plan)
         elif plan.general_personalization:
-            try:
-                self._progress.mark("retrieval")
-                self._progress.mark("context")
-                with perf.stage("context_build"):
-                    context = self.builder.build(
-                        principal,
-                        plan,
-                        db=self.db,
-                        message=payload.message,
-                        conversation_state=conv_state,
-                    )
-                self._progress.measure("retrieval")
-                self._progress.measure("context")
-            except ProviderUnavailableError:
-                # Personal context is optional for education. A provider problem must
-                # not replace the requested general explanation with an error.
-                context = HealthContext(
-                    intent=plan.intent,
-                    answer_depth=plan.answer_depth,
-                    knowledge_scope=KnowledgeScope.general,
-                    data_source="general",
-                    resolved_topic=plan.topic,
-                    resolved_topic_name=plan.topic_name,
-                )
+            self._progress.emit(ProcessingStage.fetching_personal_data, plan=plan)
         elif plan.needs_personal_data:
             self._progress.emit(ProcessingStage.fetching_personal_data, plan=plan)
 
@@ -374,6 +351,9 @@ class ChatService:
             )
         if payload.conversation_id:
             conv = self.repo.get_for_subject(payload.conversation_id, principal.subject_id)
+            if conv and (not conv.title or conv.title in {"Cura conversation", "New conversation"}):
+                conv.title = conversation_title(payload.message)
+                self.db.commit()
         else:
             title = conversation_title(payload.message)
             conv = self.repo.create(principal.subject_id, title=title)
@@ -950,6 +930,36 @@ class ChatService:
                 meta=_meta(status=status, llm_mode="none"),
             )
 
+        # Jev/semantic plan repair may run after the deterministic planner. Re-apply an
+        # explicit general-only/privacy request before any personal provider is called.
+        from app.pipeline.general_personalization import enforce_general_only_request
+
+        plan = enforce_general_only_request(plan, payload.message)
+        spec = plan.task_contract or {}
+        logger.info(
+            "answer_spec request_id=%s intent=%s focus=%s goal=%s personal_context=%s "
+            "broad_summary=%s card_count=%s recommendations=%s",
+            request_id,
+            spec.get("intent"),
+            spec.get("focus"),
+            spec.get("goal"),
+            spec.get("personal_context"),
+            spec.get("broad_summary"),
+            len(spec.get("card_keys") or []),
+            spec.get("recommendations_requested"),
+        )
+        if settings.cura_model_routing_debug:
+            eval_turn.setdefault("debug", {})["answer_spec"] = {
+                "intent": spec.get("intent"),
+                "focus": spec.get("focus"),
+                "goal": spec.get("goal"),
+                "personal_context": spec.get("personal_context"),
+                "broad_summary": spec.get("broad_summary"),
+                "card_keys": list(spec.get("card_keys") or []),
+                "recommendations_requested": spec.get("recommendations_requested"),
+                "length_band": spec.get("length_band"),
+            }
+
         # Relevance-driven questionnaire enrichment: fetch lifestyle answers only when they can
         # change this answer (advice, "why", priorities, reviews), never for a plain lookup.
         if (
@@ -971,6 +981,11 @@ class ChatService:
             plan.knowledge_scope == KnowledgeScope.general
             and not plan.needs_personal_data
             and not plan.needs_supershyft
+            and not plan.needs_user_uploaded
+            and not plan.needs_cross_source
+        )
+        general_answer = (
+            plan.knowledge_scope == KnowledgeScope.general
             and not plan.needs_user_uploaded
             and not plan.needs_cross_source
         )
@@ -1039,27 +1054,40 @@ class ChatService:
                     "provider_unavailable",
                     reason,
                 )
-                answer = personal_data_unavailable(response_lang)
-                self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
-                self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
-                return ChatResponse(
-                    conversation_id=conv.id,
-                    answer=answer,
-                    evidence=[],
-                    follow_ups=[],
-                    meta=_meta(
-                        status="provider_unavailable",
-                        llm_mode="none",
-                        knowledge_scope=plan.knowledge_scope.value,
-                        supershyft_called=True,
-                        llm_called=False,
-                        db_status=reason,
-                        supershyft_record_count=0,
-                        retrieval_status="provider_unavailable",
-                        retrieval_used=True,
-                        ihr_queried=True,
-                    ),
-                )
+                if plan.general_personalization:
+                    # Personal context is optional for education. A provider outage must
+                    # not prevent the user from receiving the general explanation.
+                    context = HealthContext(
+                        intent=plan.intent,
+                        answer_depth=plan.answer_depth,
+                        knowledge_scope=KnowledgeScope.general,
+                        data_source="general",
+                        resolved_topic=plan.topic,
+                        resolved_topic_name=plan.topic_name,
+                    )
+                    eval_turn["optional_personal_context_unavailable"] = True
+                else:
+                    answer = personal_data_unavailable(response_lang)
+                    self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
+                    self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
+                    return ChatResponse(
+                        conversation_id=conv.id,
+                        answer=answer,
+                        evidence=[],
+                        follow_ups=[],
+                        meta=_meta(
+                            status="provider_unavailable",
+                            llm_mode="none",
+                            knowledge_scope=plan.knowledge_scope.value,
+                            supershyft_called=True,
+                            llm_called=False,
+                            db_status=reason,
+                            supershyft_record_count=0,
+                            retrieval_status="provider_unavailable",
+                            retrieval_used=True,
+                            ihr_queried=True,
+                        ),
+                    )
         else:
             self._progress.mark("context")
             with perf.stage("context_build"):
@@ -1079,7 +1107,7 @@ class ChatService:
             self._progress.measure("context")
 
         medical_hits = []
-        if getattr(plan, "medical_evidence_required", False) or general_only:
+        if getattr(plan, "medical_evidence_required", False) or general_answer:
             # Three passages by default, five for broader "what should I do" questions (plan 4.5).
             limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
             with perf.stage("knowledge_lookup"):
@@ -1118,7 +1146,7 @@ class ChatService:
             self._progress.emit(ProcessingStage.analyzing_trends, plan=plan)
         elif plan.needs_cross_source:
             self._progress.emit(ProcessingStage.comparing_results, plan=plan)
-        if plan.needs_personal_data and not general_only:
+        if plan.needs_personal_data and not general_answer:
             # Stream clients can show the user's own values while the explanation is written.
             try:
                 self._progress.preview(AnswerPreview(findings=preview_findings(plan, context)))
@@ -1141,7 +1169,7 @@ class ChatService:
                 response_lang=response_lang,
                 routing_note=routing_note,
                 medical_hits=medical_hits,
-                general_only=general_only,
+                general_only=general_answer,
                 diagnosis_restraint=diagnosis_restraint,
                 budget=eval_turn.get("budget"),
                 complete_answer=self._complete_answer,
@@ -2000,7 +2028,7 @@ class ChatService:
     def _record_evaluation(self, response: ChatResponse, eval_turn: dict | None = None) -> ChatResponse:
         turn = eval_turn or getattr(self, "_eval_turn", None) or {}
         conv = turn.get("conv")
-        plan = turn.get("plan")
+        plan = turn.get("routing_plan") or turn.get("plan")
         principal = turn.get("principal")
         payload = turn.get("payload")
         if conv is None or plan is None or principal is None or payload is None:

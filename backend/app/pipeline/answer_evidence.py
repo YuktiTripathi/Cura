@@ -60,17 +60,17 @@ class InformationBudget:
 
 
 BUDGETS: dict[str, InformationBudget] = {
-    LOOKUP: InformationBudget(1, 0, 0, 0, 1, 0, 1, (50, 120)),
-    EXPLANATION: InformationBudget(1, 2, 2, 1, 1, 2, 1, (80, 180)),
-    BIO_AI: InformationBudget(3, 2, 2, 0, 1, 2, 1, (150, 300)),
-    ACTION_PLAN: InformationBudget(1, 2, 3, 1, 1, 3, 1, (120, 250)),
-    PRIORITIZATION: InformationBudget(3, 2, 3, 1, 1, 3, 1, (150, 300)),
-    TREND: InformationBudget(1, 1, 0, 1, 1, 1, 1, (80, 180)),
-    QUESTIONNAIRE_LOOKUP: InformationBudget(0, 0, 0, 0, 0, 0, 0, (30, 90)),
-    OVERVIEW: InformationBudget(12, 0, 5, 3, 1, 3, 1, (200, 400)),
-    ASSESSMENT: InformationBudget(1, 2, 4, 1, 1, 2, 1, (80, 200)),
-    CAUSES: InformationBudget(2, 3, 3, 1, 1, 2, 1, (150, 300)),
-    RISK: InformationBudget(1, 2, 2, 1, 1, 2, 1, (120, 250)),
+    LOOKUP: InformationBudget(1, 0, 0, 0, 1, 0, 0, (40, 80)),
+    EXPLANATION: InformationBudget(1, 2, 2, 1, 1, 0, 0, (100, 150)),
+    BIO_AI: InformationBudget(3, 2, 2, 0, 1, 0, 0, (100, 150)),
+    ACTION_PLAN: InformationBudget(1, 2, 3, 1, 1, 3, 1, (100, 180)),
+    PRIORITIZATION: InformationBudget(3, 2, 3, 1, 1, 3, 1, (100, 180)),
+    TREND: InformationBudget(1, 1, 0, 1, 1, 0, 0, (120, 180)),
+    QUESTIONNAIRE_LOOKUP: InformationBudget(0, 0, 0, 0, 0, 0, 0, (40, 90)),
+    OVERVIEW: InformationBudget(12, 0, 5, 3, 1, 0, 0, (180, 400)),
+    ASSESSMENT: InformationBudget(1, 2, 4, 1, 1, 0, 0, (100, 150)),
+    CAUSES: InformationBudget(2, 3, 3, 1, 1, 0, 0, (100, 150)),
+    RISK: InformationBudget(1, 2, 2, 1, 1, 0, 0, (100, 150)),
 }
 
 # Semantic response shape -> evidence mode.
@@ -92,18 +92,21 @@ _SHAPE_MODE = {
 # a comparison, rarely a small table) from the wording of the question and the evidence.
 GOAL_GUIDANCE = {
     LOOKUP: (
-        "The member wants a value. Give it with its unit and where it sits against their report's range, and, "
-        "if it helps, how much it matters relative to the rest of their results (other_notable_findings)."
+        "The member wants a value. Say whether it is in range and what that means. "
+        "The result card shows the number, unit, date and range, so do not repeat them unless no card can be shown."
     ),
-    EXPLANATION: "The member wants to understand what this result means for them, in the light of their related findings.",
+    EXPLANATION: (
+        "The member wants to understand what this result means. Explain the meaning. "
+        "Do not add diet, exercise, or next-step advice unless they asked what to do."
+    ),
     CAUSES: (
         "The member wants possible reasons. Connect the listed evidence that fits or argues against each "
         "possibility; say plainly if nothing listed explains it. Never present a possibility as the cause."
     ),
     ASSESSMENT: "The member wants a judgment (is it enough, okay, serious). Give the judgment plainly, with the evidence behind it.",
     TREND: (
-        "The member wants to know how things changed. Use the exact previous and latest values, dates and change "
-        "from the trend facts; never say 'improved' without the numbers."
+        "The member wants to know how things changed. Say whether the result moved toward or away from the expected range. "
+        "Leave the exact previous and latest numbers to the comparison card unless no card can be shown."
     ),
     PRIORITIZATION: (
         "The member wants to know what matters most. Decide the order from the evidence: how far outside range, "
@@ -762,3 +765,69 @@ def prioritize_findings(markers, risks, goal: str | None) -> list:
         return value
 
     return sorted(abnormal, key=score, reverse=True)
+
+
+def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str | None) -> dict:
+    """Facts for one answer. Laboratory status stays separate from clinical importance.
+
+    Provider critical flags are kept first. Other out-of-range results are grouped by the
+    existing health-domain map, in report order. This is a presentation limit, not a new
+    clinical score.
+    """
+    primary = primary_source or "unspecified"
+    if primary == "bio_ai":
+        risks = [
+            _risk_fact(risk)
+            for risk in (context.bio_ai_risks or [])
+        ]
+        return {
+            "primary_source": "bio_ai",
+            "kind": "risk_estimate",
+            "assessments": risks[:4],
+            "additional_assessment_count": max(0, len(risks) - 4),
+            "note": "These are model risk estimates, not laboratory measurements and not diagnoses.",
+        }
+    markers = list(context.markers or [])
+    critical = [marker for marker in markers if _flag(marker) == "critical"]
+    other = [marker for marker in markers if _flag(marker) in {"high", "low"}]
+    ordered = critical + [marker for marker in other if marker not in critical]
+    grouped: dict[str, list] = {}
+    for marker in ordered:
+        domain = domain_for_entity(marker.key)
+        grouped.setdefault(domain.code if domain else "other", []).append(marker)
+    patterns = []
+    for code, rows in list(grouped.items())[:4]:
+        facts = []
+        for marker in rows[:4]:
+            fact = _marker_fact(marker)
+            fact["laboratory_status"] = fact.pop("status", None)
+            direction = _trend_direction(context, marker.key)
+            if direction:
+                fact["earlier_report"] = direction
+            facts.append(fact)
+        patterns.append({"group": code, "measured_results": facts})
+    in_range = [
+        marker.name
+        for marker in markers
+        if _flag(marker) == "normal" and marker.name
+    ][:6]
+    return {
+        "primary_source": "blood_report" if primary == "blood_report" else primary,
+        "kind": "measured_laboratory_result",
+        "patterns": patterns,
+        "within_laboratory_range": in_range,
+        "all_listed_results_within_range": bool(markers) and not ordered,
+        "note": (
+            "laboratory_status describes the laboratory reference range only. "
+            "It is not a clinical-importance score. Do not invent results that are not listed."
+        ),
+    }
+
+
+def _trend_direction(context: HealthContext, key: str) -> str | None:
+    for row in context.comparisons or []:
+        topic = str(getattr(row, "topic", "") or "")
+        if topic == key or topic.replace(" ", "_") == key:
+            direction = getattr(row, "direction", None)
+            return str(direction) if direction else None
+    return None

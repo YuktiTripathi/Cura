@@ -122,7 +122,7 @@ describe("CuraPage shell", () => {
     expect(screen.getByText("How can I help you understand your health better?")).toBeTruthy();
     expect(screen.getByText("My Blood Report")).toBeTruthy();
     expect(screen.getByText("My Bio-AI Report")).toBeTruthy();
-    expect(screen.getByText("My Health Scenario")).toBeTruthy();
+    expect(screen.queryByText("My Health Scenario")).toBeNull();
     expect(screen.getByText("Nutrition")).toBeTruthy();
     expect(screen.getByText("Ask Cura")).toBeTruthy();
     expect(screen.getByText("Based on your health")).toBeTruthy();

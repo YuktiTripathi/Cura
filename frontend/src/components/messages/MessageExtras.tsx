@@ -24,18 +24,19 @@ export function EscalationNote({
   contacts?: EmergencyContact[];
 }) {
   const urgent = escalation === "urgent_care" || escalation === "crisis_support";
+  const message =
+    escalation === "crisis_support"
+      ? t("escalation.crisis", "Please talk to someone now. Help is free and available 24x7.")
+      : escalation === "urgent_care"
+      ? t("escalation.urgent", "Seek urgent in-person medical care.")
+      : escalation === "see_doctor_24h"
+      ? t("escalation.soon", "See a doctor within the next day.")
+      : "";
+  if (!message) return null;
   return (
     <div className="escalation">
-      <strong>{t("escalation.title", "Next step")}</strong>
-      <p>
-        {escalation === "crisis_support"
-          ? t("escalation.crisis", "Please talk to someone now. Help is free and available 24x7.")
-          : escalation === "urgent_care"
-          ? t("escalation.urgent", "Seek urgent in-person medical care.")
-          : escalation === "see_doctor_24h"
-          ? t("escalation.soon", "See a doctor within the next day.")
-          : t("escalation.clinician", "Discuss this with a qualified clinician.")}
-      </p>
+      <strong>{t("escalation.title", "Important")}</strong>
+      <p>{message}</p>
       {urgent && contacts.length > 0 && (
         <div className="escalation-calls">
           {contacts.map((c) => (

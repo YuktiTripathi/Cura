@@ -38,14 +38,23 @@ PERSONAL_EXAMPLES = [
 ]
 
 
-def test_general_examples_keep_general_objective_with_optional_scoped_context():
+def test_general_examples_do_not_become_personal_record_questions():
+    concept = {
+        "What is LDL?",
+        "What is HDL?",
+        "What is the difference between HDL and LDL?",
+        "What is a healthy cholesterol level?",
+    }
     for msg in GENERAL_EXAMPLES:
         assert requires_personal_record(msg) is False, msg
         plan = build_query_plan(msg)
         assert plan.intent == IntentType.general_health_question, msg
         assert plan.knowledge_scope == KnowledgeScope.general, msg
-        assert plan.general_personalization, msg
-        assert plan.needs_supershyft, msg
+        if msg in concept:
+            assert plan.general_personalization, msg
+        else:
+            assert not plan.general_personalization, msg
+            assert not plan.needs_supershyft, msg
 
 
 def test_personal_examples_require_records():
@@ -91,7 +100,8 @@ def test_my_ldl_then_generic_lifestyle_without_pronoun_is_general():
     )
     assert plan.intent == IntentType.general_health_question
     assert plan.knowledge_scope == KnowledgeScope.general
-    assert plan.general_personalization
+    assert not plan.general_personalization
+    assert not plan.needs_supershyft
 
 
 def test_is_it_high_after_personal_is_personal():

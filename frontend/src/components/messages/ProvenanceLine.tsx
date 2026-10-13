@@ -11,15 +11,15 @@ export function ProvenanceLine({
 }) {
   const sources = provenance?.sources || [];
   if (!sources.length) return null;
-  const label = sources.length === 1 ? "Source" : "Sources";
   const debug = debugMode();
   return (
     <details className="source-details">
       <summary className="source-line" data-testid="provenance-line">
-        {label}:{" "}
+        {t("ui.ProvenanceLine.view_sources", "View sources")}
+      </summary>
+      <div className="source-debug" data-testid="provenance-debug">
         {sources.map((source, index) => (
-          <span key={`${source.name}-${index}`}>
-            {index > 0 ? " · " : null}
+          <p key={`${source.name}-${index}`}>
             {source.url ? (
               <a href={source.url} target="_blank" rel="noreferrer">
                 {source.name}
@@ -27,10 +27,8 @@ export function ProvenanceLine({
             ) : (
               source.name
             )}
-          </span>
+          </p>
         ))}
-      </summary>
-      <div className="source-debug" data-testid="provenance-debug">
         {debug
           ? sources.map((source, index) => (
               <p key={`${source.source_id || source.name}-${index}`}>

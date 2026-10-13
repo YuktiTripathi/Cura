@@ -5,7 +5,12 @@ from __future__ import annotations
 import pytest
 
 from app.core.config import settings
-from app.pipeline.claim_check import map_claims_to_passages, supporting_passages, unmapped_share
+from app.pipeline.claim_check import (
+    map_claims_to_passages,
+    revise_unsupported_answer,
+    supporting_passages,
+    unmapped_share,
+)
 from app.retrieval.hybrid import HybridMedicalKnowledgeProvider, ontology_topics, normalize_query
 from app.retrieval.medical import MedicalEvidenceDoc
 
@@ -32,6 +37,14 @@ def test_ontology_and_indic_questions_find_the_right_topic(question, topic):
 
 def test_off_topic_question_returns_no_evidence():
     assert HybridMedicalKnowledgeProvider().query("who won the football match yesterday") == []
+
+
+def test_generic_heart_health_does_not_retrieve_unrelated_condition_passages():
+    hits = HybridMedicalKnowledgeProvider().query(
+        "What do you mean by heart health in general terms?",
+        topic="cardiac_health",
+    )
+    assert hits == []
 
 
 def test_limit_is_three_by_default_and_capped_at_five():
@@ -79,3 +92,14 @@ def test_unrelated_claims_are_unmapped_and_their_source_is_not_cited():
     answer = "Regular sleep of seven to nine hours supports recovery and mood for most adults."
     assert supporting_passages(answer, docs) == []
     assert unmapped_share(answer, docs) == 1.0
+
+
+def test_claim_repair_does_not_append_source_pointer_disclaimers():
+    docs = [_doc("A", "The heart pumps blood around the body.")]
+    answer, flags = revise_unsupported_answer(
+        "The heart pumps blood around the body. Regular sleep supports recovery and mood.",
+        docs,
+    )
+    assert flags
+    assert "source pointer" not in answer.lower()
+    assert "guideline quotation" not in answer.lower()

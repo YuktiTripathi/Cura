@@ -61,15 +61,10 @@ describe("in-chat companion pieces", () => {
     expect(chips).toEqual(["Why is this pattern still present?", "What should I discuss with my doctor?"]);
   });
 
-  it("lets the reader tick next steps and remembers them", () => {
+  it("does not render an automatic next-step checklist", () => {
     renderAnswer();
-    const box = screen.getByRole("checkbox", { name: "Recheck lipids in 3 months." }) as HTMLInputElement;
-    fireEvent.click(box);
-    expect(box.checked).toBe(true);
-    cleanup();
-    renderAnswer();
-    expect((screen.getByRole("checkbox", { name: "Recheck lipids in 3 months." }) as HTMLInputElement).checked).toBe(true);
-    expect((screen.getByRole("checkbox", { name: "Discuss this with a clinician." }) as HTMLInputElement).checked).toBe(false);
+    expect(screen.queryByRole("checkbox", { name: "Recheck lipids in 3 months." })).toBeNull();
+    expect(screen.queryByText("Worth considering")).toBeNull();
   });
 
   it("opens a printable doctor summary and copies it as text", async () => {

@@ -329,7 +329,13 @@ body { margin: 0; background: var(--bg); color: var(--text); }
   /* WCAG 2.2 target size: at least 24×24 px. */
   min-height: 24px; min-width: 24px; display: inline-flex; align-items: center; justify-content: center;
 }
-.capability-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 10px; margin: 14px 0 20px; }
+.capability-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin: 14px 0 20px; }
+@media (max-width: 900px) {
+  .capability-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 520px) {
+  .capability-grid { grid-template-columns: 1fr; }
+}
 .capability-grid button { display: grid; gap: 4px; text-align: left; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 14px; cursor: pointer; color: inherit; }
 .capability-grid button span { color: var(--text-muted); font-size: 13px; }
 .recommendations { display: grid; gap: 8px; margin-top: 12px; }
@@ -1027,8 +1033,14 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .markdown-answer p { margin: 0 0 0.6em; }
 .markdown-answer p:last-child { margin-bottom: 0; }
 .markdown-answer h3, .markdown-answer h4 { margin: 0.8em 0 0.3em; font-size: 1em; font-weight: 600; }
-.markdown-answer ul, .markdown-answer ol { margin: 0.2em 0 0.6em; padding-left: 1.4em; }
-.markdown-answer li { margin: 0.2em 0; }
+.markdown-answer { line-height: 1.45; }
+.markdown-answer ul, .markdown-answer ol { margin: 0.45em 0 0.7em; padding-left: 1.25em; }
+.markdown-answer li { margin: 0.4em 0; }
+.markdown-answer li + li { margin-top: 0.45em; }
+@media (max-width: 720px) {
+  .markdown-answer ul, .markdown-answer ol { padding-left: 1.15em; }
+  .markdown-answer li { margin: 0.5em 0; }
+}
 .markdown-answer table { border-collapse: collapse; margin: 0.4em 0 0.8em; font-size: 0.95em; }
 .markdown-answer th, .markdown-answer td { border: 1px solid var(--border, #d9dde3); padding: 0.3em 0.6em; text-align: left; }
 .markdown-answer th { font-weight: 600; }

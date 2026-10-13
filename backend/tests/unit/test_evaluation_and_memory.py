@@ -43,12 +43,11 @@ class _Chunk:
         self.page_start = page
 
 
-def test_routing_general_ldl_no_personal():
+def test_routing_general_ldl_adds_optional_personal_context():
     plan = build_query_plan("What is LDL?")
-    assert plan.needs_personal_data is False
-    result = HealthRetrievalRouter(build_registry()).retrieve(AuthenticatedPrincipal(subject_id="5"), plan)
-    assert result.status == NOT_REQUIRED
-    assert result.invoked is False
+    assert plan.knowledge_scope == KnowledgeScope.general
+    assert plan.general_personalization is True
+    assert plan.needs_blood is True
 
 
 def test_routing_my_doctor_not_personal():
@@ -296,12 +295,12 @@ def test_interaction_and_feedback_persisted():
         db.close()
 
 
-def test_general_question_records_not_required_and_no_db():
+def test_broad_general_concept_may_use_optional_verified_context():
     res = client.post("/api/v1/chat", headers=H, json={"message": "What is cholesterol?"})
     body = res.json()
-    assert body["meta"]["retrieval_status"] == NOT_REQUIRED
-    assert body["meta"]["retrieval_used"] is False
-    assert body["meta"]["supershyft_called"] is False
+    assert body["meta"]["retrieval_status"] in {"success", "no_data"}
+    assert body["meta"]["retrieval_used"] is True
+    assert body["meta"]["supershyft_called"] is True
     assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
 
 

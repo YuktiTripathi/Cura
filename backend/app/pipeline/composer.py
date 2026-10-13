@@ -107,12 +107,16 @@ class ResponseComposer:
         seeded = extras + [item for item in (follow_ups or []) if item.handling_path]
         seeded = [item for item in seeded if _valid_follow_up(item, plan, context)]
         extra_chips = chip_prompts(experience.next_action, context, plan)
+        spec = plan.task_contract or {}
+        explain_only = spec.get("goal") in {"explain", "interpret"} and not spec.get("recommendations_requested")
         question, chips = discipline_follow_ups(
             seeded,
             experience,
             answer_turn=answer_turn,
-            extra_chips=extra_chips,
-            allow_default_question=bool(context.markers) and context.knowledge_scope == KnowledgeScope.personal,
+            extra_chips=[] if explain_only else extra_chips,
+            allow_default_question=bool(context.markers)
+            and context.knowledge_scope == KnowledgeScope.personal
+            and not explain_only,
         )
         combined = [*question, *chips]
         if is_list_only(plan.raw_message) or experience.depth.value == "SHORT":
@@ -133,7 +137,11 @@ class ResponseComposer:
             ] if continuation else []
             chips = list(combined)
         response_plan = build_response_plan(plan.raw_message or "", plan, context)
-        if response_plan.kind == "report_overview":
+        if explain_only:
+            question = []
+            chips = []
+            combined = []
+        elif response_plan.kind == "report_overview":
             question = []
             combined = [
                 FollowUpSuggestion(

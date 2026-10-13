@@ -28,7 +28,7 @@ GENERAL_POOL: list[tuple[str, str]] = [
 ]
 
 _PERSONAL_TEMPLATES = {
-    "latest": "What is my latest {name}?",
+    "latest": "What does my latest {name} result mean?",
     "meaning": "What does my {name} result mean?",
     "how": "How is my {name} level?",
     "trend": "Has my {name} changed over time?",

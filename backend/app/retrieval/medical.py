@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 from dataclasses import dataclass, fields
 from datetime import date, timedelta
 from pathlib import Path
@@ -300,10 +301,16 @@ def is_servable(doc: MedicalEvidenceDoc, today: date | None = None) -> bool:
 
 
 def passage_label(doc: MedicalEvidenceDoc) -> str:
-    """Prompt line for a passage. Never presents a Cura paraphrase as the source's words."""
-    if doc.content_kind == "quoted_passage":
-        return f'Quoted from {doc.name} ({doc.url}): "{doc.excerpt}"'
-    return f"Cura summary, not a quotation (source pointer: {doc.name}, {doc.url}): {doc.excerpt}"
+    """Evidence text for the model; source identity stays in response provenance."""
+    text = re.sub(
+        r"\b(?:WHO|CDC|NIDDK|MedlinePlus|NIH ODS)\s+"
+        r"(?:describes|identifies|notes|discusses|lists)\s+",
+        "",
+        doc.excerpt,
+        flags=re.I,
+    )
+    text = re.sub(r"\s*This is a source pointer, not a quotation\.?", "", text, flags=re.I)
+    return f"Medical evidence: {text.strip()}"
 
 
 def load_content_dir(path: Path) -> tuple[MedicalEvidenceDoc, ...]:
@@ -373,12 +380,11 @@ def retrieve_medical_evidence(message: str, topic: str | None = None, limit: int
 
 
 def render_medical_evidence_answer(topic: str | None, docs: list[MedicalEvidenceDoc]) -> str | None:
-    excerpts = [doc.excerpt.strip() for doc in docs if (doc.excerpt or "").strip()]
+    excerpts = [
+        passage_label(doc).removeprefix("Medical evidence: ").strip()
+        for doc in docs
+        if (doc.excerpt or "").strip()
+    ]
     if not excerpts:
         return None
-    label = (topic or "this topic").replace("_", " ")
-    return (
-        " ".join(excerpts)
-        + f" This is general educational information about {label}, "
-        "not a personal result, diagnosis, or meal plan."
-    )
+    return " ".join(excerpts)

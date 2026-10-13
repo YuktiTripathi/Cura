@@ -39,10 +39,16 @@ class ResponsePlan:
     suppress_proactive_cards: bool = False
 
 
+_EXPLAIN_REPORT = re.compile(r"\b(?:understand|explain|interpret|what does|what do|mean)\b", re.I)
+
+
 def is_report_level_request(message: str | None) -> bool:
     text = message or ""
     # Do not collapse an explicit cross-source review into a blood-only report view.
     if re.search(r"\b(?:bio-?ai|questionnaire|all sources|multiple sources)\b", text, re.I):
+        return False
+    # "Help me understand my latest blood report" names the report in order to explain it.
+    if _EXPLAIN_REPORT.search(text):
         return False
     return bool(_REPORT_LEVEL.search(text))
 
@@ -104,6 +110,7 @@ def build_response_plan(message: str, plan: QueryPlan, context: HealthContext) -
 
     abnormal = [m for m in markers if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}]
     normal = [m for m in markers if getattr(m.flag, "value", str(m.flag)) == "normal"]
+    unclassified = [m for m in markers if m not in abnormal and m not in normal]
 
     direct = "I found your latest blood report" if markers else "I looked for your blood report"
     if date_text and markers:
@@ -116,6 +123,10 @@ def build_response_plan(message: str, plan: QueryPlan, context: HealthContext) -
             pieces.append(f"{len(abnormal)} {'is' if len(abnormal) == 1 else 'are'} outside the reported reference range")
         if normal:
             pieces.append(f"{len(normal)} {'is' if len(normal) == 1 else 'are'} within range")
+        if unclassified:
+            pieces.append(
+                f"{len(unclassified)} {'does' if len(unclassified) == 1 else 'do'} not have a clear range classification"
+            )
         summary = "; ".join(pieces) + "."
     else:
         summary = "I don't have blood measurements from the records I can access for this question."

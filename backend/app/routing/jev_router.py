@@ -16,6 +16,7 @@ from app.contracts.conversation_state import ConversationState
 from app.pipeline.conversation_state import apply_to_query_plan
 from app.pipeline.planner import attach_task_plan
 from app.pipeline.query_planner import build_query_plan
+from app.pipeline.task_contract import apply_task_contract
 from app.routing.jev_client import JevDecisionsClient
 from app.routing.mapper import force_general_plan, plan_from_jev
 from app.routing.schemas import JevRoutingState, JevTrace
@@ -255,7 +256,8 @@ def resolve_plan(
 
 def _bind_conversation_plan(plan: QueryPlan, message: str, conversation_state: ConversationState | None, *, decision=None) -> QueryPlan:
     plan = apply_to_query_plan(plan, conversation_state)
-    return attach_task_plan(plan, message, decision=decision)
+    plan = attach_task_plan(plan, message, decision=decision)
+    return apply_task_contract(plan, message)
 
 
 def _bind_metrics(
@@ -322,18 +324,38 @@ _FAST_LOOKUP = re.compile(
 
 
 def _obvious_request(plan: QueryPlan, message: str, conversation_state, document_ids: list[str]) -> bool:
-    """Single-value personal lookups and short definitions that need no router judgment."""
+    """Short, single-topic questions that deterministic planning already resolves."""
     if document_ids or plan.needs_user_uploaded:
         return False
     if conversation_state is not None and conversation_state.turn_type.value in _CONTINUING_TURNS:
         return False
     text = (message or "").strip()
-    if len(text.split()) > 8 or not _FAST_LOOKUP.match(text):
+    if len(text.split()) > 12:
         return False
     from app.pipeline.semantic_plan import ReasoningGoal, build_semantic_plan
 
     semantic = build_semantic_plan(text)
-    if semantic.secondary_goals or semantic.clarification_needed:
+    if semantic.clarification_needed:
+        return False
+    named_topics = [*semantic.markers, *semantic.bio_ai]
+    interpretation_goals = {
+        ReasoningGoal.explain,
+        ReasoningGoal.causes,
+        ReasoningGoal.assess,
+        ReasoningGoal.risk,
+    }
+    if (
+        plan.needs_personal_data
+        and len(named_topics) == 1
+        and not plan.history
+        and not plan.needs_cross_source
+        and semantic.primary_goal in interpretation_goals
+        and set(semantic.secondary_goals) <= interpretation_goals
+    ):
+        return True
+    if semantic.secondary_goals:
+        return False
+    if not _FAST_LOOKUP.match(text) or len(text.split()) > 8:
         return False
     if plan.intent.value == "latest_result" and semantic.primary_goal == ReasoningGoal.lookup:
         return len(plan.requested_metrics or ([plan.topic] if plan.topic else [])) == 1

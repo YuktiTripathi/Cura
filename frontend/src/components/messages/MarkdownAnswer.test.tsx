@@ -32,6 +32,13 @@ describe("MarkdownAnswer", () => {
     expect(container.textContent).toContain("<img");
   });
 
+  it("splits bullets that were written on the same line", () => {
+    const { container } = render(
+      <MarkdownAnswer content={"These conditions include: * A large waistline. * High blood pressure."} />,
+    );
+    expect(container.querySelectorAll("ul > li").length).toBe(2);
+  });
+
   it("parses different shapes as different blocks", () => {
     expect(parseMarkdown("One line answer.").map((b) => b.kind)).toEqual(["p"]);
     expect(parseMarkdown("Intro\n\n- a\n- b").map((b) => b.kind)).toEqual(["p", "ul"]);

@@ -180,7 +180,7 @@ def test_chat_health_summary_does_not_dump_the_full_report():
     assert "not a diagnosis" in answer
     assert "sit together as one pattern" not in answer
     assert answer.count("not a diagnosis") == 1
-    assert pres["next_steps"]
+    assert not pres["next_steps"]
 
 
 def test_chat_view_all_results_exposes_raw_table():

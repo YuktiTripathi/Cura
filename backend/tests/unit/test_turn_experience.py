@@ -37,7 +37,7 @@ def test_orchestrator_builds_ordered_semantic_blocks_from_validated_presentation
     # A single lookup already stated in the direct answer is intentionally not repeated.
     assert ExperienceBlockKind.key_facts not in kinds
     assert ExperienceBlockKind.interpretation in kinds
-    assert ExperienceBlockKind.next_step in kinds
+    assert ExperienceBlockKind.next_step not in kinds
     assert ExperienceBlockKind.continuation in kinds
     assert [item.sequence for item in experience.blocks] == list(range(len(experience.blocks)))
 

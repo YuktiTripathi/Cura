@@ -22,17 +22,20 @@ H2 = {"X-Cura-User-Id": "demo-user-002"}
 def test_general_question_does_not_load_personal_profile():
     plan = build_query_plan("What is LDL?")
     assert plan.knowledge_scope == KnowledgeScope.general
-    assert plan.needs_personal_data is False
+    assert plan.general_personalization is True
     assert plan.needs_profile is False
     ctx = ContextBuilder(build_registry()).build(AuthenticatedPrincipal(subject_id="demo-user-001"), plan)
-    assert ctx.profile is None
-    assert ctx.facts == []
+    assert ctx.knowledge_scope == KnowledgeScope.general
+    assert {marker.key for marker in ctx.markers} <= {
+        "ldl", "hdl", "cholesterol", "triglycerides", "vldl", "non_hdl", "apob",
+    }
 
 
 def test_personal_vs_general_ldl_ok():
     general = build_query_plan("What is LDL?")
     personal = build_query_plan("Is my LDL okay?")
-    assert general.needs_personal_data is False
+    assert general.knowledge_scope == KnowledgeScope.general
+    assert general.general_personalization is True
     assert personal.intent == IntentType.blood_marker_explanation
     assert personal.needs_blood is True
     assert personal.medical_evidence_required is True

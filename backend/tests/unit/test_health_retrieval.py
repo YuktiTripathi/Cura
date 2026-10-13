@@ -17,22 +17,11 @@ class _Chunk:
         self.page_start = page
 
 
-def test_general_ldl_question_does_not_invoke_retrieval():
+def test_general_ldl_definition_requests_related_blood_context():
     plan = build_query_plan("What is LDL?")
-    router = HealthRetrievalRouter(build_registry())
-    called = {"blood": False}
-
-    class Probe:
-        def query(self, *args, **kwargs):
-            called["blood"] = True
-            return []
-
-    router.registry.blood = Probe()
-    result = router.retrieve(AuthenticatedPrincipal(subject_id="5"), plan)
-    assert result.invoked is False
-    assert result.ihr_called is False
-    assert called["blood"] is False
-    assert result.skipped_reason == "general_no_personal_data"
+    assert plan.knowledge_scope == KnowledgeScope.general
+    assert plan.general_personalization is True
+    assert plan.needs_blood is True
 
 
 def test_my_doctor_told_me_does_not_query_ihr():

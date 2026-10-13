@@ -421,6 +421,8 @@ export async function createConversation(): Promise<ConversationDetail> {
   if (!res.ok) throw new Error("Could not start a conversation.");
   return (await res.json()) as ConversationDetail;
 }
+
+export async function listConversations(): Promise<ConversationSummary[]> {
   const res = await fetch(`${API}/api/v1/conversations`, { headers: authHeaders() });
   if (!res.ok) return [];
   return (await res.json()) as ConversationSummary[];

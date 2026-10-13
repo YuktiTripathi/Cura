@@ -566,6 +566,17 @@
             "title": "Cache Hit",
             "type": "boolean"
           },
+          "cached_tokens": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Cached Tokens"
+          },
           "conversation_context_used": {
             "anyOf": [
               {
@@ -1218,6 +1229,17 @@
               }
             ],
             "title": "Timing"
+          },
+          "token_usage": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Token Usage"
           }
         },
         "title": "ChatMeta",
@@ -1649,6 +1671,13 @@
               "$ref": "#/components/schemas/MessageOut"
             },
             "title": "Messages",
+            "type": "array"
+          },
+          "suggested_questions": {
+            "items": {
+              "$ref": "#/components/schemas/SuggestedQuestion"
+            },
+            "title": "Suggested Questions",
             "type": "array"
           },
           "title": {
@@ -5282,6 +5311,29 @@
         "title": "StructuredResponse",
         "type": "object"
       },
+      "SuggestedQuestion": {
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "text",
+          "category"
+        ],
+        "title": "SuggestedQuestion",
+        "type": "object"
+      },
       "SummaryStyle": {
         "enum": [
           "RAW_HEALTH_SNAPSHOT",
@@ -6075,6 +6127,22 @@
           }
         },
         "summary": "List Conversations"
+      },
+      "post": {
+        "operationId": "create_conversation_api_v1_conversations_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ConversationDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Create Conversation"
       }
     },
     "/api/v1/conversations/{conversation_id}": {

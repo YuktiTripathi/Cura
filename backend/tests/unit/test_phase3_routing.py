@@ -36,20 +36,19 @@ def test_personal_bio_ai_intents():
     assert not plan.needs_blood
 
 
-def test_general_intents_skip_personal_retrieval():
+def test_general_definitions_stay_educational_and_may_add_related_results():
     for msg in ("What is Vitamin D?", "What is LDL?", "What is HbA1c?"):
         plan = build_query_plan(msg)
         assert plan.intent == IntentType.general_health_question
         assert plan.knowledge_scope == KnowledgeScope.general
-        assert not plan.needs_personal_data
-        assert not plan.needs_blood
-        assert not plan.needs_bio_ai
+        assert plan.general_personalization
+        assert plan.needs_blood
 
 
 def test_general_chat_does_not_use_personal_values():
     body = chat("What is Vitamin D?").json()
     assert body["meta"].get("question_type") == "general_education" or body["meta"]["intent"] == "general_health_question"
-    assert body["meta"].get("supershyft_called") is not True
+    assert body["meta"].get("knowledge_scope") == "general"
     assert "12.6" not in body["answer"]
     assert "your latest" not in body["answer"].lower()
     assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
@@ -78,7 +77,7 @@ def test_switch_to_b12_then_meaning():
 
 def test_general_then_mine_becomes_personal():
     first = chat("What does B12 mean?")
-    assert first.json()["meta"].get("supershyft_called") is not True
+    assert first.json()["meta"].get("knowledge_scope") == "general"
     assert first.json()["meta"].get("question_type") == "general_education" or first.json()["meta"]["intent"] == "general_health_question"
     cid = first.json()["conversation_id"]
     mine = chat("And what about mine?", cid).json()

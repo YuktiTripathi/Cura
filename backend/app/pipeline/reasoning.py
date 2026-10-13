@@ -129,6 +129,27 @@ class ReasoningService:
             and any(getattr(item, "reason", None) == "score_not_available" for item in context.missing)
         ):
             return ReasoningResult(answer="Score not available in this report.", llm_mode="structured_bio_ai")
+        primary = (plan.task_contract or {}).get("primary_source")
+        if primary == "blood_report" and not context.markers:
+            return ReasoningResult(
+                answer=(
+                    "I can't access your latest blood report right now, so this isn't an interpretation of your results. "
+                    "I can still explain what a blood report usually shows, as general information."
+                ),
+                llm_called=False,
+                llm_mode="primary_source_unavailable",
+                latency_ms=int((time.perf_counter() - started) * 1000),
+            )
+        if primary == "bio_ai" and not context.bio_ai_risks:
+            return ReasoningResult(
+                answer=(
+                    "I can't access your latest Bio-AI report right now, so this isn't an interpretation of your risk estimates. "
+                    "I can still explain what those assessments mean in general."
+                ),
+                llm_called=False,
+                llm_mode="primary_source_unavailable",
+                latency_ms=int((time.perf_counter() - started) * 1000),
+            )
         response_plan = build_response_plan(message, plan, context)
         interpret_turn = "INTERPRET" in {str(op).upper() for op in plan.operations or []}
         if response_plan.kind == "report_overview" and context.markers and not interpret_turn:
@@ -190,7 +211,10 @@ class ReasoningService:
         completer = complete_answer or self._complete_answer
         if general_only:
             corpus_answer = render_medical_evidence_answer(plan.topic, medical_hits)
-            if corpus_answer and definition_from_reviewed_passage(message, plan, medical_hits):
+            reviewed_definition = bool(
+                corpus_answer and definition_from_reviewed_passage(message, plan, medical_hits)
+            )
+            if reviewed_definition:
                 # Cost lever 4: a plain definition is answered from the reviewed passage, no model call.
                 return ReasoningResult(
                     answer=corpus_answer,
@@ -218,7 +242,7 @@ class ReasoningService:
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
             except LLMUnavailableError:
-                if corpus_answer:
+                if reviewed_definition:
                     return ReasoningResult(
                         answer=corpus_answer,
                         llm_called=True,
@@ -244,19 +268,6 @@ class ReasoningService:
                         answer=package.blocked_answer,
                         llm_called=False,
                         llm_mode="evidence_unavailable",
-                        latency_ms=int((time.perf_counter() - started) * 1000),
-                    )
-                if package.response_type == "MARKER_LOOKUP" and len(package.measurements) == 1:
-                    row = package.measurements[0]
-                    unit = row.get("unit") or ""
-                    answer = (
-                        f"{row.get('name')} is {row.get('value')} {unit}. "
-                        f"The report marks it {row.get('flag') or 'unknown'}."
-                    ).replace("  ", " ")
-                    return ReasoningResult(
-                        answer=answer.strip(),
-                        llm_called=False,
-                        llm_mode="verified_marker",
                         latency_ms=int((time.perf_counter() - started) * 1000),
                     )
             with perf.stage("prompt_build"):

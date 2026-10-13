@@ -48,12 +48,12 @@ DOMAINS: tuple[HealthDomain, ...] = (
     ),
     HealthDomain(
         "metabolic_health",
-        ("metabolic health", "metabolic picture", "metabolic cluster", "metabolic"),
+        ("metabolic health", "metabolic syndrome", "metabolic picture", "metabolic cluster", "metabolic"),
         primary_entities=_GLYCEMIC + ("fasting_insulin",) + _LIPIDS[2:] + ("alt", "uric_acid"),
         supporting_entities=("cholesterol", "ldl"),
         contextual_entities=("bmi", "weight", "waist", "activity", "diet", "sleep", "alcohol", "smoking"),
         sources=("blood", "profile", "questionnaire", "bio_ai"),
-        bioai_domains=("type_2_diabetes", "obesity", "nafld", "hypertension", "dyslipidemia"),
+        bioai_domains=("type_2_diabetes", "metabolic_syndrome", "obesity", "nafld", "hypertension", "dyslipidemia"),
         related_domains=("glycemic_health", "lipid_health", "weight_body_composition"),
     ),
     HealthDomain(
@@ -207,6 +207,15 @@ DOMAINS: tuple[HealthDomain, ...] = (
         related_domains=("metabolic_health",),
     ),
     HealthDomain(
+        "pcos_health",
+        ("pcos", "pcod", "polycystic ovarian syndrome", "polycystic ovary syndrome"),
+        primary_entities=("hba1c", "fasting_blood_glucose", "triglycerides", "hdl"),
+        contextual_entities=("bmi", "waist", "activity", "diet"),
+        sources=("blood", "bio_ai", "questionnaire", "profile"),
+        bioai_domains=("pcos",),
+        related_domains=("metabolic_health", "weight_body_composition"),
+    ),
+    HealthDomain(
         "lifestyle_recovery",
         ("lifestyle", "sleep and exercise", "recovery habits", "daily habits"),
         primary_entities=("activity", "sleep", "diet", "smoking", "alcohol", "stress", "hydration"),
@@ -249,10 +258,14 @@ _BIO_TO_DOMAIN = {
     "thyroid": "thyroid_health",
     "cardiac_health": "cardiovascular_health",
     "type_2_diabetes": "glycemic_health",
+    "metabolic_syndrome": "metabolic_health",
     "dyslipidemia": "lipid_health",
     "hypertension": "blood_pressure_health",
     "nafld": "liver_health",
     "obesity": "weight_body_composition",
+    "oxidative_stress": "inflammation",
+    "thyroid": "thyroid_health",
+    "pcos": "pcos_health",
 }
 _LIFESTYLE_KEYS = frozenset(
     {"activity", "sleep", "diet", "smoking", "alcohol", "stress", "hydration", "physical_activity"}

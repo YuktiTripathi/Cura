@@ -311,9 +311,13 @@ class ContextBuilder:
                 )
         ctx.evidence = evidence
         ctx.evidence_ids = [e.evidence_id for e in evidence]
+        if plan.general_personalization:
+            from app.pipeline.general_personalization import limit_general_personal_context
+
+            limit_general_personal_context(ctx)
         if not ctx.meta.sources:
             ctx.meta.sources = ["supershyft"]
-        ctx.meta.report_ids = list(dict.fromkeys(e.report_id for e in evidence))
+        ctx.meta.report_ids = list(dict.fromkeys(e.report_id for e in ctx.evidence))
         self._attach_personalization(
             ctx,
             principal,
@@ -816,6 +820,11 @@ class ContextBuilder:
             documents=documents,
             questionnaire_instances=ctx.questionnaire_instances,
         )
+        primary = (plan.task_contract or {}).get("primary_source")
+        if primary == "blood_report":
+            ctx.bio_ai_risks = []
+            ctx.metabolic_age = None
+            ctx.metabolic_score = None
         facts = [marker_fact(marker, principal.subject_id) for marker in ctx.markers]
         uploaded_keys = {
             marker.key

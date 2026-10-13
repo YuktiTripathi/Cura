@@ -125,7 +125,8 @@ export interface paths {
         /** List Conversations */
         get: operations["list_conversations_api_v1_conversations_get"];
         put?: never;
-        post?: never;
+        /** Create Conversation */
+        post: operations["create_conversation_api_v1_conversations_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -659,6 +660,8 @@ export interface components {
              * @default false
              */
             cache_hit: boolean;
+            /** Cached Tokens */
+            cached_tokens?: number | null;
             /** Conversation Context Used */
             conversation_context_used?: boolean | null;
             /** Conversation Goal */
@@ -831,6 +834,8 @@ export interface components {
             timing?: {
                 [key: string]: unknown;
             } | null;
+            /** Token Usage */
+            token_usage?: string | null;
         };
         /** ChatRequest */
         ChatRequest: {
@@ -945,6 +950,8 @@ export interface components {
             id: string;
             /** Messages */
             messages: components["schemas"]["MessageOut"][];
+            /** Suggested Questions */
+            suggested_questions?: components["schemas"]["SuggestedQuestion"][];
             /** Title */
             title?: string | null;
         };
@@ -2060,6 +2067,15 @@ export interface components {
             /** Uncertainties */
             uncertainties?: string[];
         };
+        /** SuggestedQuestion */
+        SuggestedQuestion: {
+            /** Category */
+            category: string;
+            /** Id */
+            id: string;
+            /** Text */
+            text: string;
+        };
         /**
          * SummaryStyle
          * @enum {string}
@@ -2480,6 +2496,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ConversationSummary"][];
+                };
+            };
+        };
+    };
+    create_conversation_api_v1_conversations_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ConversationDetail"];
                 };
             };
         };

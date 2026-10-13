@@ -398,6 +398,9 @@ class OpenAICompatibleLLMClient:
                         continue
                     usage = chunk.get("usage") or usage
                     for choice in chunk.get("choices") or []:
+                        reason = choice.get("finish_reason")
+                        if reason:
+                            self.last_finish_reason = str(reason)
                         delta = (choice.get("delta") or {}).get("content") or ""
                         if delta:
                             parts.append(delta)
@@ -412,6 +415,9 @@ class OpenAICompatibleLLMClient:
             "usage_reported": bool(usage),
         }
         text = strip_reasoning("".join(parts))
+        if self.last_finish_reason in {"length", "max_tokens"}:
+            logger.warning("llm_stream_truncated model=%s finish_reason=%s", self.model, self.last_finish_reason)
+            raise LLMUnavailableError("LLM output was truncated")
         if not text:
             raise LLMUnavailableError("LLM returned an empty answer")
         openrouter_breaker.record_success()

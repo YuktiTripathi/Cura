@@ -28,34 +28,35 @@ export function WelcomeExperience({
       <p className="greeting">{greeting}</p>
       <p className="welcome-lead">{t("ui.WelcomeExperience.how_can_i_help_you_understand_your_healt", "How can I help you understand your health better?")}</p>
       <p className="muted">
-        I can explain your available SuperShyft reports, build your health scenario, explore nutrition,
-        and answer general health questions.
+        I can explain your blood report, Bio-AI report, and nutrition, and answer general health questions.
       </p>
       <div className="capability-grid">
         {capabilities?.has_blood_report && (
-          <button type="button" onClick={() => onSend("Show me my latest blood report")}>
+          <button
+            type="button"
+            onClick={() =>
+              onSend("Help me understand my latest blood report", [], {
+                type: "blood_report",
+                source: "supershyft",
+              })
+            }
+          >
             🩸 <strong>{t("ui.WelcomeExperience.my_blood_report", "My Blood Report")}</strong>
             <span>{t("ui.WelcomeExperience.understand_markers_and_trends", "Understand markers and trends")}</span>
           </button>
         )}
         {capabilities?.has_bio_ai_report && (
-          <button type="button" onClick={() => onSend("Explain my latest Bio-AI report")}>
-            🧬 <strong>{t("ui.WelcomeExperience.my_bio_ai_report", "My Bio-AI Report")}</strong>
-            <span>{t("ui.WelcomeExperience.explore_risk_assessments", "Explore risk assessments")}</span>
-          </button>
-        )}
-        {capabilities?.has_health_scenario && (
           <button
             type="button"
             onClick={() =>
-              onSend("Summarize my health scenario", [], {
-                type: "health_scenario",
+              onSend("Help me understand my latest Bio-AI report and its main findings.", [], {
+                type: "bio_ai_report",
                 source: "supershyft",
               })
             }
           >
-            ❤️ <strong>{t("ui.WelcomeExperience.my_health_scenario", "My Health Scenario")}</strong>
-            <span>{t("ui.WelcomeExperience.see_what_is_going_well_and_what_needs_at", "See what is going well and what needs attention")}</span>
+            🧬 <strong>{t("ui.WelcomeExperience.my_bio_ai_report", "My Bio-AI Report")}</strong>
+            <span>{t("ui.WelcomeExperience.explore_risk_assessments", "Explore risk assessments")}</span>
           </button>
         )}
         {capabilities?.has_nutrition && (

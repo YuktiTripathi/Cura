@@ -128,7 +128,6 @@ def select_blocks(goal: ConversationGoal, depth: ResponseDepth, relevant: Releva
             ResponseBlockKind.personal_result,
             ResponseBlockKind.reassurance,
             ResponseBlockKind.uncertainty,
-            ResponseBlockKind.next_step,
             ResponseBlockKind.source,
         ]
     if goal == ConversationGoal.health_review or goal == ConversationGoal.prioritize:
@@ -137,14 +136,12 @@ def select_blocks(goal: ConversationGoal, depth: ResponseDepth, relevant: Releva
             ResponseBlockKind.pattern,
             ResponseBlockKind.reassurance,
             ResponseBlockKind.missing_info,
-            ResponseBlockKind.next_step,
             ResponseBlockKind.source,
         ]
     if goal == ConversationGoal.action_plan:
         return [
             ResponseBlockKind.direct_answer,
             ResponseBlockKind.personal_result,
-            ResponseBlockKind.next_step,
             ResponseBlockKind.source,
         ]
     if goal == ConversationGoal.deep_dive:
@@ -156,7 +153,6 @@ def select_blocks(goal: ConversationGoal, depth: ResponseDepth, relevant: Releva
             ResponseBlockKind.related_context,
             ResponseBlockKind.uncertainty,
             ResponseBlockKind.missing_info,
-            ResponseBlockKind.next_step,
             ResponseBlockKind.source,
         ]
     blocks = [
@@ -169,7 +165,7 @@ def select_blocks(goal: ConversationGoal, depth: ResponseDepth, relevant: Releva
         blocks.append(ResponseBlockKind.related_context)
     if relevant.relevant_missing_keys:
         blocks.append(ResponseBlockKind.missing_info)
-    blocks.extend([ResponseBlockKind.next_step, ResponseBlockKind.source])
+    blocks.append(ResponseBlockKind.source)
     return blocks
 
 
@@ -250,6 +246,10 @@ def build_experience_plan(
     goal = infer_conversation_goal(message, plan, state)
     depth = infer_response_depth(message, plan, goal, state)
     relevant = _SELECTOR.select(context, plan, reports=reports, goal=goal, depth=depth)
+    # General education may mention related medical entities for explanation,
+    # but their absence from the patient's records is not missing information.
+    if plan.knowledge_scope.value == "general":
+        relevant.relevant_missing_keys = []
     _SELECTOR.apply(context, relevant, reports=reports, depth=depth)
     next_action = select_next_action(
         goal=goal,

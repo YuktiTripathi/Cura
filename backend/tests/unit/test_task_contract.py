@@ -56,6 +56,154 @@ def test_modular_prompt_is_smaller_and_selects_the_bio_ai_module(monkeypatch):
     assert "ABNORMAL" in {item.upper() for item in plan.selectors}
 
 
+def test_modular_modules_prefer_typed_semantic_goals(monkeypatch):
+    from app.contracts.blood import BloodMarker
+    from app.contracts.common import AnswerDepth, KnowledgeScope, MarkerFlag
+    from app.contracts.health_context import HealthContext
+    from app.core.config import settings
+    from app.pipeline.prompt_modules import modules_for
+
+    monkeypatch.setattr(settings, "cura_response_mode", "rich")
+    context = HealthContext(
+        intent=IntentType.latest_result,
+        answer_depth=AnswerDepth.focused,
+        knowledge_scope=KnowledgeScope.personal,
+        markers=[BloodMarker(id="1", key="hba1c", name="HbA1c", value=5.9, unit="%", flag=MarkerFlag.high)],
+        semantic_plan={
+            "primary_goal": "CAUSES",
+            "secondary_goals": ["ACTION"],
+            "response_shape": "POSSIBLE_EXPLANATIONS",
+        },
+    )
+
+    modules = modules_for(context, "yeh kyun badha aur main kya karun?")
+
+    assert "BIOMARKER_LOOKUP" in modules
+    assert "HEALTH_ACTION_PLANNING" in modules
+    assert "RICH_RESPONSE" in modules
+
+
+def test_modular_general_personalization_teaches_before_bridging(monkeypatch):
+    from app.contracts.common import AnswerDepth, KnowledgeScope
+    from app.contracts.health_context import HealthContext
+    from app.core.config import settings
+    from app.pipeline.prompt_modules import compose_system, modules_for
+
+    monkeypatch.setattr(settings, "cura_response_mode", "rich")
+    context = HealthContext(
+        intent=IntentType.general_health_question,
+        answer_depth=AnswerDepth.focused,
+        knowledge_scope=KnowledgeScope.general,
+        general_personalization=True,
+        semantic_plan={
+            "primary_goal": "GENERAL_EDUCATION",
+            "secondary_goals": [],
+            "response_shape": "GENERAL_EDUCATION",
+        },
+    )
+
+    modules = modules_for(context, "What is heart health?")
+    system = compose_system(context, "What is heart health?")
+
+    assert "GENERAL_HEALTH_EDUCATION" in modules
+    assert "PERSONAL_CONTEXT_BRIDGE" in modules
+    assert system.index("Explain the concept before") < system.index("The main task is still general education")
+    assert "5.9" not in system  # the cacheable system prefix never contains patient data
+
+
+def test_modular_follow_up_uses_conversation_contract(monkeypatch):
+    from app.contracts.common import AnswerDepth, KnowledgeScope
+    from app.contracts.health_context import HealthContext
+    from app.core.config import settings
+    from app.pipeline.prompt_modules import modules_for
+
+    monkeypatch.setattr(settings, "cura_response_mode", "plain")
+    context = HealthContext(
+        intent=IntentType.general_health_question,
+        answer_depth=AnswerDepth.simple,
+        knowledge_scope=KnowledgeScope.general,
+        conversation_turn="FOLLOW_UP_QUESTION",
+        semantic_plan={
+            "primary_goal": "FOLLOW_UP",
+            "secondary_goals": [],
+            "response_shape": "EXPLANATION",
+        },
+    )
+
+    assert "CONVERSATIONAL_FOLLOW_UP" in modules_for(context, "aur iska kya matlab hai?")
+
+
+def test_modular_core_preserves_safety_and_structured_contract():
+    from app.pipeline.prompt_modules import CORE
+
+    required = (
+        "Do not prescribe",
+        "Never invent personal data",
+        "Emergency safety overrides",
+        "answer, claims, recommendation_candidates, follow_up_questions, safety_flags, escalation",
+        "Bio-AI result is a prediction",
+        "separate translation stage",
+    )
+    for text in required:
+        assert text in CORE
+    assert len(CORE) < 3200
+
+
+def test_personal_marker_interpretation_uses_the_answer_model(monkeypatch):
+    from app.contracts.blood import BloodMarker
+    from app.contracts.common import AnswerModelTier, MarkerFlag
+    from app.contracts.health_context import HealthContext
+    from app.core.config import settings
+    from app.llm.models import LLMStructuredOutput
+    from app.pipeline.reasoning import ReasoningService
+
+    message = "What is my HbA1c and what does that mean?"
+    plan = build_query_plan(message).model_copy(
+        update={
+            "answer_model_tier": AnswerModelTier.standard_medical,
+            "model_tier": AnswerModelTier.standard_medical,
+            "reasoning_required": True,
+        }
+    )
+    context = HealthContext(
+        intent=plan.intent,
+        answer_depth=plan.answer_depth,
+        knowledge_scope=plan.knowledge_scope,
+        task_contract=plan.task_contract,
+        markers=[
+            BloodMarker(
+                id="hba1c-1",
+                key="hba1c",
+                name="HbA1c",
+                value=5.5,
+                unit="%",
+                flag=MarkerFlag.normal,
+            )
+        ],
+        semantic_plan={
+            "primary_goal": "EXPLAIN",
+            "secondary_goals": [],
+            "response_shape": "EXPLANATION",
+        },
+    )
+    monkeypatch.setattr(settings, "enable_llm", True)
+
+    result = ReasoningService().run(
+        message=message,
+        plan=plan,
+        context=context,
+        complete_answer=lambda *_args, **_kwargs: (
+            LLMStructuredOutput(answer="HbA1c reflects average blood sugar over time."),
+            object(),
+            AnswerModelTier.standard_medical,
+            False,
+        ),
+    )
+
+    assert result.llm_called is True
+    assert result.answer.startswith("HbA1c reflects")
+
+
 def test_bio_ai_score_list_does_not_become_a_blood_lookup():
     plan = build_query_plan("What are my Bio-AI risk scores?")
     assert plan.intent == IntentType.bio_ai_score

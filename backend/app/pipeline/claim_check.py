@@ -118,18 +118,11 @@ def revise_unsupported_answer(
     if not flags:
         return answer, flags
     if kept:
-        text = " ".join(kept)
-        if evidence:
-            text += (
-                "\n\nThis is general health education based on the retrieved source pointers. "
-                "It is not a guideline quotation or a personal diagnosis."
-            )
-        return text, flags
+        return " ".join(kept), flags
     if evidence:
         return (
-            "I can point you to authoritative sources on this topic, but I do not have a retrieved "
-            "guideline excerpt that supports a specific clinical claim here. Please use the listed "
-            "sources and a clinician for personal advice.",
+            "I couldn't verify a reliable answer to that question just now, so I don't want to "
+            "give you a misleading explanation.",
             flags,
         )
     return (

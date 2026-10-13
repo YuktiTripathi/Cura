@@ -30,6 +30,7 @@ _NARRATIVE_ASK = re.compile(
     r"\b(summarize my health|health scenario|how am i doing|what should i focus|"
     r"what matters most|complete health|overall health|biggest health concerns|"
     r"review my (?:complete |full )?health|important findings|"
+    r"help me understand my (?:latest |last |current )?(?:blood |lab )?report|"
     r"bigger-picture|comprehensive overview)\b",
     re.I,
 )
@@ -132,6 +133,10 @@ def wants_narrative_summary(message: str | None, plan: QueryPlan | None = None) 
     if wants_raw_snapshot(text, plan):
         return False
     if plan is not None:
+        spec = plan.task_contract or {}
+        # A focused question must not grow the whole-report theme cards.
+        if spec.get("broad_summary") is False and not _NARRATIVE_ASK.search(text):
+            return False
         selectors = {str(item).upper() for item in (plan.selectors or [])}
         if selectors & {"HIGH", "LOW", "ABNORMAL", "ALL", "NORMAL"} and not _NARRATIVE_ASK.search(text):
             return False
@@ -232,9 +237,17 @@ def build_narrative_summary(
     overall = (llm_overall or "").strip()
     if overall and _ROBOTIC.search(overall):
         overall = ""
-    if not overall:
-        overall = _overall_summary(themes)
-    next_action = next((item.next_step for item in themes if item.next_step), None)
+    primary = ((plan.task_contract if plan else None) or {}).get("primary_source")
+    if primary in {"blood_report", "bio_ai"}:
+        # The model explains meaning. Stock theme cards would repeat it.
+        themes = []
+        next_action = None
+        if not overall:
+            overall = "Here is a reading of the report that was retrieved."
+    else:
+        if not overall:
+            overall = _overall_summary(themes)
+        next_action = next((item.next_step for item in themes if item.next_step), None)
     return overall, themes[:5], raw, next_action
 
 
@@ -245,8 +258,6 @@ def usable_llm_overview(text: str | None) -> str | None:
     if value.count(":") >= 8 and "\n" in value:
         return None
     first = value.split("\n\n")[0].strip()
-    if len(first) > 600:
-        first = first[:600].rsplit(" ", 1)[0]
     return first or None
 
 
@@ -339,6 +350,11 @@ def _themes_from_groups(
     for code, markers in groups.items():
         abn = [marker for marker in markers if _abnormal(marker)]
         if not abn:
+            if code == "metabolic_health" and any(
+                _abnormal_count(groups.get(related))
+                for related in ("lipid_health", "glycemic_health", "glucose_health")
+            ):
+                continue
             if any(_flag(marker) == "normal" for marker in markers):
                 reassuring_labels.append(_title(code))
             continue
@@ -487,20 +503,23 @@ def _question_missing(message: str, context: HealthContext, present: set[str]) -
     return rows[:2]
 
 
+_PATTERN_TEXT = {
+    "lipid_health": "Several blood-fat measurements are higher than expected. These results may matter for long-term heart health.",
+    "red_cell_anaemia_health": "Some red blood cell measurements are outside their expected ranges. Looking at them together may help explain the pattern.",
+    "kidney_health": "A kidney-related result sits outside the usual range. One result on its own does not show that the kidneys are damaged.",
+    "glycemic_health": "A blood-sugar result is outside the expected range. That can matter for longer-term sugar control.",
+    "glucose_health": "A blood-sugar result is outside the expected range. That can matter for longer-term sugar control.",
+}
+
+
 def _interpret(code: str, findings: list[PresentedFinding], persistent: int, bio_support: int) -> str:
-    del code
-    bits = []
-    for item in findings[:4]:
-        name = format_marker_name(item.label or "Result")
-        unit = f" {format_unit(item.unit)}" if item.unit else ""
-        status = (item.status or "").replace("_", " ")
-        value = item.value if item.value is not None else "not available"
-        bits.append(f"{name} is {value}{unit} ({status})" if status else f"{name} is {value}{unit}")
-    lead = "; ".join(bits) + "."
+    del findings, bio_support
+    lead = _PATTERN_TEXT.get(
+        code,
+        f"Some {_title(code).lower()} results are outside the expected range.",
+    )
     if persistent:
-        lead += " The same pattern is also present across recent reports."
-    if bio_support:
-        lead += " The Bio-AI assessment points in a similar direction."
+        lead += " A similar pattern shows up in an earlier report."
     return lead
 
 

@@ -33,7 +33,7 @@ describe("MessageList provenance", () => {
         onFeedback={vi.fn()}
       />
     );
-    expect(screen.getByTestId("provenance-line").textContent).toBe("Source: Bio-AI Report");
+    expect(screen.getByTestId("provenance-line").textContent).toBe("View sources");
     expect(screen.queryByText("Ask Cura")).toBeNull();
     expect(screen.queryByText(/supershyft/i)).toBeNull();
     expect(screen.queryByText(/bio-9/)).toBeNull();
@@ -60,7 +60,7 @@ describe("MessageList provenance", () => {
         onFeedback={vi.fn()}
       />
     );
-    expect(screen.getByTestId("provenance-line").textContent).toBe("Sources: WHO · NICE");
+    expect(screen.getByTestId("provenance-line").textContent).toBe("View sources");
     expect(screen.getByRole("link", { name: "WHO" }).getAttribute("href")).toContain("who.int");
   });
 
@@ -104,7 +104,8 @@ describe("MessageList provenance", () => {
     );
     expect(screen.getByText("TSH")).toBeTruthy();
     expect(screen.getByText(/2\.1/)).toBeTruthy();
-    expect(screen.getByTestId("provenance-line").textContent).toContain("Latest blood report");
+    expect(screen.getByTestId("provenance-line").textContent).toBe("View sources");
+    expect(screen.getAllByText(/Latest blood report/).length).toBeGreaterThan(0);
     expect(screen.queryByText("blood-002")).toBeNull();
   });
 

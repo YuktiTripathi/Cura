@@ -35,5 +35,7 @@ def test_general_prompt_includes_the_note():
     )
     messages = PromptBuilder().build(ctx, "", "What is heart health?")
     assert "PRESENTATION:" in messages[1]["content"]
-    assert "bold heading" in messages[1]["content"]
-    assert "easy to scan" in messages[0]["content"]
+    assert "NARRATIVE LENGTH:" in messages[1]["content"]
+    assert "fewer than 120 words is fine" in messages[1]["content"]
+    assert "2 to 4 Markdown bullets" in messages[0]["content"]
+    assert "without bold labels" in messages[1]["content"]

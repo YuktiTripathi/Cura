@@ -62,6 +62,7 @@ BIO_ALIASES = {
     "metabolic age": "metabolic_age",
     "metabolic score": "metabolic_score",
     "metabolic risk": "metabolic_score",
+    "metabolic syndrome": "metabolic_syndrome",
     "pcod": "pcos",
     "pcos": "pcos",
     "polycystic ovarian": "pcos",
@@ -81,6 +82,7 @@ NAMES = {
     "nafld": "NAFLD",
     "metabolic_age": "metabolic age",
     "metabolic_score": "metabolic score",
+    "metabolic_syndrome": "metabolic syndrome",
     "glucose": "Glucose",
     "fasting_blood_glucose": "Fasting Blood Sugar Glucose",
     "cholesterol": "Cholesterol",
@@ -223,7 +225,8 @@ _GOAL = re.compile(
     re.I,
 )
 _REPORT_EXPLAIN = re.compile(
-    r"\bexplain my (?:latest |last |current )?(?:blood |lab |bio-?ai )?(?:report|results?)\b",
+    r"\bexplain my (?:latest |last |current )?(?:blood |lab |bio-?ai )?(?:report|results?)\b"
+    r"|\bhelp me understand my (?:latest |last |current )?(?:blood |lab |bio-?ai )?(?:report|results?)\b",
     re.I,
 )
 _PROFILE = re.compile(

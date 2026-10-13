@@ -35,6 +35,10 @@ _PERSONAL_MARKER = re.compile(
     r"\bmy\b.{0,32}\b(hdl|ldl|hba1c|glucose|tsh|hemoglobin|haemoglobin|cholesterol|triglycerides|alt|ast|bilirubin)\b",
     re.I,
 )
+_QUOTED_PERSONAL_CONTEXT = re.compile(
+    r"\bmy\s+(?:doctor|clinician|nurse|pharmacist|friend|family|partner)\b",
+    re.I,
+)
 
 
 class ReasoningOperation(str, Enum):
@@ -56,6 +60,111 @@ class TaskContract(BaseModel):
     operations: list[ReasoningOperation] = Field(default_factory=list)
     required_sources: list[str] = Field(default_factory=list)
     response_type: str = "DIRECT_ANSWER"
+    intent: str = ""
+    focus: str | None = None
+    personal_context: str = "none"
+    goal: str = "explain"
+    broad_summary: bool = False
+    recommendations_requested: bool = False
+    card_keys: list[str] = Field(default_factory=list)
+    length_band: str = "100-150"
+
+
+_ADVISE = re.compile(
+    r"\b(?:what should i do|what can i do|how can i|how do i|how to|improve|prevent|focus on first)\b",
+    re.I,
+)
+_BROAD = re.compile(
+    r"\b(?:overall health|how am i doing|complete blood|full report|entire report|summarize my health)\b",
+    re.I,
+)
+
+
+def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
+    """Record the resolved task. Does not add sources or replace the router."""
+    text = message or plan.raw_message or ""
+    intent = plan.intent.value if plan.intent else ""
+    if plan.knowledge_scope == KnowledgeScope.personal:
+        personal = "required"
+    elif plan.general_personalization:
+        personal = "optional"
+    else:
+        personal = "none"
+    understand_report = bool(
+        re.search(r"\bhelp me understand my (?:latest |last |current )?(?:blood |lab )?report\b", text, re.I)
+    )
+    named_focus = bool(plan.topic) and not _BROAD.search(text)
+    broad = intent in {"broad_health_summary", "health_scenario", "report_explanation"} or bool(_BROAD.search(text))
+    if named_focus or understand_report or (_ADVISE.search(text) and not _BROAD.search(text)):
+        broad = False
+    if _ADVISE.search(text):
+        goal = "advise"
+    elif plan.compare or intent in {"trend", "bio_ai_comparison"}:
+        goal = "compare"
+    elif intent == "bio_ai_score" and re.search(r"\b(?:explain|interpret|understand|what does|what do|mean)\b", text, re.I):
+        goal = "interpret"
+    elif intent in {"latest_result", "previous_result", "bio_ai_score"}:
+        goal = "lookup"
+    elif understand_report or intent in {"blood_marker_explanation", "bio_ai_explanation"} or (named_focus and personal == "required"):
+        goal = "interpret"
+    elif broad:
+        goal = "synthesize"
+    else:
+        goal = "explain"
+    if personal == "none" and goal in {"lookup", "interpret", "synthesize"}:
+        goal = "explain"
+        broad = False
+    keys = [key for key in (plan.requested_metrics or []) if key]
+    card_keys = [] if broad else keys[:6]
+    if goal == "explain" and personal == "none":
+        length = "40-80"
+    elif goal == "compare" or understand_report or (goal == "interpret" and intent in {"bio_ai_score", "bio_ai_explanation"}):
+        length = "120-180"
+    elif broad:
+        length = "180-400"
+    else:
+        length = "100-150"
+    primary = _primary_source(text, plan)
+    existing = dict(plan.task_contract or {})
+    existing.update(
+        {
+            "intent": intent,
+            "focus": plan.topic,
+            "personal_context": personal,
+            "goal": goal,
+            "broad_summary": broad,
+            "recommendations_requested": goal == "advise",
+            "card_keys": card_keys,
+            "length_band": length,
+            "primary_source": primary,
+        }
+    )
+    update: dict = {"task_contract": existing}
+    # A report explanation keeps the source the user named. Later routing must not swap it.
+    if primary == "blood_report":
+        update.update(needs_blood=True, needs_bio_ai=False, needs_questionnaire=False, source=QuerySource.blood)
+    elif primary == "bio_ai":
+        update.update(needs_blood=False, needs_bio_ai=True, needs_questionnaire=False, source=QuerySource.bio_ai)
+    return plan.model_copy(update=update)
+
+
+def _primary_source(text: str, plan: QueryPlan) -> str:
+    """Which record the answer must explain. Mixed only when the user asked across sources."""
+    blood = bool(re.search(r"\b(?:blood|lab) report\b", text or "", re.I))
+    bio = bool(re.search(r"\bbio-?ai\b", text or "", re.I))
+    if blood and bio:
+        return "mixed"
+    if blood:
+        return "blood_report"
+    if bio and re.search(r"\breport\b", text or "", re.I):
+        return "bio_ai"
+    if plan.explicit_source_ref and plan.needs_blood and not plan.needs_bio_ai:
+        return "blood_report"
+    if plan.explicit_source_ref and plan.needs_bio_ai and not plan.needs_blood:
+        return "bio_ai"
+    if plan.intent in {IntentType.broad_health_summary, IntentType.health_scenario}:
+        return "mixed"
+    return "unspecified"
 
 
 def build_task_contract(message: str | None) -> TaskContract:
@@ -87,7 +196,11 @@ def build_task_contract(message: str | None) -> TaskContract:
         ops.append(ReasoningOperation.lookup)
         sources.append("blood_report")
         response = "ABNORMAL_LIST"
-    elif _PERSONAL_MARKER.search(text) and not re.search(r"\bhow does\b", text, re.I):
+    elif (
+        _PERSONAL_MARKER.search(text)
+        and not _QUOTED_PERSONAL_CONTEXT.search(text)
+        and not re.search(r"\bhow does\b", text, re.I)
+    ):
         ops.append(ReasoningOperation.interpret if re.search(r"\b(?:good|bad|mean|normal|high|low|worry)\b", text, re.I) else ReasoningOperation.lookup)
         sources.append("blood_report")
         response = "MARKER_LOOKUP"
@@ -118,6 +231,11 @@ def apply_task_contract(plan: QueryPlan, message: str | None = None) -> QueryPla
     contract = build_task_contract(message or plan.raw_message)
     if not contract.required_sources:
         return plan
+    if plan.document_ids or plan.needs_user_uploaded:
+        # "Blood report" may refer to the explicitly attached/uploaded report. The
+        # source router has already resolved that reference, so a text-only contract
+        # must not silently replace it with the SuperShyft blood source.
+        return plan.model_copy(update={"task_contract": contract.model_dump()})
     update: dict = {
         "knowledge_scope": KnowledgeScope.personal,
         "needs_supershyft": True,

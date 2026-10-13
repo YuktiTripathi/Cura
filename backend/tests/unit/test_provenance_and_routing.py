@@ -38,17 +38,38 @@ def test_latest_hba1c_uses_blood_report_source():
 def test_hypertension_general_uses_retrieved_who():
     plan = build_query_plan("What is hypertension?")
     assert plan.intent == IntentType.general_health_question
-    assert not plan.needs_supershyft
+    assert plan.general_personalization
+    assert plan.needs_supershyft
     assert plan.medical_evidence_required
     docs = retrieve_medical_evidence("What is hypertension?", plan.topic, limit=1)
     assert docs
     assert docs[0].name == "WHO"
     body = client.post("/api/v1/chat", headers=H, json={"message": "What is hypertension?"}).json()
-    assert body["meta"]["supershyft_called"] is False
+    assert body["meta"]["supershyft_called"] is True
     names = [s["name"] for s in body["provenance"]["sources"]]
     assert names
     assert "WHO" in names or "CDC" in names or "NICE" in names
-    assert all(s.get("url") for s in body["provenance"]["sources"])
+    assert all(
+        s.get("url")
+        for s in body["provenance"]["sources"]
+        if s["name"] in {"WHO", "CDC", "NICE"}
+    )
+
+
+def test_explicit_general_only_request_never_calls_supershyft():
+    body = client.post(
+        "/api/v1/chat",
+        headers=H,
+        json={"message": "Explain heart health without using my reports."},
+    ).json()
+
+    assert body["meta"]["knowledge_scope"] == "general"
+    assert body["meta"]["supershyft_called"] is False
+    assert "personal supershyft health data" not in body["answer"].lower()
+    assert not any(
+        source["source_type"] == "personal_record"
+        for source in body["provenance"]["sources"]
+    )
 
 
 def test_hyperthyroidism_symptoms_use_retrieved_evidence():
@@ -139,7 +160,7 @@ def test_hba1c_foods_question_is_general_and_has_nutrition_evidence():
     assert any("food" in " ".join(doc.keywords) or "diet" in " ".join(doc.keywords) for doc in docs)
 
 
-def test_hba1c_foods_answers_from_corpus_when_llm_unavailable(monkeypatch):
+def test_hba1c_foods_does_not_present_index_text_as_an_answer_when_llm_unavailable(monkeypatch):
     from app.core.config import settings
     from app.core.errors import LLMUnavailableError
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
@@ -156,18 +177,17 @@ def test_hba1c_foods_answers_from_corpus_when_llm_unavailable(monkeypatch):
         json={"message": "What foods are commonly discussed in relation to HbA1c?"},
     ).json()
     answer = body["answer"].lower()
-    assert "can't access the general medical knowledge" not in answer
-    assert "please try again shortly" not in answer
+    assert "can't access the general medical knowledge" in answer
     assert body["meta"]["intent"] == "general_health_question"
-    assert body["meta"]["llm_mode"] == "medical_corpus"
+    assert body["meta"]["llm_mode"] == "unavailable"
     names = [s["name"] for s in body["provenance"]["sources"]]
     assert names
     assert set(names) <= {"NIDDK", "CDC", "MedlinePlus", "WHO", "NICE"}
     assert "Blood Report" not in names
-    assert "educational" in answer or "diet" in answer or "eating" in answer or "food" in answer
+    assert "source pointer" not in answer
 
 
-def test_vitamin_d_answers_from_corpus_when_llm_unavailable(monkeypatch):
+def test_vitamin_d_does_not_present_index_text_as_an_answer_when_llm_unavailable(monkeypatch):
     from app.core.config import settings
     from app.core.errors import LLMUnavailableError
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
@@ -184,9 +204,9 @@ def test_vitamin_d_answers_from_corpus_when_llm_unavailable(monkeypatch):
         json={"message": "What does Vitamin D do in the body?"},
     ).json()
     answer = body["answer"].lower()
-    assert "can't access the general medical knowledge" not in answer
-    assert "vitamin d" in answer or "calcium" in answer or "bone" in answer
-    assert body["meta"]["llm_mode"] == "medical_corpus"
+    assert "can't access the general medical knowledge" in answer
+    assert "source pointer" not in answer
+    assert body["meta"]["llm_mode"] == "unavailable"
 
 
 def test_lifestyle_hba1c_follow_up_stays_general(monkeypatch):
