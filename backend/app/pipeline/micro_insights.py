@@ -27,7 +27,9 @@ def _range_insight(context: HealthContext) -> str | None:
     marker = context.markers[0]
     if marker.value is None:
         return None
-    unit = f" {marker.unit}" if marker.unit else ""
+    from app.pipeline.narrative import format_unit
+
+    unit = f" {format_unit(marker.unit)}" if marker.unit else ""
     low, high = marker.reference_low, marker.reference_high
     flag = getattr(marker.flag, "value", str(marker.flag or "unknown")).lower()
 

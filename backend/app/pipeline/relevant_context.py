@@ -167,8 +167,18 @@ class RelevantContextSelector:
                 if marker.key and marker.key not in by_key and _usable(marker):
                     by_key[marker.key] = marker
         ordered = [by_key[key] for key in [*relevant.requested_keys, *relevant.supporting_keys] if key in by_key]
-        if ordered:
-            context.markers = ordered
+        comparison_topics = {item.topic for item in (context.comparisons or []) if getattr(item, "topic", None)}
+        preserved = [marker for marker in (context.markers or []) if marker.key in comparison_topics]
+        if ordered or preserved:
+            seen: set[tuple] = set()
+            merged = []
+            for marker in [*preserved, *ordered]:
+                ident = (marker.key, str(getattr(marker, "measured_at", "") or ""), marker.value)
+                if ident in seen:
+                    continue
+                seen.add(ident)
+                merged.append(marker)
+            context.markers = merged
         if relevant.relevant_missing_keys:
             context.missing = [
                 item

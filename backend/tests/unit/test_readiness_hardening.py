@@ -84,6 +84,25 @@ def test_per_ip_limit_returns_429(monkeypatch):
     assert client.get("/health/live").status_code == 200  # probes are not limited
 
 
+def test_personal_health_answers_skip_the_shared_cache(monkeypatch):
+    monkeypatch.setattr(settings, "answer_cache_ttl_seconds", 60)
+    monkeypatch.setattr(settings, "answer_cache_enabled", True)
+    monkeypatch.setattr(settings, "redis_url", "")
+    from app.core import request_controls as rc
+    from app.llm.openai_compatible import OpenAICompatibleLLMClient
+
+    monkeypatch.setattr(rc, "request_controls", RequestControlStore())
+    messages = [{"role": "user", "content": "same prompt"}]
+    answer_cache.answer_cache_put(messages, "m", LLMStructuredOutput(answer="other user's answer"))
+
+    def fresh(self, messages):
+        return LLMStructuredOutput(answer="this user's answer")
+
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "_complete_structured_uncached", fresh)
+    client = OpenAICompatibleLLMClient(api_key="test", model="m", personal_health=True)
+    assert client.complete_structured(messages).answer == "this user's answer"
+
+
 def test_member_ids_are_hashed_in_logs():
     assert subject_ref("member-42") != "member-42" and len(subject_ref("member-42")) == 12
 

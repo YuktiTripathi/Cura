@@ -113,6 +113,12 @@ class DocumentRetriever:
         )
         n_docs = max(base.count(), 1)
         rows = candidates.all()
+        # An explicitly selected document is the source even when the question
+        # shares no words with the excerpt. Otherwise every such question builds
+        # the same prompt and the answer cache can repeat another document.
+        if document_ids is not None and not rows:
+            cap = limit or settings.document_retrieve_limit
+            rows = base.limit(cap).all()
         scored: list[DocumentEvidence] = []
         df: dict[str, int] = {}
         texts = []
@@ -149,6 +155,8 @@ class DocumentRetriever:
                     score -= 6.0
                 if primary and not matched_param:
                     score -= 2.0
+            if document_ids is not None and score <= 0:
+                score = 0.1
             if score > 0:
                 scored.append(
                     DocumentEvidence(

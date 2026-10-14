@@ -160,8 +160,9 @@ def _derived_and_stated(context: HealthContext) -> str:
             f" You stated {row.fact} {row.value}; that is user-stated health information, not a laboratory measurement."
         )
     for item in context.missing or []:
-        if item.reason in {"not_computable", "not_in_reports"} and item.key in {"mentzer", "bmi", "waist", "glucose"}:
-            parts.append(f" {item.name} was {item.reason.replace('_', ' ')}.")
+        # A marker left out of this answer is not the same as a marker absent from the record.
+        if item.reason == "not_computable" and item.key in {"mentzer", "bmi", "waist"}:
+            parts.append(f" {item.name} was not computable from the values on this report.")
     return "".join(parts)
 
 
@@ -229,6 +230,15 @@ class DeterministicRenderer:
         if context.status == "ambiguous":
             return render_bio_ai_ambiguity(context)
         if context.intent.value == "latest_result" and context.markers:
+            named_gap = next(
+                (
+                    row for row in context.missing or []
+                    if row.reason == "not_in_reports" and row.key and row.key != "requested_marker"
+                ),
+                None,
+            )
+            if named_gap and not any(getattr(m, "key", None) == named_gap.key for m in context.markers):
+                return render_missing_blood_marker(context)
             extra = _derived_and_stated(context)
             if len(context.markers) > 1:
                 lines = []
@@ -358,24 +368,9 @@ class DeterministicRenderer:
             overall, themes, _raw, next_action = build_narrative_summary(context, message=message)
             return flatten_narrative(overall, themes, next_action)
         if context.intent.value == "general_health_question":
-            if context.medical_passages:
-                excerpts = []
-                for row in context.medical_passages:
-                    excerpt = row.split("): ", 1)[-1] if "): " in row else row
-                    if excerpt.strip():
-                        excerpts.append(excerpt.strip())
-                if excerpts:
-                    topic = context.resolved_topic_name or "this topic"
-                    return (
-                        " ".join(excerpts)
-                        + f" This is general educational information about {topic}, "
-                        "not a personal result, diagnosis, or meal plan."
-                    )
-            topic = context.resolved_topic_name or "this topic"
-            return (
-                f"{topic} can be explained in general terms from medical knowledge. "
-                "This is educational information, not a personal lab result."
-            )
+            from app.core.copy import GENERAL_KNOWLEDGE_UNAVAILABLE
+
+            return GENERAL_KNOWLEDGE_UNAVAILABLE
         return "I could not find matching personal health data for that question."
 
 

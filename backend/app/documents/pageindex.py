@@ -21,6 +21,10 @@ _HEADING = re.compile(
     re.I,
 )
 _TOKEN = re.compile(r"[a-z0-9]+", re.I)
+_OVERVIEW = re.compile(
+    r"\b(explain|overview|summar\w*|what does|uploaded report|this report|measurements)\b",
+    re.I,
+)
 _SYNONYMS = {
     "radiologist": ("impression", "findings", "radiology"),
     "radiology": ("impression", "findings"),
@@ -116,6 +120,25 @@ def retrieve_pageindex(tree: PageIndexTree | None, query: str, *, limit: int = 3
     q_tokens = set(_tokenize(query))
     for token in list(q_tokens):
         q_tokens.update(_SYNONYMS.get(token, ()))
+    if _OVERVIEW.search(query or ""):
+        overview: list[PageIndexHit] = []
+        for node in _flatten(tree.nodes):
+            if not (node.text or "").strip():
+                continue
+            overview.append(
+                PageIndexHit(
+                    heading=node.title,
+                    page_start=node.page_start,
+                    page_end=node.page_end,
+                    text=node.text[:1200],
+                    score=0.2,
+                    node_id=node.node_id,
+                )
+            )
+            if len(overview) >= limit:
+                break
+        if overview:
+            return overview
     if not q_tokens:
         return []
     scored: list[PageIndexHit] = []
@@ -137,6 +160,22 @@ def retrieve_pageindex(tree: PageIndexTree | None, query: str, *, limit: int = 3
                 node_id=node.node_id,
             )
         )
+    if not scored and _OVERVIEW.search(query or ""):
+        for node in _flatten(tree.nodes):
+            if not (node.text or "").strip():
+                continue
+            scored.append(
+                PageIndexHit(
+                    heading=node.title,
+                    page_start=node.page_start,
+                    page_end=node.page_end,
+                    text=node.text[:1200],
+                    score=0.1,
+                    node_id=node.node_id,
+                )
+            )
+            if len(scored) >= limit:
+                break
     scored.sort(key=lambda item: item.score, reverse=True)
     return scored[:limit]
 

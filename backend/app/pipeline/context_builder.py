@@ -1,3 +1,4 @@
+import re
 from concurrent.futures import ThreadPoolExecutor
 from uuid import uuid4
 
@@ -25,6 +26,7 @@ from app.pipeline.personal_selection import (
     measurements_for_key,
     previous_bio_report,
     select_bio_risks,
+    companion_abnormal_markers,
     select_latest_markers,
     select_previous_markers,
     wanted_metric_keys,
@@ -86,6 +88,20 @@ def attach_source_status(
         "CONTEXT",
         personal_sources=[name for name, row in ctx.source_status.items() if row.status == "available"],
         missing_sources=[name for name, row in ctx.source_status.items() if row.status == "not_available"],
+    )
+
+
+def _range_counts(markers) -> InRangeSummary:
+    """Every marker lands in exactly one bucket so a subset cannot change the report size."""
+    classified_out = {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical}
+    return InRangeSummary(
+        in_range=sum(1 for m in markers if m.value is not None and m.flag == MarkerFlag.normal),
+        out_of_range=sum(1 for m in markers if m.value is not None and m.flag in classified_out),
+        missing=sum(1 for m in markers if m.value is None),
+        unclassified=sum(
+            1 for m in markers
+            if m.value is not None and m.flag not in {MarkerFlag.normal, *classified_out}
+        ),
     )
 
 
@@ -201,12 +217,16 @@ class ContextBuilder:
                 scenario_input.lifestyle,
             )
             if scenario_input.blood_reports:
-                ctx.markers = list(
-                    sorted(
-                        scenario_input.blood_reports,
-                        key=lambda r: (r.report_date, r.report_id),
-                    )[-1].markers
-                )
+                latest_blood = sorted(
+                    scenario_input.blood_reports,
+                    key=lambda r: (r.report_date, r.report_id),
+                )[-1]
+                full = list(latest_blood.markers)
+                ctx.in_range_summary = _range_counts(full)
+                ctx.markers = [
+                    m for m in full
+                    if m.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and m.value is not None
+                ] or full[:8]
             if scenario_input.bio_ai_reports:
                 latest_bio = sorted(
                     scenario_input.bio_ai_reports,
@@ -365,9 +385,12 @@ class ContextBuilder:
             IntentType.blood_marker_explanation,
         } and len(keys) <= 1
         glucose_family = {"glucose", "fasting_blood_glucose", "postprandial_glucose"}
-        if keys and set(keys) <= glucose_family:
+        # A named measurement stays itself. "Glucose" with no fasting or postprandial
+        # word may still look at the fasting result. Postprandial is never filled by fasting.
+        named_glucose = [key for key in keys if key in glucose_family]
+        if named_glucose == ["glucose"]:
             for item in related_keys("glucose"):
-                if item not in keys:
+                if item not in keys and item != "postprandial_glucose":
                     keys.append(item)
         elif keys and not specific_marker:
             expanded: list[str] = []
@@ -376,8 +399,6 @@ class ContextBuilder:
                     if item not in expanded:
                         expanded.append(item)
             keys = expanded or keys
-        if "glucose" in keys and "fasting_blood_glucose" not in keys:
-            keys.append("fasting_blood_glucose")
 
         if plan.intent == IntentType.health_goal_progress:
             report = latest_report(reports)
@@ -427,7 +448,8 @@ class ContextBuilder:
                 evidence.append(self._ev(report.report_id, "blood_report", report.report_date, marker.name, None, marker))
             return
 
-        if plan.intent == IntentType.trend:
+        asks_change = bool(re.search(r"\b(changed|earlier report|previous report|over time|from my earlier)\b", plan.raw_message or "", re.I))
+        if plan.intent == IntentType.trend or operation == "trend" or asks_change:
             trend_keys = keys or ([plan.topic] if plan.topic else [])
             comparisons = []
             markers = []
@@ -501,18 +523,21 @@ class ContextBuilder:
             if report is None:
                 ctx.missing.append(MissingItem(key=plan.topic or "blood", name=plan.topic_name or "blood", reason="no_reports"))
                 return
-            markers = list(report.markers)
+            full = list(report.markers)
+            markers = list(full)
             if keys:
                 markers = [item for item in markers if item.key in keys]
             wanted_flags = _selector_marker_flags(selectors)
             if wanted_flags:
                 markers = [item for item in markers if item.flag in wanted_flags]
+            elif not keys and len(markers) > 24:
+                markers = [
+                    item for item in markers
+                    if item.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and item.value is not None
+                ] or markers[:8]
             ctx.markers = markers
-            in_r = sum(1 for m in markers if m.flag == MarkerFlag.normal)
-            out_r = sum(1 for m in markers if m.flag in {MarkerFlag.low, MarkerFlag.high})
-            miss = sum(1 for m in markers if m.flag == MarkerFlag.missing or m.value is None)
             if plan.intent != IntentType.latest_result:
-                ctx.in_range_summary = InRangeSummary(in_range=in_r, out_of_range=out_r, missing=miss)
+                ctx.in_range_summary = _range_counts(full)
             for m in markers:
                 evidence.append(self._ev(report.report_id, "blood_report", report.report_date, m.name, None, m))
                 if plan.intent != IntentType.latest_result and (m.flag == MarkerFlag.missing or m.value is None):
@@ -552,6 +577,19 @@ class ContextBuilder:
                         related_available=_related_available(key, latest),
                     )
                 )
+            report_question = bool(re.search(r"\b(?:blood|lab) report\b", plan.raw_message or "", re.I))
+            if not keys and report_question and latest is not None:
+                # No named marker. Keep the report counts, and send the out-of-range
+                # results as the findings. The rest stay in the report, not "missing".
+                ctx.in_range_summary = _range_counts(latest.markers)
+                flagged = [
+                    m for m in latest.markers
+                    if m.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and m.value is not None
+                ]
+                ctx.markers = flagged or list(latest.markers[:8])
+                for marker in ctx.markers:
+                    evidence.append(self._ev(latest.report_id, "blood_report", latest.report_date, marker.name, None, marker))
+                return
             if not keys and not ctx.missing:
                 ctx.missing.append(
                     MissingItem(
@@ -565,6 +603,7 @@ class ContextBuilder:
                 )
             ctx.markers = []
             return
+        selected = selected + companion_abnormal_markers(reports, selected, plan.raw_message or "")
         ctx.markers = selected
         latest = latest_report(reports)
         for key in missing:
@@ -805,6 +844,36 @@ class ContextBuilder:
                     if row.extraction_status == "completed" or load_meta(row).get("structured_facts_ready")
                 ][:2]
             ctx.uploaded_documents = [context_from_row(row) for row in owned]
+            if owned:
+                from datetime import date
+
+                from app.contracts.evidence import EvidenceRecord
+                from app.db.models import DocumentChunk
+
+                owned_ids = [row.id for row in owned]
+                chunks = (
+                    db.query(DocumentChunk)
+                    .filter(
+                        DocumentChunk.user_id == principal.subject_id,
+                        DocumentChunk.document_id.in_(owned_ids),
+                    )
+                    .all()
+                )
+                for chunk in chunks:
+                    ctx.evidence.append(
+                        EvidenceRecord(
+                            evidence_id=chunk.id,
+                            report_id=chunk.document_id,
+                            report_type="uploaded_document",
+                            report_date=date.today(),
+                            source="user_uploaded",
+                            document_id=chunk.document_id,
+                            chunk_id=chunk.id,
+                            page_start=chunk.page_start,
+                            page_end=chunk.page_end,
+                            excerpt=(chunk.text or "")[:4000],
+                        )
+                    )
         ctx.profile = build_personal_profile(
             user=user,
             lifestyle=ctx.lifestyle,

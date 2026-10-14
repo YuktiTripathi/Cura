@@ -75,8 +75,7 @@ def infer_time_operation(message: str, intent: IntentType) -> str:
     ):
         if intent == IntentType.bio_ai_comparison:
             return "compare"
-        if intent == IntentType.trend:
-            return "trend"
+        return "trend"
     if intent == IntentType.previous_result:
         return "previous"
     if intent == IntentType.bio_ai_comparison:

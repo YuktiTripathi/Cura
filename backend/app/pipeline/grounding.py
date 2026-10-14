@@ -143,10 +143,6 @@ class GroundingChecker:
             text = re.sub(r"\s{2,}", " ", text).strip()
         if medical and _ABSOLUTE.search(text):
             flags.append("overgeneralized_claim")
-            excerpts = " ".join((doc.excerpt or "").strip() for doc in medical if doc.excerpt).strip()
-            text = excerpts or _OVERCLAIM_FALLBACK
-            if "clinician" not in text.lower():
-                text = f"{text} A healthcare professional can provide advice specific to the person."
         return text, flags
 
 

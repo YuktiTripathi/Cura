@@ -615,6 +615,17 @@ def assess_answer_complexity(
 
 def select_answer_tier(plan: QueryPlan, assessment: TierAssessment) -> QueryPlan:
     """Apply the policy to a plan that will be answered by a model (deterministic stays so)."""
+    from app.core.config import settings
+
+    from app.pipeline.narrative import wants_narrative_summary
+
+    if wants_narrative_summary(plan.raw_message, plan) and settings.enable_llm and plan.intent == IntentType.health_scenario:
+        # An overall reading has to connect several findings. A one-theme template cannot.
+        plan = plan.model_copy(update={
+            "operations": list(dict.fromkeys([*(plan.operations or []), "SUMMARIZE"])),
+            "reasoning_required": True,
+        })
+        return _set_tier(plan, AnswerModelTier.standard_medical)
     reasoning_turn = any(r.startswith("goal:") and r not in {"goal:lookup", "goal:general_education", "goal:document_lookup"} for r in assessment.reasons)
     if not uses_medical_answer_llm(plan.answer_model_tier):
         # A route-time "lookup" that in fact asks for reasoning about the member's own data

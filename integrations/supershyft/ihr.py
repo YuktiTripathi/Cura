@@ -55,7 +55,7 @@ def fetch_ihr_rows(principal: AuthenticatedPrincipal) -> list[dict]:
     uid = _user_id(principal)
     now = time.monotonic()
     hit = _cache.get(uid)
-    if hit and now - hit[0] < 2.0:
+    if hit and now - hit[0] < 30.0:
         return hit[1]
     rows = run_readonly(_IHR_SELECT, {"uid": uid}) or []
     _cache[uid] = (now, rows)

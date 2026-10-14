@@ -466,10 +466,13 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         evidence.reassuring = [r for r in reassuring if r["system"] in wanted][:2]
 
     # ---- trend for the primary fact
-    if budget.trend and not evidence.trend_facts:
+    change_question = bool(re.search(r"\b(changed|earlier|previous|over time|from my)\b", message or "", re.I))
+    if (budget.trend or change_question) and not evidence.trend_facts:
         primary_codes = {f.get("code") for f in evidence.primary_facts}
         for row in context.comparisons or []:
-            if row.topic in primary_codes and row.previous_value is not None and row.current_value is not None:
+            if row.previous_value is None or row.current_value is None:
+                continue
+            if row.topic in primary_codes or (change_question and (not primary_codes or row.topic in primary_codes or True)):
                 evidence.trend_facts.append(_trend_fact(row))
         seen = {t["code"] for t in evidence.trend_facts}
         for base in context.baselines or []:
@@ -479,7 +482,8 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
                     "change": round(base.latest - base.previous, 4) if base.latest is not None else None,
                     "direction": base.direction, "unit": base.unit,
                 })
-        evidence.trend_facts = evidence.trend_facts[: budget.trend]
+        limit = budget.trend or (1 if change_question else 0)
+        evidence.trend_facts = evidence.trend_facts[:limit]
 
     # ---- one uncertainty that changes interpretation
     if budget.missing:
@@ -491,7 +495,12 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             # it (fasting glucose missing but glucose present).
             if item.key not in asked or (_family(item.key) & present) or (item.key == "bio_ai" and context.bio_ai_risks):
                 continue
-            evidence.uncertainty_facts.append({"code": item.key, "name": item.name, "reason": item.reason})
+            evidence.uncertainty_facts.append({
+                "code": item.key,
+                "name": item.name,
+                "reason": item.reason,
+                "note": "Not in the evidence selected for this question. Do not say it is absent from the member's records.",
+            })
             break
         if "glucose" in present and {"glucose", "fasting_blood_glucose"} & asked and "fasting_blood_glucose" not in present:
             evidence.uncertainty_facts.append({

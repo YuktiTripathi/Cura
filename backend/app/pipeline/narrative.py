@@ -117,10 +117,44 @@ def format_marker_name(name: str) -> str:
 
 
 def format_unit(unit: str | None) -> str | None:
-    """Render caret exponents as superscripts: 10^3/uL → 10³/uL."""
+    """Display typography only. The numeric value is not changed."""
     if not unit:
         return unit
-    return re.sub(r"\^([0-9+\-]+)", lambda match: match.group(1).translate(_SUPERSCRIPTS), unit)
+    text = str(unit).strip()
+    text = re.sub(r"ug", "µg", text, flags=re.I)
+    text = re.sub(r"(?i)(/u)l\b", r"/µL", text)
+    text = re.sub(r"(?i)\bmg/dl\b", "mg/dL", text)
+    text = re.sub(r"(?i)µg/dl\b", "µg/dL", text)
+    text = re.sub(r"(?i)\bmmol/l\b", "mmol/L", text)
+    text = re.sub(r"\^([0-9+\-]+)", lambda match: match.group(1).translate(_SUPERSCRIPTS), text)
+    return text
+
+
+_UNIT_IN_TEXT = re.compile(
+    r"(\d+(?:\.\d+)?)\s*[x×]?\s*(10(?:\^|\u00b3|\u2076|\u2079)[0-9⁰¹²³⁴⁵⁶⁷⁸⁹⁺⁻]*/[µuU]?[lL])"
+)
+
+
+def format_units_in_text(text: str | None) -> str | None:
+    if not text:
+        return text
+
+    def _one(match: re.Match) -> str:
+        return f"{match.group(1)} × {format_unit(match.group(2))}"
+
+    return _UNIT_IN_TEXT.sub(_one, text)
+
+
+def spoken_count(value: float, unit: str | None) -> str | None:
+    """Speak a thousand-per-microliter count only when it is a whole number of cells."""
+    if unit is None or not re.search(r"10\^3|10³", unit):
+        return None
+    cells = value * 1000
+    if abs(cells - round(cells)) > 1e-6:
+        return None
+    count = int(round(cells))
+    noun = "cell" if count == 1 else "cells"
+    return f"{count} {noun} per microliter"
 
 
 def wants_raw_snapshot(message: str | None, plan: QueryPlan | None = None) -> bool:
@@ -131,6 +165,10 @@ def wants_raw_snapshot(message: str | None, plan: QueryPlan | None = None) -> bo
 def wants_narrative_summary(message: str | None, plan: QueryPlan | None = None) -> bool:
     text = message or (plan.raw_message if plan else "") or ""
     if wants_raw_snapshot(text, plan):
+        return False
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    if match_lab_keys(text) and not _NARRATIVE_ASK.search(text):
         return False
     if plan is not None:
         spec = plan.task_contract or {}
@@ -247,7 +285,9 @@ def build_narrative_summary(
     else:
         if not overall:
             overall = _overall_summary(themes)
-        next_action = next((item.next_step for item in themes if item.next_step), None)
+            next_action = next((item.next_step for item in themes if item.next_step), None)
+        else:
+            next_action = None
     return overall, themes[:5], raw, next_action
 
 
@@ -538,14 +578,15 @@ def _overall_summary(themes: list[HealthTheme]) -> str:
     ]
     reassuring = [item for item in themes if item.status == ThemeStatus.reassuring]
     if attention and reassuring:
-        focus = attention[0].title
+        names = ", ".join(item.title for item in attention[:3])
         return (
-            f"Most of your major health areas look reassuring, but the main pattern that stands out is {focus}. "
+            f"Most areas look reassuring. The patterns that stand out are {names}. "
             "This is a reading of your records, not a diagnosis."
         )
     if attention:
+        names = ", ".join(item.title for item in attention[:3])
         return (
-            f"The main pattern that stands out is {attention[0].title}. "
+            f"The patterns that stand out are {names}. "
             "This is a reading of your records, not a diagnosis."
         )
     if reassuring:

@@ -68,7 +68,7 @@ class Settings(BaseSettings):
     # Bump to invalidate every cached answer, for example after a prompt or model change.
     answer_cache_version: str = "1"
     llm_reasoning_effort: str = "low"
-    llm_reasoning_output_cap: int = 1200
+    llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False
     allow_mock_auth_with_real_health: bool = False
     mock_user_id: str = ""

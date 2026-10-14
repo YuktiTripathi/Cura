@@ -53,6 +53,12 @@ PARAMETERS: tuple[LabParameter, ...] = (
     ),
     LabParameter("hba1c", "HbA1c", ("hba1c", "hb a1c", "a1c", "glycated hemoglobin", "glycosylated hemoglobin"), "hba1c"),
     LabParameter(
+        "absolute_basophils_count",
+        "Absolute Basophils Count",
+        ("absolute basophils count", "absolute basophil count", "basophils count", "basophil count"),
+        "cbc",
+    ),
+    LabParameter(
         "hemoglobin",
         "Hemoglobin",
         (
@@ -211,7 +217,7 @@ PARAMETERS: tuple[LabParameter, ...] = (
     LabParameter(
         "chloride",
         "Chloride",
-        ("serum chloride", "chloride", "cl-", "cl"),
+        ("serum chloride", "chlorides", "chloride", "cl-", "cl"),
         "electrolyte",
     ),
     LabParameter(
@@ -246,7 +252,26 @@ PARAMETERS: tuple[LabParameter, ...] = (
     LabParameter("vitamin_b12", "Vitamin B12", ("vitamin b12", "vit b12", "b12"), "vitamin"),
     LabParameter("ferritin", "Ferritin", ("ferritin",), "iron"),
     LabParameter("esr", "ESR", ("erythrocyte sedimentation", "esr"), "inflammation"),
-    LabParameter("crp", "CRP", ("c-reactive protein", "c reactive protein", "crp"), "inflammation"),
+    LabParameter("crp", "CRP", ("hs-crp", "hs crp", "c-reactive protein", "c reactive protein", "crp"), "inflammation"),
+    LabParameter("globulin", "Globulin", ("serum globulin", "globulin"), "liver"),
+    LabParameter(
+        "alkaline_phosphatase",
+        "Alkaline Phosphatase",
+        ("alkaline phosphatase", "alp"),
+        "liver",
+    ),
+    LabParameter(
+        "absolute_eosinophil_count",
+        "Absolute Eosinophil Count",
+        ("absolute eosinophil count (aec)", "absolute eosinophil count", "absolute eosinophils", "aec"),
+        "cbc",
+    ),
+    LabParameter(
+        "absolute_neutrophil_count",
+        "Absolute Neutrophil Count",
+        ("absolute neutrophil count", "absolute neutrophils", "anc"),
+        "cbc",
+    ),
     LabParameter("alt", "ALT", ("sgpt (alt)", "sgpt alt", "alanine aminotransferase", "sgpt", "alt"), "liver"),
     LabParameter("ast", "AST", ("sgot (ast)", "sgot ast", "aspartate aminotransferase", "sgot", "ast"), "liver"),
     LabParameter(
@@ -575,6 +600,7 @@ def primary_lab_key(text: str) -> str | None:
     return keys[0] if keys else None
 
 
+@lru_cache(maxsize=4096)
 def canonicalize_marker_name(name: str) -> str:
     """Map a SuperShyft / lab display name onto a CURA canonical biomarker key."""
     matched = resolve_biomarker(name)

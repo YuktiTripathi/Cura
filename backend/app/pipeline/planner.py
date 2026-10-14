@@ -624,6 +624,9 @@ def attach_task_plan(plan: QueryPlan, message: str, *, decision: JevDecision | N
         if plan.intent == IntentType.general_health_question:
             plan.intent = IntentType.questionnaire_lookup
     personal = plan.knowledge_scope == KnowledgeScope.personal or plan.needs_personal_data
+    if personal and re.search(r"\bquestionnaire\b", message or "", re.I):
+        plan.needs_questionnaire = True
+        plan.needs_supershyft = True
     if personal:
         if "blood" in task.sources:
             plan.needs_blood = True

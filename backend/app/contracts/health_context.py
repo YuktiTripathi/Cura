@@ -46,6 +46,7 @@ class InRangeSummary(BaseModel):
     in_range: int = 0
     out_of_range: int = 0
     missing: int = 0
+    unclassified: int = 0
 
 
 class MissingItem(BaseModel):

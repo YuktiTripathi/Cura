@@ -56,7 +56,22 @@ def _usable_marker(marker: BloodMarker) -> bool:
     return marker.value is not None
 
 
-def _marker_matches(marker: BloodMarker, key: str, reports: list[BloodReport]) -> bool:
+def _canonical_keys_present(reports: list[BloodReport]) -> set[str]:
+    """Computed once per match pass. Rebuilding it per marker made BUN lookups scan the whole report repeatedly."""
+    return {
+        canonicalize_marker_name(item.key) or canonicalize_marker_name(item.name or "")
+        for report in reports
+        for item in report.markers
+    }
+
+
+def _marker_matches(
+    marker: BloodMarker,
+    key: str,
+    reports: list[BloodReport],
+    *,
+    keys_present: set[str] | None = None,
+) -> bool:
     """Alias match without copying a value from a chemically different test.
 
     BUN and urea share a family, but if both are stored they stay separate.
@@ -70,9 +85,29 @@ def _marker_matches(marker: BloodMarker, key: str, reports: list[BloodReport]) -
         return True
     bun_family = {"bun", "urea"}
     if wanted in bun_family and stored in bun_family and wanted != stored:
-        keys_present = {canonicalize_marker_name(item.key) for report in reports for item in report.markers}
-        return stored in keys_present and wanted not in keys_present
+        present = keys_present if keys_present is not None else _canonical_keys_present(reports)
+        return stored in present and wanted not in present
     return False
+
+
+def companion_abnormal_markers(reports: list[BloodReport], selected: list[BloodMarker], message: str, limit: int = 4) -> list[BloodMarker]:
+    """When the user asks what to focus on, keep other out-of-range results from the same report."""
+    import re
+
+    if not re.search(r"\b(focus on first|pay attention|which result)\b", message or "", re.I):
+        return []
+    if not reports:
+        return []
+    latest = _ordered_reports(reports)[-1]
+    have = {marker.key for marker in selected}
+    extra = [
+        marker
+        for marker in latest.markers
+        if marker.key not in have and marker.value is not None and marker.flag.value in {"low", "high", "critical"}
+    ]
+    rank = {"critical": 0, "high": 1, "low": 1}
+    extra.sort(key=lambda marker: rank.get(marker.flag.value, 2))
+    return extra[:limit]
 
 
 def select_latest_markers(
@@ -83,10 +118,15 @@ def select_latest_markers(
     missing: list[str] = []
     ordered = _ordered_reports(reports)
     for key in keys:
+        present = _canonical_keys_present(reports) if canonicalize_marker_name(key) in {"bun", "urea"} else None
         found = None
         for report in reversed(ordered):
             marker = next(
-                (item for item in report.markers if _marker_matches(item, key, reports) and _usable_marker(item)),
+                (
+                    item
+                    for item in report.markers
+                    if _marker_matches(item, key, reports, keys_present=present) and _usable_marker(item)
+                ),
                 None,
             )
             if marker is None:
@@ -113,10 +153,15 @@ def select_previous_markers(
     missing: list[str] = []
     ordered = _ordered_reports(reports)
     for key in keys:
+        present = _canonical_keys_present(reports) if canonicalize_marker_name(key) in {"bun", "urea"} else None
         hits: list[BloodMarker] = []
         for report in ordered:
             marker = next(
-                (item for item in report.markers if _marker_matches(item, key, reports) and _usable_marker(item)),
+                (
+                    item
+                    for item in report.markers
+                    if _marker_matches(item, key, reports, keys_present=present) and _usable_marker(item)
+                ),
                 None,
             )
             if marker is None:
@@ -138,9 +183,14 @@ def select_previous_markers(
 
 def measurements_for_key(reports: list[BloodReport], key: str) -> list[tuple[BloodReport, BloodMarker]]:
     out: list[tuple[BloodReport, BloodMarker]] = []
+    present = _canonical_keys_present(reports) if canonicalize_marker_name(key) in {"bun", "urea"} else None
     for report in _ordered_reports(reports):
         marker = next(
-            (item for item in report.markers if item.key == key and _usable_marker(item)),
+            (
+                item
+                for item in report.markers
+                if _marker_matches(item, key, reports, keys_present=present) and _usable_marker(item)
+            ),
             None,
         )
         if marker is not None:

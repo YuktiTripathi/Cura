@@ -118,22 +118,7 @@ class LLMSafetyClassifier:
             "temperature": 0,
             "max_tokens": 60,
             "provider": prefs,
-            "response_format": {
-                "type": "json_schema",
-                "json_schema": {
-                    "name": "safety_classification",
-                    "strict": True,
-                    "schema": {
-                        "type": "object",
-                        "properties": {
-                            "category": {"type": "string", "enum": list(CATEGORIES)},
-                            "confidence": {"type": "number"},
-                        },
-                        "required": ["category", "confidence"],
-                        "additionalProperties": False,
-                    },
-                },
-            },
+            "response_format": {"type": "json_object"},
         }
 
     def classify(self, text: str) -> SafetyClassification:

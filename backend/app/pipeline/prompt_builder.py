@@ -20,7 +20,7 @@ When a question requires personal health data, defer to the personal-data pipeli
 Write in English. Keep numbers unchanged.
 
 Explain the main idea so clearly that a child could follow it, while speaking respectfully to an adult. Use familiar words and short sentences. If an important medical term is needed, explain it immediately in plain words. Use a simple comparison only when it truly helps. Do not simplify in a way that changes the medical meaning.
-Aim for about 120 words. A simple question can be shorter. A complicated question or a safety warning can be longer. Do not add filler to reach 120 words, and do not drop an important finding, an uncertainty, or a safety warning to stay short.
+Aim for about 80 to 120 words. A simple definition can be shorter. A complicated question or a safety warning can be longer. Do not add filler to reach 120 words, and do not drop an important finding, an uncertainty, or a safety warning to stay short.
 A simple question stays one short paragraph. When several findings need explaining, use a short opening paragraph and then 2 to 4 Markdown bullets, each on its own line starting with "- ". Each bullet is one natural sentence. Do not start bullets with bold labels. Never open with a label such as "Direct answer:", "Short answer:", "Measured results:", "Possible explanations:", or "What that means:". Begin by answering the question. Use bold rarely. No emoji. An emergency stays plain sentences, with the safety action first.
 Do not add lifestyle advice, diet tips, or a next step unless the user asks what to do, how to improve, or how to prevent something. Urgent symptoms still get a clear safety action in the answer itself.
 Answer the general concept first. If VERIFIED RELEVANT PERSONAL CONTEXT is supplied, add one brief connection only when it helps explain the concept. Use exact supplied values only. A Bio-AI score is a prediction, not a diagnosis or a probability. Never turn the answer into a report summary, imply causation, or mention unavailable personal data.
@@ -80,7 +80,7 @@ Before writing, work out privately: what the data says (values against the membe
 Explain, do not just retrieve: say what a marker reflects and why it matters for this member. Personalization means choosing the right facts and explaining why they matter to this question, not mentioning more values.
 Use the evidence's 'patterns' to connect findings when the connection is supported ("these point in the same direction"), never as a diagnosis. Use 'reassuring_systems' when it helps a balanced picture; never reassure falsely.
 Use the reference range printed on the member's own report. Do not substitute a generic range; if you mention a general threshold, say it is general.
-Mention missing data only if it stops you answering or would change the interpretation. A glucose value without a fasting label is still a glucose value.
+Mention missing data only if it stops you answering. A number the user states in the question is user-reported: do not say it is not on file. A database value is verified only when it appears in the evidence, with its own name, unit, range, and flag. Keep fasting glucose, random glucose, post-meal glucose, and estimated average glucose distinct. Do not rename a result to Average Blood Glucose or estimated average glucose unless that is the stored name, and do not infer the type because the number matches an HbA1c formula.
 At most one safety or clinician statement, where it matters. No urgent or same-day care unless a red flag is listed in the evidence.
 
 RESPONSE PLANNING (decide yourself, every time)
@@ -170,11 +170,12 @@ class PromptBuilder:
                 "Do not repeat those values from anywhere else, and do not add a value that is not listed. "
                 "Answer the response type in the task. Do not switch to a different topic or a different kind of answer.\n"
                 "Begin by answering the question. Do not print a heading such as Direct answer or Measured results. "
-                "If a source is listed under missing, say it is not on file. Do not tell the member to upload a report "
+                "If a source is listed under missing, say that source was not retrieved. A value written in the user question is user-reported, not missing. Do not tell the member to upload a report "
                 "when the status is NOT_PRESENT or NOT_RETRIEVED.\n"
                 "Do not print internal identifiers, routing, or the words task contract or evidence package.\n"
                 f"TASK:\n{compact_json(task)}\n"
                 f"VERIFIED PATIENT EVIDENCE:\n{compact_json(context.evidence_package)}\n"
+                + _selected_upload_block(context)
                 + _medical_block(context, user_message)
                 + "Conversation focus (topic and follow-up only; never a source of current lab values): "
                 f"{(conversation_summary or '')[:500]}\n"
@@ -229,6 +230,7 @@ class PromptBuilder:
                 + _fact_kind_blocks(context)
                 + _clinical_brief_block(context, user_message)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{compact_json(payload)}\n"
+                + _selected_upload_block(context)
                 + (
                     "VISIBLE RESULT CARDS will show exact values for: "
                     + ", ".join(marker.name for marker in (context.markers or [])[:6] if marker.name)
@@ -510,8 +512,8 @@ def _medical_block(context: HealthContext, user_message: str = "") -> str:
             "Do not open with a list of diseases or name a guideline body in the answer.\n"
         )
     return (
-        "RETRIEVED SOURCE POINTERS (title + URL). Accompanying notes are CURA topic index text, "
-        "not quoted guideline excerpts. Do not claim the answer is guideline-verified or a direct quotation.\n"
+        "BACKGROUND NOTES for your reasoning only. Do not quote them, name the organization, "
+        "or mention a source pointer. Answer the user's question in your own words.\n"
         + "\n".join(passages)
         + "\n"
     )
@@ -530,6 +532,26 @@ def _prune(value):
 
 def compact_json(value) -> str:
     return json.dumps(_prune(value), ensure_ascii=False, separators=(",", ":"), default=str)
+
+
+def _selected_upload_block(context: HealthContext) -> str:
+    rows = [
+        item
+        for item in (context.evidence or [])
+        if item.source == "user_uploaded" and (item.excerpt or "").strip()
+    ]
+    if not rows:
+        return ""
+    lines = [
+        "SELECTED UPLOADED DOCUMENT. These excerpts are the only uploaded text for this user. "
+        "Report a measurement only when it is written here, with this document id. "
+        "If it is not written here, say it is not in the selected document.\n"
+    ]
+    for item in rows[:4]:
+        lines.append(
+            f"document_id={item.document_id} chunk_id={item.chunk_id} page={item.page_start}\n{item.excerpt.strip()}\n"
+        )
+    return "".join(lines)
 
 
 def _fact_kind_blocks(context: HealthContext) -> str:

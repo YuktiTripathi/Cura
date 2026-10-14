@@ -318,12 +318,19 @@ def select_questionnaire_context(
     # ``subject_keys``: the habit the question is ABOUT ("am I active enough?"); its answer is
     # kept even when neutral, because it is the fact being judged.
     candidates = list(keys) if keys else list(REVIEW_KEYS) if review else relevant_questionnaire_keys(entities, domains)
+    if re.search(r"\bquestionnaire\b", question or "", re.I):
+        asked = (question or "").lower()
+        for answer in answers:
+            text = (getattr(answer, "question", None) or "").strip().lower()
+            if text and text[:48] in asked and answer.question_key not in candidates:
+                candidates.append(answer.question_key)
     subject = set(subject_keys or [])
     selection = QuestionnaireSelection(retrieved_keys=[a.question_key for a in answers], considered_keys=candidates)
     if not candidates:
         return selection
     by_key = {a.question_key: a for a in answers}
-    overrides = recent_statements(list(recent_messages or []) + [question])
+    # The current question can ask to use a stored answer. It is not itself a new answer.
+    overrides = recent_statements(list(recent_messages or []))
     limit = budget if budget is not None else (5 if review else 3)
     picked: list[QuestionnaireSignal] = []
     activity_overridden = "physical_activity_frequency" in overrides

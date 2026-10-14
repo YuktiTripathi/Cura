@@ -107,9 +107,9 @@ def keys_for_plan(
         if item in LAB_METRIC_KEYS:
             continue
         keys.extend(TOPIC_KEYS.get(item, (item,)))
-    q_topic = topic
-    if topic in LAB_METRIC_KEYS:
-        q_topic = questionnaire_topic(message)
+    q_topic = questionnaire_topic(message) or topic
+    if topic in LAB_METRIC_KEYS and not questionnaire_topic(message):
+        q_topic = None
     if q_topic:
         if q_topic in TOPIC_KEYS:
             keys.extend(TOPIC_KEYS[q_topic])

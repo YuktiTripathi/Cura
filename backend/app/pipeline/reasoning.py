@@ -105,10 +105,11 @@ class ReasoningService:
             and context.status != "ambiguous"
             and not plan.needs_user_uploaded
         )
-        explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand|how should i read)\b", message or "", re.I))
+        explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand|how should i read|relat\w*|compare|together)\b", message or "", re.I))
+        cross_source = bool(plan.needs_blood and plan.needs_bio_ai and re.search(r"\b(relat\w*|compare|together|fit)\b", message or "", re.I))
         if explain_bio and context.bio_ai_risks and settings.enable_llm and not uses_answer_llm(plan.answer_model_tier):
             plan = plan.model_copy(update={"answer_model_tier": AnswerModelTier.standard_medical})
-        if structured_bio_ai and not (explain_bio and settings.enable_llm):
+        if structured_bio_ai and not cross_source and not (explain_bio and settings.enable_llm):
             return ReasoningResult(
                 answer=render_bio_ai_score_list(context.bio_ai_risks),
                 llm_mode="structured_bio_ai",
@@ -160,7 +161,14 @@ class ReasoningService:
             detail = ""
             if highlights:
                 names = ", ".join(m.name for m in highlights[:3])
-                detail = f" The results worth reviewing first are {names}."
+                detail = f" A few results worth reviewing first are {names}."
+            counts = context.in_range_summary
+            if counts and (counts.in_range or counts.out_of_range):
+                total = counts.in_range + counts.out_of_range + counts.missing + counts.unclassified
+                detail = (
+                    f" The report has {total} results, {counts.out_of_range} outside the reference range."
+                    + detail
+                )
             return ReasoningResult(
                 answer=f"{response_plan.direct_answer} {response_plan.summary}{detail}".strip(),
                 llm_mode="structured_report_overview",

@@ -19,6 +19,30 @@ from app.pipeline.language import normalize_for_intent
 from app.pipeline.ontology import match_bio_keys
 
 
+def ensure_named_report_metrics(plan: QueryPlan) -> QueryPlan:
+    """Re-fetch a marker the question names. Do not copy the value from chat text."""
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    text = plan.raw_message or ""
+    named = [key for key in match_lab_keys(text) if key]
+    if not named:
+        return plan
+    personal_turn = plan.conversation_turn in {
+        "follow_up_question",
+        "reference_resolution",
+        "clarification",
+        "correction",
+    } or bool(re.search(r"\bmy\b|\d", text, re.I))
+    if not personal_turn:
+        return plan
+    plan.needs_blood = True
+    plan.needs_supershyft = True
+    plan.requested_metrics = list(dict.fromkeys([*named, *(plan.requested_metrics or [])]))
+    if not plan.topic:
+        plan.topic = named[0]
+    return plan
+
+
 def apply_to_query_plan(plan: QueryPlan, state: ConversationState | None) -> QueryPlan:
     """Bind resolved conversation semantics onto the query plan. Does not copy lab values."""
     if state is None:

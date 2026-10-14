@@ -10,7 +10,7 @@ from app.pipeline.operations import apply_operation_metadata, named_personal_sou
 from app.pipeline.planner import attach_task_plan
 from app.pipeline.response_planner import repair_report_level_plan
 from app.pipeline.task_contract import apply_task_contract
-from app.pipeline.conversation_state import apply_to_query_plan
+from app.pipeline.conversation_state import apply_to_query_plan, ensure_named_report_metrics
 from app.contracts.conversation_state import ConversationState
 from app.pipeline.lab_parameters import match_lab_keys, primary_lab_key
 from app.pipeline.questionnaire_intent import (
@@ -128,8 +128,12 @@ def build_query_plan(
         if intent == IntentType.questionnaire_lookup:
             intent = IntentType.report_explanation
             history = True
-    if personal and match_lab_keys(message) and intent != IntentType.questionnaire_lookup:
+    if match_lab_keys(message) and intent != IntentType.questionnaire_lookup and (personal or prior_personal):
         needs_blood = True
+        if prior_personal and not personal:
+            personal = True
+            scope = KnowledgeScope.personal
+            intent = IntentType.blood_marker_explanation
     lowered_msg = message.lower()
     if personal and any(token in lowered_msg for token in ("last year", "previous year", "histor")):
         history = True
@@ -227,7 +231,7 @@ def build_query_plan(
         plan.document_ids = list(document_ids)
         plan.active_document_id = plan.document_ids[0] if len(plan.document_ids) == 1 else None
     plan = apply_operation_metadata(plan)
-    plan = apply_to_query_plan(plan, conversation_state)
+    plan = ensure_named_report_metrics(apply_to_query_plan(plan, conversation_state))
     plan = attach_task_plan(plan, message)
     plan = repair_report_level_plan(plan, message)
     plan = apply_task_contract(plan, message)

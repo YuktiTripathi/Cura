@@ -117,15 +117,26 @@ def build_response_plan(message: str, plan: QueryPlan, context: HealthContext) -
         direct += f" from {date_text}"
     direct += "."
 
-    if markers:
-        pieces = [f"It contains {len(markers)} reported results"]
-        if abnormal:
-            pieces.append(f"{len(abnormal)} {'is' if len(abnormal) == 1 else 'are'} outside the reported reference range")
-        if normal:
-            pieces.append(f"{len(normal)} {'is' if len(normal) == 1 else 'are'} within range")
-        if unclassified:
+    summary_counts = getattr(context, "in_range_summary", None)
+    total = None
+    abnormal_n = len(abnormal)
+    normal_n = len(normal)
+    unclassified_n = len(unclassified)
+    if summary_counts and (summary_counts.in_range or summary_counts.out_of_range):
+        total = summary_counts.in_range + summary_counts.out_of_range + summary_counts.missing + summary_counts.unclassified
+        abnormal_n = summary_counts.out_of_range
+        normal_n = summary_counts.in_range
+        unclassified_n = summary_counts.unclassified
+    if markers or total:
+        pieces = [f"It contains {total or len(markers)} reported results"]
+        if abnormal_n:
+            pieces.append(f"{abnormal_n} {'is' if abnormal_n == 1 else 'are'} outside the reported reference range")
+        if normal_n:
+            pieces.append(f"{normal_n} {'is' if normal_n == 1 else 'are'} within range")
+        unclassified_shown = unclassified_n if summary_counts else len(unclassified)
+        if unclassified_shown:
             pieces.append(
-                f"{len(unclassified)} {'does' if len(unclassified) == 1 else 'do'} not have a clear range classification"
+                f"{unclassified_shown} {'does' if unclassified_shown == 1 else 'do'} not have a clear range classification"
             )
         summary = "; ".join(pieces) + "."
     else:

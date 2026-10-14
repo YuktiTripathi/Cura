@@ -165,7 +165,9 @@ class OpenAICompatibleLLMClient:
     def _format_fallbacks(self, json_mode: bool) -> list[str]:
         formats: list[str] = []
         if json_mode:
-            if settings.llm_json_schema_output:
+            # gpt-5 via this gateway rejects json_schema with HTTP 400. Sending it
+            # first spends a full round trip before the json_object call succeeds.
+            if settings.llm_json_schema_output and "gpt-5" not in (self.model or "").lower():
                 formats.append("json_schema")
             formats.append("json_object")
         formats.append("plain")
@@ -318,7 +320,10 @@ class OpenAICompatibleLLMClient:
     def complete_structured(self, messages: list[dict[str, str]]) -> LLMStructuredOutput:
         from app.llm.answer_cache import answer_cache_get, answer_cache_put
 
-        cached = answer_cache_get(messages, self.model) if settings.answer_cache_enabled else None
+        # Personal answers are not reused across users. The prompt is not a safe
+        # isolation key when the selected record never made it into the messages.
+        use_cache = settings.answer_cache_enabled and not self.personal_health
+        cached = answer_cache_get(messages, self.model) if use_cache else None
         if cached is not None:
             perf.mark("cache_hit", True)
             # Identical prompt (same data, question and context): no tokens spent.
@@ -332,7 +337,7 @@ class OpenAICompatibleLLMClient:
                 result = self._complete_structured_uncached(messages)
         finally:
             self._deadline = None
-        if settings.answer_cache_enabled:
+        if use_cache:
             answer_cache_put(messages, self.model, result)
         return result
 

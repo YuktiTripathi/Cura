@@ -153,7 +153,9 @@ class ResponseComposer:
             ]
             chips = list(combined)
         follow_text = question[0].text if question else None
-        cleaned = sanitize_internal_ids(prefer_report_range(answer or "", context))
+        from app.pipeline.narrative import format_units_in_text
+
+        cleaned = format_units_in_text(sanitize_internal_ids(prefer_report_range(answer or "", context))) or ""
         if context.premise_verified is False and context.premise and context.premise.note:
             note = sanitize_internal_ids(context.premise.note)
             if note.lower() not in cleaned.lower():

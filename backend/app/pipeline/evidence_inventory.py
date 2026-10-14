@@ -50,16 +50,23 @@ class EvidencePackage(BaseModel):
     missing: list[dict] = Field(default_factory=list)
     limitation: str | None = None
     blocked_answer: str | None = None
+    questionnaire: list[dict] = Field(default_factory=list)
+    report_counts: dict | None = None
 
     def prompt_payload(self) -> dict:
         """Patient facts for the model. Database identifiers stay out."""
-        return {
+        payload = {
             "response_type": self.response_type,
             "measurements": self.measurements,
             "bio_ai_risks": self.bio_ai_risks,
             "missing": self.missing,
             "limitation": self.limitation,
         }
+        if self.questionnaire:
+            payload["questionnaire"] = self.questionnaire
+        if self.report_counts:
+            payload["report_counts"] = self.report_counts
+        return payload
 
 
 def _key(value: str | None) -> str:
@@ -85,8 +92,10 @@ def _outside(marker) -> bool:
 def _measurement(marker) -> dict:
     flag = getattr(marker, "flag", None)
     measured = getattr(marker, "measured_at", None)
+    key = getattr(marker, "key", None)
     return {
-        "key": getattr(marker, "key", None),
+        "fact_id": f"blood:{key}:{measured}:{getattr(marker, 'value', None)}",
+        "key": key,
         "name": getattr(marker, "name", None),
         "value": getattr(marker, "value", None),
         "unit": getattr(marker, "unit", None),
@@ -182,7 +191,13 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
     kind = contract.get("response_type")
     message = contract.get("original_message") or plan.raw_message or ""
     measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers)]
+    measurements = _with_history(measurements, context)
     risks = [_risk_row(item) for item in _select_risks(kind, message, context.bio_ai_risks)]
+    questionnaire = _questionnaire_rows(plan, context, message)
+    measurements, questionnaire, restored, unavailable = _complete_required_facts(
+        measurements, questionnaire, plan, context, message
+    )
+    counts = _report_counts(context)
     missing: list[dict] = []
     limitation = None
     blocked = None
@@ -218,6 +233,19 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
         blocked = "I don't have report findings that I can use to discuss this symptom."
     elif kind == "MARKER_LOOKUP" and not measurements:
         blocked = "I don't have that measurement in the records I can access for your account."
+    if unavailable and limitation is None:
+        limitation = (
+            "Some required facts could not be placed in this answer's evidence: "
+            + ", ".join(unavailable)
+            + "."
+        )
+    if restored or unavailable:
+        import logging
+        logging.getLogger("cura.evidence").info(
+            "evidence_completeness restored=%s unavailable=%s",
+            restored,
+            unavailable,
+        )
 
     return EvidencePackage(
         response_type=kind,
@@ -228,4 +256,146 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
         missing=missing,
         limitation=limitation,
         blocked_answer=blocked,
+        questionnaire=questionnaire,
+        report_counts=counts,
     )
+
+
+def _complete_required_facts(
+    measurements: list[dict],
+    questionnaire: list[dict],
+    plan: QueryPlan,
+    context: HealthContext,
+    message: str,
+) -> tuple[list[dict], list[dict], list[str], list[str]]:
+    """Restore comparison and questionnaire facts that selection dropped, inside the measurement cap."""
+    restored: list[str] = []
+    unavailable: list[str] = []
+    present = {row.get("fact_id") for row in measurements}
+    required: list[dict] = []
+    for row in context.comparisons or []:
+        topic = getattr(row, "topic", None)
+        for value, when in (
+            (getattr(row, "previous_value", None), getattr(row, "previous_date", None)),
+            (getattr(row, "current_value", None), getattr(row, "current_date", None)),
+        ):
+            if value is None:
+                continue
+            fact_id = f"blood:{topic}:{when}:{value}"
+            if fact_id in present:
+                continue
+            match = next(
+                (
+                    marker
+                    for marker in context.markers or []
+                    if getattr(marker, "key", None) == topic and getattr(marker, "value", None) == value
+                ),
+                None,
+            )
+            flag = getattr(match, "flag", None) if match is not None else None
+            required.append({
+                "fact_id": fact_id,
+                "key": topic,
+                "name": getattr(match, "name", None) or topic,
+                "value": value,
+                "unit": getattr(match, "unit", None) if match is not None else None,
+                "reference_low": getattr(match, "reference_low", None) if match is not None else None,
+                "reference_high": getattr(match, "reference_high", None) if match is not None else None,
+                "flag": getattr(flag, "value", flag) if flag is not None else None,
+                "report_date": str(when) if when else None,
+                "source": "blood_report",
+                "status": "AVAILABLE",
+            })
+    cap = 24
+    protected = {row["fact_id"] for row in required} | present
+    for row in required:
+        if len(measurements) >= cap:
+            drop = next((index for index, item in enumerate(measurements) if item.get("fact_id") not in protected), None)
+            if drop is None:
+                unavailable.append(row["fact_id"])
+                continue
+            measurements.pop(drop)
+        measurements.append(row)
+        restored.append(row["fact_id"])
+    asked = bool(plan.needs_questionnaire or re.search(r"\bquestionnaire\b", message or "", re.I))
+    if asked and not questionnaire:
+        unavailable.append("questionnaire:required")
+    return measurements, questionnaire, restored, unavailable
+
+
+def _with_history(measurements: list[dict], context: HealthContext) -> list[dict]:
+    """A comparison already built in context is evidence. Do not leave only the latest point."""
+    seen = {(row.get("key"), str(row.get("report_date") or ""), row.get("value")) for row in measurements}
+    extra: list[dict] = []
+    for row in context.comparisons or []:
+        topic = getattr(row, "topic", None)
+        for value, when in (
+            (getattr(row, "previous_value", None), getattr(row, "previous_date", None)),
+            (getattr(row, "current_value", None), getattr(row, "current_date", None)),
+        ):
+            if value is None:
+                continue
+            key = (topic, str(when or ""), value)
+            if key in seen:
+                continue
+            seen.add(key)
+            match = next(
+                (
+                    marker
+                    for marker in context.markers or []
+                    if getattr(marker, "key", None) == topic and getattr(marker, "value", None) == value
+                ),
+                None,
+            )
+            flag = getattr(match, "flag", None) if match is not None else None
+            extra.append({
+                "fact_id": f"blood:{topic}:{when}:{value}",
+                "key": topic,
+                "name": getattr(match, "name", None) or topic,
+                "value": value,
+                "unit": getattr(match, "unit", None) if match is not None else None,
+                "reference_low": getattr(match, "reference_low", None) if match is not None else None,
+                "reference_high": getattr(match, "reference_high", None) if match is not None else None,
+                "flag": getattr(flag, "value", flag) if flag is not None else None,
+                "report_date": str(when) if when else None,
+                "source": "blood_report",
+                "status": "AVAILABLE",
+            })
+    return measurements + extra
+
+
+def _questionnaire_rows(plan: QueryPlan, context: HealthContext, message: str) -> list[dict]:
+    asked = bool(plan.needs_questionnaire or re.search(r"\bquestionnaire\b", message or "", re.I))
+    if not asked:
+        return []
+    rows = []
+    for answer in context.questionnaire or []:
+        value = getattr(answer, "value", None)
+        if value in (None, ""):
+            continue
+        key = getattr(answer, "question_key", None)
+        rows.append({
+            "fact_id": f"questionnaire:{key}",
+            "key": key,
+            "question": getattr(answer, "question", None),
+            "value": value,
+            "source": "questionnaire",
+            "status": "AVAILABLE",
+        })
+    return rows
+
+
+def _report_counts(context: HealthContext) -> dict | None:
+    summary = getattr(context, "in_range_summary", None)
+    if summary is None:
+        return None
+    total = summary.in_range + summary.out_of_range + summary.missing + summary.unclassified
+    if not total:
+        return None
+    return {
+        "total_markers": total,
+        "within_range": summary.in_range,
+        "outside_range": summary.out_of_range,
+        "unclassified": summary.unclassified,
+        "selected_for_this_answer": len(context.markers or []),
+    }

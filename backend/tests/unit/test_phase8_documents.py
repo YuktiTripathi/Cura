@@ -163,6 +163,25 @@ def test_retrieval_ranks_and_scopes(client):
         db.close()
 
 
+def test_selected_document_is_returned_when_question_shares_no_words(client):
+    res = _upload(client, "user-a", filename="cbc.pdf")
+    did = res.json()["document_id"]
+    from app.db.session import SessionLocal
+
+    db = SessionLocal()
+    try:
+        hits = DocumentRetriever(db).retrieve(
+            "user-a",
+            "zzzz uniquequestion",
+            document_ids=[did],
+        )
+        assert hits
+        assert hits[0].document_id == did
+        assert "140" in hits[0].text
+    finally:
+        db.close()
+
+
 def test_chat_document_question_retrieves_without_supershyft(client):
     did = _upload(client, "user-a").json()["document_id"]
     with patch("app.llm.factory.get_llm_client") as llm:

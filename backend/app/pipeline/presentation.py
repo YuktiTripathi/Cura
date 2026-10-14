@@ -19,6 +19,7 @@ from app.pipeline.narrative import (
     dedupe_markers,
     dedupe_missing,
     flatten_narrative,
+    format_unit,
     summary_style_for,
     usable_llm_overview,
     wants_narrative_summary,
@@ -300,7 +301,7 @@ def _finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     return PresentedFinding(
         label=canonical_display_label(marker),
         value=value,
-        unit=marker.unit,
+        unit=format_unit(marker.unit),
         status=_status_for(marker.flag),
         source_type="blood_report",
         source_date=str(when)[:10] if when else None,
