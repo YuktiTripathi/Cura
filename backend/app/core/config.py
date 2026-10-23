@@ -116,8 +116,11 @@ class Settings(BaseSettings):
     openrouter_zero_data_retention: bool = False
     require_zdr_for_personal_health: bool = False
     # not_approved: personal prompts stay local. safety_retention: only models listed below.
-    personal_health_privacy_profile: str = "not_approved"
-    personal_health_approved_models: str = ""
+    # The owner confirmed OpenRouter safety data retention on each listed model.
+    personal_health_privacy_profile: str = "safety_retention"
+    personal_health_approved_models: str = (
+        "google/gemini-3.8-flash,openai/gpt-5-mini,openai/gpt-5.6-luna,typesafe/jev-1.13"
+    )
     # Do not set true unless every answer model is known to support JSON Schema.
     openrouter_require_parameters: bool = False
     cura_openrouter_require_zdr: bool = False
