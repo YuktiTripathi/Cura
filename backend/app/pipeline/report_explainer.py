@@ -521,6 +521,8 @@ def explain_bio_comparison(comparisons: list, names: dict[str, str]) -> str:
 _SECTION = re.compile(
     r"\*\*(?:What to do next|Looking good|Went up|Came down|No change|Your Bio-AI report)\b"
     r"|only have one Bio-AI assessment for you"
+    r"|which is (?:higher|lower) than the normal range|which is within the normal range"
+    r"|most important result to look at|ratio is \d"
 )
 
 
@@ -540,3 +542,234 @@ def explain_missing_topic(codes: list[str]) -> str:
         "your results. If you'd like to check, ask your doctor whether these tests are worth adding "
         "to your next blood test."
     )
+
+
+# Question-aware answers -------------------------------------------------------
+# The same results answer different questions: "what does it mean", "what can I eat",
+# "why is it low", "should I take a supplement". These keep to the tests asked about
+# and answer the actual question. Advice stays general lifestyle guidance; doses and
+# medicines are always left to the doctor.
+
+_THEME_WORDS = {
+    "sugar": ("sugar", "diabet", "glucose", "hba1c", "a1c"),
+    "lipids": ("cholesterol", "cholestrol", "lipid", "triglycer", "ldl", "hdl"),
+    "iron": ("anaem", "anem", "irondeficien", "ironlevel", "haemoglobin", "hemoglobin"),
+    "kidney": ("kidney", "renal"),
+    "liver": ("liver",),
+    "thyroid": ("thyroid",),
+}
+_PATTERN_ASK = re.compile(
+    r"deficien|anaem|anem|ratio|pattern|connect|together|in common|relat|overall|picture|review", re.I
+)
+
+_KIND = (
+    ("supplement", re.compile(r"\b(supplements?|tablets?|pills?|capsules?|injections?|should i take)\b", re.I)),
+    ("foods", re.compile(r"\b(foods?|eat|eating|diet|meals?|drink)\b", re.I)),
+    ("actions", re.compile(
+        r"\b(what (?:can|should) i do|how (?:can|do|should) i|improve|lower|reduce|raise|increase|"
+        r"bring (?:it|them) (?:down|up)|fix|get (?:it|them) (?:down|up)|tips)\b", re.I)),
+    ("causes", re.compile(r"\b(why|causes?|reasons?|what makes)\b", re.I)),
+    ("top", re.compile(r"\b(most important|biggest|main (?:issue|concern|problem)|top priority|worst|first)\b", re.I)),
+)
+
+
+def question_kind(message: str | None) -> str | None:
+    for kind, pattern in _KIND:
+        if pattern.search(message or ""):
+            return kind
+    return None
+
+
+# Advice is keyed by marker family: (foods, steps, common causes, supplement note).
+_ADVICE = {
+    "vitamin_d": (
+        "oily fish such as salmon, sardines and mackerel, egg yolks, and milk, curd or cereals fortified with vitamin D. "
+        "Food alone rarely fixes a low level, because most vitamin D is made in the skin from sunlight",
+        "get some midday sun on your arms and face on most days (about 15 to 30 minutes, without burning), "
+        "and add vitamin D foods where you can",
+        "too little sun on the skin (spending most of the day indoors, covering most of the skin, sunscreen), darker skin, higher body weight, "
+        "and, less often, gut, liver or kidney conditions that affect absorption",
+        "Vitamin D supplements are often prescribed for a level this low, but the dose depends on your level "
+        "and health, so please ask your doctor before starting one",
+    ),
+    "b12": (
+        "eggs, milk, curd, paneer and cheese, fish, chicken and meat, and cereals fortified with B12. "
+        "B12 comes almost only from animal foods, so vegetarians and especially vegans often need fortified foods",
+        "include a B12 food every day, and if you are vegetarian or vegan, look for fortified foods",
+        "a vegetarian or vegan diet, long-term use of metformin or acid-reducing medicines, "
+        "and stomach or gut conditions that affect absorption",
+        "B12 is often given as tablets or injections when it is low, but your doctor should check the cause "
+        "and choose the right form and dose",
+    ),
+    "iron": (
+        "lean red meat, chicken, fish and eggs, plus lentils, beans, chana, rajma, green leafy vegetables, "
+        "and iron-fortified cereals. Having vitamin C (lemon, amla, oranges, tomatoes) with these meals helps "
+        "absorption, while tea or coffee with meals reduces it",
+        "eat iron-rich foods daily with a vitamin C source, keep tea and coffee away from meals, "
+        "and see your doctor so the cause can be found",
+        "too little iron in the diet, blood loss (for example heavy periods or bleeding in the gut), "
+        "pregnancy, and conditions that reduce absorption",
+        "Please don't start iron supplements on your own. Your doctor should first confirm low iron and find "
+        "the cause, then choose the dose, because iron tablets can upset the stomach and too much iron is harmful",
+    ),
+    "lipids": (
+        "more fibre from oats, beans, lentils, fruit and vegetables, nuts and seeds, and fish. "
+        "Cut back on ghee, butter, fried and processed foods, sweets and sugary drinks",
+        "aim for about 150 minutes a week of activity such as brisk walking, swap saturated fats for "
+        "unsaturated ones (nuts, seeds, mustard or olive oil), cut sugary drinks, refined carbs and alcohol "
+        "(these raise triglycerides most), and lose some weight if you are carrying extra",
+        "diet, low activity, extra body weight, alcohol, family history, and sometimes thyroid or blood-sugar problems",
+        "Whether you need cholesterol medicine depends on your overall heart risk, which your doctor can work out",
+    ),
+    "sugar": (
+        "whole grains instead of white rice, maida and white bread, plenty of vegetables, dal and other "
+        "protein at each meal, and fewer sweets, juices and sugary drinks",
+        "cut sugary drinks and sweets, swap refined carbs for whole grains, keep portions moderate, aim for "
+        "about 150 minutes a week of activity (a 10 to 15 minute walk after meals helps), sleep well, and lose "
+        "some weight if you are carrying extra",
+        "diet high in sugar and refined carbs, low activity, extra weight around the waist, family history, "
+        "poor sleep and stress",
+        "Any blood-sugar medicine is your doctor's decision",
+    ),
+    "liver": (
+        "plenty of vegetables, whole grains and lean protein, with fewer fried foods, sweets and sugary drinks",
+        "limit or avoid alcohol, keep to a healthy weight, cut sugar and fried food, and stay active",
+        "alcohol, extra body weight, high blood sugar or triglycerides, some medicines, and infections",
+        "Please check with your doctor before taking any supplement, because some can strain the liver",
+    ),
+    "kidney": (
+        "a balanced diet with less salt and processed food",
+        "drink enough water, keep salt down, avoid regular use of painkillers like ibuprofen without advice, "
+        "and keep blood pressure and blood sugar in check",
+        "dehydration, high protein intake or intense exercise before the test, muscle mass, and some medicines",
+        "Please check with your doctor before taking supplements, as kidneys clear many of them",
+    ),
+}
+
+
+def _advice_key(marker: BloodMarker) -> str | None:
+    text = _norm(marker.key) + _norm(marker.name)
+    if "vitamind" in text:
+        return "vitamin_d"
+    if "b12" in text or "cobalamin" in text:
+        return "b12"
+    code = _theme(marker).code
+    return code if code in _ADVICE else None
+
+
+def _focus(markers: list[BloodMarker], message: str | None) -> list[BloodMarker]:
+    """Keep to the tests the question is about."""
+    text = _norm(message)
+    if not text or _PATTERN_ASK.search(message or ""):
+        return markers
+    words = f" {re.sub(r'[^a-z0-9]+', ' ', (message or '').lower())} "
+
+    def said(term: str) -> bool:
+        term = re.sub(r"[^a-z0-9]+", " ", term.lower()).strip()
+        return len(term) >= 2 and f" {term} " in words
+
+    named = [
+        m for m in markers
+        if said(m.key.replace("_", " ")) or said(m.name)
+        or ("vitamind" in text and "vitamind" in _norm(m.name))
+        or ("triglycer" in text and "triglycer" in _norm(m.name))
+    ]
+    if named:
+        return named
+    for code, words in _THEME_WORDS.items():
+        if any(word in text for word in words):
+            themed = [m for m in markers if _theme(m).code == code]
+            if themed:
+                return themed
+    return markers
+
+
+def _ratio_answer(markers: list[BloodMarker]) -> str | None:
+    def find(*words):
+        return next((m for m in markers if m.value and any(w == _norm(m.key) or w in _norm(m.name) for w in words)), None)
+
+    hdl = find("hdl")
+    ldl = find("ldl")
+    total = next((m for m in markers if m.value and _norm(m.key) in {"cholesterol", "totalcholesterol"}
+                  or "cholesteroltotal" in _norm(m.name) or "totalcholesterol" in _norm(m.name)), None)
+    if not hdl:
+        return None
+    parts = []
+    if total:
+        parts.append(f"Your total cholesterol to HDL ratio is {total.value / hdl.value:.1f} "
+                     f"(total {total.value:g} ÷ HDL {hdl.value:g}).")
+    if ldl:
+        parts.append(f"Your LDL to HDL ratio is {ldl.value / hdl.value:.1f} (LDL {ldl.value:g} ÷ HDL {hdl.value:g}).")
+    if not parts:
+        return None
+    parts.append(
+        "A lower ratio is better: it means more \"good\" HDL compared with the cholesterol that can build up "
+        "in blood vessels. Your doctor can tell you what target suits you, based on your overall heart risk."
+    )
+    return " ".join(parts)
+
+
+def _top_answer(markers: list[BloodMarker]) -> str | None:
+    flagged = _dedupe([m for m in markers if _out_of_range(m)])
+    if not flagged:
+        return None
+    notes = clinical_notes(flagged)
+    if notes:
+        order = [t.code for t in _THEMES]
+        notes.sort(key=lambda n: (not n.urgent, order.index(_theme(n.marker).code) if _theme(n.marker).code in order else len(order)))
+        lead = notes[0].marker
+        reason = notes[0].text
+    else:
+        order = [t.code for t in _THEMES]
+        flagged.sort(key=lambda m: order.index(_theme(m).code) if _theme(m).code in order else len(order))
+        lead = flagged[0]
+        reason = _about(lead) or ""
+    others = [m for m in flagged if m is not lead][:3]
+    text = f"The most important result to look at is your {_value(lead)}. {reason}".strip()
+    if others:
+        text += " After that: " + ", ".join(_value(m) for m in others) + "."
+    return text + " It is worth going through these with your doctor."
+
+
+def answer_markers(markers: list[BloodMarker], message: str | None = None) -> str:
+    """Answer a question about specific results: meaning, foods, steps, causes or supplements."""
+    usable = _dedupe([m for m in markers if m.value is not None])
+    if not usable:
+        return ""
+    kind = question_kind(message)
+    if re.search(r"\bratio\b", message or "", re.I):
+        ratio = _ratio_answer(usable)
+        if ratio:
+            return ratio
+    if kind == "top":
+        top = _top_answer(usable)
+        if top:
+            return top
+    focus = _focus(usable, message)
+    if kind in {"foods", "actions", "causes", "supplement"}:
+        flagged = [m for m in focus if _out_of_range(m)] or focus
+        parts = [" ".join(_status_sentence(m) for m in flagged)]
+        seen: set[str] = set()
+        for marker in flagged:
+            key = _advice_key(marker)
+            if not key or key in seen:
+                continue
+            seen.add(key)
+            foods, steps, causes, supplement = _ADVICE[key]
+            if kind == "foods":
+                parts.append(f"Foods that help: {foods}.")
+                parts.append(f"Beyond food: {steps}.")
+            elif kind == "actions":
+                parts.append(f"What helps most: {steps}.")
+                parts.append(f"Foods to lean on: {foods}.")
+            elif kind == "causes":
+                parts.append(f"Common causes include {causes}. Your doctor can work out which applies to you.")
+            if kind == "supplement" or (kind in {"foods", "actions"} and supplement and "doctor" in supplement
+                                        and key in {"vitamin_d", "b12", "iron"}):
+                parts.append(supplement + ".")
+        if len(parts) == 1:
+            parts.append(explain_markers(flagged))
+        if kind != "supplement":
+            parts.append("Recheck the test after about three months of changes to see how it is moving.")
+        return "\n\n".join(p for p in parts if p)
+    return explain_markers(focus)

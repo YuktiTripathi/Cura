@@ -43,7 +43,7 @@ from app.pipeline.cross_source import (
     uploaded_fact_to_source,
 )
 from app.pipeline.intent import NAMES, is_personal_utterance, requires_personal_record
-from app.pipeline.lab_parameters import expand_requested_keys, primary_lab_key, retrieval_keys
+from app.pipeline.lab_parameters import expand_requested_keys, is_lab_key, primary_lab_key, retrieval_keys
 from app.pipeline.claim_check import ClaimVerdict, check_claims
 from integrations.supershyft.db import DB_NO_RECORDS, DB_PROVIDER_NOT_CALLED
 from app.core.errors import LLMUnavailableError, ProviderUnavailableError
@@ -83,6 +83,11 @@ from app.pipeline.stages import RouteStage, SafetyStage
 # cannot supply it (see semantic_plan). Never a generic "general, latest or comparison?".
 _EXPLICIT_UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|document|attachment|attached|file)\b", re.I)
 
+_MY_LAB_ACTION = re.compile(
+    r"\b(?:how (?:can|do|should) i|what (?:can|should) i do to|ways? to|tips? to)\b.*\b(?:lower|reduce|raise|"
+    r"increase|improve|boost|fix|bring down|get down|get up)\b.*\bmy\b",
+    re.I,
+)
 _STYLE_REQUEST = re.compile(
     r"^\s*(?:(?:can|could) you |please |just )?(?:give me |tell me |make it |keep it |say it |explain (?:it|that|this) )?"
     r"(?:the |a )?(?:short(?:er)?|brief|quick|tl;?dr|simple|simpler|plain|summary|in short|in brief|"
@@ -374,6 +379,12 @@ class ChatService:
                 eval_turn["style_request"] = True
         prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
         conv_state = ConversationStateResolver().resolve(routing_message, conv)
+        if conv_state.turn_type.value == "CLARIFICATION" and conv_state.previous_user_question:
+            # "The advanced one" answers our "which report?" question: plan the original
+            # question with the choice attached, so report selection sees it.
+            routing_message = canonicalize_biomarker_terms(
+                f"{conv_state.previous_user_question} ({payload.message})"
+            )
         eval_turn["conversation_state"] = conv_state
         from app.pipeline.conversation_state import ambiguous_referent_question, discussed_entities
 
@@ -1022,6 +1033,29 @@ class ChatService:
         from app.pipeline.general_personalization import enforce_general_only_request
 
         plan = enforce_general_only_request(plan, payload.message)
+        if (
+            plan.intent == IntentType.general_health_question
+            and plan.needs_personal_data
+            and _MY_LAB_ACTION.search(payload.message or "")
+            and any(is_lab_key(key) for key in plan.requested_metrics or [])
+        ):
+            # "How can I lower my LDL?" is about the member's own LDL: answer from their result.
+            plan = plan.model_copy(update={
+                "intent": IntentType.blood_marker_explanation,
+                "knowledge_scope": KnowledgeScope.personal,
+                "needs_blood": True,
+            })
+        if plan.needs_personal_data and plan.requested_metrics:
+            from app.pipeline.context_builder import _with_pattern_keys
+
+            # Retrieval fetches only requested tests, so a pattern question ("Am I iron
+            # deficient?") must ask for the whole group before anything is fetched.
+            widened = _with_pattern_keys(plan.raw_message or payload.message, list(plan.requested_metrics))
+            if widened != list(plan.requested_metrics):
+                plan = plan.model_copy(update={
+                    "requested_metrics": widened,
+                    "display_entities": list(dict.fromkeys([*(plan.display_entities or []), *widened])),
+                })
         spec = plan.task_contract or {}
         logger.info(
             "answer_spec request_id=%s intent=%s focus=%s goal=%s personal_context=%s "
@@ -1484,6 +1518,9 @@ class ChatService:
                 expected = ExpectedReplyType(follow.expected_reply_type)
             except ValueError:
                 expected = ExpectedReplyType.none
+        if context.status == "ambiguous":
+            # The answer asked which report to use; the next turn is that choice.
+            expected = ExpectedReplyType.report_choice
         if expected == ExpectedReplyType.none and follow and follow.handling_path == "CONTINUE_INTERPRETATION":
             if re.search(r"\b(symptoms?|medication|supplement)\b", follow.text or "", re.I):
                 expected = ExpectedReplyType.clinical_context

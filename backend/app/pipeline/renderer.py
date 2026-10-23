@@ -96,6 +96,8 @@ def render_missing_blood_marker(context: HealthContext) -> str:
     label = (item.name if item else None) or context.resolved_topic_name
     if label and label.strip().lower() in {"blood", "blood report"}:
         label = context.resolved_topic_name
+    if label and label.islower() and len(label) <= 4:
+        label = label.upper()  # short test codes: "psa" -> "PSA"
     if item and item.reason == "not_in_reports":
         scope = item.scope or "the reports checked"
         if scope in {"latest blood report", "the reports checked"}:
@@ -265,10 +267,14 @@ class DeterministicRenderer:
 
             return explain_missing_topic(context.requested_entity_codes)
         if context.intent.value == "health_scenario" and context.markers and context.requested_entity_codes:
-            from app.pipeline.report_explainer import explain_markers
+            from app.pipeline.report_explainer import answer_markers
 
             # A topic question ("How is my liver?"): explain those tests, not the whole report.
-            return explain_markers(context.markers)
+            return answer_markers(context.markers, message)
+        if context.intent.value == "health_scenario" and context.markers and question_kind_of(message) in {"top", "foods", "actions"}:
+            from app.pipeline.report_explainer import answer_markers
+
+            return answer_markers(context.markers, message)
         if context.intent.value == "health_scenario" and context.markers:
             from app.pipeline.report_explainer import explain_overall
 
@@ -338,20 +344,24 @@ class DeterministicRenderer:
         if context.intent.value == "latest_result" and context.markers:
             extra = _derived_and_stated(context, message)
             if len(context.markers) > 1:
-                lines = []
-                for m in context.markers:
-                    date = next((e.report_date for e in context.evidence if e.marker == m.name), m.measured_at)
-                    value = "unavailable" if m.value is None else f"{m.value} {m.unit or ''}".strip()
-                    caption = user_source_caption("blood_report", date, latest=True)
-                    lines.append(f"• **{m.name}:** {value} · {m.flag.value.replace('_', ' ')}. {caption}")
-                return "Your latest results:\n\n" + "\n".join(lines) + extra
+                from app.pipeline.report_explainer import answer_markers
+
+                explained = answer_markers(context.markers, message)
+                if explained:
+                    return explained + extra
             m = context.markers[0]
             date = context.evidence[0].report_date if context.evidence else m.measured_at
             value = "unavailable" if m.value is None else f"{m.value} {m.unit or ''}".strip()
             caption = user_source_caption("blood_report", date, latest=True)
+            flag = m.flag.value.replace("_", " ")
+            status = f" ({flag})" if flag in {"low", "high", "critical"} else ""
+            from app.pipeline.clinical_thresholds import clinical_note
+
+            note = clinical_note(m)
             return (
-                f"Your latest {m.name} is {value}. "
-                f"{caption}."
+                f"Your latest {m.name} is {value}{status}. "
+                + (f"{note.text} " if note else "")
+                + f"{caption}."
                 + extra
             )
         if context.intent.value == "previous_result" and context.markers:
@@ -370,9 +380,9 @@ class DeterministicRenderer:
                 )
             return render_trend_sentence(context, context.comparisons[0])
         if context.intent.value == "blood_marker_explanation" and context.markers:
-            from app.pipeline.report_explainer import explain_markers
+            from app.pipeline.report_explainer import answer_markers
 
-            explained = explain_markers(context.markers)
+            explained = answer_markers(context.markers, message)
             if explained:
                 return explained + _derived_and_stated(context, message)
         if context.intent.value == "bio_ai_comparison":
@@ -455,10 +465,14 @@ class DeterministicRenderer:
 
             return explain_missing_topic(context.requested_entity_codes)
         if context.intent.value == "broad_health_summary" and context.markers and context.requested_entity_codes:
-            from app.pipeline.report_explainer import explain_markers
+            from app.pipeline.report_explainer import answer_markers
 
             # A topic question ("How is my liver?"): explain those tests, not the whole report.
-            return explain_markers(context.markers)
+            return answer_markers(context.markers, message)
+        if context.intent.value == "broad_health_summary" and context.markers and question_kind_of(message) in {"top", "foods", "actions"}:
+            from app.pipeline.report_explainer import answer_markers
+
+            return answer_markers(context.markers, message)
         if context.intent.value == "broad_health_summary" and context.markers:
             from app.pipeline.report_explainer import explain_overall
 
@@ -500,6 +514,12 @@ def _source_gap_sentence(context: HealthContext) -> str:
     if not gaps:
         return ""
     return "Unavailable sources: " + "; ".join(gaps) + "."
+
+
+def question_kind_of(message: str | None) -> str | None:
+    from app.pipeline.report_explainer import question_kind
+
+    return question_kind(message)
 
 
 def render_diagnosis_restraint(context: HealthContext) -> str:

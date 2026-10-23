@@ -134,7 +134,7 @@ DOMAINS: tuple[HealthDomain, ...] = (
     ),
     HealthDomain(
         "red_cell_anaemia_health",
-        ("anaemia", "anemia", "anaemic", "anemic", "red cell", "cbc anaemia", "blood count anaemia"),
+        ("anaemia", "anemia", "anaemic", "anemic", "iron deficient", "iron deficiency", "red cell", "cbc anaemia", "blood count anaemia"),
         primary_entities=("hemoglobin", "rbc", "mcv", "mch", "mchc"),
         supporting_entities=("ferritin", "iron", "tibc", "transferrin", "vitamin_b12", "folate", "hematocrit", "rdw"),
         sources=("blood",),

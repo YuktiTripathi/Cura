@@ -42,7 +42,7 @@ OUT_OF_SCOPE = re.compile(r"\b(build malware|steal password|hack account)\b", re
 DIAGNOSIS_REQUEST = re.compile(
     r"\b("
     r"diagnose me|give me a diagnosis|what (?:disease|illness|condition) do i have|"
-    r"am i diabetic|am i (?:anaemic|anemic|prediabetic)|"
+    r"am i diabetic|am i (?:anaemic|anemic|prediabetic|iron deficient)|"
     r"do i have (?:diabetes|prediabetes|cancer|ckd|anaemia|anemia|anemia as a diagnosis)"
     r")\b",
     re.I,

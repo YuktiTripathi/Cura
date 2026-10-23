@@ -318,7 +318,7 @@ class ReasoningService:
 
             return ReasoningResult(answer=explain_metabolic_age(context.metabolic_age), llm_mode="structured_bio_ai")
         if structured_bio_ai and not cross_source and not relationship and not _model_explains(plan):
-            if len(context.bio_ai_risks) > 1 and _ASKS_PRIORITY.search(message or ""):
+            if len(context.bio_ai_risks) > 1 and _ASKS_PRIORITY.search(f"{message or ''} {plan.raw_message or ''}"):
                 from app.pipeline.report_explainer import explain_bio_ai
 
                 answer = explain_bio_ai(context.bio_ai_risks, context.markers)

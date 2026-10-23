@@ -149,7 +149,12 @@ _SUPPLEMENT = re.compile(
 )
 _NO_SYMPTOMS = re.compile(r"\b(no (?:new )?symptoms?|nothing new|feeling fine|no complaints)\b", re.I)
 _MEDS = re.compile(r"\b(medication|medicine|started taking|stopped taking|dose)\b", re.I)
-_CLARIFY_PICK = re.compile(r"\b(the (?:first|second|blood|bio-ai)|use (?:that|this|the)|advanced bio-ai|bio-ai)\b", re.I)
+_CLARIFY_PICK = re.compile(
+    r"\b(the (?:first|second|blood|bio-ai|latest|newer|older|basic|standard|regular|normal)|"
+    r"use (?:that|this|the)|advanced|basic|standard|regular|first one|second one|latest one|"
+    r"bio-ai|either|both|any)\b",
+    re.I,
+)
 
 
 def load_persisted_state(conversation: Conversation | None) -> ConversationState:

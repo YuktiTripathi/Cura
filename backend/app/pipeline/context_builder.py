@@ -137,6 +137,21 @@ def _find_risk(risks, code):
     return next((item for item in risks if (item.code or "").lower() in options), None)
 
 
+_ANAEMIA_ASK = re.compile(r"an(?:a)?emi|iron[- ]deficien", re.I)
+_RATIO_ASK = re.compile(r"\bratio\b", re.I)
+
+
+def _with_pattern_keys(message: str, keys: list[str]) -> list[str]:
+    """Questions about a pattern need the whole group of tests behind it: anaemia is read
+    from haemoglobin, cell size and iron together, and a cholesterol ratio needs HDL."""
+    extra: list[str] = []
+    if _ANAEMIA_ASK.search(message):
+        extra = ["hemoglobin", "rbc", "mcv", "mch", "ferritin", "iron", "tibc"]
+    elif _RATIO_ASK.search(message) and any(k in {"cholesterol", "ldl", "hdl", "lipid_profile"} for k in keys):
+        extra = ["cholesterol", "ldl", "hdl"]
+    return list(dict.fromkeys([*keys, *extra])) if extra else keys
+
+
 class ContextBuilder:
     def __init__(self, registry: ProviderRegistry):
         self.registry = registry
@@ -400,6 +415,7 @@ class ContextBuilder:
             )
             return
         keys = wanted_metric_keys(plan)
+        keys = _with_pattern_keys(plan.raw_message or "", keys)
         named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}

@@ -211,7 +211,8 @@ class ResponseComposer:
             text = f"{response_plan.direct_answer} {explained}".strip()
         if not text:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
-        change_line = None if model_wrote else _change_summary(context)
+        bio_turn = plan.intent.value.startswith("bio_ai")
+        change_line = None if model_wrote or bio_turn else _change_summary(context)
         if change_line and not any(name.lower() in text.lower() for name in change_line[1]):
             # A comparison question is answered with what moved, before any wider summary.
             text = f"{change_line[0]} {text}".strip()

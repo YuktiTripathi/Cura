@@ -424,6 +424,8 @@ def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:
             continue
         if item.key in (plan.reasoning_context or []) or item.key in DOMAIN_CODES or item.key in FAMILY_QUERY_KEYS:
             continue
+        if item.key == "glucose" and present & {"fasting_blood_glucose", "postprandial_glucose"}:
+            continue  # the fasting result is the glucose result
         if item.reason in {"not_in_reports", "not_present", "no_reports"}:
             label = item.name or display_name_for(item.key)
             if item.key == "cholesterol" and present & {"ldl", "hdl", "triglycerides"}:
@@ -684,7 +686,15 @@ def build_structured_response(
                 when = f" on {item.source_date}" if item.source_date else ""
                 status = f" ({item.status})" if item.status in {"high", "low", "critical", "normal"} else ""
                 parts.append(f"{item.label} {item.value}{unit}{status}{when}".strip())
-            summary = "Stored results for the requested dates: " + "; ".join(parts)
+            asked = set(explicit_dates)
+            if not any(str(item.source_date or "")[:10] in asked for item in findings):
+                # None of the results is from the date asked about: say so, then give the latest.
+                summary = (
+                    f"I don't have a result from {', '.join(sorted(asked))}. "
+                    "Your most recent result on record is " + "; ".join(parts) + "."
+                )
+            else:
+                summary = "Stored results for the requested dates: " + "; ".join(parts)
             q_bits = []
             lowered = (message or "").lower()
             for q in context.questionnaire or []:
