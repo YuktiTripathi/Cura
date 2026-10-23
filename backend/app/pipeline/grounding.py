@@ -215,6 +215,15 @@ def _attribution_issues(sentence: str, catalog: dict) -> list[tuple[str, str]]:
         underscored = code.replace(" ", "_")
         if underscored in catalog["bio"]:
             code = underscored
+        if code not in catalog["measured"]:
+            # The claim pattern captures only the last word of a multi-word name
+            # ("Fasting Blood Glucose" -> "Glucose"); try the longer names it ends.
+            words = scrubbed[: match.start(1)].split()
+            for size in range(1, min(3, len(words)) + 1):
+                longer = _canonical_code(" ".join(words[-size:] + [match.group(1)]))
+                if longer in catalog["measured"]:
+                    code = longer
+                    break
         number = match.group(2)
         if "." not in number and len(number) < 2:
             continue

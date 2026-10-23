@@ -1,4 +1,5 @@
 import io
+import re
 from unittest.mock import patch
 
 import pytest
@@ -228,5 +229,6 @@ def test_extraction_does_not_log_medical_values(client, caplog):
     with caplog.at_level("INFO", logger="cura.documents"):
         _upload(client, "user-a")
     joined = " ".join(r.message for r in caplog.records)
-    assert "140" not in joined
-    assert "6.2" not in joined
+    # Whole numbers only: random document ids can contain "140" or "6.2" by chance.
+    assert not re.search(r"(?<![\w.])140(?![\w.])", joined)
+    assert not re.search(r"(?<![\w.])6\.2(?![\w.])", joined)

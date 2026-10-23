@@ -137,6 +137,21 @@ def _find_risk(risks, code):
     return next((item for item in risks if (item.code or "").lower() in options), None)
 
 
+_ANAEMIA_ASK = re.compile(r"an(?:a)?emi|iron[- ]deficien", re.I)
+_RATIO_ASK = re.compile(r"\bratio\b", re.I)
+
+
+def _with_pattern_keys(message: str, keys: list[str]) -> list[str]:
+    """Questions about a pattern need the whole group of tests behind it: anaemia is read
+    from haemoglobin, cell size and iron together, and a cholesterol ratio needs HDL."""
+    extra: list[str] = []
+    if _ANAEMIA_ASK.search(message):
+        extra = ["hemoglobin", "rbc", "mcv", "mch", "ferritin", "iron", "tibc"]
+    elif _RATIO_ASK.search(message) and any(k in {"cholesterol", "ldl", "hdl", "lipid_profile"} for k in keys):
+        extra = ["cholesterol", "ldl", "hdl"]
+    return list(dict.fromkeys([*keys, *extra])) if extra else keys
+
+
 class ContextBuilder:
     def __init__(self, registry: ProviderRegistry):
         self.registry = registry
@@ -244,6 +259,20 @@ class ContextBuilder:
                     m for m in full
                     if m.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and m.value is not None
                 ] or full[:8]
+                requested = {str(code).lower() for code in plan.requested_metrics or []}
+                if requested:
+                    # A topic question ("How is my liver?", "Am I anaemic?") is about those
+                    # tests, in range or not, rather than every out-of-range result.
+                    from app.pipeline.narrative import canonical_marker_key
+
+                    topic = [
+                        m for m in full
+                        if m.value is not None
+                        and ((m.key or "").lower() in requested or canonical_marker_key(m).lower() in requested)
+                    ]
+                    # None of the asked-about tests is in the report: say so rather than
+                    # answering with unrelated out-of-range results.
+                    ctx.markers = topic
             if scenario_input.bio_ai_reports:
                 latest_bio = sorted(
                     scenario_input.bio_ai_reports,
@@ -386,6 +415,7 @@ class ContextBuilder:
             )
             return
         keys = wanted_metric_keys(plan)
+        keys = _with_pattern_keys(plan.raw_message or "", keys)
         named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}

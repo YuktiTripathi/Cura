@@ -93,4 +93,17 @@ def compose_micro_insight(
     # If the normal presentation already has an interpretation, do not compete with it.
     if presentation and (presentation.interpretation or presentation.personal_relevance):
         return None
-    return _trend_insight(context) or _range_insight(context)
+    insight = _trend_insight(context) or _range_insight(context)
+    clinical = _clinical_insight(context)
+    if insight and clinical:
+        return f"{insight} {clinical}"
+    return insight or clinical
+
+
+def _clinical_insight(context: HealthContext) -> str | None:
+    if len(context.markers or []) != 1:
+        return None
+    from app.pipeline.clinical_thresholds import clinical_note
+
+    note = clinical_note(context.markers[0])
+    return note.text if note else None

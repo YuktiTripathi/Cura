@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  # gitleaks lists the pull request's commits to scan them.
+  pull-requests: read
 
 jobs:
   secret-scan:
@@ -82,8 +84,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-      # package-lock.json is out of sync (npm ci fails on esbuild); regenerate it to switch to npm ci.
-      - run: npm install --no-audit --no-fund
+      - run: npm ci --no-audit --no-fund
       - name: Typecheck
         run: npx tsc --noEmit -p .
       - name: Tests
