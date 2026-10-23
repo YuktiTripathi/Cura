@@ -7,6 +7,8 @@ on:
 
 permissions:
   contents: read
+  # gitleaks lists the pull request's commits to scan them.
+  pull-requests: read
 
 jobs:
   secret-scan:
