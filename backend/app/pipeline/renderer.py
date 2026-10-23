@@ -244,28 +244,36 @@ class DeterministicRenderer:
         if context.intent.value == "questionnaire_lookup":
             return render_questionnaire_answers(context)
         if context.intent.value == "report_explanation":
+            from app.pipeline.clinical_thresholds import clinical_notes
+
             out = []
+            seen: set[tuple[str, object]] = set()
+            flagged = []
+            dates = set()
             for marker in context.markers:
                 if marker.flag.value not in {"low", "high", "critical"}:
                     continue
-                value = "unavailable" if marker.value is None else f"{marker.value} {marker.unit or ''}".strip()
-                when = marker.measured_at.isoformat()[:10] if hasattr(marker.measured_at, "isoformat") else ""
-                dated = f" on {when}" if when else ""
-                out.append(f"{marker.name}: {value} ({marker.flag.value}){dated}")
+                identity = ("".join(ch for ch in marker.name.lower() if ch.isalnum())[:3], marker.value)
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                flagged.append(marker)
+                value = "unavailable" if marker.value is None else f"{marker.value:g} {marker.unit or ''}".strip()
+                out.append(f"{marker.name} {value} ({marker.flag.value})")
+                if hasattr(marker.measured_at, "isoformat"):
+                    dates.add(marker.measured_at.isoformat()[:10])
+            notes = clinical_notes(flagged)
+            lead = " ".join(note.text for note in notes)
             summary = context.in_range_summary
             counts = ""
             if summary:
                 counts = (
-                    f" In range: {summary.in_range}. Out of range: {summary.out_of_range}. "
-                    f"Missing: {summary.missing}."
+                    f" {summary.in_range} results were in range and {summary.out_of_range} were outside it."
                 )
-            findings = "; ".join(out) or "no out-of-range markers in the latest retrieved report"
-            return (
-                f"Measured findings from your latest retrieved report:{counts} "
-                f"Out-of-range results: {findings}. "
-                "A written explanation could not be generated. "
-                "No missing value was estimated."
-            )
+            when = f" from {next(iter(dates))}" if len(dates) == 1 else ""
+            findings = "; ".join(out) or "none"
+            body = f"Your latest report{when}:{counts} Outside the reference range: {findings}."
+            return f"{lead}\n\n{body}" if lead else body
         if context.intent.value == "health_goal_progress":
             if not context.goal_progress:
                 return (

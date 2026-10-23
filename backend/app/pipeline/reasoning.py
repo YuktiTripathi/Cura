@@ -86,7 +86,7 @@ def _answer_with_stored_facts(rendered: str, context: HealthContext) -> str:
 
 CROSS_SOURCE_LIMITATION = (
     "A written explanation could not be generated. "
-    "The stored measurements above are unchanged, and no missing value was estimated."
+    "The stored measurements shown here are unchanged, and no missing value was estimated."
 )
 
 
