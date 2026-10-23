@@ -50,7 +50,7 @@ def presentation_note(message: str | None, response_type: str | None = None) -> 
     elif _FOLLOW_UP.match(text):
         hint = "One or two sentences. No headings or bullet list."
     elif _NUTRITION.search(text):
-        hint = "Answer the food question first. Use bullets for helpful choices and for what to limit. Do not lead with unrelated labs."
+        hint = "Answer the food question first, using everyday food names and serving sizes. Use bullets for helpful choices and for what to limit. Do not lead with unrelated labs or change a calculated amount."
     elif _LIFESTYLE.search(text) and response_type in {None, "", "DIRECT_ANSWER"}:
         hint = "Start with the habit the user asked about. Use 3 to 5 plain bullet sentences for the practical points, without bold labels."
     else:
@@ -59,14 +59,44 @@ def presentation_note(message: str | None, response_type: str | None = None) -> 
 
 
 _GLUED_HEADING = re.compile(r"([.!?])\s+(\*\*[^*\n]{2,80}\*\*)")
+# Only a closing offer, not a question mark inside the explanation.
+_CLOSING_OFFER = re.compile(
+    r"(?:(?<=[.!:])[ \t]+|\n\n)\[?((?:Would you like|Do you want|Want me to|Shall I|Should I)\b[^\n?\]]{0,300}\?)\]?\s*$",
+    re.I,
+)
 _LIST_ITEM = re.compile(r"^\s*[-*•]\s+")
 _INLINE_BULLET = re.compile(r"(?<=\S)[ \t]+([-*•])[ \t]+")
+
+
+def _detach_closing_question(text: str) -> str:
+    """Put a final offer question in its own paragraph, including one glued onto a bullet."""
+    match = _CLOSING_OFFER.search(text or "")
+    if not match:
+        return text
+    question = match.group(1).strip()
+    head = text[: match.start()].rstrip()
+    if not head:
+        return text
+    return f"{head}\n\n{question}"
+
+
+def omit_duplicate_closing_offer(text: str, suggestions: list[str]) -> str:
+    """Drop a closing offer that is already shown as a separate follow-up chip."""
+    match = _CLOSING_OFFER.search(text or "")
+    if not match or not suggestions:
+        return text
+    question = re.sub(r"\s+", " ", match.group(1)).strip().lower().rstrip("?")
+    existing = {re.sub(r"\s+", " ", item).strip().lower().rstrip("?") for item in suggestions if item}
+    if question not in existing:
+        return text
+    return text[: match.start()].rstrip()
 
 
 def separate_answer_layout(text: str) -> str:
     """Put a bold label and a following list on their own lines. Does not rewrite words."""
     if not text:
         return text
+    text = _detach_closing_question(text)
     text = _INLINE_BULLET.sub(r"\n\1 ", text)
     if "**" not in text and "\n*" not in text and "\n-" not in text:
         return text

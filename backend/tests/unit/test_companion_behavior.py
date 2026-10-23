@@ -137,7 +137,11 @@ def test_four_question_types_get_different_handling():
 )
 def test_plain_mode_final_answer_is_the_model_answer(model, plain, message):
     body = _chat(message)
-    assert body["answer"] == MODEL_ANSWER
+    if "Bio-AI" in message:
+        assert body["answer"].startswith(MODEL_ANSWER)
+        assert "not diagnoses" in body["answer"].lower() or "not a diagnosis" in body["answer"].lower()
+    else:
+        assert body["answer"] == MODEL_ANSWER
     assert body["meta"]["response_mode"] == "plain"
     assert body["presentation"] is None
     assert body["follow_ups"] == [] and body["testing_option"] is None and body["recommendations"] == []

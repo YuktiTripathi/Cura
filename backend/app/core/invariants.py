@@ -69,10 +69,11 @@ def production_config_problems(cfg: Settings) -> list[str]:
     if cfg.enable_llm:
         if _looks_placeholder(cfg.active_llm_api_key()):
             problems.append("OPENROUTER_API_KEY is empty or a placeholder")
-        if not cfg.openrouter_zero_data_retention:
-            problems.append("OPENROUTER_ZERO_DATA_RETENTION must be true in production")
-        if not (cfg.require_zdr_for_personal_health or cfg.cura_openrouter_require_zdr):
-            problems.append("REQUIRE_ZDR_FOR_PERSONAL_HEALTH must be true in production")
+        profile = (cfg.personal_health_privacy_profile or "not_approved").strip().lower()
+        if profile not in {"not_approved", "safety_retention"}:
+            problems.append("PERSONAL_HEALTH_PRIVACY_PROFILE must be not_approved or safety_retention")
+        if profile == "safety_retention" and not (cfg.personal_health_approved_models or "").strip():
+            problems.append("PERSONAL_HEALTH_APPROVED_MODELS must list endpoints before safety retention")
     if is_real_health_provider(cfg.health_provider):
         url = (cfg.supershyft_database_url or "").lower()
         if not url or "password" in url or "localhost" in url or "127.0.0.1" in url:

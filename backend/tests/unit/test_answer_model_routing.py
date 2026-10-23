@@ -122,7 +122,16 @@ def test_single_value_lookups_are_deterministic():
 
 
 def test_general_creatinine_explanation_is_standard_medical():
-    _assert_tier(GENERAL_EXPLAIN_PARAPHRASES, AnswerModelTier.standard_medical)
+    direct = build_query_plan("What is creatinine?")
+    assert direct.answer_model_tier == AnswerModelTier.fast_reasoning
+    assert "complexity_score_fast" in (direct.model_selection_reasons or [])
+    for message in GENERAL_EXPLAIN_PARAPHRASES:
+        plan = build_query_plan(message)
+        assert plan.knowledge_scope == KnowledgeScope.general
+        assert plan.answer_model_tier in {AnswerModelTier.fast_reasoning, AnswerModelTier.standard_medical}
+        assert any(
+            reason.startswith("complexity_score_") for reason in (plan.model_selection_reasons or [])
+        )
     for message in GENERAL_EXPLAIN_PARAPHRASES:
         plan = build_query_plan(message)
         assert plan.knowledge_scope == KnowledgeScope.general
@@ -175,7 +184,8 @@ def test_related_high_markers_use_medical_reasoning():
 
 
 def test_liver_domain_questions_default_to_standard_medical():
-    _assert_tier(LIVER_PARAPHRASES, AnswerModelTier.standard_medical)
+    _assert_tier(LIVER_PARAPHRASES[:2], AnswerModelTier.standard_medical)
+    _assert_tier(LIVER_PARAPHRASES[2:], AnswerModelTier.fast_reasoning, reasons_any=["complexity_score_fast"])
 
 
 def test_multi_domain_kidney_review_is_deep_when_complexity_is_sufficient():
@@ -336,6 +346,7 @@ def test_jev_typed_payload_uses_provider_independent_tiers(monkeypatch):
     transport = MagicMock()
     transport.__enter__.return_value = transport
     transport.post.return_value = response
+    monkeypatch.setattr(settings, "openrouter_zero_data_retention", True)
     monkeypatch.setattr("app.routing.jev_client.get_http_client", lambda: transport)
     from app.routing.schemas import JevRoutingState
 

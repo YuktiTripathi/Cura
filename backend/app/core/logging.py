@@ -23,12 +23,17 @@ class CuraLogFilter(logging.Filter):
 
 
 def configure_logging() -> None:
-    logging.basicConfig(
-        level=getattr(logging, settings.log_level.upper(), logging.INFO),
-        format="%(asctime)s %(levelname)s %(name)s %(message)s",
-        stream=sys.stdout,
-        force=True,
-    )
+    root = logging.getLogger()
+    # force=True removes handlers already installed by the test runner, so
+    # contract-violation logs never reach caplog. Configure only a bare process.
+    if not root.handlers:
+        logging.basicConfig(
+            level=getattr(logging, settings.log_level.upper(), logging.INFO),
+            format="%(asctime)s %(levelname)s %(name)s %(message)s",
+            stream=sys.stdout,
+        )
+    else:
+        root.setLevel(getattr(logging, settings.log_level.upper(), logging.INFO))
     filt = CuraLogFilter()
     for name in (
         "cura",

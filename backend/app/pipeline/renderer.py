@@ -1,3 +1,5 @@
+import re
+
 from app.contracts.bio_ai import BioAIRisk
 from app.contracts.health_context import HealthContext, SourceConflict
 from app.pipeline.presentation import (
@@ -35,6 +37,51 @@ def render_bio_ai_score_list(risks: list[BioAIRisk]) -> str:
         + "\n".join(lines)
         + f"\n\n{BIO_AI_DISCLAIMER}"
     )
+
+
+def _explicit_dates(message: str) -> bool:
+    import re
+
+    return len(re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")) >= 1
+
+
+def _stored_flag(marker) -> str:
+    flag = getattr(getattr(marker, "flag", None), "value", getattr(marker, "flag", None))
+    if flag in {"high", "low", "critical", "normal"}:
+        return f" ({flag})"
+    return ""
+
+
+def _observation_identity(marker) -> tuple:
+    when = marker.measured_at.isoformat() if hasattr(marker.measured_at, "isoformat") else str(marker.measured_at or "")
+    source = getattr(marker, "source_type", None) or getattr(marker, "source", None) or "blood_report"
+    return (
+        str(getattr(marker, "key", None) or marker.name or "").strip().lower(),
+        str(source),
+        str(when)[:10],
+        str(marker.value),
+    )
+
+
+def _dated_marker_line(marker) -> str:
+    value = "unavailable" if marker.value is None else f"{marker.value} {marker.unit or ''}".strip()
+    when = marker.measured_at.isoformat() if hasattr(marker.measured_at, "isoformat") else str(marker.measured_at or "unknown date")
+    return f"• **{marker.name}:** {value}{_stored_flag(marker)} on {when}"
+
+
+def _range_absence(context, message: str) -> str:
+    import re
+
+    if not re.search(r"reference range", message or "", re.I):
+        return ""
+    bare = [
+        marker
+        for marker in context.markers
+        if marker.reference_low is None and marker.reference_high is None
+    ]
+    if not bare:
+        return ""
+    return "\n\nNo reference range is stored for that result."
 
 
 def _format_report_day(value) -> str:
@@ -149,9 +196,15 @@ def render_questionnaire_answers(context: HealthContext) -> str:
     )
 
 
-def _derived_and_stated(context: HealthContext) -> str:
+def _derived_and_stated(context: HealthContext, message: str = "") -> str:
     parts: list[str] = []
+    asked = (message or "").lower()
     for row in context.derived or []:
+        fact = (row.fact or "").lower()
+        # A stored BMI is valid only as an answer to a weight question. Do not
+        # attach it to an unrelated marker explanation.
+        if fact == "bmi" and not any(token in asked for token in ("bmi", "body mass", "weight")):
+            continue
         unit = f" {row.unit}" if row.unit else ""
         note = f" ({'; '.join(row.notes)})" if row.notes else ""
         parts.append(f" Derived {row.fact}: {row.value}{unit}{note}.")
@@ -191,7 +244,14 @@ class DeterministicRenderer:
         if context.intent.value == "questionnaire_lookup":
             return render_questionnaire_answers(context)
         if context.intent.value == "report_explanation":
-            out = [m.name for m in context.markers if m.flag.value in {"low", "high", "critical"}]
+            out = []
+            for marker in context.markers:
+                if marker.flag.value not in {"low", "high", "critical"}:
+                    continue
+                value = "unavailable" if marker.value is None else f"{marker.value} {marker.unit or ''}".strip()
+                when = marker.measured_at.isoformat()[:10] if hasattr(marker.measured_at, "isoformat") else ""
+                dated = f" on {when}" if when else ""
+                out.append(f"{marker.name}: {value} ({marker.flag.value}){dated}")
             summary = context.in_range_summary
             counts = ""
             if summary:
@@ -199,10 +259,12 @@ class DeterministicRenderer:
                     f" In range: {summary.in_range}. Out of range: {summary.out_of_range}. "
                     f"Missing: {summary.missing}."
                 )
-            findings = ", ".join(out) or "no out-of-range markers in the latest retrieved report"
+            findings = "; ".join(out) or "no out-of-range markers in the latest retrieved report"
             return (
                 f"Measured findings from your latest retrieved report:{counts} "
-                f"Out-of-range markers: {findings}."
+                f"Out-of-range results: {findings}. "
+                "A written explanation could not be generated. "
+                "No missing value was estimated."
             )
         if context.intent.value == "health_goal_progress":
             if not context.goal_progress:
@@ -229,17 +291,47 @@ class DeterministicRenderer:
             )
         if context.status == "ambiguous":
             return render_bio_ai_ambiguity(context)
+        if _explicit_dates(message) and (context.markers or context.bio_ai_risks or context.questionnaire):
+            lines = []
+            seen = set()
+            shown_names = set()
+            shown_values = set()
+            for marker in context.markers:
+                identity = _observation_identity(marker)
+                if identity in seen:
+                    continue
+                seen.add(identity)
+                lines.append(_dated_marker_line(marker))
+                shown_names.add(str(getattr(marker, "key", None) or "").replace("_", " ").lower())
+                shown_names.add(str(marker.name or "").strip().lower())
+                if marker.value is not None:
+                    shown_values.add(str(marker.value))
+            for risk in context.bio_ai_risks:
+                when = getattr(risk, "measured_at", None)
+                day = when.isoformat()[:10] if hasattr(when, "isoformat") else ""
+                lines.append(f"{format_bio_ai_risk_line(risk)}{(' on ' + day) if day else ''}")
+            shown_q = False
+            lowered = (message or "").lower()
+            for answer in context.questionnaire or []:
+                question = (answer.question or "").strip().lower()
+                key_phrase = (answer.question_key or "").replace("_", " ")
+                if answer.value in (None, ""):
+                    continue
+                if not ((question and question[:48] in lowered) or (key_phrase and key_phrase in lowered)):
+                    continue
+                repeated = str(answer.value) in shown_values and (
+                    key_phrase.lower() in shown_names or question[:48] in shown_names
+                )
+                if repeated:
+                    continue
+                recorded = getattr(answer, "recorded_at", None)
+                dated = "" if recorded else " Completion date is not stored."
+                lines.append(f"• **{answer.question or answer.question_key}:** {answer.value}.{dated}")
+                shown_q = True
+            note = "\n\nThe questionnaire answer is separate from the laboratory result." if shown_q else ""
+            return "Stored results for the requested dates:\n\n" + "\n".join(lines) + _range_absence(context, message) + note
         if context.intent.value == "latest_result" and context.markers:
-            named_gap = next(
-                (
-                    row for row in context.missing or []
-                    if row.reason == "not_in_reports" and row.key and row.key != "requested_marker"
-                ),
-                None,
-            )
-            if named_gap and not any(getattr(m, "key", None) == named_gap.key for m in context.markers):
-                return render_missing_blood_marker(context)
-            extra = _derived_and_stated(context)
+            extra = _derived_and_stated(context, message)
             if len(context.markers) > 1:
                 lines = []
                 for m in context.markers:
@@ -273,7 +365,7 @@ class DeterministicRenderer:
                 )
             return render_trend_sentence(context, context.comparisons[0])
         if context.intent.value == "blood_marker_explanation" and context.markers:
-            extra = _derived_and_stated(context) + _iron_pattern_note(context)
+            extra = _derived_and_stated(context, message) + _iron_pattern_note(context)
             if len(context.markers) > 1:
                 lines = []
                 for m in context.markers:
@@ -316,7 +408,8 @@ class DeterministicRenderer:
             return render_bio_ai_score_list(context.bio_ai_risks)
         if context.intent.value == "bio_ai_explanation" and context.bio_ai_risks:
             extra = ""
-            if context.comparisons:
+            risk_codes = {str(r.code) for r in context.bio_ai_risks}
+            if context.comparisons and str(context.comparisons[0].topic) in risk_codes:
                 c = context.comparisons[0]
                 extra = (
                     f" Across the previous and latest Bio-AI assessments, the score moved "
@@ -404,14 +497,17 @@ def render_diagnosis_restraint(context: HealthContext) -> str:
     parts = [
         "I can't diagnose a condition from reports or symptoms. Diagnosis is a clinician's decision."
     ]
-    hba1c = next((m for m in context.markers if m.key == "hba1c"), None)
-    if hba1c and hba1c.value is not None:
-        evid = next((e for e in context.evidence if (e.marker or "").lower() in {"hba1c", "hba1c"}), context.evidence[0] if context.evidence else None)
-        caption = user_source_caption("blood_report", evid.report_date if evid else None, latest=True)
-        flag = getattr(hba1c.flag, "value", hba1c.flag) or "unspecified"
-        parts.append(
-            f"Your latest HbA1c is {hba1c.value} {hba1c.unit or ''} ({flag}). {caption}."
-        )
+    for marker in context.markers:
+        if marker.value is None:
+            continue
+        when = marker.measured_at.isoformat()[:10] if hasattr(marker.measured_at, "isoformat") else ""
+        flag = getattr(marker.flag, "value", marker.flag) or "unspecified"
+        line = f"{marker.name} is {marker.value} {marker.unit or ''} ({flag})".replace("  ", " ")
+        if when:
+            line += f" on {when}"
+        if marker.reference_low is not None or marker.reference_high is not None:
+            line += f". Stored reference range: {marker.reference_low}–{marker.reference_high} {marker.unit or ''}".rstrip()
+        parts.append(line + ".")
     diabetes = next((r for r in context.bio_ai_risks if (r.code or "") in {"type_2_diabetes", "diabetes"}), None)
     if diabetes and diabetes.score is not None:
         parts.append(

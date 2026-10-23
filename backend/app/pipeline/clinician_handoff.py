@@ -12,14 +12,20 @@ _ABNORMAL = {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical, "low", "high"
 
 def build_clinician_handoff(context: HealthContext) -> ClinicianHandoff:
     findings: list[str] = []
+    latest_day = _latest_report_day(context)
     for marker in context.markers or []:
         flag = getattr(getattr(marker, "flag", None), "value", getattr(marker, "flag", None))
         if flag not in _ABNORMAL or marker.value is None:
+            continue
+        when_day = _as_day(getattr(marker, "measured_at", None))
+        if latest_day is not None and when_day is not None and when_day != latest_day:
             continue
         unit = f" {marker.unit}" if marker.unit else ""
         findings.append(f"{display_name_for(marker.key)} {marker.value}{unit} ({flag})")
     changes: list[str] = []
     for item in context.baselines or []:
+        if item.previous is None or int(getattr(item, "observations", 0) or 0) < 2:
+            continue
         if item.classification in {
             LongitudinalClass.newly_abnormal,
             LongitudinalClass.persistently_abnormal,
@@ -63,6 +69,25 @@ def build_clinician_handoff(context: HealthContext) -> ClinicianHandoff:
         missing_information=list(dict.fromkeys(missing))[:6],
         questions_for_clinician=questions[:4],
     )
+
+
+def _as_day(value):
+    from datetime import date, datetime
+
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    return None
+
+
+def _latest_report_day(context: HealthContext):
+    days = [
+        _as_day(getattr(marker, "measured_at", None))
+        for marker in list(context.panel_markers or []) + list(context.markers or [])
+    ]
+    days = [day for day in days if day]
+    return max(days) if days else None
 
 
 def format_handoff(handoff: ClinicianHandoff) -> str:

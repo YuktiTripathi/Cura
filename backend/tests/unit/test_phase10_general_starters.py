@@ -49,10 +49,7 @@ def test_open_ended_general_questions():
     ):
         plan = build_query_plan(msg)
         assert plan.knowledge_scope == KnowledgeScope.general, msg
-        if msg == "What is fatty liver?":
-            assert plan.general_personalization and plan.needs_supershyft
-        else:
-            assert not plan.needs_supershyft, msg
+        assert not plan.needs_supershyft, msg
         assert plan.needs_general, msg
 
 
@@ -79,7 +76,7 @@ def test_general_chat_zero_supershyft_one_llm():
         assert body["meta"].get("question_type") == "general_education" or body["meta"]["intent"] == "general_health_question"
         assert body["meta"]["knowledge_scope"] == "general"
         assert body["meta"]["llm_called"] is True
-        assert body["meta"]["supershyft_called"] is True
+        assert body["meta"]["supershyft_called"] is False
         assert body["meta"]["document_retrieval_called"] is False
         assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
         assert calls["llm"] == 1

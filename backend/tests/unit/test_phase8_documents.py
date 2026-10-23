@@ -193,7 +193,8 @@ def test_chat_document_question_retrieves_without_supershyft(client):
             )
     body = res.json()
     assert body["meta"]["status"] == "document_retrieved"
-    assert body["meta"]["llm_mode"] == "none"
+    assert body["meta"]["llm_mode"] == "deterministic"
+    assert body["meta"]["llm_called"] is False
     assert body["evidence"][0]["source"] == "user_uploaded"
     assert "LDL" in body["answer"]
     build.assert_not_called()

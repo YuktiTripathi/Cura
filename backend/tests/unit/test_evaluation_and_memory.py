@@ -47,7 +47,8 @@ def test_routing_general_ldl_adds_optional_personal_context():
     plan = build_query_plan("What is LDL?")
     assert plan.knowledge_scope == KnowledgeScope.general
     assert plan.general_personalization is True
-    assert plan.needs_blood is True
+    assert plan.needs_blood is False
+    assert plan.needs_supershyft is False
 
 
 def test_routing_my_doctor_not_personal():
@@ -298,9 +299,9 @@ def test_interaction_and_feedback_persisted():
 def test_broad_general_concept_may_use_optional_verified_context():
     res = client.post("/api/v1/chat", headers=H, json={"message": "What is cholesterol?"})
     body = res.json()
-    assert body["meta"]["retrieval_status"] in {"success", "no_data"}
-    assert body["meta"]["retrieval_used"] is True
-    assert body["meta"]["supershyft_called"] is True
+    assert body["meta"]["knowledge_scope"] == "general"
+    assert body["meta"]["retrieval_used"] is False
+    assert body["meta"]["supershyft_called"] is False
     assert PERSONAL_DATA_UNAVAILABLE not in body["answer"]
 
 

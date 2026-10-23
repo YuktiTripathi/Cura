@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import contextvars
+
 import hashlib
 import logging
 import uuid
@@ -16,6 +18,15 @@ from app.documents.storage import LocalDocumentStore, get_document_store
 from app.documents.validation import validate_pdf_upload
 
 logger = logging.getLogger("cura.documents")
+_REQUEST_DOCUMENT_LIST: contextvars.ContextVar[tuple | None] = contextvars.ContextVar(
+    "cura_request_document_list",
+    default=None,
+)
+
+
+def reset_request_document_list() -> None:
+    """Drop the request-scoped document listing. Never share it across users or requests."""
+    _REQUEST_DOCUMENT_LIST.set(None)
 
 SOURCE_USER_UPLOADED = "user_uploaded"
 
@@ -187,13 +198,18 @@ class DocumentService:
         )
 
     def list_for_user(self, user_id: str) -> list[DocumentOut]:
+        cached = _REQUEST_DOCUMENT_LIST.get()
+        if cached is not None and cached[0] is self.db and cached[1] == user_id:
+            return list(cached[2])
         rows = (
             self.db.query(Document)
             .filter(Document.user_id == user_id, Document.upload_status != "deleted")
             .order_by(Document.created_at.desc())
             .all()
         )
-        return [to_out(r) for r in rows]
+        listed = [to_out(r) for r in rows]
+        _REQUEST_DOCUMENT_LIST.set((self.db, user_id, listed))
+        return list(listed)
 
     def assert_owned(self, user_id: str, document_ids: list[str]) -> list[Document]:
         docs = []

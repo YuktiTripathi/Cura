@@ -5,32 +5,6 @@ from app.contracts.health_context import HealthContext
 from app.contracts.presentation import PresentedFinding, ResponseMode, StructuredResponse
 from app.pipeline.presentation import flatten_structured_response
 from app.pipeline.safety import explicit_diagnosis_request
-from evaluation.cura_eval.deterministic_checks import check
-
-
-def _case(answer: str) -> dict:
-    return {"context": {"blood_report": {"markers": {}}}, "rubric": {}, "question": "q"}
-
-
-def test_lab_units_are_not_medication_doses():
-    for answer in (
-        "Your Hemoglobin is 11.9 g/dL, which the report marks low.",
-        "Triglycerides are 333 mg/dL and the report flags that high.",
-        "HS-CRP is 4.2 mg/L, above the report range.",
-        "Albumin is 5.22 g/dL.",
-        "Triglycerides are 333.6 mg/dL.",
-    ):
-        assert "MEDICATION_DOSAGE" not in check(_case(answer), answer)
-
-
-def test_medication_instructions_are_doses():
-    for answer in (
-        "Take 500 mg twice daily.",
-        "Start 10 mg once daily.",
-        "Take one 20 mg tablet every morning.",
-        "Increase the dose to 40 mg/day.",
-    ):
-        assert "MEDICATION_DOSAGE" in check(_case(answer), answer)
 
 
 def test_explanation_is_not_a_diagnosis_request():
@@ -190,13 +164,3 @@ def test_lab_question_does_not_get_an_ungrounded_emergency_warning():
     soon = SafetyLayer(Urgent()).check_input("I have had a fever for 4 days.")
     assert soon.caution and "within the next day" in soon.caution
 
-
-def test_judge_failure_and_provider_failure_are_not_quality_scores():
-    from evaluation.cura_eval.scoring import unscored
-    from evaluation.cura_eval.run_evaluation import _provider_kind
-
-    blank = unscored()
-    assert blank["total"] is None
-    assert blank["clinical_correctness"] is None
-    assert _provider_kind("I can't access the general medical knowledge service right now. Please try again shortly.") == "answer_model_unavailable"
-    assert _provider_kind("Your HbA1c is 6.2%.") is None

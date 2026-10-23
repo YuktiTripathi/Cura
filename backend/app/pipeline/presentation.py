@@ -298,8 +298,10 @@ def _has_measured_value(marker) -> bool:
 def _finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     when = marker.measured_at
     value = None if marker.value is None else f"{marker.value}"
+    stored_name = (getattr(marker, "name", None) or "").strip()
+    canonical = canonical_display_label(marker)
     return PresentedFinding(
-        label=canonical_display_label(marker),
+        label=stored_name or canonical,
         value=value,
         unit=format_unit(marker.unit),
         status=_status_for(marker.flag),
@@ -358,7 +360,9 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
     wanted = set(display_entity_codes(plan, context))
     reasoning = set(reasoning_context_codes(plan)) | _PROFILE_CONTEXT
     markers = list(context.markers or [])
-    markers = dedupe_markers(markers)
+    stamps = {(marker.key, str(getattr(marker, "measured_at", "") or "")) for marker in markers if marker.key}
+    if len(stamps) <= len({marker.key for marker in markers if marker.key}):
+        markers = dedupe_markers(markers)
     spec = plan.task_contract or {}
     card_keys = set(spec.get("card_keys") or [])
     if not spec.get("broad_summary") and spec.get("goal") in {"advise", "explain", "interpret", "lookup"}:
@@ -426,6 +430,40 @@ def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:
     return list(dict.fromkeys(rows))[:4]
 
 
+_DIAGNOSIS_OF_SCORE = re.compile(
+    r"establish a diagnosis|is (?:this|that) a diagnosis|does (?:this|that) (?:mean|show) i have|"
+    r"diagnose me|diagnosis hai",
+    re.I,
+)
+_NOT_CONCLUDE = re.compile(r"\bnot conclude\b|\bwhat (?:can|should) i conclude\b", re.I)
+_SCORE_NOT_DIAGNOSIS = (
+    "A Bio-AI score is a risk assessment, not a diagnosis. "
+    "It does not show that you have or do not have this condition."
+)
+_ONE_RESULT_LIMIT = (
+    "One stored result is not a diagnosis and does not show the cause. "
+    "Only the stored value, unit, date, and reference range can be used."
+)
+
+
+def _answer_limits(message: str | None, findings: list) -> list[str]:
+    notes: list[str] = []
+    text = message or ""
+    bio = any(getattr(item, "source_type", None) == "bio_ai_report" for item in findings)
+    if _DIAGNOSIS_OF_SCORE.search(text):
+        if bio:
+            notes.append(_SCORE_NOT_DIAGNOSIS)
+        elif findings:
+            notes.append(
+                "A laboratory result is not a diagnosis. It does not show that you have or do not have a condition."
+            )
+    if _NOT_CONCLUDE.search(text):
+        notes.append(_ONE_RESULT_LIMIT)
+        if findings and all(item.reference_low is None and item.reference_high is None for item in findings):
+            notes.append("No reference range is stored, so this result cannot be called high or low.")
+    return notes
+
+
 def _score_dump(text: str | None) -> bool:
     value = text or ""
     return "Bio-AI assessment shows" in value or "• **" in value
@@ -470,6 +508,9 @@ def build_structured_response(
             llm_overall=usable_llm_overview(llm_overall) or usable_llm_overview(answer),
             llm_themes=llm_themes,
         )
+        panel = list(getattr(context, "panel_markers", None) or [])
+        if panel:
+            raw = [_finding_from_marker(marker, latest=True) for marker in dedupe_markers(panel)]
         labeled = {
             canonical_marker_key(marker): _finding_from_marker(marker)
             for marker in dedupe_markers(list(context.markers or []))
@@ -484,6 +525,15 @@ def build_structured_response(
                 for marker in _visible_markers(plan, context)
                 if _has_measured_value(marker)
             ]
+            for risk in context.bio_ai_risks or []:
+                if getattr(risk, "score", None) is None:
+                    continue
+                card_findings.append(PresentedFinding(
+                    label=getattr(risk, "name", None) or risk.code,
+                    value=f"{risk.score:g}",
+                    status=str(getattr(risk, "status", None) or ""),
+                    source_type="bio_ai_report",
+                ))
         return StructuredResponse(
             mode=ResponseMode.health_overview,
             headline=None,
@@ -542,10 +592,14 @@ def build_structured_response(
             IntentType.bio_ai_score,
             IntentType.bio_ai_explanation,
             IntentType.bio_ai_comparison,
+            IntentType.health_scenario,
+            IntentType.broad_health_summary,
+            IntentType.report_explanation,
         } and context.intent not in {
             IntentType.bio_ai_score,
             IntentType.bio_ai_explanation,
             IntentType.bio_ai_comparison,
+            IntentType.health_scenario,
         }:
             break
         if mode == ResponseMode.domain_summary and allowed_bioai and (risk.code or "").lower() not in allowed_bioai:
@@ -583,9 +637,11 @@ def build_structured_response(
     others = [item for item in findings if item.source_type != "bio_ai_report"]
     if risks:
         findings = sorted(risks, key=lambda item: _attention(item.status)) + others
+    explicit_dates = re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")
     if (
         mode == ResponseMode.single_value
         and len(findings) > 1
+        and not explicit_dates
         and not (plan.domains or [])
         and context.intent != IntentType.bio_ai_score
     ):
@@ -619,7 +675,43 @@ def build_structured_response(
     goal = (plan.task_contract or {}).get("goal") or ""
     keep_explanation = goal not in {"", "lookup"}
     if mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary} and findings:
-        if mode == ResponseMode.single_value and findings and keep_explanation:
+        if explicit_dates and findings:
+            parts = []
+            for item in findings:
+                unit = f" {item.unit}" if item.unit else ""
+                when = f" on {item.source_date}" if item.source_date else ""
+                status = f" ({item.status})" if item.status in {"high", "low", "critical", "normal"} else ""
+                parts.append(f"{item.label} {item.value}{unit}{status}{when}".strip())
+            summary = "Stored results for the requested dates: " + "; ".join(parts)
+            q_bits = []
+            lowered = (message or "").lower()
+            for q in context.questionnaire or []:
+                question = (q.question or "").strip().lower()
+                key_phrase = (q.question_key or "").replace("_", " ")
+                if q.value in (None, ""):
+                    continue
+                if not ((question and question[:48] in lowered) or (key_phrase and key_phrase in lowered)):
+                    continue
+                recorded = getattr(q, "recorded_at", None)
+                dated = "" if recorded else " Completion date is not stored."
+                q_bits.append(f"Questionnaire answer: {q.value}.{dated}")
+            if q_bits:
+                summary += " " + " ".join(q_bits[:2])
+                summary += " The questionnaire answer is separate from the laboratory result."
+            if re.search(r"reference range|not conclude", message or "", re.I) and all(
+                item.reference_low is None and item.reference_high is None for item in findings
+            ):
+                summary += " No reference range is stored for that result."
+            interpretation = None
+        elif re.search(r"reference range", message or "", re.I) and findings and all(
+            item.reference_low is None and item.reference_high is None for item in findings
+        ):
+            item = findings[0]
+            when = f" on {item.source_date}" if item.source_date else ""
+            unit = f" {item.unit}" if item.unit else ""
+            summary = f"{item.label} {item.value}{unit}{when}. No reference range is stored for that result."
+            interpretation = None
+        elif mode == ResponseMode.single_value and findings and keep_explanation:
             summary = sanitize_internal_ids(answer or "") or None
             interpretation = None
         elif mode == ResponseMode.single_value and findings:
@@ -662,6 +754,7 @@ def build_structured_response(
     }:
         # A missing thyroid blood test is not a missing Bio-AI thyroid assessment.
         uncertainties = []
+    uncertainties.extend(_answer_limits(message, findings))
     next_steps: list[str] = []
     return StructuredResponse(
         mode=mode,
@@ -785,6 +878,16 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
             presentation.themes,
             presentation.next_steps[0] if presentation.next_steps else None,
         )
+        missing_facts = []
+        for item in presentation.findings or []:
+            if item.value is None:
+                continue
+            token = str(item.value)
+            if token not in text:
+                unit = f" {item.unit}" if item.unit else ""
+                missing_facts.append(f"{item.label} {token}{unit}".strip())
+        if missing_facts:
+            text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
         return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()
     if not presentation.findings:
         text = (raw_answer or presentation.summary or presentation.interpretation or "").strip()
@@ -833,12 +936,24 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
     if presentation.uncertainties:
         note = " ".join(presentation.uncertainties)
         blob = " ".join(parts).lower()
+        if note.lower() not in blob:
+            parts.append(note)
     if presentation.next_steps and not _repeats(" ".join(presentation.next_steps), parts):
         parts.append(" ".join(presentation.next_steps))
     captions = list(dict.fromkeys(item.source_label for item in presentation.findings if item.source_label))
     if captions and presentation.mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary}:
         parts.append(captions[0])
     text = "\n\n".join(part for part in parts if part and part.strip())
+    missing_facts = []
+    for item in presentation.findings or []:
+        if item.value is None:
+            continue
+        token = str(item.value)
+        if token not in text:
+            unit = f" {item.unit}" if item.unit else ""
+            missing_facts.append(f"{item.label} {token}{unit}".strip())
+    if missing_facts:
+        text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
     return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()
 
 

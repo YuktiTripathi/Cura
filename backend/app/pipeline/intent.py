@@ -29,12 +29,18 @@ MARKER_ALIASES = {
     "bilirubin": "bilirubin",
     "creatinine": "creatinine",
     "tsh": "tsh",
+    "anti-tpo": "anti_tpo",
+    "anti tpo": "anti_tpo",
+    "tpo antibodies": "anti_tpo",
     "ferritin": "ferritin",
     "crp": "crp",
     "alt": "alt",
     "ast": "ast",
     "hemoglobin": "hemoglobin",
     "cholesterol": "cholesterol",
+    "colesterol": "cholesterol",
+    "triglicerides": "triglycerides",
+    "creatnine": "creatinine",
     "systolic": "systolic",
     "diastolic": "diastolic",
     "urea": "urea",
@@ -101,6 +107,7 @@ NAMES = {
     "t3": "T3",
     "t4": "T4",
     "tsh": "TSH",
+    "anti_tpo": "Anti-TPO",
     "creatinine": "Creatinine",
     "egfr": "eGFR",
     "alt": "ALT",
@@ -314,6 +321,13 @@ def requires_personal_record(
     text = normalize_for_intent(message).lower().strip()
     if _NUMERIC_OWN_VALUE.search(text) or _PERSONAL_RECORD.search(text) or _YOUR_PERSONAL.search(text):
         return True
+    # A date plus a stored result is this user's record even when the sentence omits "my".
+    if re.search(r"\b20\d{2}-\d{2}-\d{2}\b", text) and re.search(
+        r"\b(stored|blood report|result|bio-?\s*ai|score)\b", text
+    ):
+        return True
+    if re.search(r"\b(are stored|is stored|what is stored)\b", text):
+        return True
     if _SCENARIO.search(text) and not _HYPOTHETICAL.search(text):
         return True
     if _VIEW_ALL_RESULTS.search(text) and not _HYPOTHETICAL.search(text):
@@ -514,9 +528,11 @@ def classify_intent(
         if _contains(text, "compare"):
             code = bio or "cardiac_health"
             return IntentType.bio_ai_comparison, code, _name(code), depth
-        if bio and _contains(text, "why", "increased", "high", "explain"):
+        if bio and _contains(text, "why", "increased", "high", "explain", "mean", "means", "contributing", "relate"):
             return IntentType.bio_ai_explanation, bio, _name(bio), depth
         if _BIO_REPORT.search(text) and not bio:
+            if _contains(text, "explain", "what does", "mean", "interpret", "understand"):
+                return IntentType.bio_ai_explanation, None, "Bio-AI", AnswerDepth.focused
             return IntentType.bio_ai_score, None, "Bio-AI", depth
     if _contains(text, "why") and bio and personal_turn:
         return IntentType.bio_ai_explanation, bio, _name(bio), depth
@@ -567,12 +583,19 @@ def classify_intent(
         if _PREVIOUS.search(text):
             return IntentType.previous_result, follow_up_topic, _name(follow_up_topic), depth
         if follow_up_topic in BIO_KEYS:
+            if _contains(text, "why", "mean", "means", "improve", "contributing", "relate", "focus", "high"):
+                return IntentType.bio_ai_explanation, follow_up_topic, _name(follow_up_topic), AnswerDepth.focused
             return IntentType.bio_ai_score, follow_up_topic, _name(follow_up_topic), depth
         return IntentType.follow_up, follow_up_topic, _name(follow_up_topic), depth
 
     if personal_turn and _BIO_CUE.search(text) and not marker:
         code = bio or _named_score_code(text)
         return IntentType.bio_ai_score, code, _name(code) if code else "requested score", AnswerDepth.simple
+    named_own = re.search(r"\bwhat(?:'s| is| was) my ([a-z0-9][a-z0-9 \-]{1,40})", text)
+    if personal_turn and named_own and not marker:
+        label = named_own.group(1).strip(" ?.!")
+        key = re.sub(r"[^a-z0-9]+", "_", label.lower()).strip("_")
+        return IntentType.latest_result, key or None, label or "requested result", AnswerDepth.simple
     if personal_turn:
         return IntentType.broad_health_summary, None, None, AnswerDepth.broad
     return IntentType.general_health_question, topic, name, depth

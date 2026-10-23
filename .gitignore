@@ -30,6 +30,11 @@ frontend/.env
 credentials.json
 backend/tests/fixtures/eval_runs/
 evaluation/cura_golden_dataset/.local/
+evaluation/cura_companion_250/.local/
+evaluation/cura_eval_v2/.local/
 evaluation/cura_eval/results/single_user_deep20_*/
+evaluation/cura_patient_250/golden_questions.jsonl
+evaluation/cura_patient_250/private/
 backend/.prompt_debug/
 .prompt_debug/
+backend/data/nutrition/

@@ -101,7 +101,8 @@ def test_chat_structured_lookup_uses_page_provenance(storage_dir):
     evidence = chat.get("evidence") or []
     assert any(item.get("page_start") for item in evidence)
     assert "chunk" not in answer
-    assert chat["meta"]["llm_mode"] == "none"
+    assert chat["meta"]["llm_mode"] == "deterministic"
+    assert chat["meta"]["llm_called"] is False
 
 
 def test_chat_narrative_uses_section_not_chunk_id(storage_dir):

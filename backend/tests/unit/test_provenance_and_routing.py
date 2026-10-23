@@ -38,14 +38,14 @@ def test_latest_hba1c_uses_blood_report_source():
 def test_hypertension_general_uses_retrieved_who():
     plan = build_query_plan("What is hypertension?")
     assert plan.intent == IntentType.general_health_question
-    assert plan.general_personalization
-    assert plan.needs_supershyft
+    assert plan.knowledge_scope == KnowledgeScope.general
+    assert not plan.needs_supershyft
     assert plan.medical_evidence_required
     docs = retrieve_medical_evidence("What is hypertension?", plan.topic, limit=1)
     assert docs
     assert docs[0].name == "WHO"
     body = client.post("/api/v1/chat", headers=H, json={"message": "What is hypertension?"}).json()
-    assert body["meta"]["supershyft_called"] is True
+    assert body["meta"]["supershyft_called"] is False
     names = [s["name"] for s in body["provenance"]["sources"]]
     assert names
     assert "WHO" in names or "CDC" in names or "NICE" in names

@@ -122,16 +122,19 @@ def test_chest_pain_does_not_consult_reports():
     assert "10.5" not in body["answer"]
 
 
-def test_structured_lookup_skips_llm(monkeypatch):
+def test_structured_lookup_uses_the_model_when_approved(monkeypatch):
     monkeypatch.setattr(settings, "enable_llm", True)
+    from app.llm.models import LLMStructuredOutput
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
 
     calls = []
-    monkeypatch.setattr(
-        OpenAICompatibleLLMClient,
-        "complete",
-        lambda self, messages, json_mode=False: calls.append("hit") or '{"answer":"nope"}',
-    )
+
+    def complete_structured(self, messages):
+        calls.append("hit")
+        return LLMStructuredOutput(answer="Your hemoglobin is 10.5 g/dL on the stored report.")
+
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", complete_structured)
     body = client.post("/api/v1/chat", headers=IRON, json={"message": "What is my hemoglobin level?"}).json()
-    assert calls == []
+    assert calls == ["hit"]
+    assert body["meta"]["llm_called"] is True
     assert "10.5" in body["answer"]

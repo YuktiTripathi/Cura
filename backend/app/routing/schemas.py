@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Literal
+from typing import Annotated, Any, Literal
 
 from pydantic import BaseModel, Field
 
@@ -158,3 +158,4 @@ class JevTrace(BaseModel):
     validated: bool = False
     validation_error: str | None = None
     overridden: bool = False
+    semantic_plan: Any | None = Field(default=None, exclude=True)

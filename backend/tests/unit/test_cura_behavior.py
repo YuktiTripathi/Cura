@@ -299,6 +299,7 @@ def test_llm_timeout_is_not_retried_with_another_format(monkeypatch):
     openrouter_breaker.reset()
     monkeypatch.setattr(oc, "get_http_client", lambda: Timeouting())
     monkeypatch.setattr(settings, "llm_max_retries", 1)
+    monkeypatch.setattr(settings, "llm_allowed_models", f"{settings.llm_allowed_models},m")
     llm = oc.OpenAICompatibleLLMClient(api_key="k", base_url="https://example.invalid/api/v1", model="m", timeout=5)
     real_complete = getattr(oc.OpenAICompatibleLLMClient, "_real_complete", oc.OpenAICompatibleLLMClient.complete)
     with pytest.raises(LLMUnavailableError):

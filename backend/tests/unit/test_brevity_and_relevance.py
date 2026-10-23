@@ -90,12 +90,24 @@ def test_no_visible_em_dash_in_any_mode(model, monkeypatch, mode):
 # ------------------------------------------------------------ prompts ask for brevity
 
 
+def test_length_notes_match_question_complexity():
+    from app.pipeline.prompt_modules import length_note
+
+    simple = length_note("What is cholesterol?", [])
+    marker = length_note("Why is my HbA1c high?", ["BIOMARKER_LOOKUP"])
+    report = length_note("Explain my blood report", ["REPORT_INTERPRETATION"])
+    assert "30 to 60" in simple
+    assert "30 to 60" in marker
+    assert "100 to 150" in report
+    assert "do not pad" in simple.lower() or "Do not pad" in simple
+
+
 def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
     for mode in ("rich", "plain", "semantic"):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
         system = _system_for_mode(SAFETY_INSTRUCTIONS)
         assert "shortest response that fully answers" in system
-        assert "80 to 120 words" in system
+        assert "120 words" in system
         assert "em dash" in system and EM not in system
         assert "at most one short safety qualifier" in system.lower()
     assert "familiar words" in GENERAL_HEALTH_INSTRUCTIONS and "2 to 4 Markdown bullets" in GENERAL_HEALTH_INSTRUCTIONS

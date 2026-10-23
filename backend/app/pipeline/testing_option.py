@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import re
-from datetime import date, datetime
 
 from app.contracts.common import MarkerFlag
 from app.contracts.conversation_state import ConversationState
@@ -30,6 +29,7 @@ from app.pipeline.health_gaps import HealthGapDetector
 from app.pipeline.lab_parameters import FAMILY_MEMBERS, display_name_for, match_lab_keys, primary_lab_key
 from app.pipeline.package_matcher import PackageMatcher
 from app.pipeline.package_policy import PackageRecommendationPolicy
+from app.pipeline.personal_selection import coerce_marker_date, latest_context_markers, marker_flag
 from app.pipeline.test_need import TestNeedGenerator
 
 logger = logging.getLogger("cura.diagnostics")
@@ -98,51 +98,11 @@ def wants_another_test(message: str) -> bool:
     return bool(_ANOTHER_TEST.search(message or ""))
 
 
-def _as_date(value) -> date | None:
-    if value is None:
-        return None
-    if isinstance(value, datetime):
-        return value.date()
-    if isinstance(value, date):
-        return value
-    try:
-        return date.fromisoformat(str(value)[:10])
-    except ValueError:
-        return None
-
-
 def _human_date(value) -> str | None:
-    measured = _as_date(value)
+    measured = coerce_marker_date(value)
     if not measured:
         return None
     return f"{measured.day} {_MONTH[measured.month]} {measured.year}"
-
-
-def _flag(marker) -> MarkerFlag:
-    raw = getattr(marker, "status", None) or getattr(marker, "flag", None)
-    if isinstance(raw, MarkerFlag):
-        return raw
-    try:
-        return MarkerFlag(str(raw))
-    except ValueError:
-        return MarkerFlag.unknown
-
-
-def _latest_markers(context: HealthContext) -> dict[str, object]:
-    latest: dict[str, object] = {}
-    for marker in context.markers or []:
-        key = getattr(marker, "key", None)
-        if not key:
-            continue
-        current = latest.get(key)
-        if current is None:
-            latest[key] = marker
-            continue
-        left = _as_date(getattr(marker, "measured_at", None))
-        right = _as_date(getattr(current, "measured_at", None))
-        if left and (right is None or left >= right):
-            latest[key] = marker
-    return latest
 
 
 def _label(item: PackageCandidate, key: str) -> str:
@@ -168,7 +128,7 @@ def _personalized_reason(
     explicit: bool,
     requested: list[str],
 ) -> str:
-    latest = _latest_markers(context)
+    latest = latest_context_markers(context)
     if explicit and not gaps:
         names = [_label(candidate, key) for key in requested[:4] if key in candidate.item.included_tests]
         named = _join_names(names) or candidate.item.display_name
@@ -204,7 +164,7 @@ def _personalized_reason(
     for gap in gaps:
         for key in gap.supporting_entities:
             marker = latest.get(key)
-            if marker is not None and _flag(marker) in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical}:
+            if marker is not None and marker_flag(marker) in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical}:
                 name = display_name_for(key)
                 if name not in abnormal:
                     abnormal.append(name)
@@ -252,7 +212,7 @@ def _comparison(
     requested: list[str],
     relevance: PackageRelevance,
 ) -> PackageComparison:
-    latest = _latest_markers(context)
+    latest = latest_context_markers(context)
     wanted = set(requested) | set(candidate.coverage.matched_entities)
     included_keys = [key for key in candidate.item.included_tests if key in wanted]
     if len(included_keys) < 2:
@@ -266,7 +226,7 @@ def _comparison(
         has = (
             marker is not None
             and getattr(marker, "value", None) is not None
-            and _flag(marker) != MarkerFlag.missing
+            and marker_flag(marker) != MarkerFlag.missing
         )
         if has:
             already.append(

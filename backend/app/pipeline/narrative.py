@@ -266,6 +266,25 @@ def build_narrative_summary(
     groups = _group_markers(markers)
     groups = _merge_related_groups(groups)
     themes = _themes_from_groups(groups, context, present, message or (plan.raw_message if plan else "") or "")
+    if not any(item.status == ThemeStatus.reassuring for item in themes) and context.panel_markers:
+        from app.pipeline.health_patterns import find_patterns
+
+        _patterns, reassuring = find_patterns(context.panel_markers, context.bio_ai_risks or [])
+        labels = [row["system"] for row in reassuring if row.get("in_range")][:4]
+        if labels:
+            interpretation = (
+                f"{labels[0]} currently looks reassuring on the available measurements."
+                if len(labels) == 1
+                else ", ".join(labels[:-1]) + f", and {labels[-1]} currently look reassuring on the available measurements."
+            )
+            themes.append(
+                HealthTheme(
+                    title="Areas that look reassuring",
+                    priority=ThemePriority.low,
+                    status=ThemeStatus.reassuring,
+                    interpretation=interpretation,
+                )
+            )
     if llm_themes:
         themes = _overlay_llm_wording(themes, llm_themes, markers, raw)
     extra_missing = _question_missing(message or (plan.raw_message if plan else "") or "", context, present)
@@ -553,11 +572,14 @@ _PATTERN_TEXT = {
 
 
 def _interpret(code: str, findings: list[PresentedFinding], persistent: int, bio_support: int) -> str:
-    del findings, bio_support
+    del bio_support
     lead = _PATTERN_TEXT.get(
         code,
         f"Some {_title(code).lower()} results are outside the expected range.",
     )
+    if findings and findings[0].value:
+        unit = f" {findings[0].unit}" if findings[0].unit else ""
+        lead += f" {findings[0].label} is {findings[0].value}{unit}."
     if persistent:
         lead += " A similar pattern shows up in an earlier report."
     return lead
@@ -581,13 +603,13 @@ def _overall_summary(themes: list[HealthTheme]) -> str:
         names = ", ".join(item.title for item in attention[:3])
         return (
             f"Most areas look reassuring. The patterns that stand out are {names}. "
-            "This is a reading of your records, not a diagnosis."
+            "This is a reading of your health records, not a diagnosis."
         )
     if attention:
         names = ", ".join(item.title for item in attention[:3])
         return (
             f"The patterns that stand out are {names}. "
-            "This is a reading of your records, not a diagnosis."
+            "This is a reading of your health records, not a diagnosis."
         )
     if reassuring:
         return "Most of the available measurements look reassuring."

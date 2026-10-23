@@ -99,6 +99,18 @@ def _completed(row: dict) -> bool:
     return str(status or "").strip().lower() in {"completed", "complete"}
 
 
+def _stored_answer(row: dict) -> bool:
+    answer = row.get("answer")
+    if answer is None or answer == "" or answer == {} or answer == []:
+        return False
+    return True
+
+
+def _usable_response(row: dict) -> bool:
+    """A stored answer with no completion date is still that user's answer."""
+    return _completed(row) or (row.get("completed_at") is None and _stored_answer(row))
+
+
 def fetch_questionnaire_instances(
     principal: AuthenticatedPrincipal,
     plan: QueryPlan,
@@ -106,7 +118,7 @@ def fetch_questionnaire_instances(
     uid = _user_id(principal)
     rows = run_readonly(_RESPONSE_SELECT, {"uid": uid}) or []
     owned = [row for row in rows if int(row.get("user_id") or 0) == uid]
-    completed = [row for row in owned if _completed(row)]
+    completed = [row for row in owned if _usable_response(row)]
     if not completed:
         return []
 
@@ -120,11 +132,15 @@ def fetch_questionnaire_instances(
             iid,
         ),
     )
-    if not (plan.history or plan.compare or plan.time_operation in {"trend", "previous", "compare"}):
-        ordered_ids = ordered_ids[-1:]
-
     wanted = keys_for_plan(plan.topic, plan.requested_metrics, plan.raw_message or "")
     wanted_set = set(wanted)
+    if not (plan.history or plan.compare or plan.time_operation in {"trend", "previous", "compare"}):
+        matching = [
+            iid
+            for iid in ordered_ids
+            if any(row.get("question_key") in wanted_set for row in by_instance[iid])
+        ]
+        ordered_ids = (matching[-1:] if matching else ordered_ids[-1:])
 
     instances: list[QuestionnaireInstance] = []
     for instance_id in ordered_ids:
@@ -148,7 +164,7 @@ def fetch_questionnaire_instances(
                     unit=unit,
                     response_type=row["question_type"],
                     category_keys=[str(item) for item in categories],
-                    recorded_at=_as_recorded(row.get("completed_at") or row.get("assigned_at")),
+                    recorded_at=_as_recorded(row.get("completed_at")),
                     subject_id=str(uid),
                     is_carried_forward=bool(row.get("is_carried_forward")),
                 )

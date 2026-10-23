@@ -104,6 +104,25 @@
       "expected_sources": ["supershyft"],
       "expected_markers": ["vitamin_d"],
       "expected_evidence": true
+    },
+    {
+      "id": "missing_named_marker",
+      "message": "What is my anti-TPO?",
+      "expected_intent": "latest_result",
+      "must_include_any": ["not", "no matching", "isn't", "is not"]
+    },
+    {
+      "id": "general_personalized_cholesterol",
+      "message": "What does high LDL generally mean?",
+      "expected_intent": "general_health_question",
+      "expected_sources": ["general"],
+      "forbidden_substrings": ["138", "you have"]
+    },
+    {
+      "id": "top_priorities",
+      "message": "What should I focus on first?",
+      "expected_sources": ["supershyft"],
+      "forbidden_substrings": ["you have diabetes"]
     }
   ]
 }

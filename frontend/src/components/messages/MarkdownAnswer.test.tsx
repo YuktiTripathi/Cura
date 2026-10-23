@@ -32,6 +32,13 @@ describe("MarkdownAnswer", () => {
     expect(container.textContent).toContain("<img");
   });
 
+  it("keeps a closing question outside the bullet list", () => {
+    const md = "- Iron is low.\n\nWould you like a summary of the lipid results?";
+    const blocks = parseMarkdown(md);
+    expect(blocks.map((block) => block.kind)).toEqual(["ul", "p"]);
+    expect(blocks[1]).toMatchObject({ kind: "p" });
+  });
+
   it("splits bullets that were written on the same line", () => {
     const { container } = render(
       <MarkdownAnswer content={"These conditions include: * A large waistline. * High blood pressure."} />,

@@ -21,11 +21,12 @@ logger = logging.getLogger("cura.pipeline")
 _UPLOAD = re.compile(r"\b(upload(?:ed)?|pdf|this (?:whole |entire )?document|the document)\b", re.I)
 # "the report" means an uploaded file only when one exists; otherwise it is the member's
 # SuperShyft report and must not switch SuperShyft off.
-_REPORT_REF = re.compile(r"\b(this (?:whole |entire )?report|the report)\b", re.I)
+_REPORT_REF = re.compile(r"\b(this (?:whole |entire )?report|the report|that report)\b", re.I)
 _SS = re.compile(r"\bsupershyft\b", re.I)
 _COMPARE = re.compile(
     r"\b(compare|comparison|difference|differ(?:ent)?|between (?:these|the|my)|"
-    r"changed between|two reports|which (?:one|report) is newer|has my .{0,40} changed)\b",
+    r"changed between|two reports|which (?:one|report) is newer|has my .{0,40} changed|"
+    r"improved|improvement|worsened|since last|since my last)\b",
     re.I,
 )
 _WHAT_ABOUT = re.compile(r"^\s*what about\b", re.I)
@@ -130,6 +131,14 @@ def apply_source_routing(
             plan.needs_blood = False
             plan.source = QuerySource.user_uploaded
 
+    if upload_cue and ss_cue:
+        needs_cross = True
+        needs_user_uploaded = True
+        needs_supershyft = True
+        needs_general = False
+        plan.needs_blood = True
+        plan.knowledge_scope = KnowledgeScope.personal
+        plan.source = QuerySource.mixed
     if ss_cue and not upload_cue and not compare_cue:
         needs_supershyft = True
         needs_user_uploaded = False

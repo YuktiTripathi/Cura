@@ -405,6 +405,10 @@ def build_task_plan(
         if mapped and mapped.code not in extra_domains:
             extra_domains.append(mapped.code)
     expansion = HealthDomainResolver().expand(message, extra_domain_codes=extra_domains)
+    # "Why is it high?" means the one marker already in the conversation, not its whole domain.
+    singular_referent = continuing and bool(plan.topic) and bool(
+        re.search(r"\b(it|that|this)\b", message or "", re.I)
+    ) and not bool(re.search(r"\b(they|them|those|these|and my)\b", message or "", re.I))
     selectors = infer_selectors(message)
     existing = list(plan.requested_metrics or [])
     seen = {item.code for item in entities}
@@ -412,17 +416,20 @@ def build_task_plan(
         if code not in seen:
             entities.append(TaskEntity(code=code, source="blood", kind=EntityKind.health_domain))
             seen.add(code)
-    for code in expansion.primary:
+    primary_codes = [] if singular_referent else expansion.primary
+    supporting_codes = [] if singular_referent else expansion.supporting
+    optional_codes = [] if singular_referent else expansion.all_optional()
+    for code in primary_codes:
         if code in FAMILY_QUERY_KEYS or code in seen:
             continue
         seen.add(code)
         entities.append(TaskEntity(code=code, source="blood", kind=EntityKind.biomarker))
-    for code in expansion.supporting:
+    for code in supporting_codes:
         if code in seen:
             continue
         seen.add(code)
         entities.append(TaskEntity(code=code, source="blood", kind=EntityKind.biomarker, optional=True))
-    for code in expansion.all_optional():
+    for code in optional_codes:
         if code in seen:
             continue
         seen.add(code)
@@ -559,6 +566,16 @@ def attach_task_plan(plan: QueryPlan, message: str, *, decision: JevDecision | N
         if is_lab_key(key) or key in FAMILY_QUERY_KEYS or key in DERIVED_ENTITY_KEYS or key in risk_codes
     ]
     plan.requested_metrics = codes
+    singular_follow_up = (plan.conversation_turn or "") in {
+        "FOLLOW_UP_QUESTION",
+        "REFERENCE_RESOLUTION",
+    } and bool(plan.topic) and bool(re.search(r"\b(it|that|this)\b", message or "", re.I)) and not bool(
+        re.search(r"\b(they|them|those|these)\b", message or "", re.I)
+    )
+    if singular_follow_up and is_lab_key(plan.topic):
+        plan.requested_metrics = [plan.topic]
+        plan.display_entities = [plan.topic]
+        plan.domains = []
     plan.domains = list(task.domains)
     plan.selectors = [item.value for item in task.selectors]
     plan.optional_entities = [item.code for item in task.entities if item.optional]
@@ -624,14 +641,21 @@ def attach_task_plan(plan: QueryPlan, message: str, *, decision: JevDecision | N
         if plan.intent == IntentType.general_health_question:
             plan.intent = IntentType.questionnaire_lookup
     personal = plan.knowledge_scope == KnowledgeScope.personal or plan.needs_personal_data
-    if personal and re.search(r"\bquestionnaire\b", message or "", re.I):
+    # An explicitly attached upload already won source selection. Do not put the
+    # same biomarker question back onto SuperShyft blood records.
+    explicit_upload = bool(plan.needs_user_uploaded and not plan.needs_cross_source)
+    if personal and re.search(r"\bquestionnaire\b", message or "", re.I) and not explicit_upload:
         plan.needs_questionnaire = True
         plan.needs_supershyft = True
-    if personal:
+    if personal and not explicit_upload:
         if "blood" in task.sources:
             plan.needs_blood = True
             plan.needs_supershyft = True
-        elif "lifestyle_recovery" in task.domains and "blood" not in task.sources:
+        elif (
+            "lifestyle_recovery" in task.domains
+            and "blood" not in task.sources
+            and not match_lab_keys(message or "")
+        ):
             plan.needs_blood = False
             plan.needs_bio_ai = False
             plan.needs_questionnaire = True

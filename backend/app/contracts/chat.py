@@ -85,6 +85,7 @@ class ChatMeta(BaseModel):
     requires_document_search: bool | None = None
     conversation_context_used: bool | None = None
     fallback_used: bool | None = None
+    fallback_reason: str | None = None
     retrieval_status: str | None = None
     retrieval_used: bool | None = None
     retrieval_sources: list[str] = Field(default_factory=list)
@@ -102,7 +103,6 @@ class ChatMeta(BaseModel):
     question_type: str | None = None
     operations: list[str] = Field(default_factory=list)
     requested_entities: list[str] = Field(default_factory=list)
-    response_mode: str | None = None
     conversation_goal: str | None = None
     response_depth: str | None = None
     next_conversation_action: str | None = None

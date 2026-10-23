@@ -1339,6 +1339,18 @@
           "meta": {
             "$ref": "#/components/schemas/ChatMeta"
           },
+          "nutrition": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nutrition"
+          },
           "presentation": {
             "anyOf": [
               {
@@ -3096,6 +3108,63 @@
         "title": "LifestyleSummary",
         "type": "object"
       },
+      "LogRequest": {
+        "properties": {
+          "acknowledge_allergy": {
+            "default": false,
+            "title": "Acknowledge Allergy",
+            "type": "boolean"
+          },
+          "description": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Description"
+          },
+          "eaten_on": {
+            "anyOf": [
+              {
+                "format": "date",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Eaten On"
+          },
+          "food_id": {
+            "title": "Food Id",
+            "type": "string"
+          },
+          "occasion": {
+            "title": "Occasion",
+            "type": "string"
+          },
+          "quantity": {
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity",
+            "type": "number"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "food_id",
+          "quantity",
+          "unit",
+          "occasion"
+        ],
+        "title": "LogRequest",
+        "type": "object"
+      },
       "LongitudinalClass": {
         "enum": [
           "NEWLY_ABNORMAL",
@@ -4194,6 +4263,30 @@
           "label"
         ],
         "title": "PresentedFinding",
+        "type": "object"
+      },
+      "PreviewRequest": {
+        "properties": {
+          "food_id": {
+            "title": "Food Id",
+            "type": "string"
+          },
+          "quantity": {
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity",
+            "type": "number"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "food_id",
+          "quantity",
+          "unit"
+        ],
+        "title": "PreviewRequest",
         "type": "object"
       },
       "ProvenanceSource": {
@@ -5342,6 +5435,161 @@
         "title": "SummaryStyle",
         "type": "string"
       },
+      "TargetRequest": {
+        "properties": {
+          "activity": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Activity"
+          },
+          "age_years": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Age Years"
+          },
+          "allergies": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Allergies",
+            "type": "array"
+          },
+          "custom_calories": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Custom Calories"
+          },
+          "eating_disorder": {
+            "default": false,
+            "title": "Eating Disorder",
+            "type": "boolean"
+          },
+          "goal_code": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Goal Code"
+          },
+          "height_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Height Cm"
+          },
+          "medical_complex": {
+            "default": false,
+            "title": "Medical Complex",
+            "type": "boolean"
+          },
+          "pregnant": {
+            "default": false,
+            "title": "Pregnant",
+            "type": "boolean"
+          },
+          "sex": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sex"
+          },
+          "weight_kg": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weight Kg"
+          }
+        },
+        "title": "TargetRequest",
+        "type": "object"
+      },
+      "TemplateItem": {
+        "properties": {
+          "food_id": {
+            "title": "Food Id",
+            "type": "string"
+          },
+          "quantity": {
+            "exclusiveMinimum": 0.0,
+            "title": "Quantity",
+            "type": "number"
+          },
+          "unit": {
+            "title": "Unit",
+            "type": "string"
+          }
+        },
+        "required": [
+          "food_id",
+          "quantity",
+          "unit"
+        ],
+        "title": "TemplateItem",
+        "type": "object"
+      },
+      "TemplateRequest": {
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/TemplateItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "occasion": {
+            "title": "Occasion",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "occasion",
+          "items"
+        ],
+        "title": "TemplateRequest",
+        "type": "object"
+      },
       "TestingOption": {
         "description": "Patient-facing package recommendation. Metadata is catalog-authored.",
         "properties": {
@@ -5729,6 +5977,46 @@
           }
         },
         "title": "TurnExperience",
+        "type": "object"
+      },
+      "UpdateRequest": {
+        "properties": {
+          "occasion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Occasion"
+          },
+          "quantity": {
+            "anyOf": [
+              {
+                "exclusiveMinimum": 0.0,
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Quantity"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          }
+        },
+        "title": "UpdateRequest",
         "type": "object"
       },
       "UserProvenance": {
@@ -6663,6 +6951,658 @@
           }
         },
         "summary": "Health Overview"
+      }
+    },
+    "/api/v1/nutrition/days/{eaten_on}": {
+      "get": {
+        "operationId": "get_day_api_v1_nutrition_days__eaten_on__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "eaten_on",
+            "required": true,
+            "schema": {
+              "format": "date",
+              "title": "Eaten On",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Day Api V1 Nutrition Days  Eaten On  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Day",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/entries": {
+      "post": {
+        "operationId": "log_entry_api_v1_nutrition_entries_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Log Entry Api V1 Nutrition Entries Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Log Entry",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/entries/{entry_id}": {
+      "delete": {
+        "operationId": "delete_entry_api_v1_nutrition_entries__entry_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Delete Entry Api V1 Nutrition Entries  Entry Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Entry",
+        "tags": [
+          "nutrition"
+        ]
+      },
+      "patch": {
+        "operationId": "update_entry_api_v1_nutrition_entries__entry_id__patch",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Update Entry Api V1 Nutrition Entries  Entry Id  Patch",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Update Entry",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/entries/{entry_id}/confirm": {
+      "post": {
+        "operationId": "confirm_entry_api_v1_nutrition_entries__entry_id__confirm_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "entry_id",
+            "required": true,
+            "schema": {
+              "title": "Entry Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Confirm Entry Api V1 Nutrition Entries  Entry Id  Confirm Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Confirm Entry",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/foods/{food_id}": {
+      "get": {
+        "operationId": "food_detail_api_v1_nutrition_foods__food_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "food_id",
+            "required": true,
+            "schema": {
+              "title": "Food Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Food Detail Api V1 Nutrition Foods  Food Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Food Detail",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/history": {
+      "get": {
+        "operationId": "history_api_v1_nutrition_history_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "days",
+            "required": false,
+            "schema": {
+              "default": 7,
+              "maximum": 90,
+              "minimum": 1,
+              "title": "Days",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response History Api V1 Nutrition History Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "History",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/preview": {
+      "post": {
+        "operationId": "preview_api_v1_nutrition_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PreviewRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Preview Api V1 Nutrition Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Preview",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/search": {
+      "get": {
+        "operationId": "search_foods_api_v1_nutrition_search_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": true,
+            "schema": {
+              "minLength": 1,
+              "title": "Q",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 8,
+              "maximum": 25,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Search Foods Api V1 Nutrition Search Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Search Foods",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/targets": {
+      "get": {
+        "operationId": "get_targets_api_v1_nutrition_targets_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Targets Api V1 Nutrition Targets Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Get Targets",
+        "tags": [
+          "nutrition"
+        ]
+      },
+      "put": {
+        "operationId": "put_targets_api_v1_nutrition_targets_put",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TargetRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Put Targets Api V1 Nutrition Targets Put",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Put Targets",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/templates": {
+      "get": {
+        "operationId": "list_templates_api_v1_nutrition_templates_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Templates Api V1 Nutrition Templates Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "List Templates",
+        "tags": [
+          "nutrition"
+        ]
+      },
+      "post": {
+        "operationId": "create_template_api_v1_nutrition_templates_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TemplateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Create Template Api V1 Nutrition Templates Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Create Template",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/templates/{template_id}": {
+      "delete": {
+        "operationId": "delete_template_api_v1_nutrition_templates__template_id__delete",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Delete Template Api V1 Nutrition Templates  Template Id  Delete",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Delete Template",
+        "tags": [
+          "nutrition"
+        ]
+      }
+    },
+    "/api/v1/nutrition/templates/{template_id}/log": {
+      "post": {
+        "operationId": "log_template_api_v1_nutrition_templates__template_id__log_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "template_id",
+            "required": true,
+            "schema": {
+              "title": "Template Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "eaten_on",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "format": "date",
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Eaten On"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Log Template Api V1 Nutrition Templates  Template Id  Log Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Log Template",
+        "tags": [
+          "nutrition"
+        ]
       }
     },
     "/api/v1/voice": {

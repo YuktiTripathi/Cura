@@ -1,4 +1,4 @@
-"""ReasoningService: LOOKUP-only stays deterministic; multi-entity/multi-op uses the LLM."""
+"""ReasoningService: verified facts are deterministic; the approved model writes the reply."""
 
 from __future__ import annotations
 
@@ -35,9 +35,58 @@ from app.retrieval.medical import is_servable, render_medical_evidence_answer
 logger = logging.getLogger("cura.reasoning")
 
 
-DEEP_UNAVAILABLE_MESSAGE = (
-    "I couldn't work through this one properly just now, and I'd rather not give you a partial answer "
-    "to a question that connects several of your results. Please try again in a minute."
+_CLINICAL_CHANGE = re.compile(
+    r"\b(improved|improvement|better|worse|worsened|right direction|clinically meaningful)\b",
+    re.I,
+)
+
+
+def _false_unit_mismatch(message: str, context: HealthContext, answer: str) -> bool:
+    if not re.search(r"units do not match|units differ|incompatible units", answer or "", re.I):
+        return False
+    from app.pipeline.evidence_inventory import classify_marker_trends
+
+    coverage = classify_marker_trends(message, context.markers, context.comparisons)
+    return bool(coverage["supported"]) and not coverage["incompatible_units"]
+
+
+def _stored_fact_lines(context: HealthContext) -> list[str]:
+    lines = []
+    for marker in context.markers or []:
+        if getattr(marker, "value", None) is None:
+            continue
+        when = getattr(marker, "measured_at", None)
+        day = when.isoformat()[:10] if hasattr(when, "isoformat") else (str(when)[:10] if when else "")
+        unit = getattr(marker, "unit", None) or ""
+        dated = f" on {day}" if day else ""
+        lines.append(f"{marker.name} {marker.value:g} {unit}{dated}".strip())
+    for risk in context.bio_ai_risks or []:
+        score = getattr(risk, "score", None)
+        if score is None:
+            continue
+        status = getattr(risk, "status", None) or getattr(risk, "band", None) or ""
+        lines.append(f"{getattr(risk, 'name', None) or risk.code} {score:g} {status}".strip())
+    return lines
+
+
+def _answer_with_stored_facts(rendered: str, context: HealthContext) -> str:
+    text = rendered or ""
+    missing = []
+    for line in _stored_fact_lines(context):
+        token = next((part for part in line.split() if re.fullmatch(r"\d+(?:\.\d+)?", part)), "")
+        if token and token not in text:
+            missing.append(line)
+    if not missing:
+        return text
+    facts = "Stored records: " + "; ".join(missing) + "."
+    if "could not be generated" in text.lower() or not text.strip():
+        return facts
+    return f"{text.rstrip()}\n\n{facts}"
+
+
+CROSS_SOURCE_LIMITATION = (
+    "A written explanation could not be generated. "
+    "The stored measurements above are unchanged, and no missing value was estimated."
 )
 
 
@@ -55,6 +104,12 @@ class ReasoningResult:
     escalation_reason: str | None = None
     first_token_ms: int | None = None
     answer_tier: AnswerModelTier | None = None  # tier that actually wrote the answer
+    fallback_reason: str | None = None
+
+
+def _privacy_block(exc: BaseException) -> bool:
+    text = str(exc).lower()
+    return "personal health" in text or "zdr" in text or "privacy" in text
 
 
 def _is_different_model(current: AnswerModelTier, target: AnswerModelTier) -> bool:
@@ -65,6 +120,105 @@ def _is_different_model(current: AnswerModelTier, target: AnswerModelTier) -> bo
         return model_id_for_tier(target) != model_id_for_tier(current)
     except Exception:  # noqa: BLE001 - unknown configuration: do not repeat the call
         return False
+
+
+_EXPLANATION_OPS = {
+    "EXPLAIN",
+    "INTERPRET",
+    "COMPARE",
+    "TREND",
+    "CORRELATE",
+    "PRIORITIZE",
+    "IDENTIFY_GAPS",
+    "IDENTIFY_PATTERN",
+    "RECOMMEND",
+    "CONTINUE_INTERPRETATION",
+    "PERSONAL_INTERPRETATION",
+    "CROSS_SOURCE_ANALYSIS",
+}
+_EXPLANATION_KINDS = {
+    "PERSONAL_RISK_EXPLANATION",
+    "PRIORITIZED_CONCERNS",
+    "SYMPTOM_CONTEXT",
+    "CROSS_SOURCE_EXPLANATION",
+}
+_LOOKUP_KINDS = {"MARKER_LOOKUP", "BIO_AI_SCORE_LIST"}
+_EXPLANATION_INTENTS = {
+    IntentType.report_explanation,
+    IntentType.blood_marker_explanation,
+    IntentType.bio_ai_explanation,
+    IntentType.health_scenario,
+    IntentType.bio_ai_comparison,
+    IntentType.trend,
+}
+
+
+def _eligible_for_model_wording(plan: QueryPlan, context: HealthContext) -> bool:
+    """Ordinary questions with verified facts can be worded by the approved model."""
+    if not settings.enable_llm or context.status == "ambiguous":
+        return False
+    if not (context.markers or context.bio_ai_risks):
+        return False
+    if plan.needs_personal_data:
+        from app.llm.openrouter_policy import openrouter_policy
+
+        return openrouter_policy().personal_interpretation_permitted()
+    return True
+
+
+def _missing_score_note(message: str, context: HealthContext, answer: str) -> str:
+    if not re.search(r"bio-?\s*ai|risk score", message or "", re.I):
+        return ""
+    missing = []
+    for risk in context.bio_ai_risks or []:
+        score = getattr(risk, "score", None)
+        if score is None:
+            continue
+        token = f"{score:g}"
+        if token not in (answer or ""):
+            name = getattr(risk, "name", None) or risk.code
+            status = getattr(risk, "status", None) or ""
+            missing.append(f"{name} {token} ({status})".strip())
+    if not missing:
+        return ""
+    return "Stored scores: " + "; ".join(missing) + ". These are risk estimates, not diagnoses."
+
+
+def _model_explains(plan: QueryPlan) -> bool:
+    """An approved model may word the answer. Facts stay in the backend."""
+    if not (settings.enable_llm and uses_answer_llm(plan.answer_model_tier)):
+        return False
+    if plan.needs_personal_data:
+        from app.llm.openrouter_policy import openrouter_policy
+
+        return openrouter_policy().personal_interpretation_permitted()
+    return True
+
+
+def _without_clinical_claim(answer: str) -> str:
+    parts = re.split(r"(?<=[.!?])\s+", (answer or "").strip())
+    kept = [part for part in parts if part and not _CLINICAL_CHANGE.search(part)]
+    return " ".join(kept).strip()
+
+
+def explanation_requested(plan: QueryPlan, message: str | None = None) -> bool:
+    """True when the planner asked for an interpretation, not a stored value or score."""
+    from app.pipeline.response_planner import is_report_level_request
+
+    text = message or plan.raw_message or ""
+    if is_report_level_request(text):
+        return False
+    ops = {str(item).upper() for item in (plan.operations or [])}
+    if plan.operation:
+        ops.add(str(plan.operation).upper())
+    kind = (plan.task_contract or {}).get("response_type")
+    if ops & _EXPLANATION_OPS:
+        return True
+    if kind in _EXPLANATION_KINDS:
+        return True
+    if kind in _LOOKUP_KINDS:
+        return False
+    return plan.intent in _EXPLANATION_INTENTS
 
 
 class ReasoningService:
@@ -97,6 +251,12 @@ class ReasoningService:
             )
         if (plan.operation or "").upper() == "PROVENANCE":
             return ReasoningResult(answer=render_provenance(context), llm_mode="structured_provenance")
+        if _eligible_for_model_wording(plan, context) and not uses_answer_llm(plan.answer_model_tier):
+            # A stored lookup still uses the existing fast tier. No new router.
+            plan = plan.model_copy(update={
+                "answer_model_tier": AnswerModelTier.fast_reasoning,
+                "model_tier": AnswerModelTier.fast_reasoning,
+            })
         lookup = self._lookup_only(plan, context)
         structured_bio_ai = (
             lookup
@@ -106,10 +266,26 @@ class ReasoningService:
             and not plan.needs_user_uploaded
         )
         explain_bio = bool(re.search(r"\b(explain|interpret|what does|what do|mean|understand|how should i read|relat\w*|compare|together)\b", message or "", re.I))
+        from app.routing.model_tier import asks_blood_and_score_relationship
+
+        relationship = asks_blood_and_score_relationship(message or "")
         cross_source = bool(plan.needs_blood and plan.needs_bio_ai and re.search(r"\b(relat\w*|compare|together|fit)\b", message or "", re.I))
-        if explain_bio and context.bio_ai_risks and settings.enable_llm and not uses_answer_llm(plan.answer_model_tier):
-            plan = plan.model_copy(update={"answer_model_tier": AnswerModelTier.standard_medical})
-        if structured_bio_ai and not cross_source and not (explain_bio and settings.enable_llm):
+        explain = explanation_requested(plan, message) or explain_bio or relationship
+        needs_model = explain and (bool(context.bio_ai_risks) or bool(context.markers) or plan.needs_personal_data)
+        if needs_model and settings.enable_llm and not uses_answer_llm(plan.answer_model_tier):
+            plan = plan.model_copy(update={"answer_model_tier": AnswerModelTier.standard_medical, "model_tier": AnswerModelTier.standard_medical})
+        if (
+            plan.intent == IntentType.bio_ai_explanation
+            and context.bio_ai_risks
+            and not settings.enable_llm
+        ):
+            return ReasoningResult(
+                answer=self.renderer.render(message, context),
+                llm_called=False,
+                llm_mode="structured_bio_ai",
+                latency_ms=int((time.perf_counter() - started) * 1000),
+            )
+        if structured_bio_ai and not cross_source and not relationship and not _model_explains(plan):
             return ReasoningResult(
                 answer=render_bio_ai_score_list(context.bio_ai_risks),
                 llm_mode="structured_bio_ai",
@@ -153,7 +329,7 @@ class ReasoningService:
             )
         response_plan = build_response_plan(message, plan, context)
         interpret_turn = "INTERPRET" in {str(op).upper() for op in plan.operations or []}
-        if response_plan.kind == "report_overview" and context.markers and not interpret_turn:
+        if response_plan.kind == "report_overview" and context.markers and not interpret_turn and not explain and not _model_explains(plan):
             highlights = [
                 m for m in context.markers
                 if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}
@@ -173,7 +349,7 @@ class ReasoningService:
                 answer=f"{response_plan.direct_answer} {response_plan.summary}{detail}".strip(),
                 llm_mode="structured_report_overview",
             )
-        if (plan.task_contract or {}).get("response_type") == "ABNORMAL_LIST" and context.markers:
+        if (plan.task_contract or {}).get("response_type") == "ABNORMAL_LIST" and context.markers and not explain and not _model_explains(plan):
             from app.pipeline.evidence_inventory import assemble_evidence
 
             abnormal = assemble_evidence(plan, context)
@@ -191,13 +367,14 @@ class ReasoningService:
 
         if (
             lookup
-            and not explain_bio
+            and not explain
             and plan.intent in {IntentType.latest_result, IntentType.previous_result}
             and plan.needs_blood
             and context.markers
             and context.status != "ambiguous"
             and not plan.needs_user_uploaded
             and not plan.needs_cross_source
+            and not _model_explains(plan)
         ):
             return ReasoningResult(
                 answer=self.renderer.render(message, context),
@@ -222,8 +399,8 @@ class ReasoningService:
             reviewed_definition = bool(
                 corpus_answer and definition_from_reviewed_passage(message, plan, medical_hits)
             )
-            if reviewed_definition:
-                # Cost lever 4: a plain definition is answered from the reviewed passage, no model call.
+            if reviewed_definition and not settings.enable_llm:
+                # A reviewed passage answers a plain definition only when no model is available.
                 return ReasoningResult(
                     answer=corpus_answer,
                     llm_called=False,
@@ -249,7 +426,7 @@ class ReasoningService:
                     model_fallback_used=fallback,
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
-            except LLMUnavailableError:
+            except LLMUnavailableError as exc:
                 if reviewed_definition:
                     return ReasoningResult(
                         answer=corpus_answer,
@@ -261,10 +438,12 @@ class ReasoningService:
                     answer=general_knowledge_unavailable(response_lang),
                     llm_called=True,
                     llm_mode="unavailable",
+                    fallback_reason="privacy" if _privacy_block(exc) else "model_unavailable",
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
+        facts_ready = bool(context.markers or context.bio_ai_risks)
         if settings.enable_llm and uses_answer_llm(plan.answer_model_tier) and (
-            plan_needs_reasoning(plan) or not lookup or (explain_bio and context.bio_ai_risks)
+            plan_needs_reasoning(plan) or not lookup or relationship or explain or facts_ready
         ):
             from app.pipeline.evidence_inventory import assemble_evidence
 
@@ -320,6 +499,37 @@ class ReasoningService:
                             logger.warning("answer_escalation_unavailable tier=%s", next_tier.value)
                 if llm_result.parse_error and not answer:
                     answer = self.renderer.render(message, context)
+                from app.pipeline.evidence_inventory import (
+                    authoritative_measurement_answer,
+                    contradicting_answer,
+                    omitted_supported_facts,
+                    render_partial_trend,
+                )
+
+                verified = render_partial_trend(message, context.markers, context.comparisons)
+                asks_change = bool(re.search(r"\b(improved|improvement|changed|change|compared)\b", message or "", re.I))
+                deflects = bool(re.search(r"\bwould you like\b", answer or "", re.I))
+                repaired = False
+                if verified and asks_change and (_CLINICAL_CHANGE.search(answer or "") or deflects):
+                    kept = _without_clinical_claim(answer or "")
+                    if kept and not deflects:
+                        answer = kept
+                    else:
+                        answer = verified
+                        repaired = True
+                elif contradicting_answer(message, context.markers, answer, context.comparisons) or _false_unit_mismatch(
+                    message, context, answer
+                ):
+                    replacement = authoritative_measurement_answer(message, context.markers, context.comparisons)
+                    if replacement:
+                        answer = replacement
+                        repaired = True
+                omitted = omitted_supported_facts(message, context.markers, answer, context.comparisons)
+                score_note = _missing_score_note(message, context, answer)
+                if score_note:
+                    omitted = f"{omitted}\n\n{score_note}".strip() if omitted else score_note
+                if omitted:
+                    answer = f"{answer.rstrip()}\n\n{omitted}"
                 return ReasoningResult(
                     answer=answer,
                     llm_result=llm_result,
@@ -331,26 +541,51 @@ class ReasoningService:
                     model_escalated=escalated,
                     escalation_reason=escalation_reason,
                     answer_tier=used_tier,
+                    flags=["verified_fallback"] if repaired else [],
                 )
-            except LLMUnavailableError:
+            except LLMUnavailableError as exc:
                 logger.warning("llm_unavailable tier=%s", plan.answer_model_tier.value if plan.answer_model_tier else None)
-                if plan.answer_model_tier == AnswerModelTier.deep_medical_reasoning:
-                    # A complex question is not answered by a template that looks equivalent.
+                privacy = _privacy_block(exc)
+                from app.pipeline.evidence_inventory import classify_marker_trends, render_partial_trend
+
+                coverage = classify_marker_trends(message, context.markers, context.comparisons)
+                partial = render_partial_trend(message, context.markers, context.comparisons) if coverage["support"] in {"partial", "full"} else None
+                if partial:
                     return ReasoningResult(
-                        answer=DEEP_UNAVAILABLE_MESSAGE,
-                        llm_called=True,
-                        llm_mode="answer_model_unavailable",
+                        answer=partial,
+                        llm_called=False,
+                        llm_mode="deterministic_fallback",
+                        fallback_reason="privacy" if privacy else "model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                if plan.answer_model_tier == AnswerModelTier.deep_medical_reasoning:
+                    # Stored facts stay. The model does not invent a link between them.
+                    rendered = _answer_with_stored_facts(self.renderer.render(message, context), context)
+                    answer = CROSS_SOURCE_LIMITATION
+                    if rendered:
+                        answer = f"{rendered}\n\n{CROSS_SOURCE_LIMITATION}"
+                    return ReasoningResult(
+                        answer=answer,
+                        llm_called=False,
+                        llm_mode="deterministic_fallback",
+                        fallback_reason="privacy" if privacy else "model_unavailable",
                         latency_ms=int((time.perf_counter() - started) * 1000),
                     )
                 return ReasoningResult(
-                    answer=self.renderer.render(message, context),
-                    llm_called=True,
+                    answer=_answer_with_stored_facts(self.renderer.render(message, context), context),
+                    llm_called=False,
                     llm_mode="deterministic_fallback",
+                    fallback_reason="privacy" if privacy else "model_unavailable",
                     latency_ms=int((time.perf_counter() - started) * 1000),
                 )
+        from app.llm.openrouter_policy import openrouter_policy
+
+        privacy = bool(plan.needs_personal_data) and not openrouter_policy().personal_interpretation_permitted()
         return ReasoningResult(
             answer=self.renderer.render(message, context),
-            llm_mode=settings.resolved_llm_provider() if settings.enable_llm else "deterministic_mock",
+            llm_called=False,
+            llm_mode="deterministic_fallback" if privacy else "deterministic",
+            fallback_reason="privacy" if privacy else None,
         )
 
     def _lookup_only(self, plan: QueryPlan, context: HealthContext) -> bool:

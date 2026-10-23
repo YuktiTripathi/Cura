@@ -71,8 +71,41 @@ def report_stamp(report: BioAIReport) -> datetime:
     return datetime.min
 
 
+def requested_dates(message: str) -> list[date]:
+    found: list[date] = []
+    for match in _ISO_DATE.finditer(message or ""):
+        try:
+            day = date.fromisoformat(match.group(1))
+        except ValueError:
+            continue
+        if day not in found:
+            found.append(day)
+    return found
+
+
+def requested_blood_dates(message: str) -> list[date]:
+    """Dates that name a blood report. A Bio-AI date in the same sentence is left out."""
+    text = message or ""
+    dates = requested_dates(text)
+    if re.search(r"bio-?\s*ai", text, re.I) and re.search(r"\bblood\b", text, re.I):
+        bio_day = requested_report_date(text)
+        kept = [day for day in dates if day != bio_day]
+        return kept or dates
+    return dates
+
+
 def requested_report_date(message: str) -> date | None:
     text = message or ""
+    bio = re.search(r"bio-?\s*ai", text, re.I)
+    if bio:
+        after = _ISO_DATE.search(text[bio.end() :])
+        before = list(_ISO_DATE.finditer(text[: bio.start()]))
+        token = after.group(1) if after else (before[-1].group(1) if before else None)
+        if token:
+            try:
+                return date.fromisoformat(token)
+            except ValueError:
+                pass
     iso = _ISO_DATE.search(text)
     if iso:
         try:

@@ -40,6 +40,8 @@ class Comparison(BaseModel):
     absolute_delta: float | None = None
     percentage_change: float | None = None
     direction: str | None = None
+    previous_unit: str | None = None
+    current_unit: str | None = None
 
 
 class InRangeSummary(BaseModel):
@@ -184,6 +186,9 @@ class HealthContext(BaseModel):
     # Patterns across the whole latest report (names only), so a single-value answer can say
     # whether the value is a major or a minor part of the picture.
     report_patterns: list[dict] = Field(default_factory=list)
+    # Full latest blood panel, including in-range results. Used for raw findings and
+    # reassuring systems. The answer still leads with the selected markers.
+    panel_markers: list = Field(default_factory=list)
     # Conversation turn type (NEW_QUESTION, FOLLOW_UP_QUESTION ...). Internal only.
     conversation_turn: str | None = None
     task_contract: dict | None = None

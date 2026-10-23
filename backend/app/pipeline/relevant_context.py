@@ -83,6 +83,13 @@ class RelevantContextSelector:
         supporting: list[str] = []
         pattern: list[str] = []
         budget = _supporting_budget(plan, goal, depth)
+        import re
+        singular_referent = (plan.conversation_turn or "") in {
+            "REFERENCE_RESOLUTION",
+            "FOLLOW_UP_QUESTION",
+        } and bool(re.search(r"\b(it|that|this)\b", plan.raw_message or "", re.I))
+        if singular_referent:
+            budget = 0
         for key in requested:
             neighbors = list(_PATTERN_NEIGHBORS.get(key, ()))
             family = FAMILY_MEMBERS.get(getattr(pool.get(key), "category", "") or "", ())
@@ -160,12 +167,30 @@ class RelevantContextSelector:
         if context.question_type in {"health_review", "health_scenario"} or "overall_health" in (context.domains or []):
             context.notes = _with_pattern_note(context.notes, relevant.pattern_note)
             return context
+        dated = {
+            (marker.key, str(getattr(marker, "measured_at", "") or ""))
+            for marker in context.markers or []
+            if marker.key
+        }
+        if len(dated) > len({key for key, _when in dated}):
+            context.notes = _with_pattern_note(context.notes, relevant.pattern_note)
+            return context
+        original_keys = {marker.key for marker in context.markers or [] if marker.key}
+        dated_selection = any(getattr(marker, "measured_at", None) for marker in context.markers or [])
         latest = latest_report(reports or []) if reports else None
         by_key = {marker.key: marker for marker in context.markers or [] if marker.key}
+        if dated_selection and latest:
+            latest = None
         if latest:
             for marker in latest.markers:
                 if marker.key and marker.key not in by_key and _usable(marker):
                     by_key[marker.key] = marker
+            for key, marker in list(by_key.items()):
+                if marker.measured_at is None and any(item.key == key for item in latest.markers):
+                    by_key[key] = marker.model_copy(update={
+                        "measured_at": latest.report_date,
+                        "report_id": marker.report_id or latest.report_id,
+                    })
         ordered = [by_key[key] for key in [*relevant.requested_keys, *relevant.supporting_keys] if key in by_key]
         comparison_topics = {item.topic for item in (context.comparisons or []) if getattr(item, "topic", None)}
         preserved = [marker for marker in (context.markers or []) if marker.key in comparison_topics]

@@ -184,6 +184,29 @@ def test_repository_returns_dyslipidemia_for_authenticated_user(monkeypatch):
     assert selected[0].status == "Healthy"
 
 
+def test_repository_fetches_ihr_rows_once_and_preserves_sorted_content(monkeypatch):
+    calls = 0
+    rows = [
+        _live_row(user_id=2, report_id=2),
+        _live_row(user_id=2, report_id=1),
+    ]
+
+    def fetch_once(_principal):
+        nonlocal calls
+        calls += 1
+        return rows
+
+    monkeypatch.setattr("integrations.supershyft.ihr.fetch_ihr_rows", fetch_once)
+    bundle = IhrRepository().get_ihr_data_for_query(
+        AuthenticatedPrincipal(subject_id="2"),
+        QueryPlan(intent=IntentType.bio_ai_explanation, needs_bio_ai=True),
+    )
+    assert calls == 1
+    assert bundle.report_ids == ["1", "2"]
+    assert [report.report_id for report in bundle.bio_ai_reports] == ["bioai-1", "bioai-2"]
+    assert bundle.bio_ai_reports[0].risks[0].score == 10
+
+
 def test_chat_dyslipidemia_uses_retrieved_live_schema_score(monkeypatch):
     from app.core.config import settings
 
@@ -332,7 +355,10 @@ def _live_db_url() -> str:
     return (os.environ.get("SUPERSHYFT_DATABASE_URL") or "").strip()
 
 
-@pytest.mark.skipif(not _live_db_url(), reason="live SuperShyft URL not in environment")
+@pytest.mark.skipif(
+    os.environ.get("CURA_LIVE_SUPERSHYFT") != "1" or not _live_db_url(),
+    reason="opt-in live SuperShyft integration; set CURA_LIVE_SUPERSHYFT=1 and SUPERSHYFT_DATABASE_URL",
+)
 def test_live_user_2_dyslipidemia_is_read_from_reports_diseases(monkeypatch):
     from app.core.config import settings
     from sqlalchemy import text
@@ -365,7 +391,10 @@ def test_live_user_2_dyslipidemia_is_read_from_reports_diseases(monkeypatch):
     reset_engine()
 
 
-@pytest.mark.skipif(not _live_db_url(), reason="live SuperShyft URL not in environment")
+@pytest.mark.skipif(
+    os.environ.get("CURA_LIVE_SUPERSHYFT") != "1" or not _live_db_url(),
+    reason="opt-in live SuperShyft integration; set CURA_LIVE_SUPERSHYFT=1 and SUPERSHYFT_DATABASE_URL",
+)
 def test_live_user_2_ldl_and_hba1c_come_from_blood_bookings(monkeypatch):
     from app.core.config import settings
     from app.pipeline.personal_selection import select_latest_markers

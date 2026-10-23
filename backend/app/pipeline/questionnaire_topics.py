@@ -33,9 +33,13 @@ TOPIC_KEYS: dict[str, tuple[str, ...]] = {
     "exercise": ("exercise_frequency_week", "exercise_level", "physical_activity_frequency"),
     "physical_activity": ("physical_activity_frequency", "daily_active_duration"),
     "physical_activity_frequency": ("physical_activity_frequency",),
+    "sitting_hours": ("sitting_hours",),
+    "sitting": ("sitting_hours",),
     "tobacco": ("tobacco_frequency",),
     "smoking": ("tobacco_frequency",),
     "lifestyle": SUMMARY_KEYS,
+    "family_history": ("family_health_history",),
+    "family_health_history": ("family_health_history",),
 }
 
 _TOPIC_ALIASES = {
@@ -55,6 +59,11 @@ _TOPIC_ALIASES = {
     "smoking": "smoking",
     "smoke": "smoking",
     "lifestyle": "lifestyle",
+    "how long do you sit": "sitting",
+    "sit continuously": "sitting",
+    "sitting": "sitting",
+    "close blood relatives": "family_history",
+    "family history": "family_history",
 }
 
 

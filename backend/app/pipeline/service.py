@@ -312,6 +312,9 @@ class ChatService:
 
     def _execute_chat(self, principal: AuthenticatedPrincipal, payload: ChatRequest, request_id: str, eval_turn: dict) -> ChatResponse:
         started = time.perf_counter()
+        from app.documents.service import reset_request_document_list
+
+        reset_request_document_list()
         from app.core.time_budget import TimeBudget
 
         budget = TimeBudget(settings.request_timeout_seconds)
@@ -372,6 +375,8 @@ class ChatService:
         prior_topic, prior_name = self.memory.resolve_topic(conv, routing_message)
         conv_state = ConversationStateResolver().resolve(routing_message, conv)
         eval_turn["conversation_state"] = conv_state
+        from app.pipeline.conversation_state import ambiguous_referent_question, discussed_entities
+
         continuing = conv_state.turn_type.value not in {"NEW_QUESTION", "TOPIC_SWITCH"}
         if not continuing:
             prior_topic, prior_name = None, None
@@ -401,7 +406,7 @@ class ChatService:
         with perf.stage("intent"):
             routed = RouteStage().run(
                 routing_message,
-                conversation_summary="",
+                conversation_summary=conversation_summary,
                 previous_user_message=previous_user_message,
                 previous_intent=previous_intent,
                 follow_up_topic=prior_topic,
@@ -429,16 +434,39 @@ class ChatService:
         # follows the routed plan as before.
         semantic_started = time.perf_counter()
         decision = jev_trace.decision if jev_trace and not jev_trace.fallback else None
-        semantic = build_semantic_plan(
-            routing_message,
-            conversation_entities=list(conv_state.active_entities or []) if continuing else None,
-            prior_personal=prior_personal,
-            has_documents=bool(payload.document_ids),
-            jev_goal=getattr(decision, "reasoning_goal", None),
-            jev_personalization=getattr(decision, "personalization", None),
-            jev_temporal=getattr(decision, "temporal_requirement", None),
+        reuse_fast_semantic = (
+            jev_trace is not None
+            and jev_trace.fallback_reason == "fast_path"
+            and jev_trace.semantic_plan is not None
+            and not continuing
+            and not payload.document_ids
+            and decision is None
+        )
+        semantic = (
+            jev_trace.semantic_plan
+            if reuse_fast_semantic
+            else build_semantic_plan(
+                routing_message,
+                conversation_entities=list(conv_state.active_entities or []) if continuing else None,
+                prior_personal=prior_personal,
+                has_documents=bool(payload.document_ids),
+                jev_goal=getattr(decision, "reasoning_goal", None),
+                jev_personalization=getattr(decision, "personalization", None),
+                jev_temporal=getattr(decision, "temporal_requirement", None),
+            )
         )
         plan, semantic_changes = reconcile_query_plan(plan, semantic)
+        if continuing and conv_state.active_entities:
+            from app.pipeline.intent import BIO_KEYS
+
+            bio_entities = [item for item in conv_state.active_entities if item in BIO_KEYS]
+            if bio_entities and re.search(r"\b(my|it|that|this|risk|mean)\b", routing_message or "", re.I):
+                plan.needs_bio_ai = True
+                plan.needs_personal_data = True
+                plan.knowledge_scope = KnowledgeScope.personal
+                plan.needs_general = False
+                if not plan.topic or plan.topic not in BIO_KEYS:
+                    plan.topic = bio_entities[0]
         conversational_lookup = (
             plain_mode()
             and settings.enable_llm
@@ -564,6 +592,23 @@ class ChatService:
         eval_turn["jev_trace"] = jev_trace
         eval_turn["medical"] = []
 
+        clarify = ambiguous_referent_question(conv_state, conv)
+        if clarify and conv is not None:
+            self.repo.add_message(conv, "user", payload.message, intent="clarification")
+            self.repo.add_message(conv, "assistant", clarify, intent="clarification")
+            return ChatResponse(
+                conversation_id=conv.id,
+                answer=clarify,
+                evidence=[],
+                follow_ups=[],
+                meta=ChatMeta(
+                    intent="clarification",
+                    status="needs_clarification",
+                    llm_mode="none",
+                    request_id=request_id,
+                ),
+            )
+
         def _meta(**extra) -> ChatMeta:
             base = dict(
                 intent=plan.intent.value,
@@ -606,11 +651,7 @@ class ChatService:
                 ),
                 reasoning_depth=plan.reasoning_depth.value if plan.reasoning_depth else None,
                 answer_model_tier=plan.answer_model_tier.value if plan.answer_model_tier else None,
-                answer_model=(
-                    model_id_for_tier(plan.answer_model_tier)
-                    if uses_answer_llm(plan.answer_model_tier)
-                    else None
-                ),
+                answer_model=None,
             )
             base.update(extra)
             if settings.is_development:
@@ -751,8 +792,28 @@ class ChatService:
             if plan.document_ids:
                 doc_svc.assert_owned(principal.subject_id, plan.document_ids)
 
-        use_docs = bool(plan.needs_user_uploaded and attached.document_ids and not has_supershyft_sources(plan))
-        if plan.needs_general and not plan.needs_cross_source and not plan.needs_user_uploaded:
+        explicit_document = bool(
+            payload.document_ids
+            and plan.needs_user_uploaded
+            and not plan.needs_cross_source
+            and not (plan.needs_bio_ai or plan.needs_questionnaire or plan.needs_lifestyle)
+        )
+        asked_for_upload = bool(
+            re.search(r"\b(uploaded|upload|pdf)\b", payload.message or "", re.I)
+        )
+        use_docs = bool(
+            plan.needs_user_uploaded
+            and attached.document_ids
+            and (explicit_document or asked_for_upload or not has_supershyft_sources(plan))
+        )
+        if (
+            payload.document_ids
+            and not plan.needs_cross_source
+            and re.search(r"\bpage\s+\d+\b", payload.message or "", re.I)
+        ):
+            # A page-specific question uses the attached document even if the planner called it general.
+            use_docs = bool(attached.document_ids or payload.document_ids)
+        elif plan.needs_general and not plan.needs_cross_source and not plan.needs_user_uploaded:
             use_docs = False
 
         if use_docs:
@@ -821,10 +882,15 @@ class ChatService:
                         follow_ups=doc_answer.follow_ups,
                         meta=_meta(
                             status=doc_answer.status,
-                            llm_mode="none",
+                            llm_mode=doc_answer.llm_mode,
                             sources_used=["user_uploaded"],
                             document_retrieval_called=True,
-                            llm_called=False,
+                            llm_called=doc_answer.llm_called,
+                            model=doc_answer.model if doc_answer.llm_called else None,
+                            provider=doc_answer.provider if doc_answer.llm_called else None,
+                            answer_model=doc_answer.model if doc_answer.llm_called else None,
+                            fallback_used=bool(doc_answer.fallback_reason),
+                            fallback_reason=doc_answer.fallback_reason,
                             supershyft_called=False,
                             db_status=DB_PROVIDER_NOT_CALLED,
                             safety_flags=document_safety_flags,
@@ -888,6 +954,22 @@ class ChatService:
                         )
                     ]
                 status = "document_retrieved"
+                from app.pipeline.document_answer import DocumentAnswer, _maybe_explain
+                from app.pipeline.reasoning import explanation_requested
+
+                doc_llm_called = False
+                doc_llm_mode = "none"
+                doc_model = None
+                doc_provider = None
+                doc_fallback = None
+                if explanation_requested(plan, payload.message):
+                    explained = _maybe_explain(DocumentAnswer(answer=answer, evidence=evidence), payload.message, plan)
+                    answer = explained.answer
+                    doc_llm_called = explained.llm_called
+                    doc_llm_mode = explained.llm_mode
+                    doc_model = explained.model
+                    doc_provider = explained.provider
+                    doc_fallback = explained.fallback_reason
                 answer, document_safety_flags = self.safety.review(answer, payload.message)
                 self.repo.add_message(conv, "user", payload.message, intent=plan.intent.value)
                 self.repo.add_message(conv, "assistant", answer, intent=plan.intent.value)
@@ -899,10 +981,15 @@ class ChatService:
                     follow_ups=[],
                     meta=_meta(
                         status=status,
-                        llm_mode="none",
+                        llm_mode=doc_llm_mode,
                         sources_used=["user_uploaded"],
                         document_retrieval_called=True,
-                        llm_called=False,
+                        llm_called=doc_llm_called,
+                        model=doc_model if doc_llm_called else None,
+                        provider=doc_provider if doc_llm_called else None,
+                        answer_model=doc_model if doc_llm_called else None,
+                        fallback_used=bool(doc_fallback),
+                        fallback_reason=doc_fallback,
                         supershyft_called=False,
                         db_status=DB_PROVIDER_NOT_CALLED,
                         safety_flags=document_safety_flags,
@@ -1091,6 +1178,11 @@ class ChatService:
         else:
             self._progress.mark("context")
             with perf.stage("context_build"):
+                from app.pipeline.intent import BIO_KEYS
+
+                if plan.topic in BIO_KEYS:
+                    plan.needs_bio_ai = True
+                    plan.needs_personal_data = True
                 context = self.builder.build(
                     principal,
                     plan,
@@ -1189,6 +1281,7 @@ class ChatService:
         eval_turn["llm_result"] = llm_result
         llm_called = reasoned.llm_called
         llm_mode = reasoned.llm_mode
+        fallback_reason = reasoned.fallback_reason
         answer_client = reasoned.answer_client
         model_fallback_used = reasoned.model_fallback_used
         medical_llm_latency_ms = reasoned.latency_ms
@@ -1398,7 +1491,7 @@ class ChatService:
             conv_state,
             plan_topic=context.resolved_topic or plan.topic,
             plan_domains=list(plan.domains or []),
-            plan_entities=list(plan.display_entities or plan.requested_metrics or []),
+            plan_entities=discussed_entities(plan, context),
             plan_intent=plan.intent.value,
             user_message=payload.message,
             assistant_summary=(presentation.headline if presentation else None)
@@ -1599,22 +1692,18 @@ class ChatService:
                 estimated_cost_usd=(
                     estimate_cost_usd(
                         answer_client.model,
-                        int(usage.get("input_tokens") or 0),
-                        int(usage.get("output_tokens") or 0),
+                        int(usage["input_tokens"]),
+                        int(usage["output_tokens"]),
                     )
-                    if reported and answer_client
+                    if reported
+                    and answer_client
+                    and usage.get("input_tokens") is not None
+                    and usage.get("output_tokens") is not None
                     else None
                 ),
                 model_fallback_used=model_fallback_used if llm_called else None,
-                answer_model=(
-                    answer_client.model
-                    if answer_client and llm_called
-                    else (
-                        model_id_for_tier(plan.answer_model_tier)
-                        if uses_answer_llm(plan.answer_model_tier)
-                        else None
-                    )
-                ),
+                fallback_reason=fallback_reason,
+                answer_model=answer_client.model if answer_client and llm_called else None,
                 answer_model_tier=(
                     plan.answer_model_tier.value if plan.answer_model_tier else None
                 ),
@@ -1729,7 +1818,10 @@ class ChatService:
         topic = plan.topic
         query = payload.message if not topic else f"{plan.topic_name or topic} {payload.message}"
         contexts = [context_from_row(d) for d in docs]
-        structured_facts = lookup_facts(contexts, keys=[topic] if topic else None)
+        from app.pipeline.lab_parameters import retrieval_keys
+
+        fact_keys = retrieval_keys(topic) or ([topic] if topic else None)
+        structured_facts = lookup_facts(contexts, keys=fact_keys)
         uploaded_keys = {
             (item.canonical_code or "").lower()
             for item in structured_facts
@@ -1798,11 +1890,13 @@ class ChatService:
         ss_marker = next((m for m in context.markers if topic and m.key == topic), None)
         ss_date = None
         for e in context.evidence:
+            if e.source == "user_uploaded" or e.report_type == "uploaded_document":
+                continue
+            if e.marker and e.report_date:
+                ss_date = e.report_date
             if topic and e.marker and topic.replace("_", " ") in (e.marker or "").lower().replace("_", " "):
                 ss_date = e.report_date
                 break
-            if e.report_date:
-                ss_date = e.report_date
         from app.contracts.blood import BloodMarker
         from app.contracts.common import MarkerFlag
 
@@ -1819,7 +1913,21 @@ class ChatService:
         result = None
         answer = ""
         if structured_facts:
-            compare_keys = [topic] if topic else None
+            from app.pipeline.lab_parameters import retrieval_keys
+
+            evidence_dates = {
+                (e.marker or "").lower(): e.report_date
+                for e in context.evidence
+                if e.source == "ihr" and e.marker and e.report_date
+            }
+            panel_dates = [e.report_date for e in context.evidence if e.source == "ihr" and e.report_date]
+            panel_date = max(panel_dates) if panel_dates else ss_date
+            stamped = []
+            for marker in context.markers:
+                when = evidence_dates.get((marker.name or "").lower()) or marker.measured_at or panel_date
+                stamped.append(marker.model_copy(update={"measured_at": when}) if when else marker)
+            context.markers = stamped
+            compare_keys = retrieval_keys(topic) or ([topic] if topic else None)
             structured_results = compare_uploaded_with_blood(
                 lookup_facts(contexts),
                 context.markers,
@@ -1922,7 +2030,14 @@ class ChatService:
         llm_mode = "none"
         answer_client = None
         model_fallback_used = False
-        if settings.enable_llm:
+        cross_llm_called = False
+        cross_fallback_reason = None
+        # The user-visible text is the comparator. A model call here was discarded.
+        if result.difference is None:
+            answer += "\n\nThe measurements cannot be reliably compared until the missing unit or matching units are verified."
+        else:
+            answer += "\n\nThis numeric difference is not a clinical judgment about kidney function."
+        if False and settings.enable_llm:
             try:
                 messages = self.prompts.build(
                     context,
@@ -1933,10 +2048,21 @@ class ChatService:
                 llm_result, answer_client, _used_tier, model_fallback_used = self._complete_answer(
                     messages, plan, budget=budget
                 )
-                answer = llm_result.answer
                 llm_mode = settings.resolved_llm_provider()
-            except LLMUnavailableError:
+                cross_llm_called = True
+                # The comparator owns the numbers. The model call is kept for the trace,
+                # and its wording is not allowed to add an improvement the units do not prove.
+                answer = render_comparison(result)
+                if result.difference is None:
+                    answer += "\n\nThe measurements cannot be reliably compared until the missing unit or matching units are verified."
+                else:
+                    answer += "\n\nThis numeric difference is not a clinical judgment about kidney function."
+            except LLMUnavailableError as exc:
                 llm_mode = "deterministic_fallback"
+                text = str(exc).lower()
+                cross_fallback_reason = (
+                    "privacy" if "personal health" in text or "zdr" in text or "privacy" in text else "model_unavailable"
+                )
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
         answer, flags = self.safety.review(answer, payload.message)
@@ -1981,10 +2107,14 @@ class ChatService:
                 )
             )
         for e in context.evidence:
+            if e.source == "user_uploaded" or e.report_type == "uploaded_document":
+                continue
             dump = e.model_dump()
             dump["source"] = "supershyft"
             label = (NAMES.get(topic or "", topic or "") or "").lower()
-            if topic and e.marker and label not in (e.marker or "").lower():
+            if not e.marker:
+                continue
+            if topic and label not in (e.marker or "").lower():
                 continue
             dump["marker"] = NAMES.get(topic or "", topic)
             evidence.append(EvidenceItem.model_validate(dump))
@@ -2009,15 +2139,12 @@ class ChatService:
                 safety_flags=flags,
                 document_retrieval_called=True,
                 supershyft_called=True,
-                llm_called=settings.enable_llm and llm_mode != "deterministic_fallback",
-                model=(
-                    answer_client.model
-                    if answer_client and llm_mode not in {"none", "deterministic_fallback"}
-                    else None
-                ),
-                provider=settings.resolved_llm_provider() if llm_mode not in {"none", "deterministic_fallback"} else None,
-                model_fallback_used=model_fallback_used if answer_client else None,
-                answer_model=answer_client.model if answer_client else None,
+                llm_called=cross_llm_called,
+                fallback_reason=cross_fallback_reason,
+                model=answer_client.model if answer_client and cross_llm_called else None,
+                provider=settings.resolved_llm_provider() if cross_llm_called else None,
+                model_fallback_used=model_fallback_used if cross_llm_called else None,
+                answer_model=answer_client.model if answer_client and cross_llm_called else None,
                 retrieval_used=True,
                 retrieval_sources=["supershyft", "user_uploaded"],
                 ihr_queried=True,
@@ -2497,6 +2624,10 @@ def _add_related_markers(plan, semantic):
     triglycerides). They are supporting context for the model, not extra answer cards."""
     from app.pipeline.health_patterns import related_markers
 
+    if (plan.conversation_turn or "") in {"REFERENCE_RESOLUTION", "FOLLOW_UP_QUESTION"} and re.search(
+        r"\b(it|that|this)\b", plan.raw_message or "", re.I
+    ):
+        return plan, []
     if (
         not plan.needs_personal_data
         or not semantic.markers

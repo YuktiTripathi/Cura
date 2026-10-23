@@ -97,7 +97,7 @@ def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
     broad = intent in {"broad_health_summary", "health_scenario", "report_explanation"} or bool(_BROAD.search(text))
     if named_focus or understand_report or (_ADVISE.search(text) and not _BROAD.search(text)):
         broad = False
-    if _ADVISE.search(text):
+    if _ADVISE.search(text) or intent == "nutrition_guidance":
         goal = "advise"
     elif plan.compare or intent in {"trend", "bio_ai_comparison"}:
         goal = "compare"
@@ -117,11 +117,13 @@ def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
     keys = [key for key in (plan.requested_metrics or []) if key]
     card_keys = [] if broad else keys[:6]
     if goal == "explain" and personal == "none":
-        length = "40-80"
-    elif goal == "compare" or understand_report or (goal == "interpret" and intent in {"bio_ai_score", "bio_ai_explanation"}):
-        length = "120-180"
-    elif broad:
-        length = "180-400"
+        length = "85-100"
+    elif intent == "blood_marker_explanation":
+        length = "100-120"
+    elif goal == "compare" or understand_report or broad or (
+        goal == "interpret" and intent in {"bio_ai_score", "bio_ai_explanation"}
+    ):
+        length = "100-150"
     else:
         length = "100-150"
     primary = _primary_source(text, plan)
@@ -152,7 +154,8 @@ def _primary_source(text: str, plan: QueryPlan) -> str:
     """Which record the answer must explain. Mixed only when the user asked across sources."""
     blood = bool(re.search(r"\b(?:blood|lab) report\b", text or "", re.I))
     bio = bool(re.search(r"\bbio-?ai\b", text or "", re.I))
-    if blood and bio:
+    marker = bool(re.search(r"\b(?:ldl|hdl|hba1c|cholesterol|triglycerides|hemoglobin|ferritin)\b", text or "", re.I))
+    if blood and bio or (bio and marker):
         return "mixed"
     if blood:
         return "blood_report"
@@ -212,6 +215,17 @@ def reapply_stored_contract(plan: QueryPlan) -> QueryPlan:
     raw = getattr(plan, "task_contract", None) or {}
     sources = list(raw.get("required_sources") or [])
     if not sources:
+        return plan
+    if plan.needs_user_uploaded and not plan.needs_cross_source:
+        return plan
+    message = plan.raw_message or ""
+    from app.pipeline.intent import is_educational_utterance, is_personal_utterance, requires_personal_record
+
+    if (
+        is_educational_utterance(message)
+        and not is_personal_utterance(message)
+        and not requires_personal_record(message, prior_personal=plan.knowledge_scope == KnowledgeScope.personal, follow_up_topic=plan.topic)
+    ):
         return plan
     if "blood_report" in sources:
         plan.needs_blood = True

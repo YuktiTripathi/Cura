@@ -32,6 +32,18 @@ _INTENT_REPLACEMENTS = [
     ("બદલાયું", "changed"),
     ("বদলেছে", "changed"),
     ("रिपोर्ट", "report"),
+    ("सुधरा", "improved"),
+    ("सुधारा", "improved"),
+    ("डायबिटीज", "diabetes"),
+    ("मधुमेह", "diabetes"),
+    ("रिस्क", "risk"),
+    ("समझाइए", "explain"),
+    ("समझाओ", "explain"),
+    ("kya mean karta hai", "what does it mean"),
+    ("mean karta hai", "what does it mean"),
+    ("improve hua", "improved"),
+    ("explain karo", "explain"),
+    ("normal hai", "is it normal"),
     ("मेरी", "my"),
     ("मेरा", "my"),
     ("मेरे", "my"),
@@ -80,4 +92,11 @@ def normalize_for_intent(message: str) -> str:
     lowered = follow_up_as_english(canonicalize_biomarker_terms(message or ""))
     for src, dest in _INTENT_REPLACEMENTS:
         lowered = re.sub(re.escape(src), dest, lowered, flags=re.I)
-    return status_question_as_english(lowered)
+    lowered = status_question_as_english(lowered)
+    # "मेरा LDL क्या है?" becomes "my LDL what is" after word swaps. Restore question order.
+    return re.sub(
+        r"\bmy\s+(\S+(?:\s+\S+){0,3})\s+(?:what is|how much)(?:\s+\S+){0,2}\s*[?.!]*\s*$",
+        r"what is my \1",
+        lowered,
+        flags=re.I,
+    )

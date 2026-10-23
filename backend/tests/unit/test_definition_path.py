@@ -44,11 +44,10 @@ def _ask(message):
     return client.post("/api/v1/chat", headers={"X-Cura-User-Id": "def-user"}, json={"message": message}).json()
 
 
-def test_definition_question_needs_no_model(reviewed_hba1c):
+def test_definition_question_uses_the_model_when_enabled(reviewed_hba1c):
     body = _ask("What is HbA1c?")
-    assert reviewed_hba1c == []
-    assert "average blood sugar" in body["answer"].lower()
-    assert body["meta"]["llm_called"] is False
+    assert reviewed_hba1c == [1]
+    assert body["meta"]["llm_called"] is True
 
 
 def test_high_risk_question_still_uses_the_model(reviewed_hba1c):

@@ -88,11 +88,17 @@ def resolve_plan(
     )
     if not settings.jev_enabled:
         return deterministic, JevTrace(called=False, fallback=False)
-    if settings.jev_fast_path and _obvious_request(deterministic, message, conversation_state, document_ids or []):
+    obvious, fast_semantic = _obvious_request(deterministic, message, conversation_state, document_ids or [])
+    if settings.jev_fast_path and obvious:
         # "What is my HbA1c?" / "What is HbA1c?": the deterministic planner is certain and a
         # router round trip would only add latency. Anything ambiguous still goes to Jev.
         logger.info("jev_skipped reason=fast_path intent=%s", deterministic.intent.value)
-        return deterministic, JevTrace(called=False, fallback=False, fallback_reason="fast_path")
+        return deterministic, JevTrace(
+            called=False,
+            fallback=False,
+            fallback_reason="fast_path",
+            semantic_plan=fast_semantic,
+        )
 
     state = JevRoutingState(
         current_message=message,
@@ -323,20 +329,20 @@ _FAST_LOOKUP = re.compile(
 )
 
 
-def _obvious_request(plan: QueryPlan, message: str, conversation_state, document_ids: list[str]) -> bool:
+def _obvious_request(plan: QueryPlan, message: str, conversation_state, document_ids: list[str]):
     """Short, single-topic questions that deterministic planning already resolves."""
     if document_ids or plan.needs_user_uploaded:
-        return False
+        return False, None
     if conversation_state is not None and conversation_state.turn_type.value in _CONTINUING_TURNS:
-        return False
+        return False, None
     text = (message or "").strip()
     if len(text.split()) > 12:
-        return False
+        return False, None
     from app.pipeline.semantic_plan import ReasoningGoal, build_semantic_plan
 
     semantic = build_semantic_plan(text)
     if semantic.clarification_needed:
-        return False
+        return False, None
     named_topics = [*semantic.markers, *semantic.bio_ai]
     interpretation_goals = {
         ReasoningGoal.explain,
@@ -352,13 +358,13 @@ def _obvious_request(plan: QueryPlan, message: str, conversation_state, document
         and semantic.primary_goal in interpretation_goals
         and set(semantic.secondary_goals) <= interpretation_goals
     ):
-        return True
+        return True, semantic
     if semantic.secondary_goals:
-        return False
+        return False, None
     if not _FAST_LOOKUP.match(text) or len(text.split()) > 8:
-        return False
+        return False, None
     if plan.intent.value == "latest_result" and semantic.primary_goal == ReasoningGoal.lookup:
-        return len(plan.requested_metrics or ([plan.topic] if plan.topic else [])) == 1
+        return len(plan.requested_metrics or ([plan.topic] if plan.topic else [])) == 1, semantic
     if plan.intent.value == "general_health_question" and semantic.primary_goal == ReasoningGoal.general_education:
-        return bool(semantic.markers or semantic.bio_ai)
-    return False
+        return bool(semantic.markers or semantic.bio_ai), semantic
+    return False, None

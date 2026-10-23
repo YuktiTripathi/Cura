@@ -202,6 +202,7 @@ body { margin: 0; background: var(--bg); color: var(--text); }
   padding: 8px 28px 16px;
 }
 .welcome { max-width: 880px; }
+.safety-notice { margin: 0 0 8px; padding: 8px 10px; border-radius: 10px; background: var(--attention-bg); border: 1px solid var(--attention-border); font-size: 13px; }
 .greeting { font-size: 28px; font-weight: 650; margin: 12px 0 4px; }
 .welcome-lead { font-size: 16px; margin-top: 0; }
 .composer-dock {
@@ -336,8 +337,28 @@ body { margin: 0; background: var(--bg); color: var(--text); }
 @media (max-width: 520px) {
   .capability-grid { grid-template-columns: 1fr; }
 }
-.capability-grid button { display: grid; gap: 4px; text-align: left; border: 1px solid var(--border); background: var(--surface); border-radius: 12px; padding: 14px; cursor: pointer; color: inherit; }
-.capability-grid button span { color: var(--text-muted); font-size: 13px; }
+.capability-grid button {
+  display: grid;
+  gap: 6px;
+  text-align: left;
+  border: 1px solid var(--border-card);
+  background: var(--surface);
+  border-radius: 16px;
+  padding: 16px;
+  cursor: pointer;
+  color: inherit;
+  box-shadow: 0 1px 2px rgba(16, 35, 61, 0.04);
+  transition: border-color 0.15s ease, transform 0.15s ease;
+}
+.capability-grid button:hover { border-color: var(--accent); transform: translateY(-1px); }
+.capability-grid button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.capability-grid button span { color: var(--text-muted); font-size: 13px; line-height: 1.4; }
+.capability-grid .card-icon { font-size: 18px; }
+.greeting { font-size: 28px; letter-spacing: -0.02em; margin-bottom: 4px; }
+@media (prefers-reduced-motion: reduce) {
+  .capability-grid button { transition: none; }
+  .capability-grid button:hover { transform: none; }
+}
 .recommendations { display: grid; gap: 8px; margin-top: 12px; }
 .recommendation-card { border: 1px solid var(--positive-border); background: var(--positive-bg); border-radius: 10px; padding: 10px; }
 .recommendation-card > p { margin: 6px 0; }

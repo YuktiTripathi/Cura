@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+import re
 from dataclasses import dataclass, field
 
 from app.core.config import settings
@@ -25,7 +26,6 @@ class OpenRouterPolicy:
     allowed_models: frozenset[str]
     allowed_providers: frozenset[str]
     allowed_upstream_providers: frozenset[str]
-    require_zdr: bool
     deny_data_collection: bool
     prompt_injection_protection: bool
     dlp_enabled: bool
@@ -33,7 +33,8 @@ class OpenRouterPolicy:
     package_safety_enabled: bool
     request_timeout: float
     max_retries: int
-    zdr_configured: bool = False
+    privacy_profile: str = "not_approved"
+    approved_personal_models: frozenset[str] = field(default_factory=frozenset)
     extra_models: frozenset[str] = field(default_factory=frozenset)
 
     @classmethod
@@ -46,29 +47,32 @@ class OpenRouterPolicy:
         models.add(settings.active_llm_model())
         if (settings.stt_provider or "").strip().lower() == "openrouter":
             models.add(settings.resolved_stt_model())
-        if (settings.eval_candidate_model or "").strip():
-            models.add(settings.eval_candidate_model.strip())
         gateway = {item.strip().lower() for item in (settings.llm_allowed_providers or "openrouter").split(",") if item.strip()}
         upstream = {
             item.strip().lower()
             for item in (settings.cura_openrouter_allowed_providers or "openai,google,anthropic,typesafe").split(",")
             if item.strip()
         }
-        require_zdr = bool(settings.cura_openrouter_require_zdr or settings.require_zdr_for_personal_health)
         deny = bool(settings.cura_openrouter_deny_data_collection and settings.openrouter_data_collection_deny)
+        profile = (settings.personal_health_privacy_profile or "not_approved").strip().lower()
+        approved = {
+            item.strip()
+            for item in (settings.personal_health_approved_models or "").split(",")
+            if item.strip()
+        }
         return cls(
             allowed_models=frozenset(models),
             allowed_providers=frozenset(gateway),
             allowed_upstream_providers=frozenset(upstream),
-            require_zdr=require_zdr,
-            deny_data_collection=deny or require_zdr,
+            deny_data_collection=deny,
             prompt_injection_protection=bool(settings.cura_openrouter_prompt_injection_protection),
             dlp_enabled=bool(settings.cura_openrouter_dlp_enabled),
             clinical_safety_enabled=bool(settings.cura_clinical_safety_enabled),
             package_safety_enabled=bool(settings.cura_package_safety_enabled),
             request_timeout=float(settings.llm_timeout_seconds),
             max_retries=int(settings.llm_max_retries),
-            zdr_configured=bool(settings.openrouter_zero_data_retention),
+            privacy_profile=profile,
+            approved_personal_models=frozenset(approved),
         )
 
     def assert_gateway(self) -> str:
@@ -82,14 +86,25 @@ class OpenRouterPolicy:
         if selected not in self.allowed_models:
             raise LLMUnavailableError("LLM model is not on the approved allowlist")
         upstream = (provider_for_model(selected) or "").lower()
-        if upstream and upstream not in self.allowed_upstream_providers:
+        # "openrouter" here means no vendor slug, not an upstream endpoint.
+        if upstream and upstream != "openrouter" and upstream not in self.allowed_upstream_providers:
             raise LLMUnavailableError("LLM model is not on the approved allowlist")
         return selected
 
-    def assert_privacy_for_health(self, *, personal_health: bool) -> None:
-        if personal_health and self.require_zdr and not self.zdr_configured:
-            self.log_privacy(model=None, approved=False, personal_health=True)
-            raise LLMUnavailableError("Personal health LLM requires a ZDR-capable endpoint")
+    def personal_interpretation_permitted(self, model_id: str | None = None) -> bool:
+        """Safety retention is not zero retention. An empty allowlist sends nothing."""
+        if self.privacy_profile != "safety_retention" or not self.approved_personal_models:
+            return False
+        if model_id and model_id not in self.approved_personal_models:
+            return False
+        return True
+
+    def assert_privacy_for_health(self, *, personal_health: bool, model: str | None = None) -> None:
+        if personal_health and not self.personal_interpretation_permitted(model):
+            self.log_privacy(model=model, approved=False, personal_health=True)
+            raise LLMUnavailableError(
+                "Personal health interpretation is not approved for an external provider"
+            )
 
     def upstream_only(self, model_id: str) -> list[str]:
         slug = _UPSTREAM_SLUGS.get((provider_for_model(model_id) or "").lower())
@@ -98,17 +113,12 @@ class OpenRouterPolicy:
     def provider_preferences(self, model_id: str, *, personal_health: bool, require_parameters: bool = False) -> dict:
         self.assert_gateway()
         self.assert_model(model_id)
-        self.assert_privacy_for_health(personal_health=personal_health)
+        self.assert_privacy_for_health(personal_health=personal_health, model=model_id)
+        # Do not pin provider.only to the model vendor. That pin selects endpoints the
+        # account privacy policy rejects. allow_fallbacks stays off so the model cannot change.
         prefs: dict = {"allow_fallbacks": False}
-        only = self.upstream_only(model_id)
-        if only:
-            prefs["only"] = only
         if self.deny_data_collection:
             prefs["data_collection"] = "deny"
-        if personal_health and self.require_zdr and self.zdr_configured:
-            prefs["zdr"] = True
-        elif self.zdr_configured and personal_health:
-            prefs["zdr"] = True
         if require_parameters:
             prefs["require_parameters"] = True
         self.log_privacy(model=model_id, approved=True, personal_health=personal_health)
@@ -116,10 +126,9 @@ class OpenRouterPolicy:
 
     def log_privacy(self, *, model: str | None, approved: bool, personal_health: bool) -> None:
         logger.info(
-            "OPENROUTER_PRIVACY_POLICY zdr_required=%s zdr_enabled=%s data_collection_denied=%s "
+            "OPENROUTER_PRIVACY_POLICY profile=%s data_collection_denied=%s "
             "provider_approved=%s personal_health=%s model=%s",
-            self.require_zdr and personal_health,
-            self.zdr_configured,
+            self.privacy_profile,
             self.deny_data_collection,
             approved,
             personal_health,
@@ -129,9 +138,28 @@ class OpenRouterPolicy:
             "OPENROUTER POLICY",
             model_approved=approved,
             provider_approved=approved,
-            zdr_enabled=self.zdr_configured if personal_health and self.require_zdr else False,
+            privacy_profile=self.privacy_profile,
             data_collection_denied=self.deny_data_collection,
         )
+
+
+_PERSONAL_CLINICAL = re.compile(
+    r"\b(?:my|mera|meri|mine)\b.{0,48}\b(?:ldl|hdl|hba1c|tsh|glucose|creatinine|ferritin|cholesterol|triglyceride|lab|report|marker)s?\b"
+    r"|\bsource_measurements\b"
+    r"|\d+(?:\.\d+)?\s*(?:mg/dl|g/dl|mmol/l|u/l|iu/l)\b"
+    r"|\b20\d{2}-\d{2}-\d{2}\b.{0,80}\b(?:stored|glucose|hba1c|cholesterol|iron|creatinine|albumin|bio-?\s*ai)\b"
+    r"|\b(?:stored|blood report|bio-?\s*ai)\b.{0,80}\b20\d{2}-\d{2}-\d{2}\b",
+    re.IGNORECASE,
+)
+
+
+def messages_contain_personal_clinical(messages: list) -> bool:
+    """True when the outbound text itself carries personal clinical content."""
+    parts: list[str] = []
+    for message in messages or []:
+        if isinstance(message, dict):
+            parts.append(str(message.get("content") or ""))
+    return bool(_PERSONAL_CLINICAL.search(" ".join(parts)))
 
 
 def openrouter_policy() -> OpenRouterPolicy:

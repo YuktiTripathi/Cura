@@ -47,26 +47,10 @@ markers, evidence, escalation, follow-ups, and prohibited claims:
 ```bash
 pytest tests/golden/test_production_eval.py -q
 pytest tests/unit/test_compositional_reasoning.py tests/unit/test_capability_eval.py -q
-python scripts/benchmark_routing.py
 ```
 
-The routing benchmark always reports the deterministic baseline. Live Jev and
-Jev+CURA-validation measurements are opt-in because they use OpenRouter:
-
-```bash
-python scripts/eval_assistant_40.py
-python scripts/eval_reasoner_models.py
-```
-
-The 40-question assistant eval (`tests/fixtures/cura_assistant_eval_40.jsonl`) uses synthetic
-users only, including `eval-user-iron` (low haemoglobin/MCV/MCH/iron, normal lipids,
-unchanged HbA1c 5.3%). `eval_reasoner_models.py` scores retrieval coverage,
-grounding, synthesis, restraint, and latency against the same fixtures.
-De-identified JSONL is written under `tests/fixtures/eval_runs/` (gitignored).
-Live model comparison (`answer_model_standard_medical`, `answer_model_deep_medical`,
-`eval_candidate_model`) is opt-in via `CURA_LIVE_MODEL_EVAL=1` and is not run
-in CI. Production model choice stays “not run” until a live ZDR-compliant run
-exists. `data_collection=deny` is not ZDR.
+`tests/fixtures/cura_assistant_eval_40.jsonl` is a synthetic regression fixture
+for the assistant tests. `data_collection=deny` is not ZDR.
 
 `OPENROUTER_DATA_COLLECTION_DENY` sets `provider.data_collection = "deny"`. That is
 not by itself proof of zero retention. `OPENROUTER_ZERO_DATA_RETENTION` additionally

@@ -146,7 +146,10 @@ class DocumentProcessor:
         if not pages:
             return pages
         total = sum(p.character_count for p in pages)
-        sparse = [p for p in pages if p.character_count < settings.document_sparse_page_chars]
+        # A short but successfully extracted lab line is text, not a scan.
+        # Only near-empty pages should demand OCR.
+        sparse_limit = min(20, settings.document_sparse_page_chars)
+        sparse = [p for p in pages if p.character_count < sparse_limit]
         most_sparse = len(sparse) > len(pages) / 2
         need = total < settings.document_min_text_chars or most_sparse
         if not need:

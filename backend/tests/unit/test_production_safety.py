@@ -64,7 +64,9 @@ def test_pii_stripped_from_model_payload():
     assert "otp" not in safe
 
 
-def test_secret_blocks_inference():
+def test_secret_blocks_inference(monkeypatch):
+    monkeypatch.setattr(settings, "personal_health_privacy_profile", "safety_retention")
+    monkeypatch.setattr(settings, "personal_health_approved_models", "openai/gpt-5.6-luna")
     token = (
         "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9."
         "eyJzdWIiOiIxMjM0NTY3ODkwIn0."
@@ -236,11 +238,10 @@ def test_unapproved_model_is_blocked():
 
 
 def test_zdr_incompatibility_fails_closed(monkeypatch):
-    monkeypatch.setattr(settings, "cura_openrouter_require_zdr", True)
-    monkeypatch.setattr(settings, "require_zdr_for_personal_health", True)
-    monkeypatch.setattr(settings, "openrouter_zero_data_retention", False)
+    monkeypatch.setattr(settings, "personal_health_privacy_profile", "not_approved")
+    monkeypatch.setattr(settings, "personal_health_approved_models", "")
     policy = OpenRouterPolicy.load()
-    with pytest.raises(LLMUnavailableError, match="ZDR"):
+    with pytest.raises(LLMUnavailableError, match="not approved"):
         policy.assert_privacy_for_health(personal_health=True)
     policy.assert_privacy_for_health(personal_health=False)
 

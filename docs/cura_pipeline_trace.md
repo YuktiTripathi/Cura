@@ -69,8 +69,7 @@ before the safety layer runs. The frontend shows stage progress during that wait
 
 ```
 cd backend
-python scripts/latency_suite.py --user <subject_id> --runs 3          # live, cold (cache off), no judge
-python scripts/eval_cura_20.py --user <subject_id>                     # 20 cases, Gemini 3.8 Flash + GPT-5.6-luna judge
+python scripts/latency_suite.py --user <subject_id> --runs 3          # live, cold (cache off)
 ```
 
 Every response carries `meta.timing.stages` and the log line `cura_perf {...}` with:

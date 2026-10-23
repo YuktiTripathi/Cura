@@ -23,7 +23,17 @@ def test_message_text_skips_reasoning_parts():
     assert message_text({"content": [{"type": "reasoning", "text": "hidden"}, {"type": "text", "text": "visible"}]}) == "visible"
     assert uses_reasoning_tokens("openai/gpt-5-nano")
     assert uses_reasoning_tokens("openai/gpt-5-mini")
-    assert not uses_reasoning_tokens("google/gemini-3.8-flash")
+    assert uses_reasoning_tokens("google/gemini-3.8-flash")
+    assert not uses_reasoning_tokens("google/gemini-2.5-flash")
+    assert not uses_reasoning_tokens("google/gemini-3.1-flash")
+
+
+def test_gemini_38_flash_uses_reasoning_output_cap():
+    client = OpenAICompatibleLLMClient(model="google/gemini-3.8-flash", api_key="synthetic")
+    payload = client._build_payload([{"role": "user", "content": "synthetic"}], "json_schema")
+    assert payload["max_tokens"] == max(settings.llm_max_output_tokens, settings.llm_reasoning_output_cap)
+    plain = OpenAICompatibleLLMClient(model="openai/gpt-4o-mini", api_key="synthetic")
+    assert plain._build_payload([{"role": "user", "content": "synthetic"}], "plain")["max_tokens"] == settings.llm_max_output_tokens
 
 
 def test_normalize_asyncpg_url():
@@ -125,11 +135,14 @@ def test_llm_retries_transient_failure(monkeypatch):
     instance = Client()
     monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: instance)
     monkeypatch.setattr(settings, "llm_max_retries", 1)
+    monkeypatch.setattr(settings, "llm_allowed_models", f"{settings.llm_allowed_models},qwen")
     client = OpenAICompatibleLLMClient(
         provider="openai_compatible", base_url="http://local", model="qwen", api_key="test"
     )
     assert client._real_complete([{"role": "user", "content": "hello"}]) == "ok"
-    assert client.last_usage == {"input_tokens": 3, "output_tokens": 1}
+    assert client.last_usage["input_tokens"] == 3
+    assert client.last_usage["output_tokens"] == 1
+    assert client.last_usage["usage_reported"] is True
 
 
 def test_llm_invalid_json_is_typed_failure(monkeypatch):
@@ -169,6 +182,7 @@ def test_gpt5_payload_sets_low_reasoning_effort(monkeypatch):
 
     monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
     monkeypatch.setattr(settings, "llm_max_output_tokens", 800)
+    monkeypatch.setattr(settings, "llm_allowed_models", f"{settings.llm_allowed_models},openai/gpt-5-nano")
     client = OpenAICompatibleLLMClient(
         provider="openrouter",
         base_url="http://local",
@@ -227,6 +241,7 @@ def test_content_parts_are_used_as_visible_text(monkeypatch):
             )
 
     monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    monkeypatch.setattr(settings, "llm_allowed_models", f"{settings.llm_allowed_models},openai/gpt-5-nano")
     client = OpenAICompatibleLLMClient(
         provider="openrouter", base_url="http://local", model="openai/gpt-5-nano", api_key="test"
     )
@@ -280,11 +295,38 @@ def test_json_schema_400_falls_back_without_opening_circuit(monkeypatch):
     )
     parsed = client.complete_structured([{"role": "user", "content": "What does Vitamin D do?"}])
     assert "absorb calcium" in parsed.answer
-    assert posts[0]["response_format"]["type"] == "json_schema"
+    assert posts[0]["response_format"]["type"] == "json_object"
+    assert len(posts) == 1
     assert "require_parameters" not in (posts[0].get("provider") or {})
-    assert any((row.get("response_format") or {}).get("type") != "json_schema" for row in posts[1:])
     openrouter_breaker.allow()
     assert openrouter_breaker._state.open is False
+
+
+def test_schema_capable_model_falls_back_once_on_http_400(monkeypatch):
+    openrouter_breaker.reset()
+    posts = []
+
+    class Client:
+        def post(self, *args, **kwargs):
+            payload = kwargs["json"]
+            posts.append(payload)
+            fmt = (payload.get("response_format") or {}).get("type")
+            if fmt == "json_schema":
+                return _Response(400, {"error": {"message": "unsupported"}})
+            return _Response(200, {"choices": [{"message": {"content": '{"answer":"ok"}'}}], "usage": {}})
+
+    monkeypatch.setattr("app.llm.openai_compatible.get_http_client", lambda: Client())
+    monkeypatch.setattr(settings, "llm_json_schema_output", True)
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "complete", OpenAICompatibleLLMClient._real_complete)
+    client = OpenAICompatibleLLMClient(
+        provider="openrouter", base_url="http://local", model="openai/gpt-4o-mini", api_key="test"
+    )
+    parsed = client.complete_structured([{"role": "user", "content": "What does Vitamin D do?"}])
+    assert parsed.answer == "ok"
+    assert posts[0]["response_format"]["type"] == "json_schema"
+    assert posts[1]["response_format"]["type"] == "json_object"
+    assert client.last_usage.get("usage_reported") is False
+    openrouter_breaker.allow()
 
 
 def test_privacy_flags_are_configured():

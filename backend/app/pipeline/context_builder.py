@@ -28,6 +28,7 @@ from app.pipeline.personal_selection import (
     select_bio_risks,
     companion_abnormal_markers,
     select_latest_markers,
+    select_markers_on_dates,
     select_previous_markers,
     wanted_metric_keys,
     _bio_code_options,
@@ -38,8 +39,22 @@ from app.pipeline.lab_parameters import (
     canonicalize_marker_name,
     display_name_for,
     is_lab_key,
+    match_lab_keys,
     related_keys,
 )
+
+_BROAD_PANEL = re.compile(
+    r"\b(?:panel|all (?:my )?(?:labs?|results|markers|values)|full (?:report|panel)|overall health|everything)\b",
+    re.I,
+)
+
+
+def _dated_display_keys(message: str, fallback: list[str]) -> list[str]:
+    """Specific dated questions show the named markers. Panel and summary questions keep the family."""
+    if _BROAD_PANEL.search(message or ""):
+        return list(fallback)
+    named = [key for key in match_lab_keys(message or "") if is_lab_key(key)]
+    return named or list(fallback)
 from app.pipeline.derived import attach_derived_facts, attach_user_stated
 from app.pipeline.health_scenario import HealthScenarioEngine
 from app.pipeline.recommendation_engine import RecommendationEngine
@@ -209,7 +224,9 @@ class ContextBuilder:
             ctx.meta.sources = ["general"]
             return ctx
 
-        if plan.intent == IntentType.health_scenario:
+        from app.pipeline.bio_ai_selection import requested_dates
+
+        if plan.intent == IntentType.health_scenario and not requested_dates(message or ""):
             scenario_input = self._scenario_input(principal, plan, retrieval)
             ctx.scenario = HealthScenarioEngine().build(
                 scenario_input.blood_reports,
@@ -369,6 +386,7 @@ class ContextBuilder:
             )
             return
         keys = wanted_metric_keys(plan)
+        named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}
         selectors = {str(item).upper() for item in (plan.selectors or [])}
@@ -399,6 +417,33 @@ class ContextBuilder:
                     if item not in expanded:
                         expanded.append(item)
             keys = expanded or keys
+
+        from app.pipeline.bio_ai_selection import requested_blood_dates
+
+        asked_dates = requested_blood_dates(plan.raw_message or "")
+        if asked_dates and (named_keys or keys):
+            # A named dated lookup stays on the markers the question asked for.
+            # A panel or report summary may still use the expanded family.
+            selected_keys = _dated_display_keys(plan.raw_message or "", named_keys or keys)
+            selected, missing_dates = select_markers_on_dates(reports, selected_keys, asked_dates)
+            ctx.markers = selected
+            for marker in selected:
+                report = next(
+                    (item for item in reports if item.report_date == marker.measured_at or item.report_id == marker.report_id),
+                    None,
+                )
+                if report is not None:
+                    evidence.append(self._ev(report.report_id, "blood_report", report.report_date, marker.name, None, marker))
+            for day in missing_dates:
+                ctx.missing.append(
+                    MissingItem(
+                        key=keys[0],
+                        name=plan.topic_name or display_name_for(keys[0]),
+                        reason="not_on_requested_date",
+                        report_date=day,
+                    )
+                )
+            return
 
         if plan.intent == IntentType.health_goal_progress:
             report = latest_report(reports)
@@ -438,7 +483,38 @@ class ContextBuilder:
             return
 
         if plan.intent == IntentType.previous_result:
-            selected, missing = select_previous_markers(reports, keys or [plan.topic] if plan.topic else [])
+            from app.pipeline.evidence_inventory import requested_marker_keys
+
+            panel = requested_marker_keys(plan.raw_message)
+            lookup_keys = list(dict.fromkeys((keys or ([plan.topic] if plan.topic else [])) + panel))
+            asks_change = bool(re.search(r"\b(improved|improve|changed|change|since|compared|comparison)\b", plan.raw_message or "", re.I))
+            if asks_change and lookup_keys:
+                selected = []
+                for key in lookup_keys:
+                    hits = measurements_for_key(reports, key)
+                    if len(hits) >= 2:
+                        prev_report, prev_m = hits[-2]
+                        curr_report, curr_m = hits[-1]
+                        prev_m = prev_m.model_copy(update={"measured_at": prev_m.measured_at or prev_report.report_date, "report_id": prev_m.report_id or prev_report.report_id})
+                        curr_m = curr_m.model_copy(update={"measured_at": curr_m.measured_at or curr_report.report_date, "report_id": curr_m.report_id or curr_report.report_id})
+                        selected.extend([prev_m, curr_m])
+                        ctx.comparisons.append(comparison(
+                            key, prev_m.value, curr_m.value,
+                            prev_report.report_id, curr_report.report_id,
+                            prev_report.report_date, curr_report.report_date,
+                        ).model_copy(update={"previous_unit": prev_m.unit, "current_unit": curr_m.unit}))
+                        evidence.append(self._ev(prev_report.report_id, "blood_report", prev_report.report_date, prev_m.name, None, prev_m))
+                        evidence.append(self._ev(curr_report.report_id, "blood_report", curr_report.report_date, curr_m.name, None, curr_m))
+                    elif len(hits) == 1:
+                        report, marker = hits[0]
+                        marker = marker.model_copy(update={"measured_at": marker.measured_at or report.report_date, "report_id": marker.report_id or report.report_id})
+                        selected.append(marker)
+                        evidence.append(self._ev(report.report_id, "blood_report", report.report_date, marker.name, None, marker))
+                    else:
+                        ctx.missing.append(MissingItem(key=key, name=display_name_for(key), reason="not_in_reports"))
+                ctx.markers = selected
+                return
+            selected, missing = select_previous_markers(reports, lookup_keys)
             if not selected:
                 ctx.missing.append(MissingItem(key=plan.topic or "blood", name="previous result", reason="no_previous"))
                 return
@@ -463,6 +539,8 @@ class ContextBuilder:
                 curr_report, curr_m = curr
                 if prev_m.key != curr_m.key:
                     continue
+                prev_m = prev_m.model_copy(update={"measured_at": prev_m.measured_at or prev_report.report_date})
+                curr_m = curr_m.model_copy(update={"measured_at": curr_m.measured_at or curr_report.report_date})
                 markers.extend([prev_m, curr_m])
                 item = comparison(
                     key,
@@ -472,7 +550,7 @@ class ContextBuilder:
                     curr_report.report_id,
                     prev_report.report_date,
                     curr_report.report_date,
-                )
+                ).model_copy(update={"previous_unit": prev_m.unit, "current_unit": curr_m.unit})
                 comparisons.append(item)
                 evidence.append(self._ev(prev_report.report_id, "blood_report", prev_report.report_date, prev_m.name, None, prev_m))
                 evidence.append(self._ev(curr_report.report_id, "blood_report", curr_report.report_date, curr_m.name, None, curr_m))
@@ -590,6 +668,23 @@ class ContextBuilder:
                 for marker in ctx.markers:
                     evidence.append(self._ev(latest.report_id, "blood_report", latest.report_date, marker.name, None, marker))
                 return
+            if (
+                not keys
+                and plan.intent in {
+                    IntentType.bio_ai_explanation,
+                    IntentType.bio_ai_score,
+                    IntentType.bio_ai_comparison,
+                }
+                and latest is not None
+            ):
+                flagged = [
+                    m for m in latest.markers
+                    if m.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and m.value is not None
+                ]
+                ctx.markers = flagged[:8]
+                for marker in ctx.markers:
+                    evidence.append(self._ev(latest.report_id, "blood_report", latest.report_date, marker.name, None, marker))
+                return
             if not keys and not ctx.missing:
                 ctx.missing.append(
                     MissingItem(
@@ -623,6 +718,21 @@ class ContextBuilder:
         for marker in selected:
             report = next((item for item in reports if item.report_id == marker.report_id), reports[-1])
             evidence.append(self._ev(report.report_id, "blood_report", report.report_date, marker.name, None, marker))
+        if plan.intent == IntentType.blood_marker_explanation and keys:
+            # Keep the latest value as the subject, and keep an earlier dated value so the
+            # model cannot claim the history does not exist.
+            for key in keys:
+                hits = measurements_for_key(reports, key)
+                if len(hits) < 2:
+                    continue
+                prev_report, prev_m = hits[-2]
+                curr_report, curr_m = hits[-1]
+                evidence.append(self._ev(prev_report.report_id, "blood_report", prev_report.report_date, prev_m.name, None, prev_m))
+                ctx.comparisons.append(comparison(
+                    key, prev_m.value, curr_m.value,
+                    prev_report.report_id, curr_report.report_id,
+                    prev_report.report_date, curr_report.report_date,
+                ).model_copy(update={"previous_unit": prev_m.unit, "current_unit": curr_m.unit}))
 
     def _fill_bio(self, ctx, plan, reports, evidence, conversation_report_id=None):
         if not reports:
@@ -969,12 +1079,13 @@ class ContextBuilder:
 
         goal = infer_conversation_goal(message or plan.raw_message or "", plan, conversation_state)
         depth = infer_response_depth(message or plan.raw_message or "", plan, goal, conversation_state)
-        if plan.intent == IntentType.latest_result and "ALL" in {str(s).upper() for s in plan.selectors or []}:
-            from app.pipeline.health_patterns import find_patterns
+        full = latest_report(blood_reports or [])
+        if full:
+            ctx.panel_markers = [marker for marker in full.markers if marker.value is not None]
+            if plan.intent == IntentType.latest_result:
+                from app.pipeline.health_patterns import find_patterns
 
-            full = latest_report(blood_reports or [])
-            if full:
-                ctx.report_patterns = find_patterns([m for m in full.markers if m.value is not None], ctx.bio_ai_risks or [])[0]
+                ctx.report_patterns = find_patterns(ctx.panel_markers, ctx.bio_ai_risks or [])[0]
         selector = RelevantContextSelector()
         relevant = selector.select(
             ctx, plan, reports=blood_reports or [], goal=goal, depth=depth

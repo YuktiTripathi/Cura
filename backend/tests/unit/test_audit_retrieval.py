@@ -45,7 +45,7 @@ def test_thyroid_results_are_blood_panel_not_bio_ai():
     assert plan.needs_blood
     assert not plan.needs_bio_ai
     assert plan.topic == "thyroid_function"
-    assert set(retrieval_keys(plan.topic)) == {"tsh", "t3", "t4"}
+    assert set(retrieval_keys(plan.topic)) == {"tsh", "t3", "t4", "free_t4"}
 
 
 def test_thyroid_score_is_bio_ai():

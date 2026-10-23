@@ -13,6 +13,7 @@ _NARRATIVE = re.compile(
     r"what did the (?:doctor|report|radiologist)|"
     r"explain the (?:impression|recommendation|findings)|"
     r"summar(?:y|ize|ise) (?:the )?(?:document|report|section|pathology|comments)|"
+    r"tell me about (?:my )?.{0,48}(?:results|report|allergy)|"
     r"main findings in this document|report comments|"
     r"what does the (?:report|doctor|radiologist) say|"
     r"recommendation section|conclude"
@@ -29,7 +30,11 @@ _STRUCTURED = re.compile(
 )
 _SUMMARY = re.compile(
     r"\b(explain this (?:whole |entire )?report|summar(?:y|ize|ise) this (?:whole |entire )?(?:report|document)|"
-    r"what (?:does|did) this (?:report|pdf|document) (?:say|show))\b",
+    r"what (?:does|did) this (?:report|pdf|document|discharge summary|prescription) (?:say|show)|"
+    r"summar(?:y|ize|ise) this discharge summary|"
+    r"summar\w*.{0,48}\b(?:findings|report|document|results)\b|"
+    r"anything unusual|anything abnormal|"
+    r"what does this medical document say about (?:my )?treatment)\b",
     re.I,
 )
 _ALL_EXTRACTED = re.compile(
@@ -52,6 +57,10 @@ def wants_document_narrative(message: str, plan: QueryPlan | None = None) -> boo
     if wants_document_summary(text):
         return True
     if _NARRATIVE.search(text):
+        return True
+    if re.search(r"\bwhat does my .{3,80}\b(?:say|show)\b", text, re.I) and not match_lab_keys(text):
+        return True
+    if re.search(r"\b(allergy|bio-?allergy)\b", text, re.I) and not match_lab_keys(text):
         return True
     ops = {str(item).upper() for item in ((plan.operations if plan else None) or [])}
     return bool(ops & {"DOCUMENT_NARRATIVE_RETRIEVAL", "DOCUMENT_SUMMARY"})

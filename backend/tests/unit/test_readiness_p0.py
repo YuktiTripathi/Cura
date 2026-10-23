@@ -47,8 +47,8 @@ def test_production_config_accepts_a_complete_setup():
     [
         ({"auth_jwt_secret": "change-me"}, "AUTH_JWT_SECRET"),
         ({"openrouter_api_key": ""}, "OPENROUTER_API_KEY"),
-        ({"openrouter_zero_data_retention": False}, "OPENROUTER_ZERO_DATA_RETENTION"),
-        ({"require_zdr_for_personal_health": False}, "REQUIRE_ZDR_FOR_PERSONAL_HEALTH"),
+        ({"personal_health_privacy_profile": "safety_retention", "personal_health_approved_models": ""}, "PERSONAL_HEALTH_APPROVED_MODELS"),
+        ({"personal_health_privacy_profile": "zdr"}, "PERSONAL_HEALTH_PRIVACY_PROFILE"),
         ({"health_provider": "supershyft", "supershyft_database_url": "postgresql://u:password@localhost/db"}, "SUPERSHYFT_DATABASE_URL"),
         ({"document_storage_backend": "local"}, "DOCUMENT_STORAGE_BACKEND"),
         ({"redis_required": False}, "REDIS_REQUIRED"),

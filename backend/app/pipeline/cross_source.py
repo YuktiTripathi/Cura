@@ -41,8 +41,15 @@ class CrossSourceComparator:
         notes: list[str] = []
         diff = None
         direction = None
-        unit = uploaded.unit or supershyft.unit
-        if uploaded.value is not None and supershyft.value is not None:
+        unit = None
+        left = "".join((uploaded.unit or "").lower().split())
+        right = "".join((supershyft.unit or "").lower().split())
+        if uploaded.value is not None and supershyft.value is not None and (not left or not right):
+            notes.append("One result has no verified unit, so no numeric change was calculated and no unit was copied from the other report.")
+        elif uploaded.value is not None and supershyft.value is not None and left != right:
+            notes.append("The units do not match, so no numeric change was calculated.")
+        elif uploaded.value is not None and supershyft.value is not None:
+            unit = uploaded.unit
             diff = round(supershyft.value - uploaded.value, 4)
             if diff < 0:
                 direction = "lower"
@@ -169,7 +176,9 @@ def render_comparison(result: ComparisonResult, *, why: bool = False, newer: boo
             "These are results from different reports. The difference alone does not establish why the values changed."
         )
     else:
-        if a.value is not None and b.value is None:
+        if a.value is not None and b.value is not None:
+            lines.append("Both results are on file. No numeric change is shown because the units or dates are not comparable.")
+        elif a.value is not None and b.value is None:
             lines.append("I found this marker in your uploaded report, but I don't have a matching result in the selected SuperShyft data.")
         elif a.value is None and b.value is not None:
             lines.append("I found this marker in your SuperShyft data, but I could not confidently extract a current value from the uploaded report.")
@@ -262,7 +271,7 @@ def compare_uploaded_with_blood(
                 code,
                 fact.display_name or marker.name,
                 uploaded_fact_to_source(fact),
-                marker_to_source(marker, report_date),
+                marker_to_source(marker, getattr(marker, "measured_at", None) or report_date),
             )
         )
         if len(results) >= 8:

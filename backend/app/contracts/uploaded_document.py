@@ -74,6 +74,12 @@ class DocumentHealthFact(BaseModel):
     original_value: float | str | None = None
     original_unit: str | None = None
     specimen: str | None = None
+    measurement_kind: str = "measured"
+    method: str | None = None
+    temporal_scope: str = "current"
+    resolution_status: str = "verified"
+    resolution_reason: str | None = None
+    raw_value: str | None = None
 
 
 class DocumentNarrativeFact(BaseModel):

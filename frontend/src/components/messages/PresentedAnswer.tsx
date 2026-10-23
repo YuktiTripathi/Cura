@@ -62,6 +62,9 @@ export function PresentedAnswer({
           {presentation.topic_summary.text}
         </p>
       ) : null}
+      {presentation.mode === "SAFETY" ? (
+        <p className="safety-notice" role="status">This answer follows CURA's safety guidance. It is not a diagnosis.</p>
+      ) : null}
       {showHeadline ? <h3 className="answer-headline">{presentation.headline}</h3> : null}
       {presentation.overall_summary || presentation.summary ? (
         <div className="answer-summary">

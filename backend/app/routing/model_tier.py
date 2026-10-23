@@ -87,9 +87,10 @@ def apply_answer_model_routing(
         jev_tier = parse_model_tier(decision.answer_model_tier) if decision.answer_model_tier else None
         if jev_tier:
             selected = jev_tier
-            if _RANK[inferred.tier] >= _RANK[AnswerModelTier.deep_medical_reasoning] and _RANK[selected] < _RANK[
-                AnswerModelTier.standard_medical
-            ]:
+            if (
+                _RANK[inferred.tier] >= _RANK[AnswerModelTier.deep_medical_reasoning]
+                and _RANK[selected] < _RANK[inferred.tier]
+            ):
                 selected = inferred.tier
                 reasons.append("inferred_complexity_prevented_under_routing")
             else:
@@ -303,7 +304,33 @@ def infer_answer_model_routing(plan: QueryPlan) -> _Inference:
             ReasoningDepth.deep,
             reasons,
         )
-    reasons.append("standard_medical_default")
+    selected = tier_for_score(score)
+    structural = bool(
+        uncertainty or cross or related or history or pdf_analysis or scenario or domain_count >= 2 or len(mentioned) >= 3
+    )
+    if selected == AnswerModelTier.deep_medical_reasoning and not structural:
+        selected = AnswerModelTier.standard_medical
+    if selected == AnswerModelTier.deep_medical_reasoning:
+        reasons.append("complexity_score_deep")
+        return _Inference(
+            AnswerComplexity.high,
+            AnswerModelTier.deep_medical_reasoning,
+            True,
+            pdf_analysis,
+            ReasoningDepth.deep,
+            reasons,
+        )
+    if selected == AnswerModelTier.fast_reasoning:
+        reasons.append("complexity_score_fast")
+        return _Inference(
+            AnswerComplexity.low,
+            AnswerModelTier.fast_reasoning,
+            bool(plan.needs_personal_data or plan.medical_evidence_required),
+            pdf_analysis,
+            ReasoningDepth.none,
+            reasons,
+        )
+    reasons.append("complexity_score_standard")
     return _Inference(
         AnswerComplexity.medium,
         AnswerModelTier.standard_medical,
@@ -340,6 +367,23 @@ _REASONING_OPS = {
 }
 
 
+def asks_blood_and_score_relationship(text: str) -> bool:
+    """A blood result and a Bio-AI score asked about together, not a single-value lookup."""
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    if not match_lab_keys(text or ""):
+        return False
+    if not re.search(r"\b(scores?|bio-?ai|risks?|estimate)\b", text or "", re.I):
+        return False
+    return bool(
+        re.search(
+            r"\b(support|argue|sit next|alongside|explain|because|disagree|consistent|when my|even though|how does)\b",
+            text or "",
+            re.I,
+        )
+    )
+
+
 def _lookup_only(plan: QueryPlan, interpret: bool, list_only: bool, metric_count: int, ops: set[str]) -> bool:
     if plan.knowledge_scope.value == "general" and plan.intent != IntentType.casual_conversation:
         return False
@@ -359,6 +403,8 @@ def _lookup_only(plan: QueryPlan, interpret: bool, list_only: bool, metric_count
     if plan.intent == IntentType.casual_conversation:
         return True
     if plan.intent == IntentType.bio_ai_score and not interpret and metric_count <= 1:
+        if asks_blood_and_score_relationship(plan.raw_message or ""):
+            return False
         return True
     return False
 
@@ -370,7 +416,7 @@ def _constrain_tier(
     reasoning: bool,
 ) -> tuple[AnswerModelTier, ReasoningDepth, list[str]]:
     extra: list[str] = []
-    if selected == AnswerModelTier.fast_reasoning and reasoning:
+    if selected == AnswerModelTier.fast_reasoning and plan.needs_personal_data:
         selected = AnswerModelTier.standard_medical
         depth = ReasoningDepth.standard
         extra.append("fast_reasoning_not_used_for_medical_answers")

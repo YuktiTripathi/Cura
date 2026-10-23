@@ -318,6 +318,11 @@ def select_questionnaire_context(
     # ``subject_keys``: the habit the question is ABOUT ("am I active enough?"); its answer is
     # kept even when neutral, because it is the fact being judged.
     candidates = list(keys) if keys else list(REVIEW_KEYS) if review else relevant_questionnaire_keys(entities, domains)
+    if re.search(r"\b(active enough|physical activity|exercise)\b", question or "", re.I) and not review:
+        activity_keys = set(_ACTIVITY_GROUP) | set(subject_keys or [])
+        narrowed = [key for key in candidates if key in activity_keys]
+        if narrowed:
+            candidates = narrowed
     if re.search(r"\bquestionnaire\b", question or "", re.I):
         asked = (question or "").lower()
         for answer in answers:

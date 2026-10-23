@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 
 from fastapi.testclient import TestClient
 
@@ -13,6 +13,7 @@ from app.pipeline.health_gaps import HealthGapDetector
 from app.pipeline.lab_parameters import canonicalize_marker_name
 from app.pipeline.package_matcher import PackageMatcher
 from app.pipeline.package_policy import PackageRecommendationPolicy
+from app.pipeline.personal_selection import coerce_marker_date, latest_context_markers, marker_flag
 from app.pipeline.safety import package_suggestion_allowed
 from app.pipeline.test_need import TestNeedGenerator as NeedGenerator
 from app.pipeline.testing_option import TestingOptionService as DiagnosticsTesting
@@ -55,6 +56,23 @@ def test_canonicalize_supershyft_parameter_keys():
     assert canonicalize_marker_name("iron_serum") == "iron"
     assert canonicalize_marker_name("vitamin_d_total-25_hydroxy") == "vitamin_d"
     assert canonicalize_marker_name("transferrin_saturation") == "transferrin"
+
+
+def test_neutral_marker_helpers_preserve_date_flag_and_latest_selection():
+    older = _marker("ldl", 140, MarkerFlag.high, date(2026, 1, 1))
+    newer = _marker("ldl", 120, MarkerFlag.normal, date(2026, 2, 1))
+    context = HealthContext(
+        intent=IntentType.latest_result,
+        answer_depth=AnswerDepth.simple,
+        markers=[newer, older],
+    )
+
+    assert coerce_marker_date(datetime(2026, 2, 1, 12, 30)) == date(2026, 2, 1)
+    assert coerce_marker_date("2026-02-01T12:30:00Z") == date(2026, 2, 1)
+    assert coerce_marker_date("not-a-date") is None
+    assert marker_flag(newer) == MarkerFlag.normal
+    assert marker_flag(type("UnknownMarker", (), {"status": "not-a-status", "flag": None})()) == MarkerFlag.unknown
+    assert latest_context_markers(context)["ldl"].value == 120
 
 
 def test_iron_gap_identifies_ferritin_without_diagnosis():

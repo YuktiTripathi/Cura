@@ -94,8 +94,6 @@ class IhrRepository:
         return self.get_ihr_data_for_query(principal, plan)
 
     def get_ihr_data_for_query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> IhrBundle:
-        uid = _user_id(principal)
-        rows = _sorted_ihr_rows(fetch_ihr_rows(principal))
         started = time.perf_counter()
         uid = _user_id(principal)
         rows = _sorted_ihr_rows(fetch_ihr_rows(principal))
@@ -127,8 +125,11 @@ class IhrRepository:
                 for r in bio
                 if r.report_id == plan.report_id or r.report_id == f"bioai-{plan.report_id}"
             ]
+        from app.pipeline.bio_ai_selection import requested_dates
+
+        dated_request = bool(requested_dates(plan.raw_message or ""))
         wanted_keys = retrieval_metric_keys(plan) if plan.needs_blood else []
-        if wanted_keys:
+        if wanted_keys and not dated_request:
             wanted = set(wanted_keys)
             for key in wanted_keys:
                 wanted |= related_keys(key) | distinct_neighbours(key)
@@ -138,16 +139,23 @@ class IhrRepository:
                 wanted |= {"ldl", "hdl", "cholesterol", "triglycerides"}
             blood = retain_blood_reports(blood, wanted)
         keep_blood_history = bool(
-            plan.history
+            dated_request
+            or plan.history
             or plan.time_operation in {"latest_marker", "trend", "previous", "compare"}
         )
-        if plan.time_operation == "latest_report" and blood:
+        if plan.time_operation == "latest_report" and blood and not dated_request:
             blood = blood[-1:]
         elif not keep_blood_history and blood:
             blood = blood[-1:]
-        if plan.time_operation == "latest_report" and bio:
+        if plan.time_operation == "latest_report" and bio and not dated_request:
             bio = bio[-1:]
-        elif not plan.history and plan.intent.value != "bio_ai_comparison" and bio and plan.intent.value != "bio_ai_explanation":
+        elif (
+            not dated_request
+            and not plan.history
+            and plan.intent.value != "bio_ai_comparison"
+            and bio
+            and plan.intent.value != "bio_ai_explanation"
+        ):
             if plan.intent.value == "bio_ai_score":
                 pass
             elif bio:

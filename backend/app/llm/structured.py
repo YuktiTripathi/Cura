@@ -24,6 +24,42 @@ _SCHEMA_KEYS = {
 }
 
 
+def parse_score_object(payload: Any) -> dict[str, Any]:
+    """Read a judge score object. A medical-answer schema is not required."""
+    if payload is None:
+        return {"error": "empty_response"}
+    text = payload if isinstance(payload, str) else json.dumps(payload)
+    text = _FENCE.sub("", text.strip()).strip()
+    if not text:
+        return {"error": "empty_response"}
+    try:
+        loaded = json.loads(text)
+    except json.JSONDecodeError:
+        start, end = text.find("{"), text.rfind("}")
+        if start < 0 or end <= start:
+            return {"error": "not_json", "raw": text[:500]}
+        try:
+            loaded = json.loads(text[start : end + 1])
+        except json.JSONDecodeError:
+            return {"error": "not_json", "raw": text[:500]}
+    if isinstance(loaded, str):
+        return parse_score_object(loaded)
+    if not isinstance(loaded, dict):
+        return {"error": "not_object", "raw": text[:500]}
+    scores = {}
+    for key in ("correctness", "relevance", "completeness", "clarity", "uncertainty", "grounding"):
+        value = loaded.get(key)
+        if isinstance(value, bool) or not isinstance(value, (int, float)):
+            return {"error": f"missing_{key}", "raw": text[:500]}
+        if not 0 <= float(value) <= 5:
+            return {"error": f"out_of_range_{key}", "raw": text[:500]}
+        scores[key] = float(value)
+    scores["critical"] = bool(loaded.get("critical"))
+    note = loaded.get("note")
+    scores["note"] = note.strip() if isinstance(note, str) else ""
+    return scores
+
+
 def looks_like_structured_json(text: str) -> bool:
     stripped = (text or "").strip()
     if not stripped.startswith("{"):

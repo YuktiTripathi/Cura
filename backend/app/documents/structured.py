@@ -31,6 +31,15 @@ class ExtractedBiomarker(BaseModel):
     excerpt: str | None = None
     confidence: str = "low"
     extraction_method: str = "text"
+    measurement_kind: str = "measured"
+    resolution_status: str = "verified"
+    resolution_reason: str | None = None
+    raw_value: str | None = None
+    section: str | None = None
+    specimen: str | None = None
+    method: str | None = None
+    collection_date: date | None = None
+    temporal_scope: str = "current"
 
     def has_reference(self) -> bool:
         return self.reference_low is not None or self.reference_high is not None or bool(self.reference_range)
@@ -97,6 +106,7 @@ def extract_structured_from_chunks(
                     source_line=extracted.line,
                     excerpt=(extracted.source_text or "")[:200],
                     confidence=extracted.confidence,
+                    measurement_kind=extracted.measurement_kind,
                 )
             )
     return ExtractedHealthDocument(

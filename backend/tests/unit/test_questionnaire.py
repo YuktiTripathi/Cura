@@ -82,7 +82,7 @@ def test_general_ldl_definition_may_use_related_questionnaire_context():
     assert plan.knowledge_scope == KnowledgeScope.general
     assert plan.general_personalization is True
     result = _retrieve(U001, plan)
-    assert result.skipped_reason != "general_no_personal_data"
+    assert result.skipped_reason == "general_no_personal_data"
 
 
 def test_explicit_questionnaire_questions_do_query():

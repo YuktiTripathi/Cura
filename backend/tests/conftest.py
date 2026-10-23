@@ -9,6 +9,13 @@ settings.allow_mock_auth_with_real_health = True
 settings.mock_user_id = ""
 settings.allow_mock_header_override = False
 settings.enable_llm = False
+# Unit tests stub the model. This is not a production approval.
+# The process default remains not_approved, so real patient prompts stay local.
+settings.personal_health_privacy_profile = "safety_retention"
+settings.personal_health_approved_models = (
+    "google/gemini-3.8-flash,openai/gpt-5-mini,openai/gpt-5.6-luna,"
+    "typesafe/jev-1.13,openai/whisper-1"
+)
 settings.llm_provider = "openrouter"
 settings.jev_enabled = False
 # Jev-mechanics tests force Jev on; the fast path is exercised by its own tests.

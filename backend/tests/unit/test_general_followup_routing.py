@@ -86,6 +86,33 @@ def test_hdl_ldl_then_personal_lifestyle_followup_uses_member_data():
     assert PERSONAL_DATA_UNAVAILABLE not in second["answer"]
 
 
+def test_chat_passes_persisted_summary_to_follow_up_router(monkeypatch):
+    from app.pipeline.service import RouteStage
+
+    seen_summaries: list[str] = []
+    original = RouteStage.run
+
+    def capture_summary(self, message, **kwargs):
+        seen_summaries.append(kwargs.get("conversation_summary", ""))
+        return original(self, message, **kwargs)
+
+    monkeypatch.setattr(RouteStage, "run", capture_summary)
+    first = client.post(
+        "/api/v1/chat",
+        headers={"X-Cura-User-Id": "summary-routing-user"},
+        json={"message": "What is LDL?"},
+    )
+    assert first.status_code == 200
+    second = client.post(
+        "/api/v1/chat",
+        headers={"X-Cura-User-Id": "summary-routing-user"},
+        json={"conversation_id": first.json()["conversation_id"], "message": "And why can it be high?"},
+    )
+    assert second.status_code == 200
+    assert seen_summaries[0] == ""
+    assert "What is LDL?" in seen_summaries[1]
+
+
 def test_my_ldl_then_how_can_i_lower_it_can_stay_personal():
     plan = build_query_plan("How can I lower it?", follow_up_topic="ldl", prior_personal=True)
     assert plan.needs_personal_data

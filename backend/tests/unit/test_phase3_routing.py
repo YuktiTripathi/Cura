@@ -42,7 +42,8 @@ def test_general_definitions_stay_educational_and_may_add_related_results():
         assert plan.intent == IntentType.general_health_question
         assert plan.knowledge_scope == KnowledgeScope.general
         assert plan.general_personalization
-        assert plan.needs_blood
+        assert not plan.needs_blood
+        assert not plan.needs_supershyft
 
 
 def test_general_chat_does_not_use_personal_values():

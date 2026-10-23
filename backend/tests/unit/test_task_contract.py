@@ -10,7 +10,7 @@ def test_insulin_resistance_is_not_a_medication_refusal():
     assert "medication" in high_risk_topics("What dose of insulin should I take?")
     from app.core.config import settings
 
-    assert settings.cura_test_suggestions_enabled is False
+    assert settings.cura_test_suggestions_enabled is True
 
 
 def test_modular_prompt_is_smaller_and_selects_the_bio_ai_module(monkeypatch):

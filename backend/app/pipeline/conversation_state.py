@@ -112,7 +112,7 @@ _REFERENCE = re.compile(
     r"the previous one|previous one|the latest one|latest one|"
     r"what about that|is that concerning|why|"
     r"another test|repeat it|test this again|"
-    r"should i (?:repeat|retest)|when should i test)\b",
+    r"should i (?:repeat|retest)|when should i test|kyun|kyu|yeh|yah|woh|iska|uska)\b",
     re.I,
 )
 _PREVIOUS_REF = re.compile(
@@ -183,6 +183,53 @@ def load_persisted_state(conversation: Conversation | None) -> ConversationState
     return state
 
 
+_DISPLAY = {
+    "hba1c": "HbA1c",
+    "ldl": "LDL",
+    "hdl": "HDL",
+    "triglycerides": "triglycerides",
+    "type_2_diabetes": "type 2 diabetes risk",
+}
+
+
+def discussed_entities(plan, context) -> list[str]:
+    """Markers or scores this turn actually talked about. Not the whole record."""
+    named = [
+        item
+        for item in (getattr(plan, "display_entities", None) or getattr(plan, "requested_metrics", None) or [])
+        if item
+    ]
+    if named:
+        return list(dict.fromkeys(named))
+    flagged = []
+    for marker in getattr(context, "markers", None) or []:
+        flag = getattr(getattr(marker, "flag", None), "value", None)
+        key = getattr(marker, "key", None)
+        if key and flag in {"high", "low", "critical"}:
+            flagged.append(key)
+    for risk in getattr(context, "bio_ai_risks", None) or []:
+        code = getattr(risk, "code", None)
+        if code:
+            flagged.append(code)
+    return list(dict.fromkeys(flagged))[:4]
+
+
+def ambiguous_referent_question(state: ConversationState, conversation: Conversation | None) -> str | None:
+    """Ask which finding is meant when a singular follow-up matches several."""
+    if "which_marker" not in (state.unresolved_references or []):
+        return None
+    prior = load_persisted_state(conversation)
+    codes = list(dict.fromkeys(prior.active_entities))[:3]
+    if len(codes) < 2:
+        return None
+    labels = [_DISPLAY.get(code, code.replace("_", " ")) for code in codes]
+    if len(labels) == 2:
+        joined = f"{labels[0]} or {labels[1]}"
+    else:
+        joined = ", ".join(labels[:-1]) + f", or {labels[-1]}"
+    return f"Do you mean {joined}?"
+
+
 class ConversationStateResolver:
     """Resolve turn type and references. Does not retrieve personal values."""
 
@@ -220,8 +267,18 @@ class ConversationStateResolver:
             TurnType.clarification,
             TurnType.correction,
         }:
-            if not entities:
-                entities = list(prior.active_entities)
+            singular = bool(
+                re.search(r"\b(it|that|this|yeh|yah|woh|kyun)\b", text, re.I)
+            ) and not re.search(r"\b(they|them|those|these)\b", text, re.I)
+            asks_which_result = bool(
+                re.search(r"\bwhy is (?:it|that|this)(?: result)? (?:high|low|elevated|up)\b", text, re.I)
+            )
+            if not current_entities and asks_which_result and len(prior.active_entities) > 1:
+                # "Why is that high?" with several markers: ask, do not pick one.
+                entities = []
+                unresolved.append("which_marker")
+            elif not entities:
+                entities = list(prior.active_entities[:1] if singular else prior.active_entities)
             if not domain or domain == "overall_health":
                 domain = prior.active_domain or domain
         new_context = _new_context(text) if turn == TurnType.answer_to_assistant else []
@@ -415,7 +472,11 @@ def _operations_hint(turn: TurnType, text: str, prior: ConversationState) -> lis
     if turn == TurnType.answer_to_assistant:
         path = prior.expected_handling_path or "CONTINUE_INTERPRETATION"
         return ["UPDATE_CONTEXT", path]
-    if _WHY_CHANGE.search(text) or (turn == TurnType.reference_resolution and re.search(r"\bchang", text, re.I)):
+    if _WHY_CHANGE.search(text) or re.search(
+        r"\b(improved|improvement|worsened|since last|since my last|badla|sudhra)\b", text, re.I
+    ):
+        return ["RETRIEVE", "TREND", "INTERPRET"]
+    if turn == TurnType.reference_resolution and re.search(r"\bchang", text, re.I):
         return ["RETRIEVE", "TREND", "INTERPRET"]
     if _CONSISTENT.search(text):
         return ["RETRIEVE", "CORRELATE", "INTERPRET"]

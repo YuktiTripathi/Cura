@@ -44,6 +44,16 @@ _ACTION_QUESTION = re.compile(
 
 def attach_general_personalization(plan: QueryPlan, message: str) -> QueryPlan:
     """Keep the general objective while requesting only topic-relevant sources."""
+    if re.search(r"\bmy doctor told\b", message or "", re.I):
+        plan.intent = IntentType.general_health_question
+        plan.knowledge_scope = KnowledgeScope.general
+        plan.source = QuerySource.general
+        plan.needs_blood = False
+        plan.needs_bio_ai = False
+        plan.needs_supershyft = False
+        plan.needs_general = True
+        plan.general_personalization = False
+        return plan
     if (
         plan.intent != IntentType.general_health_question
         or plan.knowledge_scope != KnowledgeScope.general
@@ -54,18 +64,31 @@ def attach_general_personalization(plan: QueryPlan, message: str) -> QueryPlan:
         return plan
     if re.search(r"\bwhat does .{0,48}\bdo\b", message or "", re.I):
         return plan
-    if re.search(r"\bmy doctor told\b", message or "", re.I):
-        return plan
-    if re.search(r"\b(?:common reasons|common causes|lifestyle changes|what foods|generally)\b", message or "", re.I):
+    from app.pipeline.intent import is_personal_utterance
+
+    if re.search(
+        r"\b(?:common reasons|common causes|lifestyle changes|what foods|generally)\b",
+        message or "",
+        re.I,
+    ) and not is_personal_utterance(message or ""):
         return plan
     topics_for_gate = extract_topics(message, conversation_entities=plan.conversation_entities)
     asks_action_about_marker = bool(_ACTION_QUESTION.search(message or "") and evidence_markers_for(topics_for_gate))
-    if not (
-        _CONCEPT_QUESTION.search(message or "")
-        or _BROAD_CONCEPT.search(message or "")
-        or _PERSONAL_CONNECTION.search(message or "")
-        or asks_action_about_marker
+    # A definition can be marked for optional context, but it must not retrieve records.
+    if (_CONCEPT_QUESTION.search(message or "") or _BROAD_CONCEPT.search(message or "")) and not (
+        _PERSONAL_CONNECTION.search(message or "") or asks_action_about_marker
     ):
+        plan.general_personalization = True
+        plan.semantic_scoped = True
+        plan.needs_general = True
+        plan.needs_supershyft = False
+        plan.needs_blood = False
+        plan.needs_bio_ai = False
+        plan.needs_questionnaire = False
+        plan.needs_lifestyle = False
+        plan.source = QuerySource.general
+        return plan
+    if not (_PERSONAL_CONNECTION.search(message or "") or asks_action_about_marker):
         return plan
     topics = extract_topics(message, conversation_entities=plan.conversation_entities)
     # Topic mappings are conservative "may be relevant" links, not causal claims.
@@ -112,10 +135,91 @@ def enforce_general_only_request(plan: QueryPlan, message: str) -> QueryPlan:
     """Finalize the narrow supplement or an explicit opt-out after plan repair."""
     from app.pipeline.task_contract import stamp_answer_spec
 
-    return stamp_answer_spec(_finalize_personal_scope(plan, message), message)
+    from app.pipeline.health_sources import sync_plan_sources
+
+    return stamp_answer_spec(sync_plan_sources(_finalize_personal_scope(plan, message)), message)
 
 
 def _finalize_personal_scope(plan: QueryPlan, message: str) -> QueryPlan:
+    from app.pipeline.intent import is_educational_utterance, is_personal_utterance, requires_personal_record
+
+    if re.search(r"\bmy doctor told\b", message or "", re.I):
+        plan.intent = IntentType.general_health_question
+        plan.knowledge_scope = KnowledgeScope.general
+        plan.source = QuerySource.general
+        plan.needs_blood = False
+        plan.needs_bio_ai = False
+        plan.needs_supershyft = False
+        plan.needs_general = True
+        plan.general_personalization = False
+        return plan
+    refers_to_document = bool(
+        re.search(
+            r"\b(?:this|the|my|uploaded)\b(?:\s+\w+){0,4}\s+(?:report|pdf|document|upload)\b",
+            message or "",
+            re.I,
+        )
+    )
+    if (
+        plan.needs_user_uploaded
+        and is_educational_utterance(message)
+        and not is_personal_utterance(message)
+        and not refers_to_document
+        and not plan.needs_cross_source
+    ):
+        plan.needs_user_uploaded = False
+        plan.needs_blood = False
+        plan.needs_supershyft = False
+        plan.intent = IntentType.general_health_question
+        plan.knowledge_scope = KnowledgeScope.general
+        plan.source = QuerySource.general
+        plan.needs_general = True
+        return plan
+    if (
+        plan.needs_user_uploaded
+        and not plan.needs_cross_source
+        and not (plan.needs_bio_ai or plan.needs_questionnaire or plan.needs_lifestyle)
+    ):
+        plan.needs_blood = False
+        plan.needs_bio_ai = False
+        plan.needs_questionnaire = False
+        plan.needs_lifestyle = False
+        plan.needs_supershyft = False
+        plan.source = QuerySource.user_uploaded
+        return plan
+    prior_personal = plan.knowledge_scope == KnowledgeScope.personal or bool(plan.follow_up)
+    if (
+        is_educational_utterance(message)
+        and not is_personal_utterance(message)
+        and not requires_personal_record(
+            message,
+            prior_personal=prior_personal,
+            follow_up_topic=plan.topic,
+        )
+        and not _PERSONAL_CONNECTION.search(message or "")
+        and not plan.needs_user_uploaded
+        and not plan.needs_cross_source
+        and not plan.personal_reference
+    ):
+        plan.knowledge_scope = KnowledgeScope.general
+        plan.intent = IntentType.general_health_question
+        plan.needs_supershyft = False
+        plan.needs_blood = False
+        plan.needs_bio_ai = False
+        plan.needs_questionnaire = False
+        plan.needs_lifestyle = False
+        plan.needs_general = True
+        plan.source = QuerySource.general
+        kept_out = re.search(
+            r"\b(?:common reasons|common causes|lifestyle changes|what foods|generally|my doctor told)\b",
+            message or "",
+            re.I,
+        )
+        plan.general_personalization = bool(
+            not kept_out
+            and (_CONCEPT_QUESTION.search(message or "") or _BROAD_CONCEPT.search(message or ""))
+        )
+        return plan
     general_only = bool(_GENERAL_ONLY.search(message or ""))
     non_personal_example = bool(_HYPOTHETICAL_OR_POPULATION.search(message or ""))
     if general_only or non_personal_example:

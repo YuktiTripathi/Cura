@@ -6,6 +6,7 @@ records, database metadata, or authority to execute a query.
 
 from __future__ import annotations
 
+import re
 import time
 from typing import Any
 
@@ -265,6 +266,22 @@ _TEMPORAL = {
 }
 
 
+def routing_state_has_personal_context(state: JevRoutingState) -> bool:
+    """True when the routing payload carries this user's health context, not a general definition."""
+    if state.previous_personal_data_used or state.new_context or state.resolved_references or state.previous_assistant_follow_up:
+        return True
+    text = " ".join(part for part in (state.current_message, state.previous_user_message) if part)
+    if re.search(r"\b(my|mera|meri|mine)\b", text, re.I):
+        return True
+    if re.search(r"\d+(?:\.\d+)?\s*(?:mg|g/dl|mmol|%|u/l|iu)\b", text, re.I):
+        return True
+    if re.search(r"\b20\d{2}-\d{2}-\d{2}\b", text) and re.search(
+        r"\b(stored|blood report|bio-?\s*ai|result|score)\b", text, re.I
+    ):
+        return True
+    return False
+
+
 class JevDecisionsClient:
     def __init__(
         self,
@@ -293,6 +310,10 @@ class JevDecisionsClient:
     def decide(self, state: JevRoutingState) -> tuple[JevDecision, JevDecisionsResponse]:
         if not self.api_key:
             raise LLMUnavailableError("OPENROUTER_API_KEY is not configured")
+        personal = routing_state_has_personal_context(state)
+        from app.llm.openrouter_policy import openrouter_policy
+
+        provider_prefs = openrouter_policy().provider_preferences(self.model, personal_health=personal)
         try:
             jev_breaker.allow()
         except CircuitOpenError as exc:
@@ -300,6 +321,7 @@ class JevDecisionsClient:
         payload = {
             "model": self.model,
             "state": state.model_dump(mode="json", exclude_none=True),
+            "provider": provider_prefs,
             "questions": {
                 "request_type": _REQUEST_TYPE,
                 "data_source": _SOURCE,

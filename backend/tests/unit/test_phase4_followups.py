@@ -216,12 +216,3 @@ def test_chat_api_user2_no_trend_chip():
     )
     cats = {row["category"] for row in res.json()["follow_ups"]}
     assert "historical_trend" not in cats
-
-
-def test_no_suggest_follow_ups_templates():
-    from app.pipeline.followups import suggest_follow_ups
-    try:
-        suggest_follow_ups()
-        assert False, "templates should be disabled"
-    except RuntimeError:
-        pass

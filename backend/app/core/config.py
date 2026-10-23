@@ -53,8 +53,9 @@ class Settings(BaseSettings):
     answer_prompt_compact: bool = False
     # legacy keeps the current system text. modular uses the compact core plus task modules.
     cura_prompt_variant: str = "legacy"
-    # Diagnostic package cards and retest suggestions. Off until explicitly enabled.
-    cura_test_suggestions_enabled: bool = False
+    # Diagnostic package cards and retest suggestions. Clinical policy still decides
+    # whether a card is allowed; this only turns the feature off.
+    cura_test_suggestions_enabled: bool = True
     # CURA_RESPONSE_MODE: "rich" (cards, tables, chips) or "plain" (the conversational answer
     # only). Plain mode debugs answer quality separately from presentation.
     cura_response_mode: str = "rich"
@@ -70,6 +71,8 @@ class Settings(BaseSettings):
     llm_reasoning_effort: str = "low"
     llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False
+    # Explanations of an uploaded document only. Does not turn on chat, routing, or fact extraction.
+    document_explanation_enabled: bool = False
     allow_mock_auth_with_real_health: bool = False
     mock_user_id: str = ""
     allow_mock_header_override: bool = False
@@ -107,13 +110,14 @@ class Settings(BaseSettings):
     )
     assistant_quality_v2: bool = True
     llm_json_schema_output: bool = True
-    eval_candidate_model: str = "google/gemini-3.8-flash"
-    # Request OpenRouter not to use prompts for training. This is not proof of ZDR.
+    # Request OpenRouter not to use prompts for training. This is not zero retention.
     openrouter_data_collection_deny: bool = True
-    # Route via OpenRouter ZDR-eligible endpoints when true. CURA cannot independently
-    # verify retention; confirm gateway policy before production personal-health LLM.
+    # Obsolete. A true value does not authorize personal-health model calls.
     openrouter_zero_data_retention: bool = False
     require_zdr_for_personal_health: bool = False
+    # not_approved: personal prompts stay local. safety_retention: only models listed below.
+    personal_health_privacy_profile: str = "not_approved"
+    personal_health_approved_models: str = ""
     # Do not set true unless every answer model is known to support JSON Schema.
     openrouter_require_parameters: bool = False
     cura_openrouter_require_zdr: bool = False

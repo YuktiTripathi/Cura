@@ -88,3 +88,5 @@ jobs:
         run: npx tsc --noEmit -p .
       - name: Tests
         run: npx vitest run
+      - name: API contract
+        run: npm run check:api

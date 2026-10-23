@@ -33,7 +33,7 @@ from app.pipeline.presentation import (
 )
 
 _HANDLED_LLM = re.compile(
-    r"\b(symptoms?|medication|supplement|previous report|changed over time|what does .{0,24} mean)\b",
+    r"\b(symptoms?|medication|supplement|previous report|changed over time|what does .{0,24} mean|what is a healthy)\b",
     re.I,
 )
 
@@ -43,7 +43,7 @@ def _llm_handling(text: str) -> tuple[str | None, str | None]:
         return "CLINICAL_CONTEXT", "CONTINUE_INTERPRETATION"
     if re.search(r"\bprevious|changed over time|trend\b", text, re.I):
         return "YES_NO", "TREND"
-    if re.search(r"\bwhat does .{0,24} mean\b", text, re.I):
+    if re.search(r"\bwhat does .{0,24} mean\b|\bwhat is a healthy\b", text, re.I):
         return None, "CONTINUE_INTERPRETATION"
     return None, None
 
@@ -137,10 +137,27 @@ class ResponseComposer:
             ] if continuation else []
             chips = list(combined)
         response_plan = build_response_plan(plan.raw_message or "", plan, context)
-        if explain_only:
+        if explain_only and not answer_turn:
             question = []
             chips = []
-            combined = []
+            symptom = next(
+                (item for item in seeded if "symptom" in (item.text or "").lower()),
+                None,
+            )
+            if symptom and plan.knowledge_scope == KnowledgeScope.personal:
+                combined = [symptom]
+            else:
+                combined = extras[:1]
+            if not combined and plan.knowledge_scope == KnowledgeScope.general:
+                name = plan.topic_name or "this topic"
+                combined = [
+                    FollowUpSuggestion(
+                        text=f"What does {name} mean in general?",
+                        category="suggested",
+                        knowledge_scope="general",
+                        handling_path="CONTINUE_INTERPRETATION",
+                    )
+                ]
         elif response_plan.kind == "report_overview":
             question = []
             combined = [
@@ -233,9 +250,15 @@ class ResponseComposer:
                 presentation.summary = text
         from app.pipeline.presentation_policy import apply_presentation_policy
 
-        text = separate_answer_layout(text)
+        from app.pipeline.answer_shape import omit_duplicate_closing_offer
+
+        offers = [item.text for item in combined if getattr(item, "text", None)]
+        text = omit_duplicate_closing_offer(separate_answer_layout(text), offers)
         if presentation.summary:
-            presentation.summary = separate_answer_layout(presentation.summary)
+            presentation.summary = omit_duplicate_closing_offer(separate_answer_layout(presentation.summary), offers)
+        from app.pipeline.grounding import drop_unverified_claims
+
+        text = drop_unverified_claims(text, context)
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:
             context.answer_evidence_trace.update(policy_trace)

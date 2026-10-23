@@ -21,7 +21,10 @@ import logging
 
 logger = logging.getLogger("cura.safety")
 
-DIAGNOSIS = re.compile(r"\b(you have|diagnosed with|this confirms|this proves you)\b", re.I)
+DIAGNOSIS = re.compile(
+    r"\b(diagnosed with|this confirms|this proves you|you have (?:a |an )?(?:[a-z]+ )?(?:condition|disease|disorder|deficiency|diabetes|anaemia|anemia|infection|syndrome))\b",
+    re.I,
+)
 MEDICATION = re.compile(r"\b(take \d+ mg|prescribe|dosage of|start metformin|take insulin)\b", re.I)
 EMERGENCY = re.compile(r"\b(call 911|emergency department immediately|you are having a heart attack)\b", re.I)
 IMPROVED = re.compile(r"\b(your (health|diabetes) (improved|got worse)|this confirms diabetes)\b", re.I)
@@ -158,11 +161,36 @@ def explicit_diagnosis_request(text: str) -> bool:
     return bool(DIAGNOSIS_REQUEST.search(text or ""))
 
 
+_SYMPTOM_EDUCATION = re.compile(
+    r"\b(when should|when is|what causes|what cause|warning signs|treated as|"
+    r"how (?:do|can) (?:i|you) know|an emergency)\b|"
+    r"कब|क्या कारण|emergency kab|dard kab|kab emergency",
+    re.I,
+)
+_CURRENT_SYMPTOM = re.compile(
+    r"\b(i have|i'm having|i am having|i feel|right now|"
+    r"my (?:father|mother|dad|mom|husband|wife|son|daughter|friend|parent|papa)\b)\b|"
+    r"मुझे|अभी|हो रहा|हो रही|mere (?:papa|father|dad)|"
+    r"\b(?:papa|father|dad|mother|mom) ko\b",
+    re.I,
+)
+
+
+def educational_symptom_question(text: str) -> bool:
+    """A question about warning signs, not a report that someone has them now."""
+    message = text or ""
+    if _CURRENT_SYMPTOM.search(message):
+        return False
+    return bool(_SYMPTOM_EDUCATION.search(message))
+
+
 def match_safety_category(text: str) -> tuple[str, str, float]:
     message = text or ""
     language = detect_language_hint(message)
     normalized = normalize_text(message)
     hits = match_red_flags(message)
+    if educational_symptom_question(message):
+        hits = [flag for flag in hits if flag.category != "emergency"]
     if any(flag.category == "self_harm" for flag in hits):
         return "self_harm", language, 0.99
     if any(flag.category == "emergency" for flag in hits):
@@ -291,6 +319,9 @@ class SafetyLayer:
         classified_confidence = float(getattr(classified, "confidence", 0.0) or 0.0)
 
         # Urgent from either layer wins. Otherwise a high-confidence local rule wins.
+        if educational_symptom_question(user_message) and classified_category == "emergency":
+            classified_category = "none"
+            classified_confidence = 0.0
         if category in _URGENT_CATEGORIES:
             effective = category
         elif classified_category in _URGENT_CATEGORIES and classified_confidence >= 0.6:
@@ -338,9 +369,30 @@ class SafetyLayer:
                 reply_language=reply_language,
             )
         if effective == "medication_misuse":
+            # A dose request that also names a stored result still refuses dosing,
+            # after the verified measurement is retrieved.
+            names_stored_result = bool(
+                re.search(r"\b20\d{2}-\d{2}-\d{2}\b", user_message or "")
+                and re.search(r"\b(report|result|stored|stores)\b", user_message or "", re.I)
+            )
+            refusal = medication_message(reply_language)
+            if names_stored_result:
+                return PreSafetyDecision(
+                    blocked=False,
+                    flags=["medication_or_dosage_request", *extra_flags],
+                    escalation="clinician",
+                    category="medication_misuse",
+                    language=language,
+                    reply_language=reply_language,
+                    caution=(
+                        refusal
+                        + " A single stored measurement is not enough to establish a diagnosis, "
+                        "and I will not give a dose."
+                    ),
+                )
             return PreSafetyDecision(
                 blocked=True,
-                answer=medication_message(reply_language),
+                answer=refusal,
                 flags=["medication_or_dosage_request", *extra_flags],
                 escalation="clinician",
                 category="medication_misuse",
@@ -373,7 +425,7 @@ class SafetyLayer:
             grounded = any(
                 flag.urgency in {URGENCY_NOW, URGENCY_SOON} and flag.category in {"emergency", "urgent_soon"}
                 for flag in match_red_flags(user_message)
-            )
+            ) and not educational_symptom_question(user_message)
             if not grounded:
                 effective = "none"
         if effective == "urgent_soon":
@@ -387,7 +439,11 @@ class SafetyLayer:
                 caution=see_doctor_soon_message(reply_language),
             )
         caution = None
-        if classifier_failed and SYMPTOM_HINT.search(normalize_text(user_message)):
+        if (
+            classifier_failed
+            and SYMPTOM_HINT.search(normalize_text(user_message))
+            and not educational_symptom_question(user_message)
+        ):
             # Conservative fallback when the model layer is down and symptoms are mentioned.
             extra_flags.append("symptom_caution")
             caution = see_doctor_soon_message(reply_language)

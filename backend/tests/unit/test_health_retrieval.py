@@ -21,7 +21,7 @@ def test_general_ldl_definition_requests_related_blood_context():
     plan = build_query_plan("What is LDL?")
     assert plan.knowledge_scope == KnowledgeScope.general
     assert plan.general_personalization is True
-    assert plan.needs_blood is True
+    assert plan.needs_blood is False
 
 
 def test_my_doctor_told_me_does_not_query_ihr():

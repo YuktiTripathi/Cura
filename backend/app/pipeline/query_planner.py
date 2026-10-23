@@ -107,6 +107,11 @@ def build_query_plan(
         or explicit_questionnaire_request(message)
         or (intent == IntentType.follow_up and is_questionnaire_topic(topic))
         or is_questionnaire_topic(follow_up_topic)
+        or bool(re.search(
+            r"\b(?:i recorded|how long do you sit|sit continuously|close blood relatives|family history)\b",
+            message or "",
+            re.I,
+        ))
     )
     if wants_questionnaire and intent == IntentType.questionnaire_lookup and not topic:
         topic = questionnaire_topic(message)

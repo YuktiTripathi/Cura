@@ -43,11 +43,14 @@ class ResponseValidator:
         flags: list[str] = []
         grounding_flags: list[str] = []
         medical_hits = medical_hits or []
-        if llm_called and plan.needs_personal_data:
+        if llm_called:
             unsupported = self.grounding.unsupported_number_sentences(answer, context)
             if unsupported:
                 grounding_flags.append("unsupported_personal_numbers")
                 answer = _drop_unsupported(answer, unsupported) or self.renderer.render(message, context)
+                from app.pipeline.reasoning import _answer_with_stored_facts
+
+                answer = _answer_with_stored_facts(answer, context)
         if medical_hits:
             answer, medical_flags = self.grounding.sanitize_medical_answer(answer, medical_hits)
             grounding_flags.extend(medical_flags)

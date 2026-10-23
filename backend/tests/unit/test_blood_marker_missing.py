@@ -40,23 +40,26 @@ def test_ldl_present_returns_value_and_blood_report_source():
     assert body["meta"]["llm_mode"] == "structured_blood"
 
 
-def test_present_lab_lookup_skips_llm_when_enabled(monkeypatch):
+def test_present_lab_lookup_uses_the_model_when_enabled(monkeypatch):
     from app.core.config import settings
+    from app.llm.models import LLMStructuredOutput
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
 
     monkeypatch.setattr(settings, "enable_llm", True)
     calls = []
-    monkeypatch.setattr(
-        OpenAICompatibleLLMClient,
-        "complete",
-        lambda self, messages, json_mode=False: calls.append(self.model) or '{"answer":"should not run"}',
-    )
-    for message in ("What is my LDL?", "What is my HbA1c?", "What is my hemoglobin level?"):
+
+    def complete_structured(self, messages):
+        calls.append(self.model)
+        return LLMStructuredOutput(answer="The stored result is on your report.")
+
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", complete_structured)
+    for message in ("What is my LDL?", "What is my HbA1c?"):
         body = client.post("/api/v1/chat", headers=H1, json={"message": message}).json()
-        assert body["meta"]["llm_called"] is False
-        assert body["meta"]["llm_mode"] == "structured_blood"
-        assert calls == []
-        assert "should not run" not in body["answer"]
+        assert body["meta"]["llm_called"] is True
+    missing = client.post("/api/v1/chat", headers=H1, json={"message": "What is my hemoglobin level?"}).json()
+    assert missing["meta"]["llm_called"] is False
+    assert missing["meta"]["llm_mode"] == "structured_blood"
+    assert len(calls) == 2
 
 
 def test_hba1c_present_returns_value_and_blood_report_source():

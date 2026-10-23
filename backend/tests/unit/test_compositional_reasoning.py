@@ -143,20 +143,22 @@ def test_broad_review_uses_multiple_sources_and_discloses_gaps():
     assert any(token in low for token in ("missing", "not available", "not found", "gap", "questionnaire", "goal", "next step"))
 
 
-def test_lookup_only_single_marker_stays_deterministic(monkeypatch):
+def test_lookup_only_single_marker_uses_the_model(monkeypatch):
     monkeypatch.setattr(settings, "enable_llm", True)
+    from app.llm.models import LLMStructuredOutput
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
 
     calls = []
-    monkeypatch.setattr(
-        OpenAICompatibleLLMClient,
-        "complete_structured",
-        lambda self, messages: calls.append("hit") or (_ for _ in ()).throw(AssertionError("should not call LLM")),
-    )
+
+    def complete_structured(self, messages):
+        calls.append("hit")
+        return LLMStructuredOutput(answer="Your hemoglobin is 10.5 g/dL.")
+
+    monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", complete_structured)
     body = client.post("/api/v1/chat", headers=IRON, json={"message": "What is my hemoglobin level?"}).json()
-    assert calls == []
+    assert calls == ["hit"]
     assert "10.5" in body["answer"]
-    assert body["meta"]["llm_called"] is False
+    assert body["meta"]["llm_called"] is True
 
 
 def test_derived_mentzer_from_mcv_and_rbc():

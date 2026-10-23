@@ -6,8 +6,12 @@ to the authenticated principal.
 
 from __future__ import annotations
 
+from datetime import date, datetime
+
 from app.contracts.bio_ai import BioAIReport, BioAIRisk
 from app.contracts.blood import BloodMarker, BloodReport
+from app.contracts.common import MarkerFlag
+from app.contracts.health_context import HealthContext
 from app.contracts.query import QueryPlan
 from app.pipeline.lab_parameters import (
     DERIVED_ENTITY_KEYS,
@@ -17,6 +21,46 @@ from app.pipeline.lab_parameters import (
     expand_requested_keys,
     is_lab_key,
 )
+
+
+def coerce_marker_date(value) -> date | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value.date()
+    if isinstance(value, date):
+        return value
+    try:
+        return date.fromisoformat(str(value)[:10])
+    except ValueError:
+        return None
+
+
+def marker_flag(marker) -> MarkerFlag:
+    raw = getattr(marker, "status", None) or getattr(marker, "flag", None)
+    if isinstance(raw, MarkerFlag):
+        return raw
+    try:
+        return MarkerFlag(str(raw))
+    except ValueError:
+        return MarkerFlag.unknown
+
+
+def latest_context_markers(context: HealthContext) -> dict[str, object]:
+    latest: dict[str, object] = {}
+    for marker in context.markers or []:
+        key = getattr(marker, "key", None)
+        if not key:
+            continue
+        current = latest.get(key)
+        if current is None:
+            latest[key] = marker
+            continue
+        left = coerce_marker_date(getattr(marker, "measured_at", None))
+        right = coerce_marker_date(getattr(current, "measured_at", None))
+        if left and (right is None or left >= right):
+            latest[key] = marker
+    return latest
 
 
 def wanted_metric_keys(plan: QueryPlan) -> list[str]:
@@ -108,6 +152,48 @@ def companion_abnormal_markers(reports: list[BloodReport], selected: list[BloodM
     rank = {"critical": 0, "high": 1, "low": 1}
     extra.sort(key=lambda marker: rank.get(marker.flag.value, 2))
     return extra[:limit]
+
+
+def select_markers_on_dates(
+    reports: list[BloodReport],
+    keys: list[str],
+    dates: list,
+) -> tuple[list[BloodMarker], list]:
+    """Every usable match on each requested collection date. Never substitute a later report."""
+    selected: list[BloodMarker] = []
+    missing: list = []
+    wanted = {item for item in keys if item}
+    for day in dates:
+        report = next((item for item in reports if item.report_date == day), None)
+        if report is None:
+            missing.append(day)
+            continue
+        present = _canonical_keys_present(reports) if wanted & {"bun", "urea"} else None
+        hits = [
+            item
+            for item in report.markers
+            if _usable_marker(item)
+            and any(_marker_matches(item, key, reports, keys_present=present) for key in wanted)
+        ]
+        if not hits and wanted & {"glucose", "fasting_blood_glucose", "postprandial_glucose"}:
+            hits = [
+                item
+                for item in report.markers
+                if item.value is not None and "glucose" in (item.name or "").lower()
+            ]
+        if not hits:
+            missing.append(day)
+            continue
+        for marker in hits:
+            selected.append(
+                marker.model_copy(
+                    update={
+                        "report_id": marker.report_id or report.report_id,
+                        "measured_at": report.report_date,
+                    }
+                )
+            )
+    return selected, missing
 
 
 def select_latest_markers(

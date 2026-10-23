@@ -130,6 +130,12 @@ PARAMETERS: tuple[LabParameter, ...] = (
         "lipid",
     ),
     LabParameter(
+        "non_hdl",
+        "Non-HDL cholesterol",
+        ("non-hdl cholesterol", "non hdl cholesterol", "non-hdl", "non hdl"),
+        "lipid",
+    ),
+    LabParameter(
         "hdl",
         "HDL cholesterol",
         (
@@ -148,11 +154,52 @@ PARAMETERS: tuple[LabParameter, ...] = (
     ),
     LabParameter("triglycerides", "Triglycerides", ("triglycerides", "triglyceride", "tg"), "lipid"),
     LabParameter(
+        "lipid_profile",
+        "Lipid profile",
+        ("lipid profile", "lipid panel", "lipid studies"),
+        "lipid_panel",
+    ),
+    LabParameter(
+        "cbc_panel",
+        "Complete blood count",
+        ("complete blood count", "full blood count", "cbc"),
+        "cbc",
+    ),
+    LabParameter(
+        "iron_studies",
+        "Iron studies",
+        ("iron studies", "iron profile", "iron panel"),
+        "iron",
+    ),
+    LabParameter(
+        "vldl",
+        "VLDL cholesterol",
+        (
+            "very low density lipoprotein cholesterol",
+            "very low density lipoprotein",
+            "vldl cholesterol",
+            "vldl cholestrol",
+            "vldl",
+        ),
+        "lipid",
+    ),
+    LabParameter(
+        "phosphorus",
+        "Phosphorus",
+        ("phosphorus inorganic", "inorganic phosphorus", "serum phosphorus", "phosphorus"),
+        "mineral",
+    ),
+    LabParameter("homocysteine", "Homocysteine", ("homocysteine", "homocystine"), "metabolic"),
+    LabParameter(
         "kidney_function",
         "Kidney function",
         (
+            "kidney function test",
             "kidney function",
+            "renal function test",
             "renal function",
+            "kft",
+            "rft",
             "kidney results",
             "kidney result",
             "kidney markers",
@@ -160,6 +207,8 @@ PARAMETERS: tuple[LabParameter, ...] = (
             "renal markers",
             "kidney panel",
             "kidney health",
+            "kidneys",
+            "kidney",
         ),
         "kidney",
     ),
@@ -167,6 +216,9 @@ PARAMETERS: tuple[LabParameter, ...] = (
         "thyroid_function",
         "Thyroid function",
         (
+            "thyroid function test",
+            "thyroid tests",
+            "thyroid test",
             "thyroid function",
             "thyroid hormones",
             "thyroid results",
@@ -190,6 +242,12 @@ PARAMETERS: tuple[LabParameter, ...] = (
         "creatinine",
         "Creatinine",
         ("serum creatinine", "creatinine", "creat"),
+        "kidney",
+    ),
+    LabParameter(
+        "egfr_cystatin",
+        "eGFR (cystatin C)",
+        ("egfr cystatin c", "cystatin c egfr", "egfr cystatin", "cystatin c based egfr"),
         "kidney",
     ),
     LabParameter(
@@ -233,7 +291,8 @@ PARAMETERS: tuple[LabParameter, ...] = (
         "thyroid_labs",
     ),
     LabParameter("t3", "T3", ("free t3", "serum t3", "total t3", "ft3", "t3"), "thyroid_labs"),
-    LabParameter("t4", "T4", ("free t4", "serum t4", "total t4", "ft4", "t4"), "thyroid_labs"),
+    LabParameter("free_t4", "Free T4", ("free t4", "free thyroxine", "ft4"), "thyroid_labs"),
+    LabParameter("t4", "T4", ("total t4", "serum t4", "thyroxine", "t4"), "thyroid_labs"),
     LabParameter(
         "vitamin_d",
         "Vitamin D",
@@ -252,7 +311,12 @@ PARAMETERS: tuple[LabParameter, ...] = (
     LabParameter("vitamin_b12", "Vitamin B12", ("vitamin b12", "vit b12", "b12"), "vitamin"),
     LabParameter("ferritin", "Ferritin", ("ferritin",), "iron"),
     LabParameter("esr", "ESR", ("erythrocyte sedimentation", "esr"), "inflammation"),
-    LabParameter("crp", "CRP", ("hs-crp", "hs crp", "c-reactive protein", "c reactive protein", "crp"), "inflammation"),
+    LabParameter(
+        "crp",
+        "CRP",
+        ("hs-crp", "hs crp", "hscrp", "c-reactive protein", "c reactive protein", "crp"),
+        "inflammation",
+    ),
     LabParameter("globulin", "Globulin", ("serum globulin", "globulin"), "liver"),
     LabParameter(
         "alkaline_phosphatase",
@@ -288,6 +352,18 @@ PARAMETERS: tuple[LabParameter, ...] = (
     ),
     LabParameter("albumin", "Albumin", ("serum albumin", "albumin"), "liver"),
     LabParameter(
+        "ggt",
+        "GGTP",
+        ("ggtp", "ggt", "gamma gt", "gamma-glutamyl", "ggpt"),
+        "liver",
+    ),
+    LabParameter(
+        "proteins_serum",
+        "Proteins Serum",
+        ("proteins serum", "protein serum", "serum proteins", "total protein", "serum protein"),
+        "liver",
+    ),
+    LabParameter(
         "systolic",
         "Systolic pressure",
         ("systolic pressure", "systolic bp", "sbp", "systolic"),
@@ -308,17 +384,26 @@ DERIVED_ENTITY_KEYS = frozenset({"mentzer", "bmi", "waist"})
 
 FAMILY_MEMBERS = {
     "glucose": ("fasting_blood_glucose", "postprandial_glucose", "glucose"),
-    "cholesterol": ("ldl", "hdl", "cholesterol"),
+    "cholesterol": ("ldl", "hdl", "cholesterol", "triglycerides"),
     "blood_pressure": ("systolic", "diastolic"),
-    "kidney": ("creatinine", "egfr", "urea", "bun", "uric_acid"),
+    "kidney": ("creatinine", "egfr", "egfr_cystatin", "urea", "bun", "uric_acid"),
     "electrolyte": ("sodium", "chloride", "potassium"),
-    "thyroid_labs": ("tsh", "t3", "t4"),
+    "thyroid_labs": ("tsh", "t3", "t4", "free_t4"),
     "liver": ("alt", "ast", "bilirubin"),
     "cbc": ("hemoglobin", "mcv", "mch", "mchc", "rbc", "wbc", "platelets", "hematocrit"),
+    "lipid_panel": ("ldl", "hdl", "cholesterol", "triglycerides", "vldl"),
     "iron": ("iron", "ferritin", "tibc", "transferrin"),
 }
 
-FAMILY_QUERY_KEYS = {"kidney_function", "thyroid_function", "liver_function", "blood_pressure"}
+FAMILY_QUERY_KEYS = {
+    "kidney_function",
+    "thyroid_function",
+    "liver_function",
+    "blood_pressure",
+    "lipid_profile",
+    "cbc_panel",
+    "iron_studies",
+}
 FAMILY_UNITS = {
     "glucose": ("mg/dL", "mmol/L"),
     "hba1c": ("%",),
@@ -329,6 +414,7 @@ FAMILY_UNITS = {
     "iron": ("µg/dL", "ng/mL", "%"),
     "cholesterol": ("mg/dL", "mmol/L"),
     "lipid": ("mg/dL", "mmol/L"),
+    "lipid_panel": ("mg/dL", "mmol/L"),
     "kidney": ("mg/dL", "mL/min/1.73m2"),
     "electrolyte": ("mmol/L", "mEq/L"),
     "thyroid_labs": ("µIU/mL", "pg/mL", "ng/dL", "ng/mL"),
@@ -364,14 +450,21 @@ _SLUG_ALIASES = {
     "total_t3": "t3",
     "ft3": "t3",
     "t3": "t3",
-    "free_t4": "t4",
+    "free_t4": "free_t4",
     "serum_t4": "t4",
     "total_t4": "t4",
-    "ft4": "t4",
+    "ft4": "free_t4",
     "t4": "t4",
     "thyroid_stimulating_hormone": "tsh",
     "thyroid_stimulating_hormone_tsh": "tsh",
     "tsh": "tsh",
+    "ggpt_value": "ggt",
+    "ggpt": "ggt",
+    "ggtp": "ggt",
+    "ggt": "ggt",
+    "proteins_serum": "proteins_serum",
+    "serum_proteins": "proteins_serum",
+    "total_protein": "proteins_serum",
     "sgpt": "alt",
     "sgpt_alt": "alt",
     "alanine_aminotransferase": "alt",
@@ -503,6 +596,7 @@ def _alias_span(alias: str, text: str):
 
 def prepare_entity_query(text: str) -> str:
     lowered = (text or "").lower().replace("&", " and ")
+    lowered = lowered.replace("cholestrol", "cholesterol")
     lowered = re.sub(r"[,/;|]+", " ", lowered)
     return re.sub(r"\s+", " ", lowered).strip()
 
@@ -600,6 +694,112 @@ def primary_lab_key(text: str) -> str | None:
     return keys[0] if keys else None
 
 
+# Clinically different names that string similarity will otherwise collapse.
+_NOT_THE_SAME = (
+    frozenset({"creatinine", "creatine"}),
+    frozenset({"ldl", "hdl", "vldl", "non_hdl"}),
+    frozenset({"free_t4", "t4"}),
+    frozenset({"fasting_blood_glucose", "glucose"}),
+    frozenset({"urea", "bun"}),
+)
+_STOP_WORDS = frozenset({
+    "what", "whats", "is", "my", "the", "a", "an", "of", "me", "about", "please",
+    "level", "levels", "result", "results", "test", "report", "normal", "explain",
+})
+
+
+def question_clarification(text: str) -> str | None:
+    """Ask when the wording is close to two different tests. Do not guess."""
+    lowered = prepare_entity_query(text)
+    if re.search(r"(?<!\w)creatine(?!\w)", lowered) and "creatinine" not in lowered:
+        return "Creatine and creatinine are different tests. Which one should I look up?"
+    return None
+
+
+def fuzzy_lab_keys(text: str) -> list[str]:
+    """Exact aliases first. A question token may correct one misspelling. Never reads PDF values."""
+    from difflib import SequenceMatcher
+
+    exact = match_lab_keys(text)
+    words = prepare_entity_query(text).split()
+    if "glucose" in exact and any(SequenceMatcher(None, word, "fasting").ratio() >= 0.8 for word in words):
+        return ["fasting_blood_glucose"]
+    if exact:
+        return exact
+    return _question_typos(words)
+
+
+def _question_typos(words: list[str]) -> list[str]:
+    """Match a misspelled test name in the question. Ambiguous pairs are left unresolved."""
+    from difflib import SequenceMatcher
+
+    unique = _unique_alias_word(words)
+    if unique:
+        return [unique]
+    phrases = [word for word in words if word not in _STOP_WORDS and len(word) >= 5]
+    for size in (3, 2):
+        if len(words) < size:
+            continue
+        phrases.extend(
+            " ".join(words[index : index + size])
+            for index in range(0, len(words) - size + 1)
+            if any(len(part) >= 4 for part in words[index : index + size])
+        )
+    scored: list[tuple[float, str]] = []
+    for phrase in phrases:
+        if _blocked_surface(phrase):
+            continue
+        for param in PARAMETERS:
+            for alias in (*param.aliases, param.key.replace("_", " ")):
+                ratio = SequenceMatcher(None, phrase, normalize_label(alias)).ratio()
+                if ratio >= 0.86:
+                    scored.append((ratio, param.key))
+    if not scored:
+        return []
+    scored.sort(key=lambda item: item[0], reverse=True)
+    best_ratio, best_key = scored[0]
+    rivals = [item for item in scored if item[1] != best_key]
+    if rivals and best_ratio - rivals[0][0] < 0.04:
+        return []
+    if any(best_key in group and rivals and rivals[0][1] in group and best_ratio - rivals[0][0] < 0.08 for group in _NOT_THE_SAME):
+        return []
+    return [best_key]
+
+
+def _unique_alias_word(words: list[str]) -> str | None:
+    """A question word that already occurs in exactly one test's aliases."""
+    owners: set[str] = set()
+    for word in words:
+        if word in _STOP_WORDS or len(word) < 5:
+            continue
+        hits = set()
+        for param in PARAMETERS:
+            if any(re.search(rf"(?<!\w){re.escape(word)}(?!\w)", alias) for alias in param.aliases):
+                hits.add(param.key)
+        if len(hits) == 1:
+            owners |= hits
+        elif len(hits) > 1:
+            return None
+    if len(owners) == 1:
+        return next(iter(owners))
+    return None
+
+
+def _blocked_surface(phrase: str) -> bool:
+    """A shorter clinical word is not a typo for the longer one."""
+    from difflib import SequenceMatcher
+
+    token = normalize_label(phrase)
+    guards = (("creatine", "creatinine"), ("bun", "urea"), ("hdl", "ldl"), ("vldl", "ldl"))
+    for short, long in guards:
+        short_ratio = SequenceMatcher(None, token, short).ratio()
+        if short_ratio < 0.8:
+            continue
+        if short_ratio >= SequenceMatcher(None, token, long).ratio():
+            return True
+    return False
+
+
 @lru_cache(maxsize=4096)
 def canonicalize_marker_name(name: str) -> str:
     """Map a SuperShyft / lab display name onto a CURA canonical biomarker key."""
@@ -686,7 +886,7 @@ def retrieval_keys(key: str | None) -> list[str]:
         return []
     if key in DERIVED_ENTITY_KEYS:
         return []
-    if key in FAMILY_QUERY_KEYS:
+    if key in FAMILY_QUERY_KEYS or family_for(key) == "cholesterol":
         return related_keys_ordered(key)
     return [key]
 

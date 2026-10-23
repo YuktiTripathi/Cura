@@ -368,7 +368,8 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         b.entity: "worse" for b in context.baselines or []
         if getattr(getattr(b, "classification", None), "value", "") == "WORSENED" or b.newly_abnormal
     }
-    patterns, reassuring = find_patterns(markers, context.bio_ai_risks or [], trend_codes=trend_codes)
+    panel = list(getattr(context, "panel_markers", None) or []) or markers
+    patterns, reassuring = find_patterns(panel, context.bio_ai_risks or [], trend_codes=trend_codes)
 
     # ---- primary and supporting facts
     if mode in {OVERVIEW, PRIORITIZATION}:
@@ -392,8 +393,11 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         risks = sorted(context.bio_ai_risks or [], key=lambda r: (not _elevated(r)))
         wanted = [r for r in risks if r.code in requested] or risks
         evidence.primary_facts = [_risk_fact(r) for r in wanted[: budget.primary]]
-        related = [m for m in markers if _flag(m) in _ABNORMAL]
-        evidence.supporting_facts = [_marker_fact(m) for m in related[: budget.supporting]]
+        # The marker the member named stays even when it is in range. A Bio-AI
+        # score and a blood result are different kinds of evidence.
+        named = [m for m in markers if m.key in requested]
+        related = named + [m for m in markers if m not in named and _flag(m) in _ABNORMAL]
+        evidence.supporting_facts = [_marker_fact(m) for m in related[: max(budget.supporting, len(named[:3]))]]
     elif mode == TREND and not requested:
         # "What changed / what got worse?" across the record: the markers that moved.
         moved = [b for b in context.baselines or [] if b.previous is not None and b.latest is not None and b.latest != b.previous]
@@ -409,6 +413,9 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
         # evidence (questionnaire_context); the member's notable findings give the
         # "for my health situation" context.
         notable = prioritize_findings(markers, context.bio_ai_risks or [], goal)
+        if re.search(r"\b(active enough|physical activity|exercise)\b", message or "", re.I):
+            unrelated = {"mcv", "mch", "rdw", "basophils", "eosinophils", "calcium", "bilirubin", "ferritin"}
+            notable = [marker for marker in notable if marker.key not in unrelated]
         evidence.supporting_facts = [_marker_fact(m) for m in notable[: budget.supporting]]
         if len(evidence.supporting_facts) < budget.supporting:
             room = budget.supporting - len(evidence.supporting_facts)
@@ -445,6 +452,28 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
             room = budget.supporting - len(evidence.supporting_facts)
             evidence.supporting_facts += [_risk_fact(r) for r in aligned[:room]]
 
+    facts_now = [*evidence.primary_facts, *evidence.supporting_facts]
+    has_bio = any(str(fact.get("source") or "").startswith("Bio-AI") for fact in facts_now)
+    has_blood = any(fact.get("source") == "measured blood result" for fact in facts_now)
+    if context.bio_ai_risks and not has_bio and re.search(r"\brisk\b", message or "", re.I):
+        elevated = [risk for risk in context.bio_ai_risks if _elevated(risk)]
+        if elevated:
+            if not evidence.primary_facts:
+                evidence.primary_facts = [_risk_fact(risk) for risk in elevated[: budget.primary]]
+                evidence.supporting_facts = [
+                    _marker_fact(marker) for marker in markers if _flag(marker) in _ABNORMAL
+                ][: budget.supporting]
+            else:
+                room = max(budget.supporting, 1)
+                evidence.supporting_facts = [
+                    *evidence.supporting_facts,
+                    *[_risk_fact(risk) for risk in elevated[:room]],
+                ]
+            if not has_blood and markers:
+                evidence.supporting_facts = [
+                    *[_marker_fact(marker) for marker in markers if _flag(marker) in _ABNORMAL][: budget.supporting],
+                    *evidence.supporting_facts,
+                ]
     if mode == LOOKUP and (context.report_patterns or patterns):
         patterns_all = context.report_patterns or patterns
         # Enough to say whether this value is a major or a minor part of the picture.

@@ -6,6 +6,7 @@ from app.contracts.conversation_experience import ResponseBlockKind
 from app.pipeline.conversation_experience import build_experience_plan
 from app.pipeline.general_personalization import limit_general_personal_context
 from app.pipeline.prompt_builder import PromptBuilder
+from app.pipeline.health_topics import evidence_bio_ai_for, extract_topics
 from app.pipeline.query_planner import build_query_plan
 
 
@@ -15,8 +16,8 @@ def test_general_heart_question_requests_narrow_optional_personal_context():
     assert plan.knowledge_scope == KnowledgeScope.general
     assert plan.needs_general is True
     assert plan.general_personalization is True
-    assert plan.needs_supershyft is True
-    assert plan.requested_metrics[:4] == ["cholesterol", "ldl", "hdl", "triglycerides"]
+    assert plan.needs_supershyft is False
+    assert plan.needs_blood is False
 
 
 def test_unrelated_general_question_does_not_fetch_personal_context():
@@ -31,8 +32,8 @@ def test_single_biomarker_definition_keeps_a_small_personal_connection():
     assert plan.intent == IntentType.general_health_question
     assert plan.knowledge_scope == KnowledgeScope.general
     assert plan.general_personalization is True
-    assert plan.needs_blood is True
-    assert "ldl" in plan.requested_metrics
+    assert plan.needs_blood is False
+    assert plan.needs_supershyft is False
 
 
 def test_general_and_personal_heart_questions_use_different_context():
@@ -41,7 +42,7 @@ def test_general_and_personal_heart_questions_use_different_context():
 
     assert general.knowledge_scope == KnowledgeScope.general
     assert general.general_personalization
-    assert general.needs_personal_data
+    assert not general.needs_personal_data
     assert personal.knowledge_scope == KnowledgeScope.personal
     assert personal.needs_blood and personal.needs_bio_ai
 
@@ -154,5 +155,7 @@ def test_supported_general_concepts_use_registry_without_separate_handlers():
 
     for question, risk_codes in expected.items():
         plan = build_query_plan(question)
-        assert plan.general_personalization, question
-        assert risk_codes <= set(plan.requested_metrics), question
+        assert plan.knowledge_scope == KnowledgeScope.general, question
+        assert not plan.needs_supershyft, question
+        topics = extract_topics(question)
+        assert risk_codes <= set(evidence_bio_ai_for(topics)), question

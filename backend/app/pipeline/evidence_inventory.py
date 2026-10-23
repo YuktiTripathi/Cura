@@ -8,6 +8,7 @@ from __future__ import annotations
 
 import re
 from enum import Enum
+from types import SimpleNamespace
 
 from pydantic import BaseModel, Field
 
@@ -31,6 +32,11 @@ _FATIGUE = {
 }
 _DIABETES_RISK = {"type_2_diabetes", "diabetes", "prediabetes"}
 _LIVER_RISK = {"nafld", "liver", "liver_health", "fatty_liver"}
+_CHOLESTEROL_PANEL = ("cholesterol", "hdl", "ldl", "triglycerides")
+_MARKER_TOKEN = re.compile(
+    r"\b(hdl|ldl|hba1c|glucose|tsh|hemoglobin|haemoglobin|cholesterol|triglycerides|alt|ast|bilirubin)\b",
+    re.I,
+)
 
 
 class EvidenceStatus(str, Enum):
@@ -52,6 +58,7 @@ class EvidencePackage(BaseModel):
     blocked_answer: str | None = None
     questionnaire: list[dict] = Field(default_factory=list)
     report_counts: dict | None = None
+    comparisons: list[dict] = Field(default_factory=list)
 
     def prompt_payload(self) -> dict:
         """Patient facts for the model. Database identifiers stay out."""
@@ -66,6 +73,8 @@ class EvidencePackage(BaseModel):
             payload["questionnaire"] = self.questionnaire
         if self.report_counts:
             payload["report_counts"] = self.report_counts
+        if self.comparisons:
+            payload["comparisons"] = self.comparisons
         return payload
 
 
@@ -110,7 +119,7 @@ def _measurement(marker) -> dict:
 
 def _risk_row(risk) -> dict:
     measured = getattr(risk, "measured_at", None)
-    return {
+    row = {
         "code": getattr(risk, "code", None),
         "name": getattr(risk, "name", None),
         "score": getattr(risk, "score", None),
@@ -119,6 +128,14 @@ def _risk_row(risk) -> dict:
         "source": "bio_ai",
         "status": "AVAILABLE" if getattr(risk, "score", None) is not None else "NOT_PRESENT",
     }
+    if getattr(risk, "lifestyle_contribution", None) is not None:
+        row["lifestyle_contribution"] = risk.lifestyle_contribution
+    factors = list(getattr(risk, "contributing_factors", None) or [])
+    if factors:
+        row["contributing_factors"] = factors
+    if getattr(risk, "percentile", None) is not None:
+        row["percentile"] = risk.percentile
+    return row
 
 
 def _source_status(plan: QueryPlan, context: HealthContext, source: str) -> EvidenceStatus:
@@ -145,18 +162,11 @@ def _select_measurements(kind: str, message: str, markers: list) -> list:
     if kind == "BIO_AI_SCORE_LIST":
         return []
     if kind == "MARKER_LOOKUP":
-        token = ""
-        match = re.search(
-            r"\b(hdl|ldl|hba1c|glucose|tsh|hemoglobin|haemoglobin|cholesterol|triglycerides|alt|ast|bilirubin)\b",
-            message or "",
-            re.I,
-        )
-        if match:
-            token = match.group(1).lower()
+        keys = set(requested_marker_keys(message))
         chosen = [
             item
             for item in chosen
-            if token and (token in _key(getattr(item, "key", None)) or token in _key(getattr(item, "name", None)))
+            if keys and (_key(getattr(item, "key", None)) in keys or _key(getattr(item, "name", None)) in keys)
         ]
     elif kind == "ABNORMAL_LIST":
         chosen = [item for item in chosen if _outside(item)]
@@ -169,6 +179,9 @@ def _select_measurements(kind: str, message: str, markers: list) -> list:
     elif kind == "PRIORITIZED_CONCERNS":
         abnormal = [item for item in chosen if _outside(item)]
         chosen = abnormal or chosen
+    if re.search(r"\b(active enough|physical activity|exercise)\b", message or "", re.I):
+        unrelated = {"mcv", "mch", "rdw", "basophils", "eosinophils", "calcium", "bilirubin"}
+        chosen = [item for item in chosen if _key(getattr(item, "key", None)) not in unrelated]
     return chosen[:24]
 
 
@@ -231,8 +244,18 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
             limitation = "One side of the liver comparison is missing. Describe only the side that is on file."
     elif kind == "SYMPTOM_CONTEXT" and not measurements and not risks:
         blocked = "I don't have report findings that I can use to discuss this symptom."
-    elif kind == "MARKER_LOOKUP" and not measurements:
-        blocked = "I don't have that measurement in the records I can access for your account."
+    elif kind == "MARKER_LOOKUP":
+        coverage = classify_marker_trends(message, context.markers, context.comparisons)
+        if coverage["support"] == "unsupported" and not measurements:
+            blocked = "I don't have that measurement in the records I can access for your account."
+        elif coverage["support"] == "partial":
+            limitation = _partial_trend_limitation(coverage)
+        elif coverage["support"] == "unsupported" and measurements:
+            limitation = _partial_trend_limitation(coverage)
+    coverage = classify_marker_trends(message, context.markers, context.comparisons)
+    comparisons = _comparison_rows(coverage)
+    if comparisons and limitation is None and any(not row["supported"] for row in comparisons):
+        limitation = _partial_trend_limitation(coverage)
     if unavailable and limitation is None:
         limitation = (
             "Some required facts could not be placed in this answer's evidence: "
@@ -258,6 +281,7 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
         blocked_answer=blocked,
         questionnaire=questionnaire,
         report_counts=counts,
+        comparisons=comparisons,
     )
 
 
@@ -383,6 +407,392 @@ def _questionnaire_rows(plan: QueryPlan, context: HealthContext, message: str) -
             "status": "AVAILABLE",
         })
     return rows
+
+
+def _comparison_rows(coverage: dict) -> list[dict]:
+    rows = []
+    for row in coverage["supported"]:
+        rows.append({**row, "supported": True, "reason": None})
+    for key in coverage["missing"]:
+        rows.append({"key": key, "name": key, "supported": False, "reason": "not_in_records"})
+    for key in coverage["single_date"]:
+        rows.append({"key": key, "name": key, "supported": False, "reason": "single_date"})
+    for key in coverage["incompatible_units"]:
+        rows.append({"key": key, "name": key, "supported": False, "reason": "unit_not_comparable"})
+    for key in coverage["conflicting"]:
+        rows.append({"key": key, "name": key, "supported": False, "reason": "same_day_conflict"})
+    return rows
+
+
+_ABSENCE = re.compile(
+    r"only one (?:measurement |result )?date|only one measurement|no earlier|no previous|"
+    r"was not found|were not found|not found in|did not include|does not contain|doesn't contain|"
+    r"not in the (?:retrieved |report|records)",
+    re.I,
+)
+_CHANGE = re.compile(
+    r"\b(?:improved|improvement|worsened|went down|went up|decreased|increased|fell|dropped)\b",
+    re.I,
+)
+
+
+def contradicting_answer(message: str | None, markers: list | None, answer: str | None, comparisons: list | None = None) -> bool:
+    """True when the user-visible text denies a stored pair or states an unsupported change."""
+    coverage = classify_marker_trends(message, markers, comparisons)
+    text = answer or ""
+    supported = {row["key"] for row in coverage["supported"]}
+    if supported and _ABSENCE.search(text):
+        return True
+    if any(row["reason"] == "unit_not_comparable" for row in _comparison_rows(coverage)) and _CHANGE.search(text):
+        return True
+    if coverage["incompatible_units"] and re.search(r"\bmg/dl\b", text, re.I) and not any(
+        _unit_key(getattr(item, "unit", None)) == "mg/dl" for item in markers or []
+        if (_key(getattr(item, "key", None)) in coverage["incompatible_units"])
+    ):
+        # A unit appears in the answer for a marker whose stored rows do not share that unit.
+        return True
+    return False
+
+
+def _needs_value_repair(message: str | None, answer: str | None) -> bool:
+    """Add a stored value when an explanation uses it without stating it."""
+    asks = bool(re.search(r"\b(changed|change|improved|improvement|explain|mean|why is (?:it|that|this))\b", message or "", re.I))
+    if not asks:
+        return False
+    return bool(re.search(
+        r"\b(adequate|high|low|above|below|improved|improvement|moved|rose|fell|decreased|increased|would you like)\b",
+        answer or "",
+        re.I,
+    ))
+
+
+def omitted_supported_facts(message: str | None, markers: list | None, answer: str | None, comparisons: list | None = None) -> str | None:
+    """Pairs the model skipped. Appending them does not add a model call."""
+    coverage = classify_marker_trends(message, markers, comparisons)
+    sentences = []
+    comparison_ask = bool(re.search(r"\b(changed|change|improved|improvement|compared)\b", message or "", re.I))
+    for row in coverage["supported"] if comparison_ask else []:
+        if _number_present(answer, row["previous_value"]) and _number_present(answer, row["current_value"]):
+            continue
+        change = row["absolute_change"]
+        change_text = "unchanged" if change == 0 else f"change {change:+g} {row['unit']}"
+        sentences.append(
+            f"{row['name']} was {row['previous_value']:g} {row['unit']} on {row['previous_date']} "
+            f"and {row['current_value']:g} {row['unit']} on {row['current_date']} ({change_text})."
+        )
+    dated_rows = _with_comparison_rows(markers, comparisons)
+    for key in coverage["single_date"] if _needs_value_repair(message, answer) else []:
+        rows = [
+            item for item in dated_rows
+            if (_key(getattr(item, "key", None)) == key or _key(getattr(item, "name", None)) == key)
+            and getattr(item, "value", None) is not None
+            and getattr(item, "measured_at", None) is not None
+        ]
+        if not rows:
+            continue
+        row = sorted(rows, key=lambda item: str(getattr(item, "measured_at")))[-1]
+        if _number_present(answer, row.value):
+            continue
+        unit = getattr(row, "unit", None) or ""
+        low = getattr(row, "reference_low", None)
+        high = getattr(row, "reference_high", None)
+        range_note = ""
+        if low is not None and high is not None:
+            range_note = f" Stored reference range: {low:g}–{high:g} {unit}."
+        sentences.append(
+            f"{getattr(row, 'name', None) or key} is {row.value:g} {unit} on {row.measured_at}.{range_note} "
+            "Only one date is on file, so no change was calculated."
+        )
+    if not coverage["requested"] and _needs_value_repair(message, answer):
+        latest: dict[str, object] = {}
+        for marker in markers or []:
+            key = _key(getattr(marker, "key", None)) or _key(getattr(marker, "name", None))
+            if not key or getattr(marker, "value", None) is None:
+                continue
+            current = latest.get(key)
+            if current is None or str(getattr(marker, "measured_at", "") or "") >= str(getattr(current, "measured_at", "") or ""):
+                latest[key] = marker
+        if 0 < len(latest) <= 2:
+            for marker in latest.values():
+                if _number_present(answer, getattr(marker, "value", None)):
+                    continue
+                unit = getattr(marker, "unit", None) or ""
+                when = getattr(marker, "measured_at", None)
+                dated = f" on {when}" if when else ""
+                low = getattr(marker, "reference_low", None)
+                high = getattr(marker, "reference_high", None)
+                range_note = (
+                    f" Stored reference range: {low:g}–{high:g} {unit}."
+                    if low is not None and high is not None
+                    else ""
+                )
+                sentences.append(
+                    f"{getattr(marker, 'name', None) or 'The stored result'} is {marker.value:g} {unit}{dated}.{range_note}".strip()
+                )
+    if not sentences:
+        return None
+    if "cholesterol" in coverage["requested"] and coverage["support"] != "full":
+        sentences.append(
+            "These are numerical changes only. They do not show whether overall cholesterol improved, "
+            "and a small change is not by itself clinically meaningful."
+        )
+    return " ".join(sentences)
+
+
+def authoritative_measurement_answer(message: str | None, markers: list | None, comparisons: list | None = None) -> str | None:
+    """Verified facts when a model answer contradicts them. No second model call."""
+    text = render_partial_trend(message, markers, comparisons)
+    if not text:
+        return None
+    if re.search(r"\bwhy\b", message or "", re.I):
+        return (
+            text
+            + " The difference between these dates does not establish why the latest value is outside its reference range."
+        )
+    return text
+
+
+def requested_marker_keys(message: str | None) -> list[str]:
+    """Markers the question named. 'Cholesterol' asks for the lipid panel, not one row."""
+    from app.pipeline.lab_parameters import fuzzy_lab_keys
+
+    named = [key for key in fuzzy_lab_keys(message or "") if key]
+    if "cholesterol" in named:
+        named = list(dict.fromkeys([*named, *_CHOLESTEROL_PANEL]))
+    if named:
+        return list(dict.fromkeys(named))
+    found = [item.lower() for item in _MARKER_TOKEN.findall(message or "")]
+    keys: list[str] = []
+    for token in found:
+        if token == "cholesterol":
+            keys.extend(_CHOLESTEROL_PANEL)
+        else:
+            keys.append(token)
+    return list(dict.fromkeys(keys))
+
+
+def _number_present(text: str | None, value) -> bool:
+    if value is None:
+        return False
+    token = f"{value:g}"
+    return re.search(rf"(?<!\d){re.escape(token)}(?:\.0+)?(?!\d)", text or "") is not None
+
+
+def _unit_key(value: str | None) -> str:
+    text = re.sub(r"\s+", "", (value or "").strip().lower())
+    if text in {"percent", "percentage", "pct"}:
+        return "%"
+    return text
+
+
+def _dated_unit(items: list) -> str | None:
+    """One verified unit for a date. A blank comparison unit does not disagree with %."""
+    present: list[str] = []
+    display = ""
+    for item in items:
+        raw = getattr(item, "unit", None)
+        unit = _unit_key(raw)
+        if not unit:
+            continue
+        if unit not in present:
+            present.append(unit)
+            display = str(raw).strip()
+    if len(present) > 1:
+        return None
+    return display if present else ""
+
+
+def _with_comparison_rows(markers: list | None, comparisons: list | None) -> list:
+    """Earlier dated rows live on comparisons so latest-value indexes keep the current result."""
+    rows = list(markers or [])
+    seen = {
+        (_key(getattr(marker, "key", None)), str(getattr(marker, "measured_at", None)), getattr(marker, "value", None))
+        for marker in rows
+    }
+    for item in comparisons or []:
+        topic = getattr(item, "topic", None) or (item.get("key") if isinstance(item, dict) else None)
+        pairs = (
+            (
+                getattr(item, "previous_value", None) if not isinstance(item, dict) else item.get("previous_value"),
+                getattr(item, "previous_date", None) if not isinstance(item, dict) else item.get("previous_date"),
+                getattr(item, "previous_unit", None) if not isinstance(item, dict) else item.get("previous_unit"),
+            ),
+            (
+                getattr(item, "current_value", None) if not isinstance(item, dict) else item.get("current_value"),
+                getattr(item, "current_date", None) if not isinstance(item, dict) else item.get("current_date"),
+                getattr(item, "current_unit", None) if not isinstance(item, dict) else item.get("current_unit"),
+            ),
+        )
+        for value, when, unit in pairs:
+            if value is None:
+                continue
+            identity = (_key(topic), str(when), value)
+            if identity in seen:
+                continue
+            seen.add(identity)
+            rows.append(SimpleNamespace(key=topic, name=topic, value=value, unit=unit, measured_at=when))
+    return rows
+
+
+def classify_marker_trends(message: str | None, markers: list | None, comparisons: list | None = None) -> dict:
+    """Split a multi-marker question into paired, missing, single-date, conflicting, or unit-mismatched keys.
+
+    A numeric change is returned only when the same marker has two different dates and the same unit.
+    """
+    markers = _with_comparison_rows(markers, comparisons)
+    keys = requested_marker_keys(message)
+    if not keys and re.search(r"\b(improved|worsened|since last|since my last|compared with last)\b", message or "", re.I):
+        keys = list(dict.fromkeys(
+            _key(getattr(marker, "key", None)) or _key(getattr(marker, "name", None))
+            for marker in markers or []
+        ))
+        keys = [key for key in keys if key]
+    grouped: dict[str, list] = {key: [] for key in keys}
+    for marker in markers or []:
+        key = _key(getattr(marker, "key", None)) or _key(getattr(marker, "name", None))
+        if key in grouped:
+            grouped[key].append(marker)
+    supported: list[dict] = []
+    missing: list[str] = []
+    single_date: list[str] = []
+    incompatible_units: list[str] = []
+    conflicting: list[str] = []
+    for key in keys:
+        rows = grouped.get(key) or []
+        if not rows:
+            missing.append(key)
+            continue
+        by_date: dict[str, list] = {}
+        for marker in rows:
+            when = getattr(marker, "measured_at", None)
+            if when is None:
+                continue
+            by_date.setdefault(str(when), []).append(marker)
+        if not by_date:
+            single_date.append(key)
+            continue
+        conflicted = False
+        for items in by_date.values():
+            values = {getattr(item, "value", None) for item in items}
+            units = {_unit_key(getattr(item, "unit", None)) for item in items}
+            if len(values) > 1 or len(units) > 1:
+                conflicting.append(key)
+                conflicted = True
+                break
+        if conflicted:
+            continue
+        dates = sorted(by_date)
+        if len(dates) < 2:
+            single_date.append(key)
+            continue
+        previous = by_date[dates[-2]][0]
+        current = by_date[dates[-1]][0]
+        previous_unit = _dated_unit(by_date[dates[-2]])
+        current_unit = _dated_unit(by_date[dates[-1]])
+        if not previous_unit or not current_unit or previous_unit != current_unit:
+            incompatible_units.append(key)
+            continue
+        from app.pipeline.trend_engine import compute_trend
+
+        delta, _pct, direction = compute_trend(previous.value, current.value)
+        supported.append({
+            "key": key,
+            "name": getattr(current, "name", None) or key,
+            "previous_value": previous.value,
+            "current_value": current.value,
+            "unit": current_unit or getattr(current, "unit", None),
+            "previous_date": dates[-2],
+            "current_date": dates[-1],
+            "absolute_change": delta,
+            "direction": direction,
+        })
+    if supported and not missing and not single_date and not incompatible_units and not conflicting:
+        support = "full"
+    elif supported:
+        support = "partial"
+    else:
+        support = "unsupported"
+    return {
+        "support": support,
+        "supported": supported,
+        "missing": missing,
+        "single_date": single_date,
+        "incompatible_units": incompatible_units,
+        "conflicting": conflicting,
+        "requested": keys,
+    }
+
+
+def _partial_trend_limitation(coverage: dict) -> str:
+    parts = []
+    if coverage["supported"]:
+        names = ", ".join(row["name"] for row in coverage["supported"])
+        parts.append(f"Verified dated changes exist for {names}.")
+    if coverage["missing"]:
+        parts.append("Not in the retrieved records: " + ", ".join(coverage["missing"]) + ".")
+    if coverage["single_date"]:
+        parts.append("Only one date, so no trend: " + ", ".join(coverage["single_date"]) + ".")
+    if coverage["incompatible_units"]:
+        parts.append("Units differ across dates, so no trend: " + ", ".join(coverage["incompatible_units"]) + ".")
+    if coverage["conflicting"]:
+        parts.append("Conflicting values on the same date, so no trend: " + ", ".join(coverage["conflicting"]) + ".")
+    if "cholesterol" in (coverage.get("requested") or []) and coverage["support"] != "full":
+        parts.append("A change in one lipid does not show whether overall cholesterol improved.")
+    return " ".join(parts)
+
+
+def render_partial_trend(message: str | None, markers: list | None, comparisons: list | None = None) -> str | None:
+    """Deterministic partial comparison. Uses only paired, same-unit values."""
+    coverage = classify_marker_trends(message, markers, comparisons)
+    if coverage["support"] == "unsupported" and not coverage["requested"]:
+        return None
+    if not coverage["requested"]:
+        return None
+    sentences = []
+    for row in coverage["supported"]:
+        change = row["absolute_change"]
+        change_text = "unchanged" if change == 0 else f"change {change:+g} {row['unit']}"
+        sentences.append(
+            f"{row['name']} was {row['previous_value']:g} {row['unit']} on {row['previous_date']} "
+            f"and {row['current_value']:g} {row['unit']} on {row['current_date']} ({change_text})."
+        )
+    if sentences and re.search(r"\b(improved|improvement|better|worse|worsened)\b", message or "", re.I):
+        sentences.append(
+            "This is a numerical change only. It is not a clinical conclusion that the result is better or worse."
+        )
+    if coverage["missing"]:
+        sentences.append(
+            "Not in the retrieved records: " + ", ".join(coverage["missing"]) + ". No value was estimated."
+        )
+    if coverage["single_date"]:
+        dated = _with_comparison_rows(markers, comparisons)
+        bits = []
+        for key in coverage["single_date"]:
+            rows = [
+                item for item in dated
+                if (_key(getattr(item, "key", None)) == key or _key(getattr(item, "name", None)) == key)
+                and getattr(item, "value", None) is not None
+            ]
+            if not rows:
+                bits.append(key)
+                continue
+            row = sorted(rows, key=lambda item: str(getattr(item, "measured_at") or ""))[-1]
+            unit = getattr(row, "unit", None) or ""
+            when = getattr(row, "measured_at", None)
+            bits.append(f"{getattr(row, 'name', None) or key} {row.value:g} {unit} on {when}".replace("  ", " "))
+        sentences.append("Only one measurement date is on file for " + "; ".join(bits) + ", so no trend was calculated.")
+    if coverage["incompatible_units"]:
+        sentences.append("Units do not match across dates for " + ", ".join(coverage["incompatible_units"]) + ", so no trend was calculated.")
+    if coverage["conflicting"]:
+        sentences.append("Conflicting values are stored on the same date for " + ", ".join(coverage["conflicting"]) + ", so no trend was calculated.")
+    if not sentences:
+        return None
+    if "cholesterol" in coverage["requested"] and coverage["support"] != "full":
+        sentences.append(
+            "These are numerical changes only. They do not show whether overall cholesterol improved, "
+            "and a small change is not by itself clinically meaningful."
+        )
+    return " ".join(sentences)
 
 
 def _report_counts(context: HealthContext) -> dict | None:

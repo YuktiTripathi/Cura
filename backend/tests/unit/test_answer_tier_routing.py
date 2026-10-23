@@ -213,4 +213,5 @@ def test_deep_failure_is_honest_not_a_weaker_answer(monkeypatch, routing):
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", down)
     body = _chat("Why is my Bio-AI diabetes risk high even though some blood markers are normal?")
-    assert "try again" in body["answer"].lower()
+    assert "could not be generated" in body["answer"].lower()
+    assert "type 2 diabetes" in body["answer"].lower()

@@ -22,7 +22,9 @@ _FORMAT_ERRORS = {"LLM request format was rejected", "Unexpected LLM response", 
 logger = logging.getLogger("cura.llm")
 
 _THINK_RE = re.compile(r"<think>.*?</think>", re.DOTALL | re.IGNORECASE)
-_REASONING_MODEL_RE = re.compile(r"(gpt-5|o1|o3|o4|gemini-3)", re.I)
+# gemini-3.8-flash spends most of the completion budget on hidden reasoning.
+# Other gemini-3.x-flash models stay on the normal output cap.
+_REASONING_MODEL_RE = re.compile(r"(gpt-5|o1|o3|o4|gemini-3\.8-flash|gemini-3(?!\.\d+-flash))", re.I)
 _ANSWER_SCHEMA = {
     "type": "json_schema",
     "json_schema": {
@@ -54,6 +56,18 @@ def strip_reasoning(text: str) -> str:
 
 def uses_reasoning_tokens(model: str | None) -> bool:
     return bool(_REASONING_MODEL_RE.search(model or ""))
+
+
+# Strict json_schema was rejected by OpenRouter for these approved answer models
+# ("No endpoints found that support the requested parameters"). Starting with
+# json_object avoids a predictable HTTP 400. A model not listed here may still
+# fall back once if the provider rejects json_schema.
+_JSON_OBJECT_ONLY = ("gemini", "gpt-5-mini", "gpt-5.6")
+
+
+def supports_json_schema(model: str | None) -> bool:
+    name = (model or "").lower()
+    return not any(token in name for token in _JSON_OBJECT_ONLY)
 
 
 def message_text(message: dict | None) -> str:
@@ -124,9 +138,12 @@ class OpenAICompatibleLLMClient:
         from app.pipeline.model_safe_context import guard_outgoing_messages
 
         policy = openrouter_policy()
-        if self.personal_health:
+        from app.llm.openrouter_policy import messages_contain_personal_clinical
+
+        self._effective_personal = self.personal_health or messages_contain_personal_clinical(messages)
+        if self._effective_personal:
             policy.assert_model(self.model)
-            policy.assert_privacy_for_health(personal_health=True)
+            policy.assert_privacy_for_health(personal_health=True, model=self.model)
         if policy.dlp_enabled:
             messages = guard_outgoing_messages(messages)
         try:
@@ -165,9 +182,7 @@ class OpenAICompatibleLLMClient:
     def _format_fallbacks(self, json_mode: bool) -> list[str]:
         formats: list[str] = []
         if json_mode:
-            # gpt-5 via this gateway rejects json_schema with HTTP 400. Sending it
-            # first spends a full round trip before the json_object call succeeds.
-            if settings.llm_json_schema_output and "gpt-5" not in (self.model or "").lower():
+            if settings.llm_json_schema_output and supports_json_schema(self.model):
                 formats.append("json_schema")
             formats.append("json_object")
         formats.append("plain")
@@ -188,16 +203,21 @@ class OpenAICompatibleLLMClient:
         from app.llm.openrouter_policy import openrouter_policy
 
         policy = openrouter_policy()
-        provider_prefs: dict = {"allow_fallbacks": False}
-        only = policy.upstream_only(self.model)
-        if only:
-            provider_prefs["only"] = only
-        if policy.deny_data_collection or settings.openrouter_data_collection_deny:
-            provider_prefs["data_collection"] = "deny"
-        if self.personal_health and policy.require_zdr and policy.zdr_configured:
-            provider_prefs["zdr"] = True
-        elif settings.openrouter_zero_data_retention:
-            provider_prefs["zdr"] = True
+        personal = bool(self.personal_health or getattr(self, "_effective_personal", False))
+        if personal:
+            payload["provider"] = policy.provider_preferences(
+                self.model,
+                personal_health=True,
+                require_parameters=fmt == "json_schema" and bool(settings.openrouter_require_parameters),
+            )
+            if fmt == "json_schema":
+                payload["temperature"] = 0
+                payload["response_format"] = dict(_ANSWER_SCHEMA)
+            elif fmt == "json_object":
+                payload["temperature"] = 0
+                payload["response_format"] = {"type": "json_object"}
+            return payload
+        provider_prefs = policy.provider_preferences(self.model, personal_health=False)
         if fmt == "json_schema":
             payload["temperature"] = 0
             payload["response_format"] = dict(_ANSWER_SCHEMA)
@@ -256,6 +276,7 @@ class OpenAICompatibleLLMClient:
             if response.status_code < 400:
                 break
             if response.status_code == 400:
+                self.http_requests = int(getattr(self, "http_requests", 0)) + 1
                 logger.warning(
                     "llm_http_error status=400 model=%s format=%s detail=%s",
                     self.model,
@@ -274,19 +295,31 @@ class OpenAICompatibleLLMClient:
             data = response.json()
         except ValueError as exc:
             raise LLMUnavailableError("Unexpected LLM response") from exc
-        usage = data.get("usage") or {}
-        details = usage.get("prompt_tokens_details") or {}
-        completion_details = usage.get("completion_tokens_details") or {}
-        cached = details.get("cached_tokens")
-        self.last_usage = {
-            "input_tokens": int(usage.get("prompt_tokens") or 0),
-            "output_tokens": int(usage.get("completion_tokens") or 0),
-            "cached_tokens": int(cached or 0),
-            "reasoning_tokens": int(completion_details.get("reasoning_tokens") or usage.get("reasoning_tokens") or 0),
-            "usage_reported": bool(usage),
-        }
-        perf.count("prompt_tokens", self.last_usage["input_tokens"])
-        perf.count("completion_tokens", self.last_usage["output_tokens"])
+        usage = data.get("usage") if isinstance(data.get("usage"), dict) else None
+        self.http_requests = int(getattr(self, "http_requests", 0)) + 1
+        if not usage:
+            self.last_usage = {"usage_reported": False}
+            self.last_usage_detail = {"usage_reported": False, "reasoning_tokens": None, "provider_cost": None}
+        else:
+            details = usage.get("prompt_tokens_details") or {}
+            completion_details = usage.get("completion_tokens_details") or {}
+            cached = details.get("cached_tokens")
+            reasoning = completion_details.get("reasoning_tokens")
+            if reasoning is None:
+                reasoning = usage.get("reasoning_tokens")
+            self.last_usage = {
+                "input_tokens": usage.get("prompt_tokens"),
+                "output_tokens": usage.get("completion_tokens"),
+                "cached_tokens": cached,
+                "reasoning_tokens": reasoning,
+                "provider_cost": usage.get("cost"),
+                "usage_reported": True,
+            }
+            self.last_usage_detail = dict(self.last_usage)
+            if self.last_usage.get("input_tokens") is not None:
+                perf.count("prompt_tokens", int(self.last_usage["input_tokens"]))
+            if self.last_usage.get("output_tokens") is not None:
+                perf.count("completion_tokens", int(self.last_usage["output_tokens"]))
         try:
             message = data["choices"][0]["message"]
             finish_reason = data["choices"][0].get("finish_reason")

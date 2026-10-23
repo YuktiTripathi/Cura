@@ -22,4 +22,16 @@ describe("PresentedAnswer", () => {
     expect(container.textContent).not.toContain("**");
     expect(container.textContent).not.toContain("* Blood");
   });
+
+  it("keeps a safety answer visible and does not invent a biomarker card", () => {
+    const { container } = render(
+      <PresentedAnswer
+        presentation={{ mode: "SAFETY", summary: "Please seek urgent care.", findings: [], uncertainties: [], next_steps: [] }}
+        fallback=""
+      />
+    );
+    expect(container.querySelector(".safety-notice")).toBeTruthy();
+    expect(container.textContent).toContain("Please seek urgent care.");
+    expect(container.querySelector(".value-cards")).toBeNull();
+  });
 });

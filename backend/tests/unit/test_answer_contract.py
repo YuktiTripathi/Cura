@@ -47,7 +47,7 @@ def test_blood_report_starter_asks_for_an_explanation():
     assert plan.needs_blood is True
     assert plan.needs_bio_ai is False
     assert spec["goal"] == "interpret"
-    assert spec["length_band"] == "120-180"
+    assert spec["length_band"] == "100-150"
     assert spec["broad_summary"] is False
     assert spec["recommendations_requested"] is False
     assert spec["primary_source"] == "blood_report"
@@ -59,7 +59,7 @@ def test_bio_ai_report_explanation_is_an_interpretation():
     plan = build_query_plan("Explain my latest Bio-AI report")
     spec = plan.task_contract
     assert spec["goal"] == "interpret"
-    assert spec["length_band"] == "120-180"
+    assert spec["length_band"] == "100-150"
     assert spec["broad_summary"] is False
     assert spec["recommendations_requested"] is False
     assert spec["primary_source"] == "bio_ai"
