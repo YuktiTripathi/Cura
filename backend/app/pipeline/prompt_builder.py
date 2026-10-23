@@ -104,7 +104,7 @@ For one biomarker: what the test measures, the value, unit, and date when suppli
 For a Bio-AI score: what the estimate means, that a prediction is not a diagnosis, and which verified factors put it in context. Never say the score confirms a disease.
 For nutrition: everyday food names and serving sizes. Do not change a calculated amount.
 The first sentence answers the question. Never begin with "Direct answer:", "Short answer:", "Measured results:", "Possible explanations:", or "What that means:". A simple question stays one short paragraph with no list. When several findings need explaining, follow that opening with 2 to 4 concise Markdown bullets. Each bullet is one everyday sentence and does not begin with a bold label. Do not repeat the same point in another bullet. Use a heading only when it clearly helps, and use bold sparingly. A numbered list is only for an order the user asked for.
-Use at most one short safety qualifier, and only when it matters (for example "This is a risk estimate, not a diagnosis."). Do not repeat it in other words, and skip it for simple low-risk education.
+Use at most one short safety qualifier, and only when it matters. Match it to the source: Bio-AI scores are "risk estimates, not diagnoses"; laboratory results are "a reading of your results, not a diagnosis". Never call a laboratory result a risk estimate. Do not repeat the qualifier in other words, and skip it for simple low-risk education.
 Never use the em dash character; use commas, full stops, colons or parentheses instead.
 Choose the shape that fits this answer, not a fixed template:
 - one or two sentences for a simple follow-up;
@@ -191,7 +191,8 @@ class PromptBuilder:
                 "Do not repeat those values from anywhere else, and do not add a value that is not listed. "
                 "Answer the response type in the task. Do not switch to a different topic or a different kind of answer.\n"
                 "Begin by answering the question. Do not print a heading such as Direct answer or Measured results. "
-                "If a source is listed under missing, say that source was not retrieved. A value written in the user question is user-reported, not missing. Do not tell the member to upload a report "
+                "If a source is listed under missing, say in plain words that the member's report does not include it "
+                "(never use the words retrieved, retrieval, or not available in the records). A value written in the user question is user-reported, not missing. Do not tell the member to upload a report "
                 "when the status is NOT_PRESENT or NOT_RETRIEVED.\n"
                 "Do not print internal identifiers, routing, or the words task contract or evidence package.\n"
                 "If comparisons lists a supported pair, use those values and dates. "
@@ -494,8 +495,14 @@ def _clinical_brief_block(context: HealthContext, user_message: str) -> str:
         "Explain only this brief. Say what the pattern may suggest, why it matters, and what cannot be concluded. "
         "Do not stop at 'outside the expected range' or 'this can affect long-term health'. "
         "Do not name a condition that these facts do not support. "
-        "Result cards show the exact numbers, so do not repeat every value and range. "
+        "Give the value and unit for each finding you explain (for example \"HbA1c 9.1%\"), so the member can see "
+        "how far outside the range it is; do not list every in-range value. "
+        "If guideline_notes are listed, lead with the most important one and state it plainly in everyday words, "
+        "including when to see a doctor. "
+        "Write test names in their standard form (HbA1c, LDL, HDL, eGFR, TSH), even when the report spells them differently. "
         "If every listed result is within its laboratory range, say that, and do not invent an abnormality. "
+        "End with one short next step. If you add a qualifier, use \"This is a reading of your results, not a diagnosis.\" "
+        "once. These are laboratory measurements, so never call them risk estimates. "
         "Finish the last sentence.\n"
     )
 
@@ -508,11 +515,15 @@ def _bio_explain_note(context: HealthContext, user_message: str) -> str:
     if (context.task_contract or {}).get("primary_source") == "blood_report":
         return ""
     return (
-        "The Bio-AI scores are already shown in cards. Write about 100 to 150 words, fewer if one score is enough: one opening sentence, then 3 to 5 plain bullets. "
-        "Group related concerns. Say which assessments look reassuring, without claiming a low-risk band rules out disease. "
-        "Do not repeat each score or its number. Say once that these are risk estimates, not diagnoses. "
-        "A blood test and a Bio-AI score are different. Do not say an assessment is unavailable when its score is listed. "
-        "Do not add lifestyle advice unless the user asked what to do.\n"
+        "The Bio-AI scores are also shown in cards. Write about 100 to 160 words: one opening sentence, then 3 to 5 plain bullets. Do not add a heading. "
+        "Start with the highest scores, giving each one's score and level once (for example \"Dyslipidemia 84, very high\"). "
+        "Name only assessments listed in the evidence, and describe each with the level the evidence gives it. "
+        "When an assessment lists related_blood_results, connect them in plain words (for example that a Type 2 diabetes "
+        "risk estimate fits an HbA1c above range); a score and a blood test are different things, so say they point the same way, not that one proves the other. "
+        "Briefly explain every raised assessment you mention. Say which assessments look reassuring, without claiming a low-risk band rules out disease. "
+        "Say once, and only once, that these are risk estimates, not diagnoses. "
+        "Do not say an assessment is unavailable when its score is listed. "
+        "End with one short next step, such as which score to go through with the doctor first.\n"
     )
 
 

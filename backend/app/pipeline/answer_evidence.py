@@ -814,15 +814,21 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
     """
     primary = primary_source or "unspecified"
     if primary == "bio_ai":
-        risks = [
-            _risk_fact(risk)
-            for risk in (context.bio_ai_risks or [])
-        ]
+        from app.pipeline.report_explainer import related_blood_results
+
+        ranked = sorted(context.bio_ai_risks or [], key=lambda r: -(getattr(r, "score", None) or 0))
+        assessments = []
+        for risk in ranked:
+            fact = _risk_fact(risk)
+            linked = related_blood_results(risk, context.markers or [])
+            if linked:
+                fact["related_blood_results"] = linked
+            assessments.append(fact)
         return {
             "primary_source": "bio_ai",
             "kind": "risk_estimate",
-            "assessments": risks[:4],
-            "additional_assessment_count": max(0, len(risks) - 4),
+            # Every assessment in the report: the answer may name only these.
+            "assessments": assessments,
             "note": "These are model risk estimates, not laboratory measurements and not diagnoses.",
         }
     markers = list(context.markers or [])
@@ -833,6 +839,15 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
     for marker in ordered:
         domain = domain_for_entity(marker.key)
         grouped.setdefault(domain.code if domain else "other", []).append(marker)
+    from app.pipeline.clinical_thresholds import clinical_notes
+
+    notes = clinical_notes([m for m in ordered if m.value is not None])
+    # The group holding the most important guideline finding is explained first.
+    lead_keys = [note.marker.key for note in notes]
+    grouped = dict(sorted(
+        grouped.items(),
+        key=lambda item: min((lead_keys.index(m.key) for m in item[1] if m.key in lead_keys), default=len(lead_keys)),
+    ))
     patterns = []
     for code, rows in list(grouped.items())[:4]:
         facts = []
@@ -855,6 +870,8 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
         "patterns": patterns,
         "within_laboratory_range": in_range,
         "all_listed_results_within_range": bool(markers) and not ordered,
+        # Published guideline ranges (ADA, NCEP, ACC/AHA, Endocrine Society): how far outside.
+        "guideline_notes": [note.text for note in notes],
         "note": (
             "laboratory_status describes the laboratory reference range only. "
             "It is not a clinical-importance score. Do not invent results that are not listed."

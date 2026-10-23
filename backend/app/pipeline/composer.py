@@ -260,6 +260,9 @@ class ResponseComposer:
         from app.pipeline.grounding import drop_unverified_claims
 
         text = drop_unverified_claims(text, context)
+        from app.pipeline.answer_polish import polish_answer
+
+        text = polish_answer(text, context, intent=getattr(context.intent, "value", None))
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:
             context.answer_evidence_trace.update(policy_trace)
