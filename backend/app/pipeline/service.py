@@ -315,6 +315,19 @@ class ChatService:
             ),
         )
 
+    def _member_findings(self, principal, plan, context) -> tuple[list, list] | None:
+        """Latest results and Bio-AI scores for follow-up suggestions when this turn's context
+        holds none (goal or nutrition answers). Never used for the answer itself."""
+        if plan.knowledge_scope != KnowledgeScope.personal or context.markers or context.bio_ai_risks:
+            return None
+        try:
+            from app.pipeline.starters import collect_snapshot
+
+            snap = collect_snapshot(principal, self.registry)
+        except Exception:  # noqa: BLE001 - suggestions are optional; the answer must not fail
+            return None
+        return list(snap.markers or []), list(snap.bio_risks or [])
+
     def _execute_chat(self, principal: AuthenticatedPrincipal, payload: ChatRequest, request_id: str, eval_turn: dict) -> ChatResponse:
         started = time.perf_counter()
         from app.documents.service import reset_request_document_list
@@ -1449,6 +1462,11 @@ class ChatService:
                     testing_option=testing_option,
                     experience=experience,
                     conversation_turn=conv_state.turn_type.value,
+                    history=[
+                        q for q in self.memory.user_messages(conv) if q.strip() != (payload.message or "").strip()
+                    ],
+                    shown_follow_ups=list(getattr(conv_state, "suggested_follow_ups", None) or []),
+                    member_findings=self._member_findings(principal, plan, context),
                 )
         self._progress.measure("compose")
         eval_turn.setdefault("answer_stages", {})["post_safety_answer"] = pre_compose_answer
@@ -1526,6 +1544,7 @@ class ChatService:
                 expected = ExpectedReplyType.clinical_context
         next_state = persistable_state(
             conv_state,
+            suggested=[item.text for item in (suggestions or []) if getattr(item, "text", None)],
             plan_topic=context.resolved_topic or plan.topic,
             plan_domains=list(plan.domains or []),
             plan_entities=discussed_entities(plan, context),

@@ -123,7 +123,8 @@ Do not imply that a questionnaire response caused a lab abnormality. Do not list
 If the member already reports a supportive habit, acknowledge it briefly and do not tell them to start doing what they already do.
 Something the member said recently in this conversation overrides an older questionnaire answer. If questionnaire data is missing, answer anyway without drawing attention to the gap.
 
-Return a JSON object with: answer (your complete Markdown answer; it must stand on its own), claims, recommendation_candidates, follow_up_questions (0-3 short questions the member would naturally ask next about THIS conversation; never generic ones such as "Do you have any new symptoms?"), safety_flags, escalation.
+Return a JSON object with: answer (your complete Markdown answer; it must stand on its own), claims, recommendation_candidates, follow_up_questions (2-3 questions, see FOLLOW-UP QUESTIONS below), safety_flags, escalation.
+FOLLOW-UP QUESTIONS: write them as the member would ask them next, in the first person, short and natural (at most 12 words, ending with "?"), for example "Why is my HbA1c so high?" or "Are my low ferritin and MCV connected?". Move the conversation one step along this path, skipping steps already covered: overview, areas of concern, understanding an abnormal result, how results connect, lifestyle and food, changes since earlier reports, future risk, next steps with a doctor. Ground each question in the FOLLOW-UP BRIEF: name only tests and Bio-AI scores listed there, and prefer the most clinically important finding (one with see_doctor_soon first). Do not repeat a question in already_asked or already_suggested, do not ask what this answer has just explained, and never suggest medicine names or doses or generic questions such as "Do you have any new symptoms?" or "Anything else?".
 <<SEMANTIC_ONLY>>SEMANTIC RESPONSE (same JSON): also return "summary", the core answer in one to three sentences that stands on its own, and "blocks", 0-3 optional blocks (never more than 4) used only when the answer naturally holds separate ideas such as the evidence behind it, what is reassuring, or next steps. A simple question gets no blocks; never turn every sentence into a block and never repeat the summary inside one.
 Do not copy measured values into blocks: reference them with evidence keys and the app shows the exact values. Keys: blood.<code>.latest, blood.<code>.trend (previous vs latest), bioai.<code>, using the codes in the evidence.
 Block shapes: {"type":"metric"|"metric_group"|"risk"|"comparison","title","evidence":[keys]}; {"type":"insight"|"reassurance"|"warning"|"text","title","text","evidence":[keys]}; {"type":"priority_list"|"action_list","title","items":[{"title","text","evidence":[keys]}]}; {"type":"nutrition","title","increase":[foods],"reduce":[foods],"text":"why it matters"}. Titles are short and specific to this answer, never stock labels.
@@ -202,6 +203,7 @@ class PromptBuilder:
                 f"TASK:\n{compact_json(task)}\n"
                 f"VERIFIED PATIENT EVIDENCE:\n{compact_json(context.evidence_package)}\n"
                 f"{evidence_block}"
+                f"{_follow_up_brief_block(context)}"
                 + _selected_upload_block(context)
                 + _medical_block(context, user_message)
                 + "Conversation focus (topic and follow-up only; never a source of current lab values): "
@@ -565,6 +567,21 @@ def _prune(value):
         pruned = [_prune(v) for v in value]
         return [v for v in pruned if v not in (None, "", [], {})]
     return value
+
+
+def _follow_up_brief_block(context: HealthContext) -> str:
+    """The member's findings for writing grounded follow_up_questions."""
+    if not (getattr(context, "markers", None) or getattr(context, "bio_ai_risks", None)):
+        return ""
+    from app.pipeline.followup_generator import build_brief
+
+    brief = build_brief(
+        markers=list(context.markers or []),
+        risks=list(context.bio_ai_risks or []),
+        comparisons=list(context.comparisons or []),
+    )
+    bio_only = str(getattr(context.intent, "value", context.intent) or "").startswith("bio_ai")
+    return f"FOLLOW-UP BRIEF JSON:\n{compact_json(brief.prompt_json(bio_only=bio_only))}\n"
 
 
 def compact_json(value) -> str:

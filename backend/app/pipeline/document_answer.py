@@ -324,12 +324,22 @@ def _summary_answer(rows: list[Document], contexts: list[UploadedDocumentContext
                 source="user_uploaded",
                 knowledge_scope="personal",
                 handling_path="LOOKUP",
-            )
+            ),
+            *_grounded_document_followups(facts, _message),
         ],
         used_structured=bool(facts),
         used_pageindex=bool(hits),
         still_indexing=pending,
     )
+
+
+def _grounded_document_followups(facts, message: str) -> list[FollowUpSuggestion]:
+    from app.pipeline.followup_generator import document_followups
+
+    try:
+        return document_followups(facts, message=message, count=3)
+    except ValueError:
+        return []
 
 
 def _wants_explanation(message: str, plan: QueryPlan | None = None) -> bool:
