@@ -244,36 +244,14 @@ class DeterministicRenderer:
         if context.intent.value == "questionnaire_lookup":
             return render_questionnaire_answers(context)
         if context.intent.value == "report_explanation":
-            from app.pipeline.clinical_thresholds import clinical_notes
+            from app.pipeline.report_explainer import explain_blood_report
 
-            out = []
-            seen: set[tuple[str, object]] = set()
-            flagged = []
-            dates = set()
-            for marker in context.markers:
-                if marker.flag.value not in {"low", "high", "critical"}:
-                    continue
-                identity = ("".join(ch for ch in marker.name.lower() if ch.isalnum())[:3], marker.value)
-                if identity in seen:
-                    continue
-                seen.add(identity)
-                flagged.append(marker)
-                value = "unavailable" if marker.value is None else f"{marker.value:g} {marker.unit or ''}".strip()
-                out.append(f"{marker.name} {value} ({marker.flag.value})")
-                if hasattr(marker.measured_at, "isoformat"):
-                    dates.add(marker.measured_at.isoformat()[:10])
-            notes = clinical_notes(flagged)
-            lead = " ".join(note.text for note in notes)
             summary = context.in_range_summary
-            counts = ""
-            if summary:
-                counts = (
-                    f" {summary.in_range} results were in range and {summary.out_of_range} were outside it."
-                )
-            when = f" from {next(iter(dates))}" if len(dates) == 1 else ""
-            findings = "; ".join(out) or "none"
-            body = f"Your latest report{when}:{counts} Outside the reference range: {findings}."
-            return f"{lead}\n\n{body}" if lead else body
+            return explain_blood_report(
+                context.markers,
+                in_range=summary.in_range if summary else None,
+                out_of_range=summary.out_of_range if summary else None,
+            )
         if context.intent.value == "health_goal_progress":
             if not context.goal_progress:
                 return (
@@ -413,7 +391,15 @@ class DeterministicRenderer:
                 )
             return " ".join(lines) + " These are assessments, not diagnoses."
         if context.intent.value == "bio_ai_score" and context.bio_ai_risks:
+            if len(context.bio_ai_risks) > 1:
+                from app.pipeline.report_explainer import explain_bio_ai
+
+                return explain_bio_ai(context.bio_ai_risks, context.markers)
             return render_bio_ai_score_list(context.bio_ai_risks)
+        if context.intent.value == "bio_ai_explanation" and len(context.bio_ai_risks or []) > 1 and not context.comparisons:
+            from app.pipeline.report_explainer import explain_bio_ai
+
+            return explain_bio_ai(context.bio_ai_risks, context.markers)
         if context.intent.value == "bio_ai_explanation" and context.bio_ai_risks:
             extra = ""
             risk_codes = {str(r.code) for r in context.bio_ai_risks}

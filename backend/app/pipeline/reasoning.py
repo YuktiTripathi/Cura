@@ -90,6 +90,14 @@ CROSS_SOURCE_LIMITATION = (
 )
 
 
+def _whole_report_explained(context: HealthContext) -> bool:
+    """True when the renderer's report explainer answers the turn (see report_explainer)."""
+    intent = context.intent.value
+    if intent == "report_explanation":
+        return True
+    return intent in {"bio_ai_explanation", "bio_ai_score"} and len(context.bio_ai_risks or []) > 1 and not context.comparisons
+
+
 @dataclass
 class ReasoningResult:
     answer: str
@@ -553,6 +561,15 @@ class ReasoningService:
                 if partial:
                     return ReasoningResult(
                         answer=partial,
+                        llm_called=False,
+                        llm_mode="deterministic_fallback",
+                        fallback_reason="privacy" if privacy else "model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                if _whole_report_explained(context):
+                    # The deterministic explainer already covers every flagged result.
+                    return ReasoningResult(
+                        answer=self.renderer.render(message, context),
                         llm_called=False,
                         llm_mode="deterministic_fallback",
                         fallback_reason="privacy" if privacy else "model_unavailable",
