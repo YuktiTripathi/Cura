@@ -773,3 +773,12 @@ def answer_markers(markers: list[BloodMarker], message: str | None = None) -> st
             parts.append("Recheck the test after about three months of changes to see how it is moving.")
         return "\n\n".join(p for p in parts if p)
     return explain_markers(focus)
+
+
+def related_blood_results(risk, markers: list[BloodMarker]) -> list[str]:
+    """Out-of-range blood results behind a Bio-AI score ("HbA1c 9.1% (high)")."""
+    _meaning, theme = _risk_info(getattr(risk, "code", "") or "", getattr(risk, "name", "") or "")
+    if not theme:
+        return []
+    linked = [m for m in markers if _out_of_range(m) and _theme(m).code == theme]
+    return [_value(m) for m in _dedupe(linked)[:4]]
