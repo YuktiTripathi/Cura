@@ -244,6 +244,20 @@ class ContextBuilder:
                     m for m in full
                     if m.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and m.value is not None
                 ] or full[:8]
+                requested = {str(code).lower() for code in plan.requested_metrics or []}
+                if requested:
+                    # A topic question ("How is my liver?", "Am I anaemic?") is about those
+                    # tests, in range or not, rather than every out-of-range result.
+                    from app.pipeline.narrative import canonical_marker_key
+
+                    topic = [
+                        m for m in full
+                        if m.value is not None
+                        and ((m.key or "").lower() in requested or canonical_marker_key(m).lower() in requested)
+                    ]
+                    # None of the asked-about tests is in the report: say so rather than
+                    # answering with unrelated out-of-range results.
+                    ctx.markers = topic
             if scenario_input.bio_ai_reports:
                 latest_bio = sorted(
                     scenario_input.bio_ai_reports,

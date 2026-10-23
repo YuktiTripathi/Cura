@@ -260,6 +260,25 @@ class DeterministicRenderer:
                 )
             parts = [item.summary for item in context.goal_progress]
             return " ".join(parts) + " Progress is calculated only from stored reports."
+        if context.intent.value == "health_scenario" and context.requested_entity_codes and not context.markers:
+            from app.pipeline.report_explainer import explain_missing_topic
+
+            return explain_missing_topic(context.requested_entity_codes)
+        if context.intent.value == "health_scenario" and context.markers and context.requested_entity_codes:
+            from app.pipeline.report_explainer import explain_markers
+
+            # A topic question ("How is my liver?"): explain those tests, not the whole report.
+            return explain_markers(context.markers)
+        if context.intent.value == "health_scenario" and context.markers:
+            from app.pipeline.report_explainer import explain_overall
+
+            summary = context.in_range_summary
+            return explain_overall(
+                context.markers,
+                context.bio_ai_risks,
+                in_range=summary.in_range if summary else None,
+                out_of_range=summary.out_of_range if summary else None,
+            )
         if context.intent.value == "health_scenario" and context.scenario:
             from app.pipeline.narrative import build_narrative_summary, flatten_narrative
 
@@ -351,45 +370,19 @@ class DeterministicRenderer:
                 )
             return render_trend_sentence(context, context.comparisons[0])
         if context.intent.value == "blood_marker_explanation" and context.markers:
-            extra = _derived_and_stated(context, message) + _iron_pattern_note(context)
-            if len(context.markers) > 1:
-                lines = []
-                for m in context.markers:
-                    ref = f"{m.reference_low}–{m.reference_high} {m.unit or ''}".strip()
-                    lines.append(
-                        f"• **{m.name}:** {m.value} {m.unit or ''} (flag {m.flag.value}). "
-                        f"Typical lab reference on this report is {ref}."
-                    )
-                return (
-                    "Your latest results:\n\n"
-                    + "\n".join(lines)
-                    + extra
-                )
-            m = context.markers[0]
-            ref = f"{m.reference_low}–{m.reference_high} {m.unit or ''}".strip()
-            range_note = (
-                "This falls within the reference range reported by your laboratory."
-                if m.flag.value == "normal"
-                else f"Typical lab reference on this report is {ref}."
-            )
-            return (
-                f"Your latest {m.name} is {m.value} {m.unit or ''} "
-                f"({m.flag.value.replace('_', ' ')}). {range_note}"
-                + extra
-            )
-        if context.intent.value == "bio_ai_comparison" and context.comparisons:
-            lines = []
-            for c in context.comparisons:
-                name = context.resolved_topic_name if len(context.comparisons) == 1 else c.topic
-                name = name or c.topic
-                prev_label = user_source_caption("bio_ai_report", c.previous_date, latest=False)
-                curr_label = user_source_caption("bio_ai_report", c.current_date, latest=True)
-                lines.append(
-                    f"{name}: {prev_label} = {c.previous_value}; "
-                    f"{curr_label} = {c.current_value}. "
-                    f"Delta {c.absolute_delta} ({c.percentage_change}%), direction {c.direction}."
-                )
-            return " ".join(lines) + " These are assessments, not diagnoses."
+            from app.pipeline.report_explainer import explain_markers
+
+            explained = explain_markers(context.markers)
+            if explained:
+                return explained + _derived_and_stated(context, message)
+        if context.intent.value == "bio_ai_comparison":
+            from app.pipeline.report_explainer import explain_bio_comparison
+
+            # Blood comparisons can ride along in the context; only Bio-AI scores belong here.
+            risk_codes = {str(r.code) for r in context.bio_ai_risks or []}
+            names = {str(r.code): r.name for r in context.bio_ai_risks or []}
+            bio = [c for c in context.comparisons or [] if str(c.topic) in risk_codes]
+            return explain_bio_comparison(bio, names)
         if context.intent.value == "bio_ai_score" and context.bio_ai_risks:
             if len(context.bio_ai_risks) > 1:
                 from app.pipeline.report_explainer import explain_bio_ai
@@ -400,6 +393,14 @@ class DeterministicRenderer:
             from app.pipeline.report_explainer import explain_bio_ai
 
             return explain_bio_ai(context.bio_ai_risks, context.markers)
+        if context.intent.value == "bio_ai_explanation" and len(context.bio_ai_risks or []) == 1:
+            from app.pipeline.report_explainer import explain_bio_risk
+
+            risk = context.bio_ai_risks[0]
+            comparison = next(
+                (c for c in context.comparisons or [] if str(c.topic) == str(risk.code)), None
+            )
+            return explain_bio_risk(risk, comparison=comparison, markers=context.markers)
         if context.intent.value == "bio_ai_explanation" and context.bio_ai_risks:
             extra = ""
             risk_codes = {str(r.code) for r in context.bio_ai_risks}
@@ -449,11 +450,25 @@ class DeterministicRenderer:
                 f"I couldn't find a {label} result in the health data currently available to me. "
                 "I will not invent it."
             )
-        if context.intent.value == "broad_health_summary" and context.markers:
-            from app.pipeline.narrative import build_narrative_summary, flatten_narrative
+        if context.intent.value == "broad_health_summary" and context.requested_entity_codes and not context.markers:
+            from app.pipeline.report_explainer import explain_missing_topic
 
-            overall, themes, _raw, next_action = build_narrative_summary(context, message=message)
-            return flatten_narrative(overall, themes, next_action)
+            return explain_missing_topic(context.requested_entity_codes)
+        if context.intent.value == "broad_health_summary" and context.markers and context.requested_entity_codes:
+            from app.pipeline.report_explainer import explain_markers
+
+            # A topic question ("How is my liver?"): explain those tests, not the whole report.
+            return explain_markers(context.markers)
+        if context.intent.value == "broad_health_summary" and context.markers:
+            from app.pipeline.report_explainer import explain_overall
+
+            summary = context.in_range_summary
+            return explain_overall(
+                context.markers,
+                context.bio_ai_risks,
+                in_range=summary.in_range if summary else None,
+                out_of_range=summary.out_of_range if summary else None,
+            )
         if context.intent.value == "general_health_question":
             from app.core.copy import GENERAL_KNOWLEDGE_UNAVAILABLE
 
@@ -488,29 +503,29 @@ def _source_gap_sentence(context: HealthContext) -> str:
 
 
 def render_diagnosis_restraint(context: HealthContext) -> str:
+    from app.pipeline.report_explainer import explain_markers, explain_missing_topic
+
+    explained = explain_markers(list(context.markers or []))
+    if not explained and context.requested_entity_codes:
+        return (
+            "I can't diagnose a condition. Only a doctor can do that, usually with a few more tests. "
+            + explain_missing_topic(context.requested_entity_codes)
+        )
     parts = [
-        "I can't diagnose a condition from reports or symptoms. Diagnosis is a clinician's decision."
+        "I can't diagnose a condition. Only a doctor can do that, usually with a few more tests. "
+        "Here is what your results show."
     ]
-    for marker in context.markers:
-        if marker.value is None:
-            continue
-        when = marker.measured_at.isoformat()[:10] if hasattr(marker.measured_at, "isoformat") else ""
-        flag = getattr(marker.flag, "value", marker.flag) or "unspecified"
-        line = f"{marker.name} is {marker.value} {marker.unit or ''} ({flag})".replace("  ", " ")
-        if when:
-            line += f" on {when}"
-        if marker.reference_low is not None or marker.reference_high is not None:
-            line += f". Stored reference range: {marker.reference_low}–{marker.reference_high} {marker.unit or ''}".rstrip()
-        parts.append(line + ".")
+    if explained:
+        parts.append(explained)
     diabetes = next((r for r in context.bio_ai_risks if (r.code or "") in {"type_2_diabetes", "diabetes"}), None)
     if diabetes and diabetes.score is not None:
         parts.append(
-            f"Your Bio-AI type 2 diabetes assessment is {format_bio_ai_score_value(diabetes.score)}"
+            f"Your Bio-AI type 2 diabetes risk estimate is {format_bio_ai_score_value(diabetes.score)}"
             + (f" ({diabetes.status})" if diabetes.status else "")
-            + ". That score is an assessment, not a disease diagnosis."
+            + ". That is a risk estimate, not a diagnosis."
         )
-    parts.append("Please discuss these results with a clinician if you have diagnostic questions.")
-    return " ".join(parts)
+    parts.append("If you are worried, go through these results with your doctor. They can tell you what they mean for you.")
+    return "\n\n".join(parts)
 
 
 def render_provenance(context: HealthContext) -> str:
@@ -599,7 +614,12 @@ def render_trend_sentence(context: HealthContext, c) -> str:
         return 0.0
 
     before, after = outside(c.previous_value), outside(c.current_value)
-    ref = f"{_fmt(marker.reference_low)}–{_fmt(marker.reference_high)}{unit_text}"
+    if marker.reference_low in (None, 0) and marker.reference_high is not None:
+        ref = f"below {marker.reference_high:g}{unit_text}"
+    elif marker.reference_high is None:
+        ref = f"above {marker.reference_low:g}{unit_text}"
+    else:
+        ref = f"{marker.reference_low:g}–{marker.reference_high:g}{unit_text}"
     if after == 0 and before > 0:
         text += f" That brings it back within your report's range ({ref})."
     elif after == 0:

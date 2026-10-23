@@ -67,3 +67,48 @@ def test_grounding_reads_multi_word_marker_names():
     catalog = {"measured": {"fasting_blood_glucose": [{"value": "102.0000", "unit": "mg/dL", "current": True}]},
                "bio": {}, "derived": {}, "ranges": {}}
     assert _attribution_issues("Your Fasting Blood Glucose is 102 mg/dL.", catalog) == []
+
+
+def test_explain_markers_gives_meaning_and_guideline_note():
+    from app.pipeline.report_explainer import explain_markers
+
+    text = explain_markers([_m("Vitamin D", 12.6, "ng/mL", F.low)])
+    assert "lower than the normal range" in text
+    assert "absorb calcium" in text
+    assert "deficient range" in text
+
+
+def test_explain_markers_all_normal_says_no_action():
+    from app.pipeline.report_explainer import explain_markers
+
+    assert "nothing that needs action" in explain_markers([_m("HDL", 51, "mg/dL", F.normal)])
+
+
+def test_bio_risk_not_raised_corrects_the_premise():
+    from app.pipeline.report_explainer import explain_bio_risk
+
+    text = explain_bio_risk(BioAIRisk(code="cardiac_health", name="Cardiac health", score=11, status="low"))
+    assert "not raised" in text
+
+
+def test_bio_risk_raised_links_blood_and_trend():
+    from app.contracts.health_context import Comparison
+    from app.pipeline.report_explainer import explain_bio_risk
+
+    risk = BioAIRisk(code="dyslipidemia", name="Dyslipidemia", score=84, status="Very High")
+    text = explain_bio_risk(risk, comparison=Comparison(topic="dyslipidemia", previous_value=60, current_value=84,
+                                                        direction="increased"), markers=MARKERS)
+    assert "gone up from 60 to 84" in text
+    assert "Triglycerides 265.9 mg/dL (high)" in text
+
+
+def test_bio_comparison_needs_two_assessments():
+    from app.pipeline.report_explainer import explain_bio_comparison
+
+    assert "only have one Bio-AI assessment" in explain_bio_comparison([], {})
+
+
+def test_missing_topic_names_the_tests():
+    from app.pipeline.report_explainer import explain_missing_topic
+
+    assert "ALT" in explain_missing_topic(["alt", "ast", "liver_function"])

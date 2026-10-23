@@ -200,15 +200,15 @@ class ResponseComposer:
             # steps stay in the structured presentation; they are not spliced into the prose.
             text = cleaned.strip()
         if response_plan.kind == "report_overview":
-            abnormal = [
-                m for m in (context.markers or [])
-                if getattr(m.flag, "value", str(m.flag)) in {"low", "high", "critical"}
-            ]
-            highlight = ""
-            if abnormal:
-                names = ", ".join(m.name for m in abnormal[:3])
-                highlight = f" The results worth reviewing first are {names}."
-            text = f"{response_plan.direct_answer} {response_plan.summary}{highlight}".strip()
+            from app.pipeline.report_explainer import explain_blood_report
+
+            counts = context.in_range_summary
+            explained = explain_blood_report(
+                list(context.markers or []),
+                in_range=counts.in_range if counts else None,
+                out_of_range=counts.out_of_range if counts else None,
+            ) if context.markers else response_plan.summary
+            text = f"{response_plan.direct_answer} {explained}".strip()
         if not text:
             text = strip_lookup_disclaimers(cleaned, presentation.mode) or cleaned
         change_line = None if model_wrote else _change_summary(context)

@@ -426,7 +426,9 @@ def _uncertainties(plan: QueryPlan, context: HealthContext) -> list[str]:
             continue
         if item.reason in {"not_in_reports", "not_present", "no_reports"}:
             label = item.name or display_name_for(item.key)
-            rows.append(f"{label} was not available in the retrieved report.")
+            if item.key == "cholesterol" and present & {"ldl", "hdl", "triglycerides"}:
+                label = "Total cholesterol"
+            rows.append(f"{label} isn't included in this report.")
     return list(dict.fromkeys(rows))[:4]
 
 
@@ -725,6 +727,10 @@ def build_structured_response(
             prose = sanitize_internal_ids(answer or "")
             summary = None if _score_dump(prose) else prose or None
             interpretation = None
+            if summary and "\n\n" in summary:
+                # A written explanation (report_explainer): show it as prose; the scores
+                # stay on the cards instead of being repeated as raw lines.
+                mode = ResponseMode.interpretation
         elif mode == ResponseMode.result_list:
             prose = sanitize_internal_ids(answer or "")
             if (asks_explanation or keep_explanation) and prose and not _score_dump(prose):
@@ -867,25 +873,50 @@ def prefer_report_range(answer: str, context: HealthContext) -> str:
     return f"{' '.join(notes[:2])} {text}".strip()
 
 
+def _explained(text: str | None) -> bool:
+    from app.pipeline.report_explainer import is_explained
+
+    return is_explained(text)
+
+
+def _unstated_flagged_facts(presentation: StructuredResponse, text: str) -> list[str]:
+    """Out-of-range findings whose value the prose never states (cards show the rest)."""
+    missing = []
+    from app.pipeline.report_explainer import is_explained
+
+    if is_explained(text):
+        return missing
+    for item in presentation.findings or []:
+        if item.value is None or (item.status or "") not in {"high", "low", "critical"}:
+            continue
+        if item.source_type == "bio_ai_report":
+            continue  # a Bio-AI "low" is a good result, not an out-of-range value
+        tokens = {str(item.value)}
+        try:
+            tokens.add(f"{float(item.value):g}")
+        except (TypeError, ValueError):
+            pass
+        if not any(re.search(rf"(?<![\d.]){re.escape(token)}(?![\d])", text) for token in tokens):
+            unit = f" {item.unit}" if item.unit else ""
+            missing.append(f"{item.label} {item.value}{unit}".strip())
+    return missing
+
+
 def flatten_structured_response(presentation: StructuredResponse, *, raw_answer: str = "") -> str:
     if presentation.mode == ResponseMode.clinician_handoff and presentation.summary:
         return sanitize_internal_ids(presentation.summary)
     if presentation.quiet_mode and presentation.summary:
         return sanitize_internal_ids(presentation.summary)
+    if (presentation.summary_style == SummaryStyle.narrative_health_summary or presentation.themes) and _explained(raw_answer):
+        # A sectioned explanation (report_explainer) is the chat text; theme cards stay as cards.
+        return sanitize_internal_ids(_CONTEXT_LEAK.sub("", raw_answer)).strip()
     if presentation.summary_style == SummaryStyle.narrative_health_summary or presentation.themes:
         text = flatten_narrative(
             presentation.overall_summary or presentation.summary or "",
             presentation.themes,
             presentation.next_steps[0] if presentation.next_steps else None,
         )
-        missing_facts = []
-        for item in presentation.findings or []:
-            if item.value is None:
-                continue
-            token = str(item.value)
-            if token not in text:
-                unit = f" {item.unit}" if item.unit else ""
-                missing_facts.append(f"{item.label} {token}{unit}".strip())
+        missing_facts = _unstated_flagged_facts(presentation, text)
         if missing_facts:
             text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
         return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()
@@ -917,11 +948,12 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
             if extra and not _repeats(extra, parts):
                 parts.append(extra.strip())
     else:
-        if presentation.headline and presentation.mode not in {ResponseMode.single_value}:
+        explained = presentation.headline == "Your Bio-AI Report" and ("\n\n" in prose or len(prose) > 200)
+        if presentation.headline and presentation.mode not in {ResponseMode.single_value} and not explained:
             parts.append(presentation.headline)
         if prose:
             parts.append(prose)
-        if presentation.mode != ResponseMode.single_value:
+        if presentation.mode != ResponseMode.single_value and not explained:
             lines = []
             for item in presentation.findings:
                 unit = f" {item.unit}" if item.unit else ""
@@ -944,14 +976,7 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
     if captions and presentation.mode in {ResponseMode.single_value, ResponseMode.result_list, ResponseMode.domain_summary}:
         parts.append(captions[0])
     text = "\n\n".join(part for part in parts if part and part.strip())
-    missing_facts = []
-    for item in presentation.findings or []:
-        if item.value is None:
-            continue
-        token = str(item.value)
-        if token not in text:
-            unit = f" {item.unit}" if item.unit else ""
-            missing_facts.append(f"{item.label} {token}{unit}".strip())
+    missing_facts = _unstated_flagged_facts(presentation, text)
     if missing_facts:
         text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
     return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()

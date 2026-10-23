@@ -201,7 +201,7 @@ def test_chat_related_iron_pattern_is_grouped():
     related = attention[0]["related_findings"]
     assert len(related) >= 3
     answer = body["answer"].lower()
-    assert "pattern" in answer and ("stand out" in answer or "look reassuring" in answer)
+    assert "pattern" in answer and ("stand out" in answer or "stands out" in answer or "look reassuring" in answer)
     assert "prioritized findings" not in answer
     labels = [item["label"].lower() for item in related]
     assert any("hemoglobin" in label or "haemoglobin" in label for label in labels)

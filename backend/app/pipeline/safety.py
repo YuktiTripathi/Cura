@@ -42,7 +42,8 @@ OUT_OF_SCOPE = re.compile(r"\b(build malware|steal password|hack account)\b", re
 DIAGNOSIS_REQUEST = re.compile(
     r"\b("
     r"diagnose me|give me a diagnosis|what (?:disease|illness|condition) do i have|"
-    r"am i diabetic|do i have (?:diabetes|cancer|ckd|anemia as a diagnosis)"
+    r"am i diabetic|am i (?:anaemic|anemic|prediabetic)|"
+    r"do i have (?:diabetes|prediabetes|cancer|ckd|anaemia|anemia|anemia as a diagnosis)"
     r")\b",
     re.I,
 )
@@ -532,10 +533,11 @@ class SafetyLayer:
             out += "\n\nA value difference is not by itself an assessment of improvement or worsening."
         if user_message and UNSAFE_REQUEST.search(user_message):
             flags.append("unsafe_user_request")
-            out += (
-                "\n\nI can't diagnose, prescribe, or change medication. "
-                "Please discuss your results with a clinician."
-            )
+            if not re.search(r"\b(can't|cannot) diagnose\b", out, re.I):
+                out += (
+                    "\n\nI can't diagnose, prescribe, or change medication. "
+                    "Please discuss your results with a clinician."
+                )
         return out, flags
 
 

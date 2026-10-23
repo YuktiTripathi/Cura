@@ -90,6 +90,9 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
         return QualityGateResult(passed=True, flags=flags, repairs=repairs)
     if not re.search(r"\b(my|mine)\b", plan.raw_message or "", re.I):
         return QualityGateResult(passed=True, flags=flags, repairs=repairs)
+    if context.status == "ambiguous":
+        # The answer asks which report to use; nothing has been looked up yet.
+        return QualityGateResult(passed=True, flags=flags, repairs=repairs)
     blob = (answer or "").lower()
     already_discloses_missing = any(
         token in blob

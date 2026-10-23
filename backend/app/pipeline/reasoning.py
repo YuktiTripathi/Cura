@@ -84,17 +84,32 @@ def _answer_with_stored_facts(rendered: str, context: HealthContext) -> str:
     return f"{text.rstrip()}\n\n{facts}"
 
 
+def _rendered_or_facts(rendered: str, context: HealthContext) -> str:
+    """The renderer already states the facts the question needs; list every stored record
+    only when it produced nothing, so members don't get a raw dump ahead of the answer."""
+    if (rendered or "").strip():
+        return rendered
+    return _answer_with_stored_facts(rendered, context)
+
+
 CROSS_SOURCE_LIMITATION = (
     "A written explanation could not be generated. "
     "The stored measurements shown here are unchanged, and no missing value was estimated."
 )
 
 
+_ASKS_PRIORITY = re.compile(
+    r"\b(attention|concern\w*|worr\w*|focus|priorit\w*|important|serious|highest|bad|riskiest|"
+    r"which|should i|explain|understand|mean|summar\w*)\b",
+    re.I,
+)
+
+
 def _whole_report_explained(context: HealthContext) -> bool:
     """True when the renderer's report explainer answers the turn (see report_explainer)."""
     intent = context.intent.value
-    if intent == "report_explanation":
-        return True
+    if intent in {"report_explanation", "broad_health_summary", "blood_marker_explanation", "health_scenario"}:
+        return bool(context.markers) or intent == "report_explanation"
     return intent in {"bio_ai_explanation", "bio_ai_score"} and len(context.bio_ai_risks or []) > 1 and not context.comparisons
 
 
@@ -293,11 +308,23 @@ class ReasoningService:
                 llm_mode="structured_bio_ai",
                 latency_ms=int((time.perf_counter() - started) * 1000),
             )
+        if (
+            plan.intent == IntentType.bio_ai_score
+            and context.status != "ambiguous"
+            and context.metabolic_age is not None
+            and re.search(r"\bmetabolic\s+age\b", message or "", re.I)
+        ):
+            from app.pipeline.report_explainer import explain_metabolic_age
+
+            return ReasoningResult(answer=explain_metabolic_age(context.metabolic_age), llm_mode="structured_bio_ai")
         if structured_bio_ai and not cross_source and not relationship and not _model_explains(plan):
-            return ReasoningResult(
-                answer=render_bio_ai_score_list(context.bio_ai_risks),
-                llm_mode="structured_bio_ai",
-            )
+            if len(context.bio_ai_risks) > 1 and _ASKS_PRIORITY.search(message or ""):
+                from app.pipeline.report_explainer import explain_bio_ai
+
+                answer = explain_bio_ai(context.bio_ai_risks, context.markers)
+            else:
+                answer = render_bio_ai_score_list(context.bio_ai_risks)
+            return ReasoningResult(answer=answer, llm_mode="structured_bio_ai")
         if (
             lookup
             and plan.intent == IntentType.bio_ai_score
@@ -577,7 +604,7 @@ class ReasoningService:
                     )
                 if plan.answer_model_tier == AnswerModelTier.deep_medical_reasoning:
                     # Stored facts stay. The model does not invent a link between them.
-                    rendered = _answer_with_stored_facts(self.renderer.render(message, context), context)
+                    rendered = _rendered_or_facts(self.renderer.render(message, context), context)
                     answer = CROSS_SOURCE_LIMITATION
                     if rendered:
                         answer = f"{rendered}\n\n{CROSS_SOURCE_LIMITATION}"
@@ -589,7 +616,7 @@ class ReasoningService:
                         latency_ms=int((time.perf_counter() - started) * 1000),
                     )
                 return ReasoningResult(
-                    answer=_answer_with_stored_facts(self.renderer.render(message, context), context),
+                    answer=_rendered_or_facts(self.renderer.render(message, context), context),
                     llm_called=False,
                     llm_mode="deterministic_fallback",
                     fallback_reason="privacy" if privacy else "model_unavailable",
