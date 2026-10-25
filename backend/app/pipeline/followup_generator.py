@@ -49,6 +49,14 @@ _GENERIC = re.compile(
     r"tell me more|learn more|what else|more information)\b",
     re.I,
 )
+# A chip is the member asking Cura. Questions Cura would ask the member ("Would you like a
+# plan I can tailor?", "How many minutes can you walk?") belong in the answer, not in chips.
+_CURA_VOICE = re.compile(
+    r"\b(would you like|do you (?:have|want|take|feel|get|eat|drink|exercise|smoke|sleep|know)|have you|"
+    r"are you|did you|were you|will you|can you realistically|how (?:much|many|often|long)\b.{0,30}\byou\b|"
+    r"you can|I can|I'll|I will|let me|shall I|should I make)\b",
+    re.I,
+)
 _WORD = re.compile(r"[a-z0-9]+")
 _STOP = {
     "my", "i", "the", "a", "an", "is", "are", "of", "to", "do", "does", "what", "how", "should",
@@ -282,7 +290,7 @@ def _candidates(brief: FollowUpBrief) -> list[tuple[str, str, int]]:
         out.append(("What should I focus on improving?", "trends", 9))  # takes the place of trend questions
     if not brief.has_lifestyle and (flagged or raised):
         # Ask for the context rather than assume it.
-        out.append(("Can I share my diet and activity so you can tailor this?", "lifestyle", 3))
+        out.append(("Can I tell you about my diet and activity?", "lifestyle", 3))
     return out
 
 
@@ -340,7 +348,7 @@ def valid_question(text: str, brief: FollowUpBrief, *, current: str | None = Non
     q = (text or "").strip()
     if not q.endswith("?") or len(q) > 90 or len(q.split()) > 12 or len(q.split()) < 3:
         return False
-    if _UNSAFE.search(q) or _GENERIC.search(q):
+    if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q):
         return False
     for seen in [*(brief.asked or []), *(brief.shown or []), *([current] if current else []), *chosen]:
         if seen and _similar(q, seen):

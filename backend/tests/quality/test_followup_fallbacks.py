@@ -60,7 +60,7 @@ def test_no_lifestyle_data_means_no_assumptions():
                           model_questions=["Is my poor sleep raising my HbA1c?", "Does my diet explain my vitamin D?"])
     assert not any("sleep" in q or "my diet explain" in q for q in qs)
     # Asking the member to share context is allowed.
-    assert "Can I share my diet and activity so you can tailor this?" in [
+    assert "Can I tell you about my diet and activity?" in [
         c for c, *_ in __import__("app.pipeline.followup_generator", fromlist=["_candidates"])._candidates(brief)]
 
 

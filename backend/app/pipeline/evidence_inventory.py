@@ -496,12 +496,12 @@ def omitted_supported_facts(message: str | None, markers: list | None, answer: s
         unit = getattr(row, "unit", None) or ""
         low = getattr(row, "reference_low", None)
         high = getattr(row, "reference_high", None)
-        range_note = ""
-        if low is not None and high is not None:
-            range_note = f" Stored reference range: {low:g}–{high:g} {unit}."
+        range_note = f" (your lab's range is {low:g}–{high:g} {unit})" if low is not None and high is not None else ""
+        # The value the answer left out, said once and plainly. A note about a missing earlier
+        # result only belongs when the member asked how it changed.
         sentences.append(
-            f"{getattr(row, 'name', None) or key} is {row.value:g} {unit} on {row.measured_at}.{range_note} "
-            "Only one date is on file, so no change was calculated."
+            f"Your {getattr(row, 'name', None) or key} is {row.value:g} {unit}{range_note}.".replace(" )", ")")
+            + (" There is only one result on file, so a change can't be worked out yet." if comparison_ask else "")
         )
     if not coverage["requested"] and _needs_value_repair(message, answer):
         latest: dict[str, object] = {}
@@ -517,17 +517,13 @@ def omitted_supported_facts(message: str | None, markers: list | None, answer: s
                 if _number_present(answer, getattr(marker, "value", None)):
                     continue
                 unit = getattr(marker, "unit", None) or ""
-                when = getattr(marker, "measured_at", None)
-                dated = f" on {when}" if when else ""
                 low = getattr(marker, "reference_low", None)
                 high = getattr(marker, "reference_high", None)
                 range_note = (
-                    f" Stored reference range: {low:g}–{high:g} {unit}."
-                    if low is not None and high is not None
-                    else ""
+                    f" (your lab's range is {low:g}–{high:g} {unit})" if low is not None and high is not None else ""
                 )
                 sentences.append(
-                    f"{getattr(marker, 'name', None) or 'The stored result'} is {marker.value:g} {unit}{dated}.{range_note}".strip()
+                    f"Your {getattr(marker, 'name', None) or 'result'} is {marker.value:g} {unit}{range_note}.".replace(" )", ")")
                 )
     if not sentences:
         return None

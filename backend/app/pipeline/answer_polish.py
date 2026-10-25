@@ -27,17 +27,18 @@ _RETRIEVED = (
 _SPELLING = (
     (re.compile(r"\bHba1c\b|\bHBA1C\b|\bHBA1c\b|\bhba1c\b"), "HbA1c"),
 )
-# Bio-AI assessment names as members see them. Only these are checked.
+# The Bio-AI report's assessments as members see them: 9 for men, 10 for women (PCOS).
 _ASSESSMENTS = {
-    "nafld": ("nafld", "fatty liver"),
     "metabolic_syndrome": ("metabolic syndrome",),
-    "cardiac_health": ("cardiac health", "heart health"),
-    "type_2_diabetes": ("type 2 diabetes",),
     "dyslipidemia": ("dyslipidemia", "dyslipidaemia"),
+    "cardiac_health": ("cardiac health", "heart health"),
+    "nafld": ("nafld", "fatty liver", "non-alcoholic fatty liver"),
+    "oxidative_stress": ("oxidative stress",),
     "hypertension": ("hypertension",),
     "obesity": ("obesity",),
-    "oxidative_stress": ("oxidative stress",),
     "thyroid": ("thyroid health",),
+    "type_2_diabetes": ("type 2 diabetes",),
+    "pcos": ("pcos", "polycystic ovary", "polycystic ovarian"),
 }
 
 
@@ -55,33 +56,47 @@ def _present_assessments(context: HealthContext) -> set[str]:
     return present
 
 
+_BULLET = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+")
+
+
 def _drop_unlisted_assessments(text: str, context: HealthContext) -> str:
-    """Bio-AI answers may name only assessments the member's report contains."""
+    """Bio-AI answers may name only assessments the member's report contains.
+
+    Only a whole bullet that is solely about a missing assessment is removed. Sentences
+    inside a paragraph are never cut, because removing one mid-explanation leaves the
+    rest without its subject.
+    """
     if not context.bio_ai_risks:
         return text
     present = _present_assessments(context)
-    missing_names = [
-        name for code, names in _ASSESSMENTS.items() if code not in present for name in names
-    ]
-    if not missing_names:
+    missing = {code: names for code, names in _ASSESSMENTS.items() if code not in present}
+    if not missing:
         return text
-    pattern = re.compile(r"\b(" + "|".join(re.escape(n) for n in missing_names) + r")\b", re.I)
-    kept_lines = []
+    missing_pattern = re.compile(
+        r"\b(" + "|".join(re.escape(n) for names in missing.values() for n in names) + r")\b", re.I
+    )
+    present_pattern = re.compile(
+        r"\b(" + "|".join(re.escape(n) for code in present for n in _ASSESSMENTS[code]) + r")\b", re.I
+    ) if present else None
+    kept = []
     for line in text.split("\n"):
-        sentences = re.split(r"(?<=[.!?])\s+", line)
-        kept = [s for s in sentences if not pattern.search(s) or re.search(r"\b(isn't|not) included\b|\bdoesn't include\b", s)]
-        if line.strip() and not "".join(kept).strip():
-            continue  # a bullet that was only about an unlisted assessment
-        kept_lines.append(" ".join(kept))
-    return "\n".join(kept_lines)
+        about_missing_only = (
+            _BULLET.match(line)
+            and missing_pattern.search(line)
+            and not (present_pattern and present_pattern.search(line))
+            and not re.search(r"\b(isn't|not) included\b|\bdoesn't include\b", line)
+        )
+        if not about_missing_only:
+            kept.append(line)
+    return "\n".join(kept)
 
 
-def _qualifier_once(text: str) -> str:
-    """Each kind once: a Bio-AI risk-estimate qualifier and a lab-results qualifier can both belong."""
+def _qualifier_once(text: str, *, both_sources: bool = True) -> str:
+    """Once per kind when an answer covers lab results and Bio-AI scores; otherwise once in all."""
     seen: set[str] = set()
 
     def keep_first(match: re.Match) -> str:
-        kind = "risk" if re.search(r"risk estimate", match.group(0), re.I) else "other"
+        kind = "risk" if both_sources and re.search(r"risk estimate", match.group(0), re.I) else "other"
         if kind in seen:
             return ""
         seen.add(kind)
@@ -91,7 +106,29 @@ def _qualifier_once(text: str) -> str:
     return re.sub(r"[ \t]{2,}", " ", out).replace(" \n", "\n").strip()
 
 
-def polish_answer(text: str, context: HealthContext, *, intent: str | None = None) -> str:
+def _ensure_urgent_notes(text: str, context: HealthContext) -> str:
+    """A result in a guideline range that needs a doctor soon (HbA1c 9.1%, triglycerides over
+    500 mg/dL) is always stated with its value and cut-off, whatever the model wrote."""
+    from app.pipeline.clinical_thresholds import clinical_notes
+
+    markers = [m for m in context.markers or [] if getattr(m, "value", None) is not None]
+    if not markers:
+        return text
+    additions = []
+    for note in clinical_notes(markers):
+        if not note.urgent:
+            continue
+        value = f"{note.marker.value:g}"
+        cutoffs = re.findall(r"\((\d+(?:\.\d+)?)", note.text)
+        said = re.search(rf"(?<![\d.]){re.escape(value)}(?![\d])", text) and any(c in text for c in cutoffs)
+        if not said:
+            additions.append(note.text)
+    if not additions:
+        return text
+    return text.rstrip() + "\n\n**Important:** " + " ".join(additions)
+
+
+def polish_answer(text: str, context: HealthContext, *, intent: str | None = None, add_notes: bool = True) -> str:
     if not text:
         return text
     out = text
@@ -103,4 +140,7 @@ def polish_answer(text: str, context: HealthContext, *, intent: str | None = Non
     if lab_only:
         out = _RISK_QUALIFIER.sub("This is a reading of your results, not a diagnosis.", out)
     out = _drop_unlisted_assessments(out, context)
-    return _qualifier_once(out)
+    if add_notes:
+        out = _ensure_urgent_notes(out, context)
+    both = bool(context.markers) and bool(context.bio_ai_risks) and not (intent or "").startswith("bio_ai")
+    return _qualifier_once(out, both_sources=both)

@@ -129,7 +129,8 @@ def _journey_follow_ups(
     )
     if len(kept) + len(questions) < 2:
         return None
-    return [*kept, *to_suggestions(questions)]
+    # The member's own next questions first; Cura's clinical-context question last.
+    return [*to_suggestions(questions), *kept]
 
 
 class ResponseComposer:
@@ -327,7 +328,16 @@ class ResponseComposer:
         text = drop_unverified_claims(text, context)
         from app.pipeline.answer_polish import polish_answer
 
-        text = polish_answer(text, context, intent=getattr(context.intent, "value", None))
+        intent_value = getattr(context.intent, "value", None)
+        text = polish_answer(text, context, intent=intent_value)
+        # The app renders these fields rather than `text`, so they get the same fixes.
+        for name in ("summary", "overall_summary", "interpretation"):
+            value = getattr(presentation, name, None)
+            if value:
+                # The warning goes in the main text only, so it is never shown twice.
+                setattr(presentation, name, polish_answer(
+                    value, context, intent=intent_value, add_notes=name != "interpretation",
+                ))
         # A reply to Cura's own question stays lean, and "show me my report" keeps its
         # concrete actions; every other personal answer gets grounded follow-ups.
         try:
