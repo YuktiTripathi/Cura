@@ -31,8 +31,8 @@ STAGES = (
 # What kind of question a message is, so covered stages are not suggested again.
 _STAGE_OF = (
     ("next_steps", re.compile(r"\b(doctor|specialist|retest|re-test|recheck|next steps?|what (?:should|do) i do next|appointment|follow[- ]?up test)\b", re.I)),
-    ("trends", re.compile(r"\b(chang\w*|trend|previous|earlier|last (?:report|test)|over time|better|worse|improv(?:ed|ing)|compare)\b", re.I)),
-    ("lifestyle", re.compile(r"\b(eat|food|diet|meal|exercise|walk|lifestyle|habit|sleep|lower|raise|reduce|increase|improve|bring (?:it|them) (?:down|up))\b", re.I)),
+    ("trends", re.compile(r"\b(chang\w*|trend|previous|earlier|last (?:report|test)|over time|better|worse|improved|compare)\b", re.I)),
+    ("lifestyle", re.compile(r"\b(eat|food|diet|meal|exercise|walk|lifestyle|habit|sleep|lower|raise|reduce|increase|improv(?:e|ing)|bring (?:it|them) (?:down|up))\b", re.I)),
     ("connections", re.compile(r"\b(connect\w*|link\w*|relat\w*|together|because of|caus\w*|explain my .* score|fit)\b", re.I)),
     ("risks", re.compile(r"\b(risk|future|chance|lead to|develop|long[- ]term|score)\b", re.I)),
     ("concerns", re.compile(r"\b(concern\w*|worr\w*|attention|most important|focus|serious|abnormal|wrong)\b", re.I)),
@@ -107,6 +107,15 @@ class FollowUpBrief:
     asked: list[str] = field(default_factory=list)
     focus_keys: set[str] = field(default_factory=set)
     shown: list[str] = field(default_factory=list)  # suggested earlier in this conversation
+    has_history: bool = False    # an earlier report exists, so change over time can be answered
+    has_lifestyle: bool = False  # diet, activity, sleep or symptom answers are on record
+
+    @property
+    def data_kind(self) -> str:
+        """Which verified sources exist: none, blood, bio or both."""
+        if self.findings and self.risks:
+            return "both"
+        return "blood" if self.findings else "bio" if self.risks else "none"
 
     def prompt_json(self, *, bio_only: bool = False) -> dict:
         """What the model sees when writing follow_up_questions. A Bio-AI question lists
@@ -160,6 +169,7 @@ def build_brief(
     asked: list[str] | None = None,
     focus_keys: set[str] | None = None,
     shown: list[str] | None = None,
+    has_lifestyle: bool = False,
 ) -> FollowUpBrief:
     from app.pipeline.clinical_thresholds import clinical_note
     from app.pipeline.report_explainer import _concern, _CONCERN, _out_of_range, _theme, _dedupe, related_blood_results
@@ -191,7 +201,9 @@ def build_brief(
     covered = {s for s in (stage_of(q) for q in asked or []) if s}
     return FollowUpBrief(findings=findings, risks=risk_rows, covered=covered,
                          asked=list(asked or []), focus_keys=set(focus_keys or set()),
-                         shown=list(shown or []))
+                         shown=list(shown or []),
+                         has_history=bool(history) or any(f.has_history for f in findings),
+                         has_lifestyle=has_lifestyle)
 
 
 # ---------------------------------------------------------------------------- candidates
@@ -265,6 +277,12 @@ def _candidates(brief: FollowUpBrief) -> list[tuple[str, str, int]]:
         out.append(("Which of these results should I discuss with my doctor?", "next_steps", 6))
     if any(f.has_history for f in brief.findings) and not any(q[1] == "trends" for q in out):
         out.append(("What has changed since my last report?", "trends", 6))
+    if not brief.has_history and (flagged or raised):
+        # Nothing to compare with: point forward instead of backward.
+        out.append(("What should I focus on improving?", "trends", 9))  # takes the place of trend questions
+    if not brief.has_lifestyle and (flagged or raised):
+        # Ask for the context rather than assume it.
+        out.append(("Can I share my diet and activity so you can tailor this?", "lifestyle", 3))
     return out
 
 
@@ -327,7 +345,78 @@ def valid_question(text: str, brief: FollowUpBrief, *, current: str | None = Non
     for seen in [*(brief.asked or []), *(brief.shown or []), *([current] if current else []), *chosen]:
         if seen and _similar(q, seen):
             return False
-    return _named_tests_present(q, brief)
+    return _named_tests_present(q, brief) and _fits_available_data(q, brief)
+
+
+_BIO_WORDS = re.compile(r"\b(bio-?ai|scores?|risk estimates?)\b", re.I)
+_RESULT_WORDS = re.compile(
+    r"\b(blood (?:test|report|results?)|lab(?:s| results?)?|biomarkers?|my results|my report)\b", re.I
+)
+_ASSUMED_LIFESTYLE = re.compile(
+    r"\bmy (?:poor |bad |low |high |current |daily )?(?:diet|sleep|exercise|activity|stress|symptoms?|"
+    r"smoking|drinking|alcohol|weight)\b",
+    re.I,
+)
+_ASKS_TO_SHARE = re.compile(r"\b(share|tell you|give you|add)\b", re.I)
+
+
+def _fits_available_data(q: str, brief: FollowUpBrief) -> bool:
+    """Cura must be able to answer it from what is on record (critical rule 4)."""
+    if not brief.risks and _BIO_WORDS.search(q):
+        return False  # no Bio-AI report: no scores or risk estimates to talk about
+    if not brief.findings and _RESULT_WORDS.search(q) and brief.data_kind != "none":
+        return False  # Bio-AI only: there are no blood values to discuss
+    if not brief.has_history and stage_of(q) == "trends":
+        return False  # no earlier report to compare with
+    if not brief.has_lifestyle and _ASSUMED_LIFESTYLE.search(q) and not _ASKS_TO_SHARE.search(q):
+        return False  # do not assume diet, sleep or symptoms that are not on record
+    return True
+
+
+# Small, clinically safe sets for when nothing personal fits or the model is unavailable.
+# Each still passes the same checks, so a set never names data the member does not have.
+FALLBACK = {
+    "none": (
+        "How can I improve my overall health?",
+        "What health checks should I consider?",
+        "What does a routine blood test usually check?",
+        "How much exercise do I need each week?",
+    ),
+    "blood": (
+        "Which of my results should I focus on first?",
+        "What should I focus on improving?",
+        "Which of these results should I discuss with my doctor?",
+        "When should I get my next blood test?",
+    ),
+    "bio": (
+        "Which of my Bio-AI scores deserve attention?",
+        "What can I do to lower my highest risk score?",
+        "Which score should I discuss with my doctor first?",
+    ),
+    "both": (
+        "Which of my results should I focus on first?",
+        "How do my blood results relate to my Bio-AI scores?",
+        "What should I focus on improving?",
+        "Which of these results should I discuss with my doctor?",
+    ),
+    "unreadable": (
+        "Can I upload a clearer copy of my report?",
+        "Which results could you read from my report?",
+        "What should a complete blood report include?",
+    ),
+}
+
+
+def fallback_questions(
+    brief: FollowUpBrief, *, count: int = 3, current: str | None = None, chosen: list[str] = (), kind: str | None = None,
+) -> list[str]:
+    out: list[str] = []
+    for text in FALLBACK[kind or brief.data_kind]:
+        if len(out) + len(chosen) >= count:
+            break
+        if valid_question(text, brief, current=current, chosen=[*chosen, *out]):
+            out.append(text)
+    return out
 
 
 # ---------------------------------------------------------------------------- selection
@@ -386,6 +475,8 @@ def select_followups(
             chosen.append(text)
             stages_used.add(stage)
             per_test[subject] = per_test.get(subject, 0) + 1
+    if len(chosen) < min(2, count):
+        chosen += fallback_questions(brief, count=count, current=current_question, chosen=chosen)
     return chosen
 
 
@@ -418,7 +509,11 @@ def document_followups(facts, *, message: str | None, count: int = 3) -> list[Fo
             reference_low=fact.reference_low, reference_high=fact.reference_high,
         ))
     if not markers:
-        return []
+        # Nothing could be read as a measurement: say what can be done next.
+        return [
+            item.model_copy(update={"source": "user_uploaded"})
+            for item in to_suggestions(fallback_questions(FollowUpBrief(), count=count, current=message, kind="unreadable"))
+        ]
     brief = build_brief(markers=markers)
     return [
         item.model_copy(update={"source": "user_uploaded"})

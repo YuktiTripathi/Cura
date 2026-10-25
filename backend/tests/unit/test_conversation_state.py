@@ -201,7 +201,13 @@ def test_composer_requires_handling_path_and_skips_answer_turn():
         follow_ups=[FollowUpSuggestion(text="How is the weather?", category="chit_chat")],
         llm_follow_ups=["Want a recipe?"],
     )
-    assert suggestions == []
+    # Invalid suggestions never reach the member; the row falls back to general questions
+    # rather than staying empty.
+    from app.pipeline.followup_generator import FALLBACK
+
+    texts = [item.text for item in suggestions]
+    assert "How is the weather?" not in texts and "Want a recipe?" not in texts
+    assert texts and all(text in FALLBACK["none"] for text in texts)
     plan.conversation_turn = "ANSWER_TO_ASSISTANT"
     _text, suggestions, _pres = composer.compose(
         "Your ALT is 22 U/L.",

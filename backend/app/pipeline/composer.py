@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 import re
 
 from app.contracts.common import IntentType, KnowledgeScope
@@ -31,6 +32,8 @@ from app.pipeline.presentation import (
     attach_presentation_personalization,
     prefer_report_range,
 )
+
+logger = logging.getLogger("cura.composer")
 
 _HANDLED_LLM = re.compile(
     r"\b(symptoms?|medication|supplement|previous report|changed over time|what does .{0,24} mean|what is a healthy)\b",
@@ -95,10 +98,16 @@ def _journey_follow_ups(
     markers, risks = list(context.markers or []), list(context.bio_ai_risks or [])
     if not (markers or risks) and member_findings:
         markers, risks = list(member_findings[0]), list(member_findings[1])
-    if not (markers or risks):
-        return None
-    from app.pipeline.followup_generator import build_brief, select_followups, to_suggestions
+    from app.pipeline.followup_generator import (
+        FollowUpBrief, build_brief, fallback_questions, select_followups, to_suggestions,
+    )
 
+    if not (markers or risks):
+        # No blood or Bio-AI report on record: useful general questions, never personal claims.
+        general = fallback_questions(
+            FollowUpBrief(asked=list(history or []), shown=list(shown or [])), count=3, current=plan.raw_message,
+        )
+        return to_suggestions(general, personal=False) if general else None
     brief = build_brief(
         markers=markers,
         risks=risks,
@@ -106,6 +115,7 @@ def _journey_follow_ups(
         asked=list(history or []),
         focus_keys={k for k in [plan.topic, context.resolved_topic, *(plan.requested_metrics or [])] if k},
         shown=list(shown or []),
+        has_lifestyle=bool(getattr(context, "lifestyle", None) or getattr(context, "questionnaire", None)),
     )
     overview = plan.intent in _OVERVIEW_INTENTS and len(context.markers or []) + len(context.bio_ai_risks or []) > 2
     # A clinical-context question (its reply continues the interpretation) and the
@@ -320,15 +330,19 @@ class ResponseComposer:
         text = polish_answer(text, context, intent=getattr(context.intent, "value", None))
         # A reply to Cura's own question stays lean, and "show me my report" keeps its
         # concrete actions; every other personal answer gets grounded follow-ups.
-        journey = None if answer_turn or response_plan.kind == "report_overview" else _journey_follow_ups(
-            plan, context, llm_follow_ups=llm_follow_ups, history=history, shown=shown_follow_ups,
-            # The clinical-context question is asked once per conversation, not after every answer.
-            keep=[
-                item for item in combined
-                if item.expected_reply_type == "CLINICAL_CONTEXT" and item.text not in (shown_follow_ups or [])
-            ][:1],
-            member_findings=member_findings,
-        )
+        try:
+            journey = None if answer_turn or response_plan.kind == "report_overview" else _journey_follow_ups(
+                plan, context, llm_follow_ups=llm_follow_ups, history=history, shown=shown_follow_ups,
+                # The clinical-context question is asked once per conversation, not after every answer.
+                keep=[
+                    item for item in combined
+                    if item.expected_reply_type == "CLINICAL_CONTEXT" and item.text not in (shown_follow_ups or [])
+                ][:1],
+                member_findings=member_findings,
+            )
+        except Exception:  # noqa: BLE001 - suggestions must never break or delay the answer
+            logger.warning("follow_up_generation_failed", exc_info=True)
+            journey = None
         if journey is not None:
             combined = journey
             presentation.suggestion_chips = [item.text for item in journey]
@@ -337,6 +351,16 @@ class ResponseComposer:
             # Never offer a question this conversation already suggested.
             combined = [item for item in combined if item.text not in shown_follow_ups]
             presentation.suggestion_chips = [t for t in presentation.suggestion_chips if t not in shown_follow_ups]
+        if not combined and not answer_turn and context.status != "ambiguous":
+            # Never an empty row: a few general, clinically safe questions.
+            from app.pipeline.followup_generator import FollowUpBrief, fallback_questions, to_suggestions
+
+            general = fallback_questions(
+                FollowUpBrief(asked=list(history or []), shown=list(shown_follow_ups or [])),
+                count=3, current=plan.raw_message,
+            )
+            combined = to_suggestions(general, personal=False)
+            presentation.suggestion_chips = [item.text for item in combined]
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:
             context.answer_evidence_trace.update(policy_trace)
