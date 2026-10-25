@@ -1077,10 +1077,8 @@ class ChatService:
             # deficient?") must ask for the whole group before anything is fetched.
             widened = _with_pattern_keys(plan.raw_message or payload.message, list(plan.requested_metrics))
             if widened != list(plan.requested_metrics):
-                plan = plan.model_copy(update={
-                    "requested_metrics": widened,
-                    "display_entities": list(dict.fromkeys([*(plan.display_entities or []), *widened])),
-                })
+                # Fetched as context only: a related test the report lacks is not announced as missing.
+                plan = plan.model_copy(update={"requested_metrics": widened})
         spec = plan.task_contract or {}
         logger.info(
             "answer_spec request_id=%s intent=%s focus=%s goal=%s personal_context=%s "

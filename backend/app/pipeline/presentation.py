@@ -316,6 +316,14 @@ def _finding_from_marker(marker, *, latest: bool = True) -> PresentedFinding:
     )
 
 
+_BIO_CARD_ASK = re.compile(r"\b(bio-?ai|risk|score|overall|summar\w*|everything|how am i doing|health scenario)\b", re.I)
+_LIFESTYLE_ASK = re.compile(
+    r"\b(activity|active|exercise|walk\w*|steps|sleep|diet|food|eat\w*|meal|habit|lifestyle|stress|"
+    r"how (?:can|do|should) i|what (?:can|should) i do|improve|tips?)\b",
+    re.I,
+)
+
+
 def _headline(plan: QueryPlan, context: HealthContext, mode: ResponseMode) -> str:
     for code in list(plan.domains or []) + [plan.topic]:
         if code and code in _HEADLINES:
@@ -329,11 +337,24 @@ def _headline(plan: QueryPlan, context: HealthContext, mode: ResponseMode) -> st
         return "High markers"
     if mode == ResponseMode.result_list and {str(s).upper() for s in (plan.selectors or [])} & {"ABNORMAL"}:
         return "Results outside range"
+    if str(getattr(context.intent, "value", context.intent) or "").startswith("bio_ai"):
+        return "Your Bio-AI report"
     if context.resolved_topic_name:
-        return context.resolved_topic_name
+        return _display_heading(context.resolved_topic, context.resolved_topic_name)
     if context.markers:
-        return context.markers[0].name
-    return "Results"
+        return _display_heading(context.markers[0].key, context.markers[0].name)
+    return "Your results"
+
+
+def _display_heading(key: str | None, name: str) -> str:
+    """A heading as members read it: "TIBC", "HbA1c", "Vitamin D", never "tibc"."""
+    proper = display_name_for(key) if key else None
+    label = proper if proper and proper.lower() != (key or "").lower() else name
+    if label.islower():
+        label = label.upper() if len(label) <= 5 else label[:1].upper() + label[1:]
+    from app.pipeline.report_explainer import _display_name
+
+    return _display_name(label)
 
 
 def _include_interpretation(mode: ResponseMode, message: str | None) -> bool:
@@ -591,7 +612,15 @@ def build_structured_response(
         domain = domain_for_code(code)
         if domain:
             allowed_bioai.update(domain.bioai_domains)
+    # Score cards belong to questions about Bio-AI, risk or overall health, not to a
+    # lifestyle or "how do I" question that happens to use the member's wider context.
+    bio_question = bool(_BIO_CARD_ASK.search(message or "")) or plan.intent in {
+        IntentType.bio_ai_score, IntentType.bio_ai_explanation, IntentType.bio_ai_comparison,
+    }
+    lifestyle_question = bool(_LIFESTYLE_ASK.search(message or ""))
     for risk in context.bio_ai_risks or []:
+        if lifestyle_question and not bio_question:
+            break
         if plan.intent not in {
             IntentType.bio_ai_score,
             IntentType.bio_ai_explanation,

@@ -92,6 +92,11 @@ def _dedupe(markers: list[BloodMarker]) -> list[BloodMarker]:
     return out
 
 
+def _bullets(items) -> str:
+    """Members read bullets more easily than paragraphs: one idea per line."""
+    return "\n".join(f"- {item.strip()}" for item in items if item and item.strip())
+
+
 def _value(marker: BloodMarker) -> str:
     from app.pipeline.narrative import format_marker_name, format_unit
 
@@ -205,7 +210,7 @@ def explain_blood_report(markers: list[BloodMarker], *, in_range: int | None = N
         for note in notes:
             if _theme(note.marker).code == theme.code:
                 section.append(note.text)
-        parts.append(section[0] + "\n" + " ".join(section[1:]))
+        parts.append(section[0] + "\n" + _bullets(section[1:]))
 
     if urgent:
         close = (
@@ -225,7 +230,11 @@ def explain_blood_report(markers: list[BloodMarker], *, in_range: int | None = N
 
 # Bio-AI ---------------------------------------------------------------------
 
+# The Bio-AI report's assessments (PCOS for women only). Metabolic syndrome comes first so
+# "metabolic syndrome" is not read as the blood-sugar entry.
 _RISK_INFO = (
+    (("metabolicsyndrome",), "your risk of metabolic syndrome, a cluster of raised blood sugar, blood fats, blood pressure and waist size that together raise heart and diabetes risk", "sugar"),
+    (("pcos", "polycystic"), "your risk related to PCOS (polycystic ovary syndrome), a hormonal condition linked to periods, weight and blood sugar", "sugar"),
     (("dyslipid", "cholesterol", "lipid"), "how likely you are to have unhealthy levels of blood fats such as cholesterol and triglycerides", "lipids"),
     (("diabet", "glyc", "sugar", "insulin"), "your risk of developing type 2 diabetes", "sugar"),
     (("hypertension", "bloodpressure"), "your risk of high blood pressure", None),
@@ -273,7 +282,7 @@ def explain_bio_ai(risks: list, markers: list[BloodMarker] | None = None) -> str
         parts.append(f"The scores that deserve the most attention are **{names}**.")
     for risk in attention:
         meaning, theme = _risk_info(risk.code, risk.name)
-        line = f"**{risk.name}: {risk.score:g} ({risk.status or 'no level given'})**\nThis score reflects {meaning}."
+        line = f"- **{risk.name}: {risk.score:g} ({risk.status or 'no level given'}).** This score reflects {meaning}."
         linked = [m for m in flagged if theme and _theme(m).code == theme]
         if linked:
             line += (
@@ -400,6 +409,7 @@ def explain_markers(markers: list[BloodMarker]) -> str:
             lines.append(note.text)
         parts.append(" ".join(lines))
     flagged = [m for m in usable if _out_of_range(m)]
+    one_test = len(parts) == 1
     themes = {_theme(m).code for m in flagged}
     patterns = [p for p in (_pattern(code, [m for m in flagged if _theme(m).code == code]) for code in themes) if p]
     parts.extend(patterns)
@@ -408,7 +418,9 @@ def explain_markers(markers: list[BloodMarker]) -> str:
     elif not clinical_notes(flagged) and not patterns:
         parts.append("Results a little outside the range are common and often settle on their own. "
                      "It is worth mentioning them to your doctor at your next visit.")
-    return "\n\n".join(parts)
+    if one_test and len(parts) <= 2:
+        return "\n\n".join(parts)  # a simple question stays a short paragraph
+    return _bullets(parts)
 
 
 def explain_overall(markers: list[BloodMarker], risks: list | None, *,
@@ -462,9 +474,12 @@ def explain_bio_risk(risk, *, comparison=None, markers: list[BloodMarker] | None
         )
     if raised and (getattr(risk, "lifestyle_contribution", None) or 0) >= 40:
         parts.append("A large part of this score is linked to lifestyle, so changes to diet, activity and sleep can bring it down.")
-    parts.append("Bio-AI scores are risk estimates, not a medical diagnosis."
-                 + (" It is worth going through this one with your doctor." if raised else ""))
-    return " ".join(parts)
+    closing = ("Bio-AI scores are risk estimates, not a medical diagnosis."
+               + (" It is worth going through this one with your doctor." if raised else ""))
+    details = parts[1:]
+    if len(details) < 2:
+        return " ".join([*parts, closing])
+    return f"{parts[0]}\n\n{_bullets(details)}\n\n{closing}"
 
 
 def explain_metabolic_age(metabolic_age: float) -> str:
@@ -675,6 +690,9 @@ def _focus(markers: list[BloodMarker], message: str | None) -> list[BloodMarker]
         or ("triglycer" in text and "triglycer" in _norm(m.name))
     ]
     if named:
+        # An iron test is read with the member's other out-of-range iron results.
+        if any(_theme(m).code == "iron" for m in named):
+            named += [m for m in markers if m not in named and _theme(m).code == "iron" and _out_of_range(m)]
         return named
     for code, words in _THEME_WORDS.items():
         if any(word in text for word in words):
@@ -769,9 +787,10 @@ def answer_markers(markers: list[BloodMarker], message: str | None = None) -> st
                 parts.append(supplement + ".")
         if len(parts) == 1:
             parts.append(explain_markers(flagged))
-        if kind != "supplement":
-            parts.append("Recheck the test after about three months of changes to see how it is moving.")
-        return "\n\n".join(p for p in parts if p)
+            return "\n\n".join(p for p in parts if p)
+        opening, advice = parts[0], [p for p in parts[1:] if p]
+        closing = "Recheck the test after about three months of changes to see how it is moving." if kind != "supplement" else ""
+        return "\n\n".join(p for p in (opening, _bullets(advice), closing) if p)
     return explain_markers(focus)
 
 

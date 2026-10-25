@@ -139,13 +139,17 @@ def _find_risk(risks, code):
 
 _ANAEMIA_ASK = re.compile(r"an(?:a)?emi|iron[- ]deficien", re.I)
 _RATIO_ASK = re.compile(r"\bratio\b", re.I)
+_IRON_GROUP = {"tibc", "ferritin", "iron", "transferrin", "transferrin_saturation", "hemoglobin", "mcv", "mch"}
+_EXPLAIN_ASK = re.compile(r"\b(mean|means|why|explain|understand|high|low|normal|ok|okay|concern|worr)", re.I)
 
 
 def _with_pattern_keys(message: str, keys: list[str]) -> list[str]:
     """Questions about a pattern need the whole group of tests behind it: anaemia is read
     from haemoglobin, cell size and iron together, and a cholesterol ratio needs HDL."""
     extra: list[str] = []
-    if _ANAEMIA_ASK.search(message):
+    iron_test = set(keys) & _IRON_GROUP
+    if _ANAEMIA_ASK.search(message) or (iron_test and _EXPLAIN_ASK.search(message)):
+        # One iron test is read with the others: a high TIBC means little without ferritin.
         extra = ["hemoglobin", "rbc", "mcv", "mch", "ferritin", "iron", "tibc"]
     elif _RATIO_ASK.search(message) and any(k in {"cholesterol", "ldl", "hdl", "lipid_profile"} for k in keys):
         extra = ["cholesterol", "ldl", "hdl"]

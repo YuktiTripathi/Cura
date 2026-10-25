@@ -167,6 +167,21 @@ def drop_unsupported_trends(answer: str, context: HealthContext) -> tuple[str, l
     return " ".join(kept).strip(), flags
 
 
+_NEGATED = re.compile(
+    r"\b(not|n't|cannot|never|no|whether|without|rule out|ruled out|confirm(?:s|ed)? that|mean that)\b[^.!?]{0,30}$",
+    re.I,
+)
+
+
+def _rewrite_unless_negated(match: re.Match) -> str:
+    """"You have diabetes" claims a diagnosis; "does not confirm that you have diabetes" is
+    the correct caveat and must stay as written."""
+    before = match.string[max(0, match.start() - 60):match.start()]
+    if _NEGATED.search(before):
+        return match.group(0)
+    return "your Bio-AI Type 2 Diabetes risk score"
+
+
 def review_clinical_output(answer: str, *, plan: QueryPlan, context: HealthContext) -> tuple[str, list[str]]:
     flags: list[str] = []
     out, absence_flags = correct_false_absence(answer or "", context)
@@ -182,7 +197,7 @@ def review_clinical_output(answer: str, *, plan: QueryPlan, context: HealthConte
             out = out.rstrip() + " The available information does not establish this as the cause."
     if _BIOAI_DX.search(out) and context.bio_ai_risks:
         flags.append("bio_ai_treated_as_diagnosis")
-        out = _BIOAI_DX.sub("your Bio-AI Type 2 Diabetes risk score", out)
+        out = _BIOAI_DX.sub(_rewrite_unless_negated, out)
         if "not a diagnosis" not in out.lower() and "risk" in out.lower():
             out = out.rstrip() + " A Bio-AI score is a risk assessment, not a diagnosis."
     if context.markers and _CURRENT_AS_NOW.search(out) and not _HAS_DATE.search(out):
