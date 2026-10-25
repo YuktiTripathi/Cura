@@ -88,6 +88,10 @@ _MY_LAB_ACTION = re.compile(
     r"increase|improve|boost|fix|bring down|get down|get up)\b.*\bmy\b",
     re.I,
 )
+# Follow-up suggestions may look up the member's latest findings, within a short budget.
+_SUGGESTION_POOL = ThreadPoolExecutor(max_workers=2, thread_name_prefix="cura-suggest")
+_SUGGESTION_LOOKUP_SECONDS = 0.5
+
 _STYLE_REQUEST = re.compile(
     r"^\s*(?:(?:can|could) you |please |just )?(?:give me |tell me |make it |keep it |say it |explain (?:it|that|this) )?"
     r"(?:the |a )?(?:short(?:er)?|brief|quick|tl;?dr|simple|simpler|plain|summary|in short|in brief|"
@@ -314,6 +318,27 @@ class ChatService:
                 emergency_contacts=emergency_contacts() if urgent else [],
             ),
         )
+
+    def _member_findings(self, principal, plan, context) -> tuple[list, list] | None:
+        """Latest results and Bio-AI scores for follow-up suggestions when this turn's context
+        holds none (goal or nutrition answers). Never used for the answer itself."""
+        if plan.knowledge_scope != KnowledgeScope.personal or context.markers or context.bio_ai_risks:
+            return None
+        from concurrent.futures import TimeoutError as FutureTimeout
+
+        from app.pipeline.starters import collect_snapshot
+
+        future = _SUGGESTION_POOL.submit(collect_snapshot, principal, self.registry)
+        try:
+            # Suggestions never hold up the answer: a slow lookup just means general questions.
+            snap = future.result(timeout=_SUGGESTION_LOOKUP_SECONDS)
+        except FutureTimeout:
+            future.cancel()
+            logger.info("follow_up_findings_timeout")
+            return None
+        except Exception:  # noqa: BLE001 - suggestions are optional; the answer must not fail
+            return None
+        return list(snap.markers or []), list(snap.bio_risks or [])
 
     def _execute_chat(self, principal: AuthenticatedPrincipal, payload: ChatRequest, request_id: str, eval_turn: dict) -> ChatResponse:
         started = time.perf_counter()
@@ -1449,6 +1474,11 @@ class ChatService:
                     testing_option=testing_option,
                     experience=experience,
                     conversation_turn=conv_state.turn_type.value,
+                    history=[
+                        q for q in self.memory.user_messages(conv) if q.strip() != (payload.message or "").strip()
+                    ],
+                    shown_follow_ups=list(getattr(conv_state, "suggested_follow_ups", None) or []),
+                    member_findings=self._member_findings(principal, plan, context),
                 )
         self._progress.measure("compose")
         eval_turn.setdefault("answer_stages", {})["post_safety_answer"] = pre_compose_answer
@@ -1526,6 +1556,7 @@ class ChatService:
                 expected = ExpectedReplyType.clinical_context
         next_state = persistable_state(
             conv_state,
+            suggested=[item.text for item in (suggestions or []) if getattr(item, "text", None)],
             plan_topic=context.resolved_topic or plan.topic,
             plan_domains=list(plan.domains or []),
             plan_entities=discussed_entities(plan, context),

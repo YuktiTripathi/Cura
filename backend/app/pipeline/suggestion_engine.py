@@ -71,6 +71,38 @@ def candidates_for(snap: HealthSnapshot) -> list[Suggestion]:
     return rows
 
 
+def _journey_suggestions(snap: HealthSnapshot, avoid: set[str], limit: int) -> list[Suggestion]:
+    """Opening questions from the member's own findings (followup_generator), most important first."""
+    if not (snap.has_blood or snap.has_bio):
+        return []
+    from app.pipeline.followup_generator import build_brief, select_followups, stage_of
+
+    from app.contracts.blood import BloodMarker
+
+    markers = []
+    for m in snap.markers or []:
+        try:
+            markers.append(m if isinstance(m, BloodMarker) else BloodMarker(
+                id=str(getattr(m, "id", "") or getattr(m, "key", "")), key=getattr(m, "key", ""),
+                name=getattr(m, "name", "") or getattr(m, "key", ""), value=getattr(m, "value", None),
+                unit=getattr(m, "unit", None), flag=getattr(m, "flag", "unknown"),
+            ))
+        except ValueError:
+            continue
+    brief = build_brief(
+        markers=markers,
+        risks=list(snap.bio_risks or []),
+        history_keys={key for key, count in (snap.marker_history or {}).items() if count >= 2},
+    )
+    out: list[Suggestion] = []
+    for text in select_followups(brief, current_question=None, count=limit + 2):
+        sid = "journey." + hashlib.sha256(text.lower().encode()).hexdigest()[:10]
+        if sid in avoid:
+            continue
+        out.append(Suggestion(sid, text, f"journey_{stage_of(text) or 'start'}"))
+    return out[:limit]
+
+
 def choose_suggestions(
     snap: HealthSnapshot,
     *,
@@ -80,6 +112,10 @@ def choose_suggestions(
 ) -> list[Suggestion]:
     started = time.perf_counter()
     avoid = avoid_ids or set()
+    journey = _journey_suggestions(snap, avoid, limit)
+    if len(journey) >= min(3, limit):
+        logger.info("suggestion_generated source=journey selected=%s", len(journey))
+        return journey
     pool = candidates_for(snap)
     fresh = [item for item in pool if item.id not in avoid]
     fallback = not fresh

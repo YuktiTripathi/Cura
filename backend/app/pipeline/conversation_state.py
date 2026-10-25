@@ -297,6 +297,7 @@ class ConversationStateResolver:
             previous_user_question=prior.previous_user_question,
             previous_assistant_summary=prior.previous_assistant_summary,
             previous_assistant_follow_up=prior.previous_assistant_follow_up,
+            suggested_follow_ups=list(prior.suggested_follow_ups or []),
             previous_intent=prior.previous_intent,
             expected_reply_type=prior.expected_reply_type,
             expected_handling_path=prior.expected_handling_path,
@@ -346,6 +347,7 @@ def persistable_state(
     conversation_goal: str | None = None,
     explained_entities: list[str] | None = None,
     topic_summary: str | None = None,
+    suggested: list[str] | None = None,
 ) -> ConversationState:
     entities = list(dict.fromkeys([*(plan_entities or []), *resolved.active_entities]))
     domain = (plan_domains[0] if plan_domains else None) or resolved.active_domain
@@ -363,6 +365,7 @@ def persistable_state(
         previous_user_question=user_message,
         previous_assistant_summary=(assistant_summary or "")[:240] or None,
         previous_assistant_follow_up=follow_up,
+        suggested_follow_ups=list(dict.fromkeys([*(resolved.suggested_follow_ups or []), *(suggested or [])]))[-12:],
         previous_intent=plan_intent,
         expected_reply_type=expected_reply_type,
         expected_handling_path=expected_handling_path,

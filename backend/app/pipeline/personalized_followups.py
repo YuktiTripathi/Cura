@@ -249,7 +249,7 @@ class PersonalizedFollowUpEngine:
             out.extend(
                 [
                     FollowUpSuggestion(
-                        text="Which areas in my health scenario need the most attention?",
+                        text="Which part of my health needs the most attention?",
                         category="scenario_attention",
                         intent="health_scenario",
                         requires_personal_context=True,
@@ -261,7 +261,7 @@ class PersonalizedFollowUpEngine:
                         requires_personal_context=True,
                     ),
                     FollowUpSuggestion(
-                        text="What nutrition actions are supported by my available health context?",
+                        text="What should I eat for my results?",
                         category="scenario_nutrition",
                         intent="nutrition_guidance",
                         requires_personal_context=True,
@@ -280,13 +280,13 @@ class PersonalizedFollowUpEngine:
                         requires_personal_context=True,
                     ),
                     FollowUpSuggestion(
-                        text="Which foods could I limit based on my available context?",
+                        text="Which foods should I cut back on?",
                         category="nutrition_limit",
                         intent="nutrition_guidance",
                         requires_personal_context=True,
                     ),
                     FollowUpSuggestion(
-                        text="How does this relate to my overall health scenario?",
+                        text="How does this fit with my overall health?",
                         category="nutrition_scenario",
                         intent="health_scenario",
                         requires_personal_context=True,

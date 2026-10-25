@@ -36,6 +36,8 @@ class ConversationState(BaseModel):
     previous_user_question: str | None = None
     previous_assistant_summary: str | None = None
     previous_assistant_follow_up: str | None = None
+    # Follow-up questions already suggested in this conversation, newest last.
+    suggested_follow_ups: list[str] = Field(default_factory=list)
     previous_intent: str | None = None
     expected_reply_type: ExpectedReplyType = ExpectedReplyType.none
     expected_handling_path: str | None = None

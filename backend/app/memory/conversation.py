@@ -55,6 +55,13 @@ class FollowUpMemory:
                 return msg.content
         return None
 
+    def user_messages(self, conversation: Conversation | None, limit: int = 8) -> list[str]:
+        """Earlier questions in this conversation, oldest first."""
+        if conversation is None:
+            return []
+        rows = [msg.content for msg in (conversation.messages or []) if msg.role == "user" and msg.content]
+        return rows[-limit:]
+
     def resolve_topic(self, conversation: Conversation | None, message: str) -> tuple[str | None, str | None]:
         if conversation is None:
             return None, None
