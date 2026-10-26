@@ -918,6 +918,11 @@ def _explained(text: str | None) -> bool:
     return is_explained(text)
 
 
+def _also_outside_range(facts: list[str]) -> str:
+    """An out-of-range value the prose skipped, said as a sentence rather than a raw list."""
+    return "Your report also marks " + "; ".join(facts) + " as outside its range."
+
+
 def _unstated_flagged_facts(presentation: StructuredResponse, text: str) -> list[str]:
     """Out-of-range findings whose value the prose never states (cards show the rest)."""
     missing = []
@@ -957,7 +962,7 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
         )
         missing_facts = _unstated_flagged_facts(presentation, text)
         if missing_facts:
-            text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
+            text = text.rstrip() + "\n\n" + _also_outside_range(missing_facts)
         return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()
     if not presentation.findings:
         text = (raw_answer or presentation.summary or presentation.interpretation or "").strip()
@@ -1017,7 +1022,7 @@ def flatten_structured_response(presentation: StructuredResponse, *, raw_answer:
     text = "\n\n".join(part for part in parts if part and part.strip())
     missing_facts = _unstated_flagged_facts(presentation, text)
     if missing_facts:
-        text = "Stored records: " + "; ".join(missing_facts) + ".\n\n" + text
+        text = text.rstrip() + "\n\n" + _also_outside_range(missing_facts)
     return sanitize_internal_ids(_CONTEXT_LEAK.sub("", text)).strip()
 
 
