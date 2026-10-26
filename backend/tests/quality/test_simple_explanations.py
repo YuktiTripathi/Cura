@@ -100,3 +100,42 @@ def test_system_prompt_is_static_and_cacheable():
 def test_personal_system_prompt_budget():
     # Measured with the repo's counter: 4,229 before this change. Guard against creep.
     assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 2400
+
+
+# Real answers seen in the app (fictional values): the model copied data-sheet formats.
+SHEET_ANSWER = """Quick idea: yes, high total cholesterol and high LDL are related, because LDL is a large part of total cholesterol.
+
+- Cholesterol Total 228.9 mg/dl on 2026-08-08: total amount of cholesterol in the blood; this report marks it high.
+- LDL Cholestrol Calculated 128.25 mg/dl on 2026-08-08: "bad" cholesterol; this report marks it high.
+- HDL Cholestrol Direct 47.5 mg/dl on 2026-08-08: "good" cholesterol; this report marks it normal.
+- Your questionnaire: sleeping_hours = Between 5 to 7 hours. Short sleep is linked with higher blood sugar.
+- These are associations, not diagnoses. Why might my sleep affect blood sugar or fats?"""
+
+
+def test_polish_turns_data_sheet_wording_into_plain_speech():
+    from app.pipeline.answer_polish import polish_answer
+
+    ctx = _context("Are my high cholesterol total and high LDL cholesterol connected?")
+    ctx.bio_ai_risks = []
+    ctx.markers = []
+    out = polish_answer(SHEET_ANSWER, ctx, intent="latest_result")
+    for bad in ("Quick idea:", "marks it", "Cholestrol", "sleeping_hours", " = ", "on 2026-08-08", "Why might my sleep"):
+        assert bad not in out, bad
+    assert out.startswith("Yes, high total cholesterol")
+    # Values and meaning survive.
+    for kept in ("228.9 mg/dl", "128.25 mg/dl", "47.5 mg/dl", "higher than the healthy range", "in the healthy range", "Between 5 to 7 hours"):
+        assert kept in out, kept
+
+
+def test_polish_keeps_dates_when_the_answer_compares_two_dates():
+    from app.pipeline.answer_polish import _plain_speech
+
+    text = "Your LDL went from 142 mg/dL on 2026-02-10 to 138 mg/dL on 2026-08-18."
+    assert _plain_speech(text) == text
+
+
+def test_prompt_shows_a_plain_speech_example_and_bans_data_rows():
+    system = _system_for_mode(SAFETY_INSTRUCTIONS)
+    assert "Talk like a person, not a data sheet" in system
+    assert "Bad:" in system and "Good:" in system
+    assert "the report marks it" not in system  # the model was copying this phrase
