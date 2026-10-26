@@ -78,7 +78,7 @@ def _answer_with_stored_facts(rendered: str, context: HealthContext) -> str:
             missing.append(line)
     if not missing:
         return text
-    facts = "Stored records: " + "; ".join(missing) + "."
+    facts = "For reference, your report shows: " + "; ".join(missing) + "."
     if "could not be generated" in text.lower() or not text.strip():
         return facts
     return f"{text.rstrip()}\n\n{facts}"
@@ -193,10 +193,15 @@ def _missing_score_note(message: str, context: HealthContext, answer: str) -> st
     if not re.search(r"bio-?\s*ai|risk score", message or "", re.I):
         return ""
     missing = []
-    for risk in context.bio_ai_risks or []:
+    requested = {str(code).lower() for code in (context.requested_entity_codes or [])}
+    asked = [r for r in context.bio_ai_risks or [] if (r.code or "").lower() in requested]
+    for risk in asked or context.bio_ai_risks or []:
         score = getattr(risk, "score", None)
         if score is None:
             continue
+        status = (getattr(risk, "status", None) or "").lower()
+        if not asked and status in {"", "low", "normal", "healthy", "optimal", "good"}:
+            continue  # a reassuring score the answer skipped is not worth a raw line
         token = f"{score:g}"
         if token not in (answer or ""):
             name = getattr(risk, "name", None) or risk.code
@@ -204,7 +209,8 @@ def _missing_score_note(message: str, context: HealthContext, answer: str) -> st
             missing.append(f"{name} {token} ({status})".strip())
     if not missing:
         return ""
-    return "Stored scores: " + "; ".join(missing) + ". These are risk estimates, not diagnoses."
+    qualifier = "" if re.search(r"risk estimate", answer or "", re.I) else " These are risk estimates, not diagnoses."
+    return "Your Bio-AI report also shows " + "; ".join(missing) + "." + qualifier
 
 
 def _model_explains(plan: QueryPlan) -> bool:
