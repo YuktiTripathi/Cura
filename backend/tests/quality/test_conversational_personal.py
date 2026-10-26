@@ -74,7 +74,7 @@ def test_conflicts_resolved_in_system_prompt():
 
 def test_single_marker_prompt_is_narrow_and_has_no_forced_next_step():
     _ctx, _system, user = _prompt("What does my HbA1c mean?")
-    assert "Do not review other results or the whole report" in user
+    assert "No other results" in user
     assert "End with one short next step" not in user
     assert "as long as the important findings need" not in user  # "explain my X" is not a full review
 
@@ -83,7 +83,7 @@ def test_whole_bio_ai_prompt_has_no_word_band_or_forced_bullets():
     _ctx, _system, user = _prompt("Explain my Bio-AI report")
     assert "100 to 160 words" not in user
     assert "3 to 5 plain bullets" not in user
-    assert "overall picture first" in user
+    assert "One-line overall picture" in user
 
 
 def test_safety_rules_are_kept():
@@ -92,7 +92,7 @@ def test_safety_rules_are_kept():
         "BIO_AI_ASSESSMENT is an assessment, not a diagnosis",
         "QUESTIONNAIRE_RESPONSE and USER_STATED_HEALTH_INFORMATION are user-reported context",
         "that range decides low, normal, or high",
-        "Do not diagnose, prescribe medication, recommend dose changes",
+        "Do not diagnose, prescribe, recommend dose changes",
         "If SOURCE CONFLICTS exist",
         "Never invent values",
     ):
@@ -101,7 +101,7 @@ def test_safety_rules_are_kept():
 
 def test_urgent_question_puts_safety_first():
     _ctx, _system, user = _prompt("I have chest pain and my LDL is high, what should I do?")
-    assert "The first sentence is the safety action" in user
+    assert "First sentence is the safety action" in user
     assert "First sentence is the immediate safety action" in user
 
 
