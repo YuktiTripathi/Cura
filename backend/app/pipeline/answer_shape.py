@@ -43,7 +43,13 @@ _NOTES = {
 }
 
 
-def presentation_note(message: str | None, response_type: str | None = None) -> str:
+_PERSONAL_DIRECT = (
+    "A short opening line, then short bullets for separate points, written as plain sentences without bold labels. "
+    "One simple idea needs only one or two sentences."
+)
+
+
+def presentation_note(message: str | None, response_type: str | None = None, *, personal: bool = False) -> str:
     text = (message or "").strip()
     if _EMERGENCY.search(text):
         hint = "First sentence is the immediate safety action. No analogy, lifestyle tips, or headings before that action."
@@ -53,6 +59,8 @@ def presentation_note(message: str | None, response_type: str | None = None) -> 
         hint = "Answer the food question first, using everyday food names and serving sizes. Use bullets for helpful choices and for what to limit. Do not lead with unrelated labs or change a calculated amount."
     elif _LIFESTYLE.search(text) and response_type in {None, "", "DIRECT_ANSWER"}:
         hint = "Start with the habit the user asked about. Use 3 to 5 plain bullet sentences for the practical points, without bold labels."
+    elif personal and (response_type or "DIRECT_ANSWER") == "DIRECT_ANSWER":
+        hint = _PERSONAL_DIRECT
     else:
         hint = _NOTES.get(response_type or "DIRECT_ANSWER", _NOTES["DIRECT_ANSWER"])
     return f"PRESENTATION: {hint} No emojis.\n"
