@@ -26,6 +26,26 @@ _RETRIEVED = (
 )
 _SPELLING = (
     (re.compile(r"\bHba1c\b|\bHBA1C\b|\bHBA1c\b|\bhba1c\b"), "HbA1c"),
+    (re.compile(r"\bCholestrol\b", re.I), "Cholesterol"),
+    (re.compile(r"\b(LDL|HDL|VLDL) Cholesterol(?: (?:Calculated|Direct|Calc\.?))?\b", re.I), lambda m: f"{m.group(1).upper()} cholesterol"),
+    (re.compile(r"\bCholesterol,? Total\b", re.I), "total cholesterol"),
+)
+# Data-sheet habits a model sometimes copies from the evidence; said the way a person would.
+_SHEET = (
+    # "Quick idea:" / "How they connect:" style labels.
+    (re.compile(r"(^|(?<=[.!?]\s)|(?<=^- )|(?<=^\* ))(?:Quick idea|Short answer|In short|Bottom line|How they connect|Why it matters|What it means|Summary)\s*:\s*", re.I | re.M), r"\1"),
+    # "this report marks it high" -> plain words.
+    (re.compile(r"\b(?:this|the|your) report marks (?:it|this) (high|low)\b", re.I), lambda m: f"that is {'higher' if m.group(1).lower() == 'high' else 'lower'} than the healthy range"),
+    (re.compile(r"\b(?:this|the|your) report marks (?:it|this) (?:normal|within range)\b", re.I), "that is in the healthy range"),
+    # "sleeping_hours = Between 5 to 7 hours" -> "sleeping hours: Between 5 to 7 hours".
+    (re.compile(r"\bYour questionnaire\s*:\s*", re.I), "In your questionnaire, "),
+    (re.compile(r"\b([a-z]+(?:_[a-z0-9]+)+)\s*=\s*([^.;\n]+)"),
+     lambda m: f'your answer for {m.group(1).replace("_", " ")} was "{m.group(2).strip()}"'),
+)
+_DATED_VALUE = re.compile(r"(\d(?:[\d.]*)\s*(?:%|[A-Za-zµμ/]+(?:/[A-Za-z]+)?))\s+on\s+(\d{4}-\d{2}-\d{2})\b")
+_MEMBER_QUESTION = re.compile(
+    r"(?:(?<=[.!])[ \t]+|^)(?:Why|What|How|Is|Are|Can|Could|Should|Do|Does|Will|Would)\b[^.!?\n]{0,160}\bmy\b[^.!?\n]{0,160}\?[ \t]*$",
+    re.M,
 )
 # The Bio-AI report's assessments as members see them: 9 for men, 10 for women (PCOS).
 _ASSESSMENTS = {
@@ -128,6 +148,20 @@ def _ensure_urgent_notes(text: str, context: HealthContext) -> str:
     return text.rstrip() + "\n\n**Important:** " + " ".join(additions)
 
 
+def _plain_speech(text: str) -> str:
+    out = text
+    for pattern, repl in _SHEET:
+        out = pattern.sub(repl, out)
+    # One test date repeated after every value: the cards show it, so drop it. Several dates stay.
+    if len(set(_DATED_VALUE.findall(out) and [d for _v, d in _DATED_VALUE.findall(out)])) == 1:
+        out = _DATED_VALUE.sub(r"\1", out)
+    # A question in the member's own voice ("Why might my sleep...?") is a follow-up chip, not Cura's words.
+    out = _MEMBER_QUESTION.sub("", out)
+    # Capitalize a line or sentence the label removal left lower-case.
+    out = re.sub(r"(^|^[-*] |[.!?] )([a-z])", lambda m: m.group(1) + m.group(2).upper(), out, flags=re.M)
+    return out
+
+
 def polish_answer(text: str, context: HealthContext, *, intent: str | None = None, add_notes: bool = True) -> str:
     if not text:
         return text
@@ -136,6 +170,7 @@ def polish_answer(text: str, context: HealthContext, *, intent: str | None = Non
         out = pattern.sub(repl, out)
     for pattern, repl in _RETRIEVED:
         out = pattern.sub(repl, out)
+    out = _plain_speech(out)
     lab_only = (intent or "").startswith(("report_", "blood_", "latest_", "previous_", "trend")) and not context.bio_ai_risks
     if lab_only:
         out = _RISK_QUALIFIER.sub("This is a reading of your results, not a diagnosis.", out)
