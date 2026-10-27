@@ -113,19 +113,28 @@ def _drop_unlisted_assessments(text: str, context: HealthContext) -> str:
 
 def _qualifier_once(text: str, *, both_sources: bool = True) -> str:
     """Once per kind when an answer covers lab results and Bio-AI scores; otherwise once in all."""
-    seen: set[str] = set()
+    seen: dict[str, str] = {}
 
-    def keep_first(match: re.Match) -> str:
+    def take(match: re.Match) -> str:
         kind = "risk" if both_sources and re.search(r"risk estimate", match.group(0), re.I) else "other"
-        if kind in seen:
-            return ""
-        seen.add(kind)
-        return match.group(0)
+        if kind not in seen:
+            seen[kind] = match.group(0).strip()
+        return ""
 
-    out = _ANY_QUALIFIER.sub(keep_first, text)
-    return re.sub(r"[ \t]{2,}", " ", out).replace(" \n", "\n").strip()
+    out = _ANY_QUALIFIER.sub(take, text)
+    out = re.sub(r"[ \t]{2,}", " ", out).replace(" \n", "\n").strip()
+    tail = [seen[kind] for kind in ("other", "risk") if kind in seen and seen[kind].lower() not in out.lower()]
+    if tail:
+        out = out.rstrip() + "\n\n" + " ".join(tail)
+    return out
 
 
+_LEAKED_LABEL = re.compile(
+    r"(?im)^\s*[-*]?\s*(?:short opening line\s*:?\s*)?(?:here is a short,? plain summary\b[^\n]*)\s*"
+)
+_MISSING_BIO = re.compile(
+    r"(?im)^\s*[-*]?\s*.*\bbio-?\s*ai\b[^\n]*\b(?:not (?:present|included|found)|does not include)\b[^\n]*\n?"
+)
 _REFERRAL = re.compile(r"\b(doctor|clinician|physician|medical review)\b", re.I)
 _DISCUSS_SOON = re.compile(r"Please discuss this result with your doctor soon\.\s*", re.I)
 
@@ -176,7 +185,7 @@ def _plain_speech(text: str) -> str:
 def polish_answer(text: str, context: HealthContext, *, intent: str | None = None, add_notes: bool = True) -> str:
     if not text:
         return text
-    out = text
+    out = _MISSING_BIO.sub("", _LEAKED_LABEL.sub("", text))
     for pattern, repl in _SPELLING:
         out = pattern.sub(repl, out)
     for pattern, repl in _RETRIEVED:

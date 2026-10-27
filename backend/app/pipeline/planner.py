@@ -681,6 +681,18 @@ def attach_task_plan(plan: QueryPlan, message: str, *, decision: JevDecision | N
         if "bio_ai" in named:
             plan.needs_bio_ai = True
             plan.needs_supershyft = True
+        if re.search(r"\b(?:score|bio-?\s*ai)\b", message or "", re.I):
+            from app.pipeline.intent import BIO_ALIASES
+
+            for alias, code in BIO_ALIASES.items():
+                if re.search(rf"\b{re.escape(alias)}\b", message or "", re.I):
+                    plan.needs_bio_ai = True
+                    plan.needs_supershyft = True
+                    metrics = list(plan.requested_metrics or [])
+                    if code not in metrics:
+                        metrics.append(code)
+                    plan.requested_metrics = metrics
+                    break
         if "questionnaire" in named:
             plan.needs_questionnaire = True
         if "goals" in named:

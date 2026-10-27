@@ -15,7 +15,10 @@ from app.pipeline.grounding import GroundingChecker
 from app.pipeline.lab_parameters import DERIVED_ENTITY_KEYS, aliases_for, display_name_for
 from app.pipeline.quality_gate import review_answer
 from app.pipeline.renderer import DeterministicRenderer
+from app.pipeline.intent import BIO_ALIASES
 from app.pipeline.safety import SafetyLayer
+
+_BIO_CODES = set(BIO_ALIASES.values())
 
 
 class ResponseValidator:
@@ -48,9 +51,10 @@ class ResponseValidator:
             if unsupported:
                 grounding_flags.append("unsupported_personal_numbers")
                 answer = _drop_unsupported(answer, unsupported) or self.renderer.render(message, context)
-                from app.pipeline.reasoning import _answer_with_stored_facts
+                if not (answer or "").strip():
+                    from app.pipeline.reasoning import _answer_with_stored_facts
 
-                answer = _answer_with_stored_facts(answer, context)
+                    answer = _answer_with_stored_facts(answer, context)
         if medical_hits:
             answer, medical_flags = self.grounding.sanitize_medical_answer(answer, medical_hits)
             grounding_flags.extend(medical_flags)
@@ -150,10 +154,16 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
             continue
         stated = any((row.fact or "").lower() == code.lower() for row in (context.user_stated or []))
         derived = any((row.fact or "").lower() == code.lower() for row in (context.derived or []))
+        asked = code.lower().replace("_score", "")
         measured = any((m.key or "").lower() == code.lower() for m in context.markers) or any(
-            (r.code or "").lower() == code.lower() for r in context.bio_ai_risks
+            asked == (r.code or "").lower() or asked in ((r.name or "").lower())
+            for r in context.bio_ai_risks
         )
         if stated or derived or measured:
+            flags.append("entity_unmentioned")
+        elif not plan.needs_bio_ai and asked in _BIO_CODES:
+            # The question named a Bio-AI score, but this turn did not load Bio-AI.
+            # Do not tell the member the score is missing.
             flags.append("entity_unmentioned")
         else:
             repairs.append(f"{display_name_for(code)} was not found in the retrieved records.")

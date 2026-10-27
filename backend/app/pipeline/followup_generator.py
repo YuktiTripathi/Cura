@@ -46,7 +46,7 @@ _UNSAFE = re.compile(
 )
 _GENERIC = re.compile(
     r"\b(any (?:new )?(?:symptoms|medications?)|anything else|other questions?|how (?:are|do) you feel|"
-    r"tell me more|learn more|what else|more information)\b",
+    r"tell me more|learn more|what else|more information|what does (?:this|that) topic mean|in general)\b",
     re.I,
 )
 # A chip is the member asking Cura. Questions Cura would ask the member ("Would you like a

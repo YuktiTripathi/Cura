@@ -214,16 +214,7 @@ class ResponseComposer:
                 combined = [symptom]
             else:
                 combined = extras[:1]
-            if not combined and plan.knowledge_scope == KnowledgeScope.general:
-                name = plan.topic_name or "this topic"
-                combined = [
-                    FollowUpSuggestion(
-                        text=f"What does {name} mean in general?",
-                        category="suggested",
-                        knowledge_scope="general",
-                        handling_path="CONTINUE_INTERPRETATION",
-                    )
-                ]
+            # No chip is better than a generic "what does this topic mean" chip.
         elif response_plan.kind == "report_overview":
             question = []
             combined = [
@@ -361,7 +352,8 @@ class ResponseComposer:
             # Never offer a question this conversation already suggested.
             combined = [item for item in combined if item.text not in shown_follow_ups]
             presentation.suggestion_chips = [t for t in presentation.suggestion_chips if t not in shown_follow_ups]
-        if not combined and not answer_turn and context.status != "ambiguous":
+        definition = bool(re.search(r"\bwhat is\b", plan.raw_message or "", re.I) and not re.search(r"\bmy\b", plan.raw_message or "", re.I))
+        if not combined and not answer_turn and context.status != "ambiguous" and not definition:
             # Never an empty row: a few general, clinically safe questions.
             from app.pipeline.followup_generator import FollowUpBrief, fallback_questions, to_suggestions
 

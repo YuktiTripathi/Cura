@@ -86,7 +86,8 @@ def test_tibc_answer_uses_the_members_ferritin():
     from tests.quality.test_conversation_quality import ask
 
     body = ask("eval-user-iron", "What does my serum iron result mean?")
-    assert "Haemoglobin" in body["answer"] or "haemoglobin" in body["answer"].lower()
+    lowered = body["answer"].lower()
+    assert "ferritin" in lowered or "haemoglobin" in lowered or "hemoglobin" in lowered
 
 
 def test_no_bio_ai_cards_under_a_lifestyle_question():

@@ -195,13 +195,12 @@ def _missing_score_note(message: str, context: HealthContext, answer: str) -> st
     missing = []
     requested = {str(code).lower() for code in (context.requested_entity_codes or [])}
     asked = [r for r in context.bio_ai_risks or [] if (r.code or "").lower() in requested]
-    for risk in asked or context.bio_ai_risks or []:
+    if not asked:
+        return ""
+    for risk in asked:
         score = getattr(risk, "score", None)
         if score is None:
             continue
-        status = (getattr(risk, "status", None) or "").lower()
-        if not asked and status in {"", "low", "normal", "healthy", "optimal", "good"}:
-            continue  # a reassuring score the answer skipped is not worth a raw line
         token = f"{score:g}"
         if token not in (answer or ""):
             name = getattr(risk, "name", None) or risk.code

@@ -279,6 +279,8 @@ def limit_general_personal_context(context) -> None:
     chosen = sorted(ranked, key=lambda row: (row[0], row[1]), reverse=True)[:3]
     marker_keys = {key for _score, _kind_rank, kind, key in chosen if kind == "marker"}
     risk_keys = {key for _score, _kind_rank, kind, key in chosen if kind == "risk"}
+    asked = {str(code).lower().replace("_score", "") for code in (getattr(context, "requested_entity_codes", None) or [])}
+    risk_keys |= {risk.code for risk in context.bio_ai_risks or [] if (risk.code or "").lower() in asked}
     question_keys = {key for _score, _kind_rank, kind, key in chosen if kind == "questionnaire"}
     context.markers = [item for item in context.markers or [] if item.key in marker_keys]
     context.bio_ai_risks = [item for item in context.bio_ai_risks or [] if item.code in risk_keys]

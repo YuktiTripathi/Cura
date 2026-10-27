@@ -261,10 +261,7 @@ def explain_bio_ai(risks: list, markers: list[BloodMarker] | None = None) -> str
     fine = [r for r in scored if r not in attention]
     flagged = [m for m in (markers or []) if _out_of_range(m)]
 
-    parts = [
-        "Bio-AI scores estimate your risk for common health conditions from your data. "
-        "They are risk estimates, not diagnoses, and a higher score means a higher estimated risk."
-    ]
+    parts = []
     if attention:
         names = ", ".join(r.name for r in attention[:3])
         parts.append(f"The scores that deserve the most attention are **{names}**.")
@@ -287,11 +284,9 @@ def explain_bio_ai(risks: list, markers: list[BloodMarker] | None = None) -> str
     if fine:
         names = ", ".join(f"{r.name} ({r.score:g}, {r.status or 'no level given'})" for r in fine)
         parts.append(f"**Looking good:** {names}.")
-    if attention:
-        parts.append(
-            "**What to do next:** share these scores with your doctor, starting with "
-            f"{attention[0].name.lower()}, and ask which tests or changes would help most."
-        )
+    parts.append(
+        "These are risk estimates, not diagnoses. A higher score means a higher estimated risk."
+    )
     return "\n\n".join(parts)
 
 
@@ -462,8 +457,7 @@ def explain_bio_risk(risk, *, comparison=None, markers: list[BloodMarker] | None
         )
     if raised and (getattr(risk, "lifestyle_contribution", None) or 0) >= 40:
         parts.append("A large part of this score is linked to lifestyle, so changes to diet, activity and sleep can bring it down.")
-    closing = ("Bio-AI scores are risk estimates, not a medical diagnosis."
-               + (" It is worth going through this one with your doctor." if raised else ""))
+    closing = "Bio-AI scores are risk estimates, not a medical diagnosis."
     details = parts[1:]
     if len(details) < 2:
         return " ".join([*parts, closing])
@@ -680,7 +674,12 @@ def _focus(markers: list[BloodMarker], message: str | None) -> list[BloodMarker]
     if named:
         # An iron test is read with the member's other out-of-range iron results.
         if any(_theme(m).code == "iron" for m in named):
-            named += [m for m in markers if m not in named and _theme(m).code == "iron" and _out_of_range(m)]
+            pool = [
+                m for m in markers
+                if m not in named and _theme(m).code == "iron" and _out_of_range(m)
+            ]
+            ferritin = [m for m in pool if "ferritin" in _norm(m.name + m.key)]
+            named += (ferritin or pool)[:1]
         return named
     for code, words in _THEME_WORDS.items():
         if any(word in text for word in words):

@@ -86,6 +86,8 @@
       {"id": "ei-rbc-2", "key": "rbc", "name": "RBC", "value": 4.8, "unit": "million/µL", "reference_low": 4.0, "reference_high": 5.4, "flag": "normal", "category": "cbc"},
       {"id": "ei-mch-2", "key": "mch", "name": "MCH", "value": 24.0, "unit": "pg", "reference_low": 27, "reference_high": 33, "flag": "low", "category": "cbc"},
       {"id": "ei-iron-2", "key": "iron", "name": "Serum Iron", "value": 35.0, "unit": "µg/dL", "reference_low": 60, "reference_high": 170, "flag": "low", "category": "iron"},
+      {"id": "ei-tibc-2", "key": "tibc", "name": "TIBC", "value": 450.0, "unit": "µg/dL", "reference_low": 250, "reference_high": 400, "flag": "high", "category": "iron"},
+      {"id": "ei-fer-2", "key": "ferritin", "name": "Ferritin", "value": 8.0, "unit": "ng/mL", "reference_low": 15, "reference_high": 150, "flag": "low", "category": "iron"},
       {"id": "ei-ldl-2", "key": "ldl", "name": "LDL", "value": 94.0, "unit": "mg/dL", "reference_low": 0, "reference_high": 100, "flag": "normal", "category": "lipid"},
       {"id": "ei-hdl-2", "key": "hdl", "name": "HDL", "value": 51.0, "unit": "mg/dL", "reference_low": 40, "reference_high": 60, "flag": "normal", "category": "lipid"},
       {"id": "ei-tg-2", "key": "triglycerides", "name": "Triglycerides", "value": 82.9, "unit": "mg/dL", "reference_low": 0, "reference_high": 150, "flag": "normal", "category": "lipid"},

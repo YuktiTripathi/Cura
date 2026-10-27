@@ -229,7 +229,7 @@ class PromptBuilder:
                 f"{depth}\n"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"User question: {user_message}\n"
+                f"{_asked_task(user_message)}User question: {user_message}\n"
             )
         elif personal and uses_answer_evidence(context):
             # Answer director: the model sees the few facts that answer this question, the
@@ -263,7 +263,7 @@ class PromptBuilder:
                 f"{_bio_explain_note(context, user_message)}"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"User question: {user_message}\n"
+                f"{_asked_task(user_message)}User question: {user_message}\n"
             )
         elif personal:
             compact = _use_compact_context(context)
@@ -296,7 +296,7 @@ class PromptBuilder:
                 f"{_bio_explain_note(context, user_message)}"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"User question: {user_message}\n"
+                f"{_asked_task(user_message)}User question: {user_message}\n"
             )
         else:
             topic = context.resolved_topic_name or "the asked topic"
@@ -337,7 +337,7 @@ class PromptBuilder:
                     else "No relevant personal context is supplied. Explain the concept without mentioning this absence.\n"
                 )
                 + f"{_presentation_line(context, user_message)}"
-                + f"User question: {user_message}\n"
+                + f"{_asked_task(user_message)}User question: {user_message}\n"
             )
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else _system_for_mode(SAFETY_INSTRUCTIONS)
         from app.core.config import settings
@@ -786,6 +786,39 @@ def _adaptive_response_brief(context: HealthContext) -> str:
 def _experience_instruction(context: HealthContext) -> str:
     """Backward-compatible alias for older tests/callers."""
     return _adaptive_response_brief(context)
+
+
+def _asked_task(message: str) -> str:
+    """One line so the model answers the asked task. Not part of the system prompt."""
+    from app.pipeline.report_explainer import question_kind
+
+    text = message or ""
+    kind = question_kind(text)
+    if kind == "foods":
+        return (
+            "Answer the food question first with the specific foods to cut or eat. "
+            "Do not open with a cholesterol lecture, a lab-value list, missing Bio-AI data, or a doctor visit.\n"
+        )
+    if kind == "actions":
+        return (
+            "Answer with the practical steps first, in 2 to 4 bullets. "
+            "Do not open with a report summary, missing data, or a doctor visit.\n"
+        )
+    if re.search(r"\bwhat is\b", text, re.I) and not re.search(r"\bmy\b", text, re.I):
+        return "This is a definition. Use 1 to 3 short bullets and do not turn it into a personal report.\n"
+    if re.search(r"\bbio-?\s*ai\b", text, re.I):
+        return (
+            "Explain the main findings first. Say once, in the last bullet, that these are risk estimates, not diagnoses. "
+            "Do not repeat that line or mention a score that is not in the evidence.\n"
+        )
+    if re.search(r"\bwhat does my\b", text, re.I):
+        return (
+            "Explain this one result: what it measures, what the result means, and at most one related finding. "
+            "Do not list every related test or add a doctor visit unless the result needs urgent review.\n"
+        )
+    if re.search(r"\b(?:blood report|bio-ai report)\b", text, re.I):
+        return "Use 3 to 5 grouped bullets for the important findings. Do not dump every marker or start with a stock summary phrase.\n"
+    return ""
 
 
 def _depth_instruction(context: HealthContext) -> str:

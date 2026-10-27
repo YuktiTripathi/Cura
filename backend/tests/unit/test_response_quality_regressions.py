@@ -91,6 +91,42 @@ def test_bio_ai_pcos_does_not_pull_cholesterol():
     assert related_blood_results(risk, markers) == []
 
 
+def test_stock_summary_and_missing_bio_line_are_removed():
+    text = (
+        "Here is a short plain summary of your blood report and what the main results mean.\n"
+        "- Cut sugary drinks first.\n"
+        "- Bio-AI risk data is not present in your report, so these are the measured blood results only."
+    )
+    out = polish_answer(text, HealthContext(intent=IntentType.blood_marker_explanation, answer_depth=AnswerDepth.simple))
+    assert "short plain summary" not in out.lower()
+    assert "not present" not in out.lower()
+    assert "sugary drinks" in out
+
+
+def test_food_question_is_told_to_name_foods_first():
+    from app.pipeline.prompt_builder import _asked_task
+
+    line = _asked_task("Which foods should I cut first to lower my LDL and triglycerides?")
+    assert "foods to cut or eat" in line
+    assert "doctor visit" in line
+
+
+def test_generic_topic_chip_is_rejected():
+    assert not is_member_question("What does this topic mean in general?")
+    assert is_member_question("Which foods should I cut back on?")
+
+
+def test_bio_qualifier_is_kept_once_at_the_end():
+    text = (
+        "These are risk estimates, not diagnoses.\n"
+        "- Type 2 diabetes is high.\n"
+        "These are risk estimates, not diagnoses."
+    )
+    out = polish_answer(text, HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=AnswerDepth.simple))
+    assert out.lower().count("risk estimates, not diagnoses") == 1
+    assert out.rstrip().lower().endswith("risk estimates, not diagnoses.")
+
+
 def test_follow_up_chips_are_questions_the_member_would_ask():
     assert not is_member_question("Do you have any new symptoms or medication or supplement changes?")
     assert is_member_question("Could new symptoms or a medicine change affect this result?")

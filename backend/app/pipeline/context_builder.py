@@ -1035,9 +1035,18 @@ class ContextBuilder:
         )
         primary = (plan.task_contract or {}).get("primary_source")
         if primary == "blood_report":
-            ctx.bio_ai_risks = []
-            ctx.metabolic_age = None
-            ctx.metabolic_score = None
+            from app.pipeline.intent import BIO_ALIASES
+
+            asked_bio = {
+                str(code).lower().replace("_score", "")
+                for code in (plan.requested_metrics or [])
+            } & set(BIO_ALIASES.values())
+            if asked_bio:
+                ctx.bio_ai_risks = [risk for risk in ctx.bio_ai_risks or [] if (risk.code or "").lower() in asked_bio]
+            else:
+                ctx.bio_ai_risks = []
+                ctx.metabolic_age = None
+                ctx.metabolic_score = None
         facts = [marker_fact(marker, principal.subject_id) for marker in ctx.markers]
         uploaded_keys = {
             marker.key
