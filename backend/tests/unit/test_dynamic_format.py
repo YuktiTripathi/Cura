@@ -81,10 +81,9 @@ def test_system_prompt_plans_format_dynamically(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     ctx, _ = _evidence(COMPANION, "Why are my triglycerides high?")
     system = PromptBuilder().build(ctx, "", "Why are my triglycerides high?")[0]["content"]
-    assert "RESPONSE PLANNING" in system and "not a fixed template" in system
-    assert "short version" in system and "explain in detail" in system  # density chosen by the model
-    assert "shortest response that fully answers" in system
-    assert "themes: 3" not in system  # plain mode does not ask for UI theme cards
+    assert "ANSWER STYLE" in system
+    assert "normally <=120 words" in system
+    assert "overall_summary" in system
     for heading in _TEMPLATE_HEADINGS:
         assert f"## {heading}" not in system
 
@@ -93,7 +92,7 @@ def test_rich_mode_keeps_theme_contract(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "rich")
     ctx, _ = _evidence(COMPANION, "How am I doing overall?")
     system = PromptBuilder().build(ctx, "", "How am I doing overall?")[0]["content"]
-    assert "themes: 3" in system
+    assert "overall_summary" in system and "`themes`" in system
 
 
 FORMAT_DIVERSITY = [

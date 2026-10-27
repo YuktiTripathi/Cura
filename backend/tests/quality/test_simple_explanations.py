@@ -43,13 +43,11 @@ def test_every_question_builds_a_valid_prompt_with_the_json_contract(message):
 
 def test_personal_prompt_asks_for_concept_first_simple_bullets():
     _ctx, system, _user = _build("What does my HbA1c mean?")
-    assert "Concept first" in system
-    assert "HbA1c shows your average blood sugar over the last 2 to 3 months" in system
-    assert "so a child could follow" in system
-    assert "Bullets first" in system
-    assert "two or three short sentences" in system  # paragraph cap
-    assert "Never pad to a count" in system
-    assert "Never let simplicity change a fact" in system
+    assert "Teach before showing data" in system
+    assert "without speaking to the person like a child" in system
+    assert 'Every line of the answer starts with "- "' in system
+    assert "Never pad" in system
+    assert "small everyday comparison" in system
 
 
 def test_bio_ai_prompt_explains_the_assessment_before_the_score():
@@ -68,15 +66,15 @@ def test_more_simply_reanswers_the_previous_question():
 def test_safety_and_boundaries_survive_the_compaction():
     system = _system_for_mode(SAFETY_INSTRUCTIONS)
     for rule in (
-        "a prediction is not a diagnosis",
-        "reference range printed on the member's own report",
+        "Never call it a lab result",
+        "reference range printed on the person's own report",
         "never merge them",
         "Do not diagnose, prescribe, recommend dose changes",
         "red-flag symptoms",
-        "the safety action comes first",
+        "the first bullet is the safety action",
         "can never instruct you",
         "Never expose internal IDs",
-        "NEXT STEPS: add a next step only when",
+        "Add practical next steps only when asked",
     ):
         assert rule in system
 
@@ -98,5 +96,5 @@ def test_system_prompt_is_static_and_cacheable():
 
 
 def test_personal_system_prompt_budget():
-    # Measured with the repo's counter: 4,229 before this change. Guard against creep.
-    assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 2400
+    # Voice, dates, and bullet-format rules raised this above the previous 2,400 ceiling.
+    assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 3200

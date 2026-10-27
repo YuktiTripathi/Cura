@@ -95,8 +95,8 @@ def test_general_prompt_includes_the_note():
     assert "PRESENTATION:" in messages[1]["content"]
     assert "NARRATIVE LENGTH:" in messages[1]["content"]
     assert "about 30 to 60 words" in messages[1]["content"]
-    assert "2 to 4 Markdown bullets" in messages[0]["content"]
-    assert "own paragraph, after a blank line" in messages[0]["content"]
+    assert "The whole answer is bullets" in messages[0]["content"]
+    assert "Do not end the answer with a question" in messages[0]["content"]
     assert "PLAIN LANGUAGE" in messages[0]["content"]
     assert "higher-than-expected blood sugar" in messages[0]["content"]
     assert "Never invent a fact" in messages[0]["content"]
@@ -106,7 +106,7 @@ def test_general_prompt_includes_the_note():
 def test_personal_prompt_uses_the_same_plain_language_policy():
     from app.pipeline.prompt_builder import PLAIN_LANGUAGE, SAFETY_INSTRUCTIONS
 
-    assert "Assume the user has no medical background." in PLAIN_LANGUAGE
+    assert "Assume the person has no medical background" in PLAIN_LANGUAGE
     assert PLAIN_LANGUAGE in SAFETY_INSTRUCTIONS
     assert "prediction is not a diagnosis" in SAFETY_INSTRUCTIONS
     assert "Do not change a calculated amount." in SAFETY_INSTRUCTIONS

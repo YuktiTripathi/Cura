@@ -110,7 +110,7 @@ def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
         assert "120 words" in system
         assert "em dash" in system and EM not in system
         assert "at most one short safety qualifier" in system.lower()
-    assert "familiar words" in GENERAL_HEALTH_INSTRUCTIONS and "2 to 4 Markdown bullets" in GENERAL_HEALTH_INSTRUCTIONS
+    assert "familiar words" in GENERAL_HEALTH_INSTRUCTIONS and "The whole answer is bullets" in GENERAL_HEALTH_INSTRUCTIONS
     assert EM not in GENERAL_HEALTH_INSTRUCTIONS
 
 

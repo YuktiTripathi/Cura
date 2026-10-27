@@ -73,7 +73,7 @@ def test_personalized_single_marker_answer_uses_report_range_and_explains():
     payload = evidence.payload()
     _assert_purpose_not_template(payload["how_to_answer"])
     system = prompt[0]["content"]
-    assert "reference range printed on the member's own report" in system
+    assert "reference range printed on the person's own report" in system
     assert "Explain, do not just retrieve" in system
     assert "RESPONSE PLANNING" in system and "not a fixed template" in system
 
