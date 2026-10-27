@@ -197,9 +197,11 @@ class OpenAICompatibleLLMClient:
             "max_tokens": settings.llm_max_output_tokens,
         }
         if uses_reasoning_tokens(self.model):
-            # Hidden reasoning is billed as output: keep effort low and the cap explicit.
+            # Hidden reasoning is counted inside max_tokens. Using the larger of the two
+            # budgets left a full blood-report call with 1,984 reasoning tokens and no
+            # finished answer. Add the configured answer budget on top of the reasoning cap.
             payload["reasoning"] = {"effort": settings.llm_reasoning_effort or "low"}
-            payload["max_tokens"] = max(int(settings.llm_max_output_tokens), int(settings.llm_reasoning_output_cap))
+            payload["max_tokens"] = int(settings.llm_max_output_tokens) + int(settings.llm_reasoning_output_cap)
         from app.llm.openrouter_policy import openrouter_policy
 
         policy = openrouter_policy()

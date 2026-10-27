@@ -185,6 +185,25 @@ def educational_symptom_question(text: str) -> bool:
     return bool(_SYMPTOM_EDUCATION.search(message))
 
 
+_LAB_PREPARATION = re.compile(
+    r"\b(?:fasting|non-?fasting|fasted|empty stomach|repeat(?:ed|ing)?|re-?test|recheck)\b",
+    re.I,
+)
+_LAB_SUBJECT = re.compile(
+    r"\b(?:test|tests|panel|lipid|lipids|blood|lab|hba1c|glucose|cholesterol|triglyceride)\b",
+    re.I,
+)
+
+
+def lab_preparation_question(text: str) -> bool:
+    """A question about how or whether to repeat a lab test, not about a medicine."""
+    message = text or ""
+    if not (_LAB_PREPARATION.search(message) and _LAB_SUBJECT.search(message)):
+        return False
+    normalized = normalize_text(message)
+    return not any(pattern.search(normalized) for pattern in MEDICATION_MISUSE) and not DOSAGE_LEGACY.search(normalized)
+
+
 def match_safety_category(text: str) -> tuple[str, str, float]:
     message = text or ""
     language = detect_language_hint(message)
@@ -321,6 +340,10 @@ class SafetyLayer:
 
         # Urgent from either layer wins. Otherwise a high-confidence local rule wins.
         if educational_symptom_question(user_message) and classified_category == "emergency":
+            classified_category = "none"
+            classified_confidence = 0.0
+        # A fasting or repeat-test question is not a dose request, even if the model classifier says so.
+        if classified_category == "medication_misuse" and lab_preparation_question(user_message) and category != "medication_misuse":
             classified_category = "none"
             classified_confidence = 0.0
         if category in _URGENT_CATEGORIES:

@@ -9,6 +9,7 @@ from app.contracts.health_context import HealthContext
 from app.contracts.query import QueryPlan
 from app.core.errors import ProviderUnavailableError
 from app.db.models import Conversation
+from app.pipeline.followup_generator import is_member_question
 from app.providers.registry import ProviderRegistry
 
 RELATED_MARKERS: dict[str, list[str]] = {
@@ -172,22 +173,26 @@ class PersonalizedFollowUpEngine:
             return []
         inv = inventory or FollowUpInventory()
         if context.status == "ambiguous":
-            return self._limit(
-                [
-                    FollowUpSuggestion(
-                        text="Would you like me to compare those Bio-AI reports?",
-                        category="clarification",
-                        intent="bio_ai_comparison",
-                        requires_personal_context=True,
-                    ),
-                    FollowUpSuggestion(
-                        text="Would you like to use the Bio-AI report?",
-                        category="clarification",
-                        intent="bio_ai_score",
-                        requires_personal_context=True,
-                    ),
-                ]
-            )
+            return [
+                item
+                for item in self._limit(
+                    [
+                        FollowUpSuggestion(
+                            text="Which of those Bio-AI reports should I use?",
+                            category="clarification",
+                            intent="bio_ai_comparison",
+                            requires_personal_context=True,
+                        ),
+                        FollowUpSuggestion(
+                            text="Can you explain the Bio-AI report?",
+                            category="clarification",
+                            intent="bio_ai_score",
+                            requires_personal_context=True,
+                        ),
+                    ]
+                )
+                if is_member_question(item.text)
+            ]
 
         candidates = self._candidates(plan, context, inv)
         filtered = [c for c in candidates if self._available(c, plan, context, inv)]
@@ -201,7 +206,7 @@ class PersonalizedFollowUpEngine:
             if plan.needs_cross_source and item.requires_personal_context:
                 scope = "personal"
             scoped.append(self._bind_handling(item.model_copy(update={"knowledge_scope": scope})))
-        return [item for item in scoped if item.handling_path]
+        return [item for item in scoped if item.handling_path and is_member_question(item.text)]
 
     def _candidates(self, plan: QueryPlan, context: HealthContext, inv: FollowUpInventory) -> list[FollowUpSuggestion]:
         topic = context.resolved_topic_name or plan.topic_name or "this result"
@@ -299,7 +304,7 @@ class PersonalizedFollowUpEngine:
             if plan.intent == IntentType.blood_marker_explanation and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
                 out.append(
                     FollowUpSuggestion(
-                        text="Do you have any new symptoms or medication or supplement changes?",
+                        text="Could new symptoms or a medicine change affect this result?",
                         category="clinical_context",
                         intent="blood_marker_explanation",
                         requires_personal_context=True,
@@ -365,7 +370,7 @@ class PersonalizedFollowUpEngine:
             if inv.topic_result_count >= 2 and plan.intent != IntentType.trend:
                 out.append(
                     FollowUpSuggestion(
-                        text=f"Would you like to see how your {topic} has changed over time?",
+                        text=f"How has my {topic} changed over time?",
                         category="historical_trend",
                         intent="trend",
                         requires_personal_context=True,
@@ -376,7 +381,7 @@ class PersonalizedFollowUpEngine:
                     name = inv.latest_marker_names.get(related, related.replace("_", " "))
                     out.append(
                         FollowUpSuggestion(
-                            text=f"Would you like me to explain how your {topic} relates to your {name} result?",
+                            text=f"How does my {topic} relate to my {name} result?",
                             category="related_marker",
                             intent="latest_result",
                             requires_personal_context=True,
@@ -387,7 +392,7 @@ class PersonalizedFollowUpEngine:
                     label = BIO_NAMES.get(bio_code, "Bio-AI assessment")
                     out.append(
                         FollowUpSuggestion(
-                            text=f"Would you like me to explain how your {topic} relates to your {label}?",
+                            text=f"How does my {topic} relate to my {label}?",
                             category="bio_ai_relationship",
                             intent="bio_ai_explanation",
                             requires_personal_context=True,
@@ -396,7 +401,7 @@ class PersonalizedFollowUpEngine:
             if inv.has_nutrition:
                 out.append(
                     FollowUpSuggestion(
-                        text=f"Would you like to look at your recorded nutrition preferences alongside your {topic}?",
+                        text=f"How do my recorded nutrition preferences fit with my {topic}?",
                         category="nutrition",
                         intent="broad_health_summary",
                         requires_personal_context=True,
@@ -416,7 +421,7 @@ class PersonalizedFollowUpEngine:
             if inv.has_lifestyle and key in {"hba1c", "ldl", "triglycerides", "hdl"}:
                 out.append(
                     FollowUpSuggestion(
-                        text="Would you like to explore lifestyle factors that may be relevant to this result?",
+                        text="Which lifestyle factors matter for this result?",
                         category="lifestyle",
                         intent="bio_ai_explanation",
                         requires_personal_context=True,
@@ -427,7 +432,7 @@ class PersonalizedFollowUpEngine:
             if plan.intent != IntentType.bio_ai_explanation:
                 out.append(
                     FollowUpSuggestion(
-                        text="Would you like me to explain what this Bio-AI assessment means?",
+                        text="What does this Bio-AI assessment mean?",
                         category="explanation",
                         intent="bio_ai_explanation",
                         requires_personal_context=True,
@@ -436,7 +441,7 @@ class PersonalizedFollowUpEngine:
             if plan.intent != IntentType.bio_ai_comparison and len(inv.bio_codes) > 0:
                 out.append(
                     FollowUpSuggestion(
-                        text="Would you like to compare this with your other Bio-AI report?",
+                        text="How does this compare with my other Bio-AI report?",
                         category="comparison",
                         intent="bio_ai_comparison",
                         requires_personal_context=True,

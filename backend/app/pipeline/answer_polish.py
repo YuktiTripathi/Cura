@@ -126,23 +126,34 @@ def _qualifier_once(text: str, *, both_sources: bool = True) -> str:
     return re.sub(r"[ \t]{2,}", " ", out).replace(" \n", "\n").strip()
 
 
+_REFERRAL = re.compile(r"\b(doctor|clinician|physician|medical review)\b", re.I)
+_DISCUSS_SOON = re.compile(r"Please discuss this result with your doctor soon\.\s*", re.I)
+
+
 def _ensure_urgent_notes(text: str, context: HealthContext) -> str:
     """A result in a guideline range that needs a doctor soon (HbA1c 9.1%, triglycerides over
-    500 mg/dL) is always stated with its value and cut-off, whatever the model wrote."""
+    500 mg/dL) is stated once, with its value and cut-off. Do not add a second referral."""
     from app.pipeline.clinical_thresholds import clinical_notes
 
     markers = [m for m in context.markers or [] if getattr(m, "value", None) is not None]
     if not markers:
         return text
     additions = []
+    already_referred = bool(_REFERRAL.search(text))
     for note in clinical_notes(markers):
         if not note.urgent:
             continue
         value = f"{note.marker.value:g}"
+        name = note.marker.name or note.marker.key or ""
         cutoffs = re.findall(r"\((\d+(?:\.\d+)?)", note.text)
-        said = re.search(rf"(?<![\d.]){re.escape(value)}(?![\d])", text) and any(c in text for c in cutoffs)
-        if not said:
-            additions.append(note.text)
+        has_value = bool(re.search(rf"(?<![\d.]){re.escape(value)}(?![\d])", text))
+        has_name = bool(name and re.search(re.escape(name), text, re.I))
+        said = has_value and any(c in text for c in cutoffs)
+        if said or (already_referred and (has_value or has_name)):
+            continue
+        fact = _DISCUSS_SOON.sub("", note.text).strip() if already_referred else note.text
+        if fact:
+            additions.append(fact)
     if not additions:
         return text
     return text.rstrip() + "\n\n**Important:** " + " ".join(additions)

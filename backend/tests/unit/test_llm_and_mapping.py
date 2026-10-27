@@ -31,7 +31,8 @@ def test_message_text_skips_reasoning_parts():
 def test_gemini_38_flash_uses_reasoning_output_cap():
     client = OpenAICompatibleLLMClient(model="google/gemini-3.8-flash", api_key="synthetic")
     payload = client._build_payload([{"role": "user", "content": "synthetic"}], "json_schema")
-    assert payload["max_tokens"] == max(settings.llm_max_output_tokens, settings.llm_reasoning_output_cap)
+    assert payload["max_tokens"] == settings.llm_max_output_tokens + settings.llm_reasoning_output_cap
+    assert payload["reasoning"] == {"effort": settings.llm_reasoning_effort or "low"}
     plain = OpenAICompatibleLLMClient(model="openai/gpt-4o-mini", api_key="synthetic")
     assert plain._build_payload([{"role": "user", "content": "synthetic"}], "plain")["max_tokens"] == settings.llm_max_output_tokens
 
@@ -192,6 +193,7 @@ def test_gpt5_payload_sets_low_reasoning_effort(monkeypatch):
     )
     assert client._real_complete([{"role": "user", "content": "hello"}]) == "ok"
     assert captured["payload"]["reasoning"] == {"effort": "low"}
+    assert captured["payload"]["max_tokens"] == settings.llm_max_output_tokens + settings.llm_reasoning_output_cap
     assert captured["payload"]["max_tokens"] >= 1200
     assert captured["timeout"] == 12
 

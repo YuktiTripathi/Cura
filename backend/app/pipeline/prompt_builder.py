@@ -596,7 +596,9 @@ def _bio_explain_note(context: HealthContext, user_message: str) -> str:
         "(\"Dyslipidemia 84, very high\"), in short bullets, highest first. Name only assessments in the evidence "
         "(the report can hold Metabolic Syndrome, Dyslipidemia, Cardiac Health, NAFLD, Oxidative Stress, Hypertension, "
         "Obesity, Thyroid Health, Type 2 Diabetes and, for women, PCOS); never mention absent ones. "
-        "Link related_blood_results as pointing the same way, not as proof. Never say a listed score is unavailable.\n"
+        "Link related_blood_results as pointing the same way, not as proof. Never say a listed score is unavailable. "
+        "For PCOS, use cycle, hormone, and symptom evidence. Do not explain it through cholesterol unless the question is about blood fats. "
+        "Do not say a fact is missing unless the question asked for it.\n"
     )
 
 

@@ -30,7 +30,8 @@ def test_blood_report_leads_with_urgent_area_and_explains_patterns():
     assert text.index("**Blood sugar**") < text.index("**Cholesterol and blood fats**")
     assert "range used to diagnose diabetes" in text
     assert "iron stores are running low" in text
-    assert "doctor soon" in text.split("**What to do next:**")[1]
+    assert text.lower().count("discuss this result with your doctor") == 1
+    assert "What to do next" not in text
 
 
 def test_blood_report_dedupes_and_cleans_lab_spellings():

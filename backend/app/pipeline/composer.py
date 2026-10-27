@@ -265,7 +265,7 @@ class ResponseComposer:
             # The model's answer IS the chat answer. Cards, missing-data notes and stock next
             # steps stay in the structured presentation; they are not spliced into the prose.
             text = cleaned.strip()
-        if response_plan.kind == "report_overview":
+        if response_plan.kind == "report_overview" and not (model_wrote and cleaned.strip()):
             from app.pipeline.report_explainer import explain_blood_report
 
             counts = context.in_range_summary

@@ -1450,6 +1450,9 @@ class ChatService:
                 ):
                     continue
                 llm_follow.append(text)
+        from app.pipeline.followup_generator import is_member_question
+
+        llm_follow = [q for q in llm_follow if is_member_question(q)]
         eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)][:3]
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)

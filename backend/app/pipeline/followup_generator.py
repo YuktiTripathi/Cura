@@ -344,6 +344,14 @@ def _named_tests_present(text: str, brief: FollowUpBrief) -> bool:
     return all(f"{float(n):g}" in known for n in numbers)
 
 
+def is_member_question(text: str) -> bool:
+    """A clickable chip must be something the member would ask Cura, not a question Cura asks them."""
+    q = (text or "").strip()
+    if not q:
+        return False
+    return not (_CURA_VOICE.search(q) or _GENERIC.search(q))
+
+
 def valid_question(text: str, brief: FollowUpBrief, *, current: str | None = None, chosen: list[str] = ()) -> bool:
     q = (text or "").strip()
     if not q.endswith("?") or len(q) > 90 or len(q.split()) > 12 or len(q.split()) < 3:

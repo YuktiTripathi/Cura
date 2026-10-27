@@ -198,7 +198,7 @@ def explain_blood_report(markers: list[BloodMarker], *, in_range: int | None = N
 
     parts = [opening]
     for theme in order:
-        items = groups[theme.code]
+        items = groups[theme.code][:4]
         section = [f"**{theme.title}**"]
         if theme.about:
             section.append(theme.about)
@@ -212,19 +212,7 @@ def explain_blood_report(markers: list[BloodMarker], *, in_range: int | None = N
                 section.append(note.text)
         parts.append(section[0] + "\n" + _bullets(section[1:]))
 
-    if urgent:
-        close = (
-            "**What to do next:** book a visit with your doctor soon and take this report with you, "
-            f"starting with your {_SHORT.get(order[0].code, order[0].title.lower())} results. "
-            "This is a reading of your results, not a diagnosis."
-        )
-    else:
-        close = (
-            "**What to do next:** go through these results with your doctor at your next visit, "
-            f"starting with your {_SHORT.get(order[0].code, order[0].title.lower())} results. "
-            "This is a reading of your results, not a diagnosis."
-        )
-    parts.append(close)
+    # The urgent clinical note already says to see a doctor. Do not add a second visit paragraph.
     return "\n\n".join(parts)
 
 
@@ -234,7 +222,7 @@ def explain_blood_report(markers: list[BloodMarker], *, in_range: int | None = N
 # "metabolic syndrome" is not read as the blood-sugar entry.
 _RISK_INFO = (
     (("metabolicsyndrome",), "your risk of metabolic syndrome, a cluster of raised blood sugar, blood fats, blood pressure and waist size that together raise heart and diabetes risk", "sugar"),
-    (("pcos", "polycystic"), "your risk related to PCOS (polycystic ovary syndrome), a hormonal condition linked to periods, weight and blood sugar", "sugar"),
+    (("pcos", "polycystic"), "your risk related to PCOS (polycystic ovary syndrome), a hormonal condition linked to periods, weight and blood sugar", None),
     (("dyslipid", "cholesterol", "lipid"), "how likely you are to have unhealthy levels of blood fats such as cholesterol and triglycerides", "lipids"),
     (("diabet", "glyc", "sugar", "insulin"), "your risk of developing type 2 diabetes", "sugar"),
     (("hypertension", "bloodpressure"), "your risk of high blood pressure", None),
