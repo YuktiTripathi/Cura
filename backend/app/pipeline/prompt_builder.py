@@ -14,7 +14,7 @@ CURA explains health information in very simple, everyday words.
 - If a medical term is necessary, explain it right away in plain words. Keep the test name (HbA1c, LDL, MCV, creatinine) when it identifies the evidence.
 - Use a small everyday comparison when it truly helps (for example, "sugar in your blood is like sugar in a glass of juice"). Never let a comparison change the medical meaning.
 - Say what was found, why it matters, and, only when the person asks what to do, what they can reasonably do next.
-- Do not open with a long list of unexplained test names. Prefer everyday words: higher-than-expected blood sugar, unhealthy levels of fats in the blood, results that may suggest your body is low on iron, the size and makeup of red blood cells, chance of heart or blood-vessel problems, how your results have changed over time.
+- Do not open with a long list of unexplained test names. Prefer everyday words: higher-than-expected blood sugar, unhealthy levels of fats in the blood, results that may suggest your body is low on iron, the size and makeup of red blood cells, possible strain on the heart or blood vessels, how your results have changed over time.
 - Keep every supplied value, unit, and uncertainty. Never invent a fact, diagnosis, medication, dose, or measurement, and never replace the report's own range.
 - Do not turn a possible pattern into a confirmed diagnosis, call a mild abnormality harmless, or hide an important abnormal result.
 - Avoid frightening language, a disclaimer on every bullet, and robotic phrasing. The answer should be understandable on the first reading.
@@ -49,7 +49,7 @@ CURA explains health information in very simple, everyday words.
 - If a medical term is necessary, explain it right away in plain words. Keep the test name (HbA1c, LDL, MCV, creatinine) when it identifies the evidence.
 - Use a small everyday comparison when it truly helps. Never let it change the medical meaning.
 - Say what it is, why it matters, and, only when the person asks what to do, what they can reasonably do next.
-- Do not open with a long list of unexplained test names. Prefer everyday words: higher-than-expected blood sugar, unhealthy levels of fats in the blood, results that may suggest your body is low on iron, the size and makeup of red blood cells, chance of heart or blood-vessel problems.
+- Do not open with a long list of unexplained test names. Prefer everyday words: higher-than-expected blood sugar, unhealthy levels of fats in the blood, results that may suggest your body is low on iron, the size and makeup of red blood cells, possible strain on the heart or blood vessels.
 - Keep every supplied value, unit, and uncertainty. Never invent a fact, diagnosis, medication, dose, or measurement, and never replace the report's own range.
 - Do not turn a possible pattern into a confirmed diagnosis, call a mild abnormality harmless, or hide an important abnormal result.
 - Avoid frightening language, a disclaimer on every bullet, and robotic phrasing. The answer should be understandable on the first reading.
@@ -82,7 +82,7 @@ PRIORITY ORDER (higher wins when rules pull apart)
 2. Correct use of the verified evidence: exact values, units, the report's own ranges; measured vs estimated vs self-reported.
 3. Answering the question actually asked, at its scope.
 4. Very simple, warm explanation in bullets, spoken directly to the person.
-5. Format and length. These are guides, not limits: never drop a point from 1 to 3 to fit them.
+5. Format and length. These are guides: never drop a safety or accuracy point to stay short, and do not add a retrieved finding the question does not need.
 
 VOICE (always)
 - Speak directly to the person when discussing their health. Use "you" and "your": "your HbA1c", "your blood sugar", "your report". Keep general facts neutral when appropriate.
@@ -111,11 +111,14 @@ Do not diagnose, prescribe, recommend dose changes, or imply cause from associat
 
 """ + PLAIN_LANGUAGE + """
 EXPLAINING BLOOD RESULTS AND BIO-AI (always)
-Explain, do not just retrieve.
-- Teach before showing data: first explain in one simple bullet what the asked biomarker, condition, or Bio-AI score is, what it measures or estimates, and why it matters (HbA1c shows your average blood sugar over the last 2 to 3 months). Do not open with a list of values. Skip a definition already explained in this conversation.
-- Next explain "Your report...": give the relevant verified value and unit (or score), whether the report marks it low, normal or high, and what it means for you. Keep measured lab findings separate from Bio-AI estimates. Combine related findings only when the link is supported.
-- Never let simplicity change a fact, a risk, or an uncertainty.
-- NUMBERS: for each out-of-range result or raised score you explain, say its value and unit (or score and level) once, so the text works without cards. Do not recite in-range values or ranges unless asked.
+Explain, do not just retrieve. Write so someone with no biology background understands it on a first reading.
+- On a first mention, say what it is in everyday words and why it matters, then the person's verified result when they asked about their own. A follow-up answers the new question and does not teach the concept again.
+- A definition, the person's result, what it means, a related finding, a qualifier, and a next step may share a bullet. Do not give each one its own section, and do not define a concept the person did not ask about.
+- One biomarker is usually 2 or 3 short bullets. One Bio-AI score is usually 2 or 3: what it estimates, the score, and the category. A score is a risk estimate, not a diagnosis and not a calibrated chance of disease. Mention another blood marker only when it changes the meaning.
+- If you use a technical word, explain it in the same sentence. Prefer "a little higher than your report expects" when the value is only just outside the report's range, and "clearly higher" when it is well outside. How far a number sits past the limit is not how serious it is. A possible reason is not a diagnosis, and a small rise is not automatically harmless.
+- A whole report is 3 to 5 grouped bullets. Practical advice leads with the actions. A comparison leads with what changed. A simple definition is 1 or 2 short bullets.
+- Keep lab measurements separate from Bio-AI estimates. Never let simplicity change a fact, a risk, or an uncertainty.
+- NUMBERS: for each out-of-range result or raised score you explain, say its value and unit (or score and level) once, so the text works without cards. Do not recite ranges unless asked.
 - Use at most one short safety qualifier: Bio-AI scores are "risk estimates, not diagnoses"; lab results are "a reading of your results, not a diagnosis". Never call a lab result a risk estimate.
 
 FORMAT (always, every answer)
@@ -126,10 +129,10 @@ FORMAT (always, every answer)
 - An emergency: the first bullet is the safety action, in plain words.
 
 RESPONSE PLANNING (silent, not a fixed template)
-Think broadly, but answer narrowly, at the scope of the question; more data should improve selection, not length. Use the shortest response that fully answers the question. For a new blood or Bio-AI topic, the first bullet explains the concept and the next gives the person's result; for a short follow-up about an already-explained topic, answer directly. Emergency safety actions always take precedence. Never open with a label such as "Direct answer:" or "Based on your available data".
-- One marker: concept, your value, what it means (about 120 words at most). Several markers: how they connect; supported links kept apart from possibilities.
-- Whole blood report: overall picture, then the most important findings grouped by what they affect, plus one reassuring finding. Do not explain every result unless asked.
-- One Bio-AI score: that assessment only, linked to related blood results where listed. Whole Bio-AI report: the raised assessments that matter most, grouped where related, the reassuring ones in one bullet.
+Think broadly, but answer narrowly, at the scope of the question. More data should improve which facts you use, not how long you write. Use the shortest response that fully answers the question. For a short follow-up about an already-explained topic, answer directly. Emergency safety actions always take precedence. Never open with a label such as "Direct answer:" or "Based on your available data". Do not open with a stock summary sentence.
+- One marker: usually 2 or 3 short bullets. Several markers: how they connect; supported links kept apart from possibilities.
+- Whole blood report: 3 to 5 grouped bullets for what matters, plus one reassuring finding when it is true. Do not explain every result unless asked.
+- One Bio-AI score: that assessment only. A related blood result is optional. Whole Bio-AI report: the raised assessments that matter most, grouped where related, the reassuring ones in one bullet.
 - Blood and Bio-AI together: keep measurements and estimates apart; say they point the same way, never that one proves the other.
 - "Why?", "is that bad?": one to three bullets building on the last turn. "short version", "explain in detail", "more simply": re-answer the previous question in that style, still in bullets.
 - "Show my results": one bullet per result. "What changed?": one bullet per result, "last time" vs "this time" with numbers.
@@ -215,9 +218,13 @@ class PromptBuilder:
                 "Answer the task's response type only. "
                 "For a source under missing, say the member's report does not include it (never 'retrieved'); do not ask for an upload "
                 "when the status is NOT_PRESENT or NOT_RETRIEVED. Never print the words task contract or evidence package.\n"
-                "Use a supported comparison's values and dates. For an unsupported one, state no numeric change, copy no unit, "
-                "and do not say it improved or worsened.\n"
-                f"TASK:\n{compact_json(task)}\n"
+                + (
+                    "Use a supported comparison's values and dates. For an unsupported one, state no numeric change, copy no unit, "
+                    "and do not say it improved or worsened.\n"
+                    if (context.task_contract or {}).get("goal") == "compare"
+                    else "Do not compare an earlier report unless the question asks what changed.\n"
+                )
+                + f"TASK:\n{compact_json(task)}\n"
                 f"VERIFIED PATIENT EVIDENCE:\n{compact_json(context.evidence_package)}\n"
                 f"{evidence_block}"
                 f"{_follow_up_brief_block(context)}"
@@ -229,7 +236,7 @@ class PromptBuilder:
                 f"{depth}\n"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"{_asked_task(user_message)}User question: {user_message}\n"
+                f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
         elif personal and uses_answer_evidence(context):
             # Answer director: the model sees the few facts that answer this question, the
@@ -263,7 +270,7 @@ class PromptBuilder:
                 f"{_bio_explain_note(context, user_message)}"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"{_asked_task(user_message)}User question: {user_message}\n"
+                f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
         elif personal:
             compact = _use_compact_context(context)
@@ -296,11 +303,13 @@ class PromptBuilder:
                 f"{_bio_explain_note(context, user_message)}"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
-                f"{_asked_task(user_message)}User question: {user_message}\n"
+                f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
         else:
             topic = context.resolved_topic_name or "the asked topic"
-            personal_context = _general_personal_context(context)
+            contract = context.task_contract or {}
+            teach_only = contract.get("goal") == "explain" and contract.get("personal_context") != "required"
+            personal_context = {} if teach_only else _general_personal_context(context)
             user = (
                 "Mode: GENERAL_HEALTH\n"
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
@@ -337,7 +346,7 @@ class PromptBuilder:
                     else "No relevant personal context is supplied. Explain the concept without mentioning this absence.\n"
                 )
                 + f"{_presentation_line(context, user_message)}"
-                + f"{_asked_task(user_message)}User question: {user_message}\n"
+                + f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else _system_for_mode(SAFETY_INSTRUCTIONS)
         from app.core.config import settings
@@ -763,20 +772,30 @@ def _topic_key(value: str | None) -> str:
 
 def _adaptive_response_brief(context: HealthContext) -> str:
     """Only what differs from the defaults in the system prompt."""
-    goal = context.conversation_goal or ""
+    conversation_goal = context.conversation_goal or ""
     depth = context.response_depth or ""
     explained = ", ".join(context.explained_entities or [])
     style = ""
     if context.personalization and context.personalization.communication_preference:
         style = context.personalization.communication_preference.value
     lines = []
+    spec = context.task_contract or {}
+    goal = spec.get("goal") or ""
+    if goal == "explain" and spec.get("personal_context") != "required":
+        lines.append("Use 1 or 2 bullets. Do not use this person's results.")
+    elif goal in {"lookup", "interpret"} and not spec.get("broad_summary"):
+        lines.append("Use 2 to 4 bullets about the current result only. No section headings and no extra tests.")
+    elif goal == "advise":
+        lines.append("Use 3 or 4 bullets, with the practical steps first.")
+    elif goal in {"synthesize", "compare"} or spec.get("broad_summary"):
+        lines.append("Use 3 to 5 grouped bullets. Include a change only when the question asks for it.")
     if depth == "SHORT" or style in {"QUICK", "ACTION_FOCUSED"}:
         lines.append("Keep it compact: the requested result and two or three bullets.")
-    if goal == "REASSURANCE":
+    if conversation_goal == "REASSURANCE":
         lines.append(
             "Balance what is reassuring, what deserves attention, and what is uncertain; never call them healthy or unhealthy."
         )
-    if goal == "HEALTH_REVIEW":
+    if conversation_goal == "HEALTH_REVIEW":
         lines.append("Group findings into a few themes. Do not list every biomarker.")
     if explained:
         lines.append(f"Already explained: {explained}. Do not define these again.")
@@ -788,37 +807,60 @@ def _experience_instruction(context: HealthContext) -> str:
     return _adaptive_response_brief(context)
 
 
-def _asked_task(message: str) -> str:
+def _continuation_note(message: str, context: HealthContext | None) -> str:
+    spec = (getattr(context, "task_contract", None) or {}) if context else {}
+    if not spec.get("continuation"):
+        return ""
+    text = message or ""
+    if re.search(r"\b(changed|change|since|previous|trend|compare|last report)\b", text, re.I):
+        return "Lead with what changed. Do not define the topic again.\n"
+    if re.search(r"\b(exact value|what is my|how much)\b", text, re.I):
+        return "Give the value they asked for. Do not add a new definition.\n"
+    if spec.get("concept_already_explained") or spec.get("measurement_already_stated"):
+        return (
+            "Answer only the new question. Do not repeat the definition"
+            + (" or the number already given" if spec.get("measurement_already_stated") else "")
+            + ".\n"
+        )
+    return ""
+
+
+def _asked_task(message: str, context: HealthContext | None = None) -> str:
     """One line so the model answers the asked task. Not part of the system prompt."""
     from app.pipeline.report_explainer import question_kind
 
     text = message or ""
+    note = _continuation_note(text, context)
     kind = question_kind(text)
     if kind == "foods":
         return (
-            "Answer the food question first with the specific foods to cut or eat. "
-            "Do not open with a cholesterol lecture, a lab-value list, missing Bio-AI data, or a doctor visit.\n"
-        )
+            "Answer with the foods for this topic, in everyday words. "
+            "Do not switch to a different condition or open with a lab-value list.\n"
+        ) + note
     if kind == "actions":
         return (
-            "Answer with the practical steps first, in 2 to 4 bullets. "
-            "Do not open with a report summary, missing data, or a doctor visit.\n"
-        )
+            "Lead with the practical steps, in 2 to 4 bullets. "
+            "Use a verified result only to show why a step fits. Do not open with a definition or a doctor visit.\n"
+        ) + note
     if re.search(r"\bwhat is\b", text, re.I) and not re.search(r"\bmy\b", text, re.I):
-        return "This is a definition. Use 1 to 3 short bullets and do not turn it into a personal report.\n"
+        return (
+            "Explain this in everyday words for someone with no medical background: what it is and why it matters. "
+            "Use 1 or 2 short bullets and no personal results.\n"
+        ) + note
     if re.search(r"\bbio-?\s*ai\b", text, re.I):
         return (
-            "Explain the main findings first. Say once, in the last bullet, that these are risk estimates, not diagnoses. "
-            "Do not repeat that line or mention a score that is not in the evidence.\n"
-        )
-    if re.search(r"\bwhat does my\b", text, re.I):
+            "Say what this assessment estimates in everyday words, then the score and category. "
+            "It is a risk estimate, not a diagnosis or a chance of disease.\n"
+        ) + note
+    if re.search(r"\bwhat does my\b|\bwhat do my\b", text, re.I) and not note:
         return (
-            "Explain this one result: what it measures, what the result means, and at most one related finding. "
-            "Do not list every related test or add a doctor visit unless the result needs urgent review.\n"
+            "Start with what this is in everyday words and why it matters, then what this person's result means. "
+            "If it is outside the report's range, say whether it is only a little outside or clearly outside, and explain any technical word in the same sentence. "
+            "Use 2 or 3 short bullets. Do not add another test.\n"
         )
     if re.search(r"\b(?:blood report|bio-ai report)\b", text, re.I):
-        return "Use 3 to 5 grouped bullets for the important findings. Do not dump every marker or start with a stock summary phrase.\n"
-    return ""
+        return "Use 3 to 5 grouped bullets for the important findings. Do not dump every marker or start with a stock summary phrase.\n" + note
+    return note
 
 
 def _depth_instruction(context: HealthContext) -> str:
@@ -835,6 +877,24 @@ def _requested_codes(context: HealthContext) -> set[str]:
 
 
 def _relevant_markers(context: HealthContext):
+    spec = context.task_contract or {}
+    named = {_topic_key(key) for key in (spec.get("card_keys") or [])}
+    goal = spec.get("goal") or ""
+    if named and not spec.get("broad_summary") and goal in {"lookup", "interpret", "explain"}:
+        matched = [
+            marker
+            for marker in context.markers
+            if _topic_key(marker.key) in named or _topic_key(marker.name) in named
+        ]
+        if matched:
+            return matched
+    intent = getattr(context.intent, "value", "") or ""
+    if (
+        intent in {"bio_ai_score", "bio_ai_explanation"}
+        and not spec.get("broad_summary")
+        and goal in {"lookup", "interpret"}
+    ):
+        return []
     wanted = _requested_codes(context)
     if not wanted:
         return list(context.markers)
@@ -887,8 +947,18 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
     markers = markers[:marker_cap]
     risks = risks[:risk_cap]
     marker_keys = {_topic_key(m.key) for m in markers} | {_topic_key(m.name) for m in markers}
+    intent = getattr(context.intent, "value", "") or ""
+    goal = (context.task_contract or {}).get("goal") or ""
+    bio_only = (
+        not markers
+        and intent in {"bio_ai_score", "bio_ai_explanation"}
+        and goal in {"lookup", "interpret"}
+        and not (context.task_contract or {}).get("broad_summary")
+    )
     facts = []
     for row in context.facts:
+        if bio_only:
+            continue
         key = _topic_key(row.fact)
         if not marker_keys or key in marker_keys:
             facts.append(row)
@@ -927,7 +997,8 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
             continue
         fact_rows.append(dumped)
     evidence_rows = []
-    for row in (context.evidence or [])[: (4 if compact else 12)]:
+    evidence_source = [] if bio_only else (context.evidence or [])
+    for row in evidence_source[: (4 if compact else 12)]:
         dumped = {
             k: v
             for k, v in row.model_dump(mode="json", exclude_none=True).items()
@@ -955,7 +1026,11 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
         "bio_ai_risks": risk_payload,
         "derived": [row.model_dump(mode="json", exclude_none=True) for row in (context.derived or [])[:6]],
         "user_stated": [row.model_dump(mode="json", exclude_none=True) for row in (context.user_stated or [])[:6]],
-        "comparisons": [row.model_dump(mode="json", exclude_none=True) for row in (context.comparisons or [])[:6]],
+        "comparisons": [
+            row.model_dump(mode="json", exclude_none=True)
+            for row in (context.comparisons or [])[:6]
+            if (context.task_contract or {}).get("goal") == "compare"
+        ],
         "approved_recommendations": [
             row.model_dump(mode="json", exclude_none=True) for row in (context.recommendations or [])[:5]
         ],

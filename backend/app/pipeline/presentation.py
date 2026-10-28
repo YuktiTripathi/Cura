@@ -325,6 +325,14 @@ _LIFESTYLE_ASK = re.compile(
 
 
 def _headline(plan: QueryPlan, context: HealthContext, mode: ResponseMode) -> str:
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    named = match_lab_keys(plan.raw_message or "")
+    if len(named) == 1:
+        label = _display_heading(named[0], display_name_for(named[0]) or named[0])
+        if re.search(r"\b(changed|change|since|trend|compare|previous|last report)\b", plan.raw_message or "", re.I):
+            return f"Your {label} trend"
+        return label
     for code in list(plan.domains or []) + [plan.topic]:
         if code and code in _HEADLINES:
             return _HEADLINES[code]
@@ -385,6 +393,8 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
     if len(stamps) <= len({marker.key for marker in markers if marker.key}):
         markers = dedupe_markers(markers)
     spec = plan.task_contract or {}
+    if spec.get("goal") == "explain" and spec.get("personal_context") != "required":
+        return []
     card_keys = set(spec.get("card_keys") or [])
     if not spec.get("broad_summary") and spec.get("goal") in {"advise", "explain", "interpret", "lookup"}:
         if card_keys:
@@ -892,6 +902,7 @@ def prefer_report_range(answer: str, context: HealthContext) -> str:
     if not _RANGE_CONTRADICTION.search(text):
         return text
     notes = []
+    sentences = re.split(r"(?<=[.!?])\s+", text)
     for marker in context.markers or []:
         flag = getattr(marker.flag, "value", str(marker.flag or ""))
         if flag not in {"high", "low", "critical"}:
@@ -899,7 +910,13 @@ def prefer_report_range(answer: str, context: HealthContext) -> str:
         if marker.reference_low is None and marker.reference_high is None:
             continue
         name = marker.name or marker.key
-        if not name or name.lower() not in text.lower():
+        if not name:
+            continue
+        contradicted = any(
+            name.lower() in sentence.lower() and _RANGE_CONTRADICTION.search(sentence)
+            for sentence in sentences
+        )
+        if not contradicted:
             continue
         note = (
             f"Your report marks {name} as {flag} "

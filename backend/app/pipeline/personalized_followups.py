@@ -36,7 +36,7 @@ BIO_NAMES = {
     "cardiac_health": "cardiac health assessment",
 }
 
-UNSAFE = ("medication", "prescribe", "diagnos", "start taking", "stop taking")
+UNSAFE = ("medication", "medicine", "statin", "dosage", "dose", "prescribe", "diagnos", "start taking", "stop taking")
 
 
 @dataclass

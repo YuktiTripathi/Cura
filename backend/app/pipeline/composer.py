@@ -57,18 +57,22 @@ _AMBIGUOUS_DEICTIC = re.compile(
 )
 
 def _has_unique_referent(plan: QueryPlan, context: HealthContext) -> bool:
-    candidates = [
-        *(plan.display_entities or []),
-        *(plan.requested_metrics or []),
-        *[m.key for m in (context.markers or []) if m.key],
-    ]
-    return len(set(item for item in candidates if item)) == 1
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    if len(match_lab_keys(plan.raw_message or "")) == 1:
+        return True
+    candidates = [m.key for m in (context.markers or []) if m.key]
+    return len(set(candidates)) == 1
 
 def _valid_follow_up(item: FollowUpSuggestion, plan: QueryPlan, context: HealthContext) -> bool:
     text = (item.text or "").strip()
     if not text:
         return False
     if _AMBIGUOUS_DEICTIC.search(text) and not _has_unique_referent(plan, context):
+        return False
+    from app.pipeline.followup_generator import _UNSAFE
+
+    if _UNSAFE.search(text):
         return False
     return True
 
@@ -321,6 +325,12 @@ class ResponseComposer:
 
         intent_value = getattr(context.intent, "value", None)
         text = polish_answer(text, context, intent=intent_value)
+        from app.pipeline.answer_polish import incomplete_segments
+
+        if not text.strip() or incomplete_segments(text):
+            from app.pipeline.renderer import DeterministicRenderer
+
+            text = DeterministicRenderer().render(plan.raw_message or "", context)
         # The app renders these fields rather than `text`, so they get the same fixes.
         for name in ("summary", "overall_summary", "interpretation"):
             value = getattr(presentation, name, None)

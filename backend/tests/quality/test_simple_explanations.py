@@ -43,7 +43,7 @@ def test_every_question_builds_a_valid_prompt_with_the_json_contract(message):
 
 def test_personal_prompt_asks_for_concept_first_simple_bullets():
     _ctx, system, _user = _build("What does my HbA1c mean?")
-    assert "Teach before showing data" in system
+    assert "no biology background" in system
     assert "without speaking to the person like a child" in system
     assert 'Every line of the answer starts with "- "' in system
     assert "Never pad" in system

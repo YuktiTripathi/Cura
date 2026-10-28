@@ -188,24 +188,24 @@ def length_note(message: str, modules: list[str]) -> str:
         return f"The user asked for fewer than {match.group(1)} words. Stay within that unless emergency advice needs more.\n"
     if "BIOMARKER_LOOKUP" in modules:
         return (
-            "Length guidance: about 30 to 60 words for one stored result. An explanation stays within 150 words. "
-            "Finish the last sentence. Do not pad, and do not cut a sentence to stay short. "
+            "Length guidance: 2 or 3 short bullets for one result. "
+            "Finish the last sentence. Do not pad, and do not add a retrieved result the question does not need. "
             "Do not add lifestyle advice unless asked.\n"
         )
     if "CROSS_REPORT_COMPARISON" in modules or "BIO_AI_EXPLANATION" in modules or "REPORT_INTERPRETATION" in modules:
         extra = " A score is not a diagnosis." if "BIO_AI_EXPLANATION" in modules else ""
         return (
-            "Length guidance: about 100 to 150 words. Shorter is fine when the findings are few. "
-            "Finish the last sentence. Do not pad, and do not cut a sentence or drop a verified finding to stay under 150. "
+            "Length guidance: 3 to 5 grouped bullets. Shorter is fine when the findings are few. "
+            "Finish the last sentence. Do not pad, and do not drop a verified finding the question needs. "
             f"An emergency may be longer.{extra}\n"
         )
     if "HEALTH_ACTION_PLANNING" in modules:
         return (
-            "Length guidance: about 100 to 150 words. Finish the last sentence. Do not pad. "
+            "Length guidance: 2 to 4 action bullets. Finish the last sentence. Do not pad. "
             "The user asked what to do.\n"
         )
     return (
-        "Length guidance: a simple question is about 30 to 60 words. Use up to 150 only when the question needs it. "
+        "Length guidance: a simple question is 1 or 2 short bullets. Use more only when the question needs it. "
         "Finish the last sentence. Do not pad, and do not cut a sentence to stay short. "
         "An emergency may be longer. Do not add lifestyle advice unless asked.\n"
     )

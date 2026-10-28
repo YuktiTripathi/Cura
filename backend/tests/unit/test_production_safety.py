@@ -197,12 +197,16 @@ def test_stale_result_is_dated():
             )
         ],
     )
-    plan = QueryPlan(intent=IntentType.latest_result, topic="vitamin_d")
+    plan = QueryPlan(intent=IntentType.latest_result, topic="vitamin_d", raw_message="What is my vitamin D?")
     repaired, flags = review_clinical_output(
         "Your Vitamin D is low.",
         plan=plan,
         context=ctx,
     )
+    assert "stale_presented_as_current" not in flags
+    assert "18 Aug 2026" not in repaired
+    timed = QueryPlan(intent=IntentType.latest_result, topic="vitamin_d", raw_message="Has my vitamin D changed since my last report?")
+    repaired, flags = review_clinical_output("Your Vitamin D is low.", plan=timed, context=ctx)
     assert "stale_presented_as_current" in flags
     assert "18 Aug 2026" in repaired
 

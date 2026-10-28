@@ -26,6 +26,39 @@ _INTERNAL_ID = re.compile(
 )
 _PII = re.compile(r"\b(eyJ[A-Za-z0-9_-]{8,}|sk-[A-Za-z0-9]{8,}|Bearer\s+\S+|\S+@\S+\.\S+)\b")
 _FERRITIN_SUB = re.compile(r"\bferritin\b.{0,40}\b(serum iron|estimated)\b", re.I)
+_SCORE_AS_PROBABILITY = re.compile(
+    r"\b{token}\s*(?:%|percent)\s*(?:chance|probability|likelihood)\b(?:\s+of\b[^.!?]{{0,48}})?",
+    re.I,
+)
+_BIO_HORIZON = re.compile(
+    r"\b(?:within|in|over) the next \d+\s+(?:days?|weeks?|months?|years?)\b",
+    re.I,
+)
+_BIO_CERTAINTY = re.compile(r"\byou will (?:develop|get|have)\b", re.I)
+# Score copy that states a chance, without a percent sign, is still not a calibrated probability.
+_BIO_CHANCE = re.compile(r"\bestimates your chance(?:\s+of(?:\s+having)?)?\b", re.I)
+_BIO_CHANCE_BAND = re.compile(r"\bhigher-than-typical chance of\b", re.I)
+
+
+def _score_probabilities(text: str, context: HealthContext) -> tuple[str, list[str]]:
+    """A Bio-AI score is not a percent chance of disease unless a validated model says so.
+    Lab percentages such as HbA1c 9.1% are left alone."""
+    flags: list[str] = []
+    out = text
+    for risk in context.bio_ai_risks or []:
+        score = getattr(risk, "score", None)
+        if score is None:
+            continue
+        token = f"{score:g}"
+        name = getattr(risk, "name", None) or "Bio-AI"
+        pattern = re.compile(_SCORE_AS_PROBABILITY.pattern.format(token=re.escape(token)), re.I)
+        if pattern.search(out):
+            flags.append("bio_ai_score_as_probability")
+            out = pattern.sub(
+                f"a {name} score of {token}, which is a risk estimate rather than a percentage probability",
+                out,
+            )
+    return out, flags
 
 
 _ABSENCE = re.compile(
@@ -200,7 +233,8 @@ def review_clinical_output(answer: str, *, plan: QueryPlan, context: HealthConte
         out = _BIOAI_DX.sub(_rewrite_unless_negated, out)
         if "not a diagnosis" not in out.lower() and "risk" in out.lower():
             out = out.rstrip() + " A Bio-AI score is a risk assessment, not a diagnosis."
-    if context.markers and _CURRENT_AS_NOW.search(out) and not _HAS_DATE.search(out):
+    asks_timing = re.search(r"\b(when|date|trend|changed|change|since|compare|previous|last report)\b", plan.raw_message or "", re.I)
+    if asks_timing and context.markers and _CURRENT_AS_NOW.search(out) and not _HAS_DATE.search(out):
         dated = [
             row.measured_at.date() if hasattr(row.measured_at, "date") else row.measured_at
             for row in context.markers
@@ -225,4 +259,17 @@ def review_clinical_output(answer: str, *, plan: QueryPlan, context: HealthConte
         if _FERRITIN_SUB.search(out):
             flags.append("missing_value_substituted")
             out = re.sub(_FERRITIN_SUB, "ferritin is not available in the retrieved results", out)
-    return out, flags
+    rewritten, score_flags = _score_probabilities(out, context)
+    flags.extend(score_flags)
+    if context.bio_ai_risks:
+        if _BIO_HORIZON.search(rewritten):
+            flags.append("bio_ai_time_horizon")
+            rewritten = _BIO_HORIZON.sub("over time", rewritten)
+        if _BIO_CERTAINTY.search(rewritten):
+            flags.append("bio_ai_outcome_certainty")
+            rewritten = _BIO_CERTAINTY.sub("this estimate does not mean you will", rewritten)
+        if _BIO_CHANCE.search(rewritten):
+            flags.append("bio_ai_chance_as_probability")
+            rewritten = _BIO_CHANCE.sub("is a risk estimate for", rewritten)
+            rewritten = _BIO_CHANCE_BAND.sub("a higher risk estimate for", rewritten)
+    return rewritten, flags

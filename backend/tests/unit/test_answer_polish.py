@@ -38,6 +38,47 @@ def test_unlisted_bio_ai_assessment_is_dropped():
     assert "Dyslipidemia fits your high LDL." in out
 
 
+def test_qualifier_does_not_cut_a_content_sentence():
+    text = (
+        "- This Dyslipidemia score estimates your chance of having unhealthy blood fats, "
+        "and it is a risk estimate not a diagnosis.\n"
+        "- Your score is 71, which is high."
+    )
+    out = polish_answer(text, _ctx(intent=IntentType.bio_ai_explanation, risks=[
+        BioAIRisk(code="dyslipidemia", name="Dyslipidemia", score=71, status="high")
+    ]))
+    assert "unhealthy blood fats" in out
+    assert not out.endswith("blood")
+    assert "71" in out
+
+
+def test_incomplete_bullets_anywhere_are_repaired():
+    from app.contracts.blood import BloodMarker
+    from app.contracts.common import MarkerFlag
+
+    marker = BloodMarker(id="1", key="hba1c", name="HbA1c", value=9.1, unit="%", flag=MarkerFlag.high)
+    ctx = HealthContext(intent=IntentType.report_explanation, answer_depth=AnswerDepth.simple,
+                        knowledge_scope=KnowledgeScope.personal, markers=[marker])
+    text = "\n".join([
+        "- Your average blood",
+        "- The middle point is still",
+        "- HbA1c reflects average sugar.\n  over recent months.",
+        "- The closing thought is",
+        "- Your HbA1c is 9.1%.",
+        "- LDL is 162 mg/dL.",
+    ])
+    out = polish_answer(text, ctx, intent="report_explanation")
+    assert "average blood" not in out
+    assert "middle point is still" not in out
+    assert "closing thought is" not in out
+    assert "over recent months." in out
+    assert "9.1%" in out
+    assert "162 mg/dL" in out
+    only = polish_answer("- Your HbA1c is 9.1% and the explanation of average blood", ctx, intent="report_explanation")
+    assert "9.1%" in only
+    assert "average blood" not in only
+
+
 def test_listed_assessment_is_kept():
     risks = [BioAIRisk(code="nafld", name="NAFLD", score=40, status="Moderate")]
     out = polish_answer("NAFLD is moderate.", _ctx(intent=IntentType.bio_ai_explanation, risks=risks))

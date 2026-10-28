@@ -16,8 +16,11 @@ from app.contracts.health_context import HealthContext
 
 _RISK_QUALIFIER = re.compile(r"(?:This|These|That|Those) (?:is|are) (?:a )?risk estimates?, not (?:a )?(?:medical )?diagnos[ie]s\.", re.I)
 # Short stand-alone qualifier sentences only, so a longer sentence with real content stays.
+# A qualifier that is its own sentence. Matching from any space would delete the
+# end of a content sentence and leave a fragment such as "unhealthy blood".
 _ANY_QUALIFIER = re.compile(
-    r"(?<![^\s])[^.!?\n]{0,70}\bnot (?:a )?(?:medical )?diagnos[ie]s\b[^.!?\n]{0,40}[.!?]", re.I
+    r"(?:^|(?<=[.!?।]\s))\s*[-*•]?\s*[^.!?\n]{0,90}\bnot (?:a )?(?:medical )?diagnos[ie]s\b[^.!?\n]{0,40}[.!?]",
+    re.I | re.M,
 )
 _RETRIEVED = (
     (re.compile(r"\b(\w[\w\s-]{0,40}?) (?:was|were) not retrieved\b", re.I), r"\1 isn't included in your report"),
@@ -130,7 +133,9 @@ def _qualifier_once(text: str, *, both_sources: bool = True) -> str:
 
 
 _LEAKED_LABEL = re.compile(
-    r"(?im)^\s*[-*]?\s*(?:short opening line\s*:?\s*)?(?:here is a short,? plain summary\b[^\n]*)\s*"
+    r"(?im)^\s*[-*]?\s*(?:short opening line\s*:?\s*)?"
+    r"(?:here (?:is|are) (?:a |the )?(?:short,? )?(?:plain )?(?:summary|key things|main points)\b[^\n]*|"
+    r"let me explain your results\.?)\s*"
 )
 _MISSING_BIO = re.compile(
     r"(?im)^\s*[-*]?\s*.*\bbio-?\s*ai\b[^\n]*\b(?:not (?:present|included|found)|does not include)\b[^\n]*\n?"
@@ -182,6 +187,115 @@ def _plain_speech(text: str) -> str:
     return out
 
 
+_BULLET_START = re.compile(r"^\s*(?:[-*•]|\d+[.)])\s+")
+_HEADING = re.compile(r"^\s*#{1,6}\s+\S|^\s*\*\*[^*]+\*\*\s*$")
+# A finished sentence, a measurement, or a unit. "Dr." and "mg/dL" count; "average blood" does not.
+_COMPLETE_END = re.compile(
+    r"(?:[.!?।…]|[)\"”’]|%|\d|"
+    r"(?:mg/dl|mg/l|ng/ml|pg/ml|g/dl|u/l|iu/l|mmol/l|mm ?hg|ml/min|kg/m2))\s*$",
+    re.I,
+)
+
+
+def _segments(text: str) -> list[str]:
+    """Join a sentence that wraps onto the next line, then treat each bullet as its own segment."""
+    segments: list[str] = []
+    buf = ""
+    for line in (text or "").splitlines():
+        if not line.strip():
+            if buf:
+                segments.append(buf)
+                buf = ""
+            continue
+        continuation = buf and not _BULLET_START.match(line) and not _COMPLETE_END.search(buf.rstrip())
+        if continuation:
+            buf = buf.rstrip() + " " + line.strip()
+        else:
+            if buf:
+                segments.append(buf)
+            buf = line
+    if buf:
+        segments.append(buf)
+    return segments
+
+
+def incomplete_segments(text: str) -> list[str]:
+    """Bullets or sentences that stop mid-clause, wherever they sit in the answer."""
+    found = []
+    for segment in _segments(text):
+        if _HEADING.match(segment):
+            continue
+        body = _BULLET_START.sub("", segment).strip()
+        if not body or len(body.split()) < 2 or _COMPLETE_END.search(body):
+            continue
+        found.append(segment)
+    return found
+
+
+def _stated_number(text: str, value) -> bool:
+    try:
+        token = f"{float(value):g}"
+    except (TypeError, ValueError):
+        return False
+    return bool(re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", text or ""))
+
+
+def _fact_line(marker) -> str:
+    unit = marker.unit or ""
+    value = f"{float(marker.value):g}"
+    shown = f"{value}{unit}" if unit.startswith("%") else f"{value} {unit}".strip()
+    name = marker.name or marker.key or "This result"
+    return f"{name} is {shown}."
+
+
+def repair_incomplete_output(text: str, context: HealthContext) -> str:
+    """Drop a fragment. If it was the only place a verified result appeared, keep that result."""
+    bad = incomplete_segments(text)
+    if not bad:
+        return text
+    kept: list[str] = []
+    for segment in _segments(text):
+        if segment not in bad:
+            kept.append(segment)
+            continue
+        already = "\n".join(kept)
+        for marker in context.markers or []:
+            if getattr(marker, "value", None) is None:
+                continue
+            if _stated_number(segment, marker.value) and not _stated_number(already, marker.value):
+                kept.append(_fact_line(marker))
+                break
+        else:
+            for risk in context.bio_ai_risks or []:
+                if risk.score is None:
+                    continue
+                if _stated_number(segment, risk.score) and not _stated_number(already, risk.score):
+                    name = risk.name or risk.code or "This score"
+                    status = f", {risk.status}" if risk.status else ""
+                    kept.append(f"{name} is {float(risk.score):g}{status}.")
+                    break
+    return "\n".join(kept).strip()
+
+
+_BARE_LABEL = re.compile(r"(?m)^\s*[-*]?\s*[A-Za-z][^:\n\d]{0,40}:\s*$")
+# A planning label glued to the front of a bullet ("What this test is: ..."), not a phrase list.
+_LABEL_PREFIX = re.compile(r"(?m)^(\s*[-*]\s+)[A-Z][A-Za-z ]{0,32}:\s+")
+
+
+def _drop_repeated_bullets(text: str) -> str:
+    """Drop a later bullet that only restates an earlier one."""
+    kept: list[str] = []
+    seen: list[str] = []
+    for line in _LABEL_PREFIX.sub(r"\1", _BARE_LABEL.sub("", text)).splitlines():
+        body = re.sub(r"\s+", " ", _BULLET_START.sub("", line).strip().lower())
+        if body and len(body) > 24 and any(body in prior or prior in body for prior in seen):
+            continue
+        kept.append(line)
+        if body:
+            seen.append(body)
+    return "\n".join(kept)
+
+
 def polish_answer(text: str, context: HealthContext, *, intent: str | None = None, add_notes: bool = True) -> str:
     if not text:
         return text
@@ -198,4 +312,5 @@ def polish_answer(text: str, context: HealthContext, *, intent: str | None = Non
     if add_notes:
         out = _ensure_urgent_notes(out, context)
     both = bool(context.markers) and bool(context.bio_ai_risks) and not (intent or "").startswith("bio_ai")
-    return _qualifier_once(out, both_sources=both)
+    out = _qualifier_once(out, both_sources=both)
+    return repair_incomplete_output(_drop_repeated_bullets(out), context)

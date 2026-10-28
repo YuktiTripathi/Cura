@@ -114,8 +114,14 @@ def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
     if personal == "none" and goal in {"lookup", "interpret", "synthesize"}:
         goal = "explain"
         broad = False
-    keys = [key for key in (plan.requested_metrics or []) if key]
-    card_keys = [] if broad else keys[:6]
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    named = match_lab_keys(text)
+    if not broad and named and goal != "synthesize":
+        card_keys = named[:4]
+    else:
+        keys = [key for key in (plan.requested_metrics or []) if key]
+        card_keys = [] if broad else keys[:6]
     if goal == "explain" and personal == "none":
         length = "85-100"
     elif intent == "blood_marker_explanation":

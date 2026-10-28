@@ -349,7 +349,7 @@ def discipline_follow_ups(
         if not question and allow_default_question:
             question = [
                 FollowUpSuggestion(
-                    text="Have there been any new symptoms, medications, or supplement changes?",
+                    text="Could new symptoms or a medicine change affect this result?",
                     category="clinical_context",
                     handling_path="CONTINUE_INTERPRETATION",
                     expected_reply_type="CLINICAL_CONTEXT",

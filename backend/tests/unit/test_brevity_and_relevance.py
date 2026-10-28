@@ -96,9 +96,9 @@ def test_length_notes_match_question_complexity():
     simple = length_note("What is cholesterol?", [])
     marker = length_note("Why is my HbA1c high?", ["BIOMARKER_LOOKUP"])
     report = length_note("Explain my blood report", ["REPORT_INTERPRETATION"])
-    assert "30 to 60" in simple
-    assert "30 to 60" in marker
-    assert "100 to 150" in report
+    assert "1 or 2 short bullets" in simple
+    assert "2 or 3 short bullets" in marker
+    assert "3 to 5 grouped bullets" in report
     assert "do not pad" in simple.lower() or "Do not pad" in simple
 
 
@@ -107,7 +107,8 @@ def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
         system = _system_for_mode(SAFETY_INSTRUCTIONS)
         assert "shortest response that fully answers" in system
-        assert "120 words" in system
+        assert "2 or 3 short bullets" in system
+        assert "not a calibrated chance" in system
         assert "em dash" in system and EM not in system
         assert "at most one short safety qualifier" in system.lower()
     assert "familiar words" in GENERAL_HEALTH_INSTRUCTIONS and "The whole answer is bullets" in GENERAL_HEALTH_INSTRUCTIONS

@@ -14,7 +14,7 @@ from app.contracts.query import QueryPlan
 from app.db.models import Conversation
 from app.pipeline.health_domains import HealthDomainResolver, domain_for_code
 from app.pipeline.intent import extract_topics, is_contextual_follow_up
-from app.pipeline.lab_parameters import is_lab_key
+from app.pipeline.lab_parameters import is_lab_key, match_lab_keys
 from app.pipeline.language import normalize_for_intent
 from app.pipeline.ontology import match_bio_keys
 
@@ -58,11 +58,29 @@ def apply_to_query_plan(plan: QueryPlan, state: ConversationState | None) -> Que
         TurnType.clarification,
         TurnType.correction,
     }
+    named_now = match_lab_keys(plan.raw_message or "")
+    same_topic = not named_now or any(
+        key in (state.biomarkers_already_discussed or []) or key in (state.explained_entities or [])
+        for key in named_now
+    )
+    contract = dict(plan.task_contract or {})
+    contract["continuation"] = continuing and same_topic
+    contract["concept_already_explained"] = bool(state.explained_entities) and continuing and same_topic
+    contract["measurement_already_stated"] = bool(state.biomarkers_already_discussed) and continuing and same_topic
+    plan.task_contract = contract
     if not continuing:
         return plan
-    if not plan.topic and state.active_entities:
-        plan.topic = state.active_entities[0]
-        plan.topic_name = plan.topic_name or state.active_entities[0].replace("_", " ")
+    if named_now:
+        # This turn names its own tests. Do not keep the previous topic's markers or heading.
+        return plan
+    if not named_now:
+        labs = [item for item in state.active_entities if is_lab_key(item)]
+        if labs:
+            plan.topic = labs[0]
+            plan.topic_name = labs[0].replace("_", " ")
+        elif not plan.topic and state.active_entities:
+            plan.topic = state.active_entities[0]
+            plan.topic_name = plan.topic_name or state.active_entities[0].replace("_", " ")
     if not plan.domains and state.active_domain:
         plan.domains = [state.active_domain]
     if state.active_entities:
@@ -317,10 +335,29 @@ class ConversationStateResolver:
             conversation_goal=prior.conversation_goal,
             topic_turn_count=prior.topic_turn_count,
             explained_entities=list(prior.explained_entities or [])[:12],
+            facts_already_explained=list(prior.facts_already_explained or [])[:12],
+            biomarkers_already_discussed=list(prior.biomarkers_already_discussed or [])[:12],
             topic_summary=prior.topic_summary,
             last_surfaced_catalog_id=prior.last_surfaced_catalog_id,
             last_surfaced_catalog_name=prior.last_surfaced_catalog_name,
         )
+
+
+def stated_measurement_keys(answer: str | None, markers: list | None) -> list[str]:
+    """Markers whose verified value appears in the answer the member just read."""
+    keys = []
+    for marker in markers or []:
+        value = getattr(marker, "value", None)
+        key = getattr(marker, "key", None)
+        if value is None or not key:
+            continue
+        try:
+            token = f"{float(value):g}"
+        except (TypeError, ValueError):
+            continue
+        if re.search(rf"(?<![\d.]){re.escape(token)}(?:\.0+)?(?!\d)", answer or ""):
+            keys.append(key)
+    return list(dict.fromkeys(keys))[:12]
 
 
 def persistable_state(
@@ -348,6 +385,7 @@ def persistable_state(
     explained_entities: list[str] | None = None,
     topic_summary: str | None = None,
     suggested: list[str] | None = None,
+    stated_measurements: list[str] | None = None,
 ) -> ConversationState:
     entities = list(dict.fromkeys([*(plan_entities or []), *resolved.active_entities]))
     domain = (plan_domains[0] if plan_domains else None) or resolved.active_domain
@@ -387,6 +425,14 @@ def persistable_state(
         conversation_goal=conversation_goal or resolved.conversation_goal,
         topic_turn_count=turns,
         explained_entities=explained,
+        facts_already_explained=list(dict.fromkeys([
+            *( [] if switched else (resolved.facts_already_explained or [])),
+            *(stated_measurements or []),
+        ]))[:12],
+        biomarkers_already_discussed=list(dict.fromkeys([
+            *( [] if switched else (resolved.biomarkers_already_discussed or [])),
+            *(stated_measurements or []),
+        ]))[:12],
         topic_summary=topic_summary or resolved.topic_summary,
     )
 
@@ -445,6 +491,12 @@ def _classify(
         return TurnType.follow_up_question if _CONSISTENT.search(text) or re.search(r"\b(mean|normal|chang)", text, re.I) else TurnType.reference_resolution
     if _CONFIRM.match(text) and has_prior:
         return TurnType.confirmation
+    if (
+        has_prior
+        and not current_entities
+        and re.search(r"\b(foods?|eat|diet|help|exact value|how much|what can i|what should i)\b", text, re.I)
+    ):
+        return TurnType.follow_up_question
     return TurnType.new_question
 
 

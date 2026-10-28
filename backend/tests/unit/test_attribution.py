@@ -111,3 +111,33 @@ def test_educational_number_is_not_a_personal_claim():
     ctx = _ctx(markers=[_hba1c()])
     text = "Many adults walk 30 minutes a day. A typical fasting glucose discussion uses 70-100 mg/dl as a general range."
     assert GroundingChecker().unsupported_number_sentences(text, ctx) == []
+
+
+def test_verified_value_survives_the_same_clause_as_an_unsupported_value():
+    from app.pipeline.grounding import drop_unverified_claims
+
+    line = "Your HbA1c is 9.1% with glucose 300 mg/dl."
+    visible = drop_unverified_claims(line, _ctx(markers=[_hba1c()]))
+    assert "9.1" in visible
+    assert "300" not in visible
+
+
+def test_verified_value_stays_when_the_same_sentence_has_an_unsupported_value():
+    from app.pipeline.grounding import drop_unverified_claims
+
+    line = "Your HbA1c is 9.1% and your glucose is 300 mg/dl."
+    visible = drop_unverified_claims(line, _ctx(markers=[_hba1c()]))
+    assert "9.1" in visible
+    assert "300" not in visible
+
+
+def test_a_true_result_is_kept_when_another_number_in_the_line_is_not():
+    from app.pipeline.grounding import drop_unverified_claims
+
+    marker = BloodMarker(
+        id="alp", key="alkaline_phosphatase", name="Alkaline phosphatase",
+        value=148, unit="U/L", reference_low=44, reference_high=147, flag=MarkerFlag.high,
+    )
+    ctx = _ctx(markers=[marker])
+    line = "Your alkaline phosphatase is 148 U/L, just above a general cutoff of 120."
+    assert "148" in drop_unverified_claims(line, ctx)

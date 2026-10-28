@@ -41,7 +41,9 @@ _STAGE_OF = (
 )
 
 _UNSAFE = re.compile(
-    r"\b(dose|dosage|mg\b|prescri\w*|start taking|stop taking|which (?:medicine|medication|drug)|antibiotic|insulin dose|statin dose)\b",
+    r"\b(?:dose|dosage|doses|prescri\w*|antibiotic|medications?|medicines?|statins?|"
+    r"(?:start|stop|change|adjust|increase|decrease|need|needs|needed|take|taking)"
+    r"(?:\s+\w+){0,4}\s+(?:medications?|medicines?|drugs?|statins?|doses?))\b",
     re.I,
 )
 _GENERIC = re.compile(

@@ -127,7 +127,123 @@ def test_bio_qualifier_is_kept_once_at_the_end():
     assert out.rstrip().lower().endswith("risk estimates, not diagnoses.")
 
 
-def test_follow_up_chips_are_questions_the_member_would_ask():
+def test_a_definition_does_not_carry_personal_cards():
+    from app.pipeline.presentation import _visible_markers
+    from app.pipeline.query_planner import build_query_plan
+
+    plan = build_query_plan("What is insulin resistance?")
+    context = HealthContext(
+        intent=plan.intent,
+        answer_depth=AnswerDepth.simple,
+        markers=[BloodMarker(id="1", key="hba1c", name="HbA1c", value=9.1, unit="%", flag=F.high)],
+    )
+    assert (plan.task_contract or {}).get("goal") == "explain"
+    assert _visible_markers(plan, context) == []
+    fats = build_query_plan("How can I lower my triglycerides?")
+    assert fats.task_contract["card_keys"] == ["triglycerides"]
+
+
+def test_incomplete_tail_is_dropped_when_earlier_lines_are_complete():
+    from app.pipeline.reasoning import trim_incomplete_tail
+
+    text = "- Your score is 71, which is high.\n- Dyslipidemia estimates how likely your"
+    assert trim_incomplete_tail(text).rstrip().endswith("high.")
+    assert "how likely your" not in trim_incomplete_tail(text)
+    assert trim_incomplete_tail("- Dyslipidemia estimates how likely your") == "- Dyslipidemia estimates how likely your"
+
+
+def test_a_single_result_question_does_not_carry_the_whole_panel():
+    from app.contracts.blood import BloodMarker
+    from app.contracts.common import MarkerFlag
+    from app.pipeline.prompt_builder import _relevant_markers
+    from app.pipeline.query_planner import build_query_plan
+
+    plan = build_query_plan("What does my Iron Serum result mean?")
+    iron = BloodMarker(id="1", key="iron", name="Iron", value=35, unit="µg/dL", flag=MarkerFlag.low)
+    ferritin = BloodMarker(id="2", key="ferritin", name="Ferritin", value=8, unit="ng/mL", flag=MarkerFlag.low)
+    ctx = HealthContext(
+        intent=plan.intent,
+        answer_depth=AnswerDepth.simple,
+        markers=[iron, ferritin],
+        task_contract=plan.task_contract,
+    )
+    keys = [_topic_key(marker.key) for marker in _relevant_markers(ctx)]
+    assert keys == ["iron"]
+
+
+def _topic_key(value: str) -> str:
+    import re
+    return re.sub(r"[^a-z0-9]+", "", value.lower())
+
+
+def test_bio_score_does_not_become_a_timed_certainty():
+    from app.contracts.query import QueryPlan
+    from app.pipeline.clinical_postcheck import review_clinical_output
+
+    ctx = HealthContext(
+        intent=IntentType.bio_ai_score,
+        answer_depth=AnswerDepth.simple,
+        bio_ai_risks=[BioAIRisk(code="dyslipidemia", name="Dyslipidemia", score=71, status="high")],
+    )
+    plan = QueryPlan(intent=IntentType.bio_ai_score, raw_message="What does my Dyslipidemia score mean?")
+    out, flags = review_clinical_output(
+        "Your Dyslipidemia score is 71, high. You will develop heart disease within the next 5 years.",
+        plan=plan,
+        context=ctx,
+    )
+    assert "bio_ai_time_horizon" in flags
+    assert "bio_ai_outcome_certainty" in flags
+    assert "71" in out
+    assert "high" in out.lower()
+    assert "next 5 years" not in out
+    assert "you will develop" not in out.lower()
+
+
+def test_bio_score_is_not_rewritten_into_a_disease_probability():
+    from app.contracts.query import QueryPlan
+    from app.pipeline.clinical_postcheck import review_clinical_output
+
+    ctx = HealthContext(
+        intent=IntentType.bio_ai_score,
+        answer_depth=AnswerDepth.simple,
+        bio_ai_risks=[BioAIRisk(code="dyslipidemia", name="Dyslipidemia", score=71, status="high")],
+    )
+    plan = QueryPlan(intent=IntentType.bio_ai_score, raw_message="What does my Dyslipidemia score mean?")
+    out, flags = review_clinical_output(
+        "Your Dyslipidemia score of 71 means a 71% chance of developing heart disease. Your HbA1c is 9.1%.",
+        plan=plan,
+        context=ctx,
+    )
+    assert "bio_ai_score_as_probability" in flags
+    assert "71% chance" not in out
+    assert "9.1%" in out
+    assert "risk estimate" in out.lower()
+    chance, chance_flags = review_clinical_output(
+        "This score estimates your chance of having unhealthy blood fats. Your HbA1c is 9.1%.",
+        plan=plan,
+        context=ctx,
+    )
+    assert "bio_ai_chance_as_probability" in chance_flags
+    assert "estimates your chance" not in chance
+    assert "9.1%" in chance
+
+    from app.contracts.common import KnowledgeScope
+    from app.contracts.presentation import ResponseMode
+    from app.contracts.query import QueryPlan
+    from app.pipeline.presentation import _headline
+
+    plan = QueryPlan(
+        intent=IntentType.trend,
+        raw_message="Has my alkaline phosphatase changed since my last report?",
+        domains=["red_cell_anaemia_health"],
+        knowledge_scope=KnowledgeScope.personal,
+    )
+    context = HealthContext(intent=IntentType.trend, answer_depth=AnswerDepth.simple)
+    heading = _headline(plan, context, ResponseMode.trend)
+    assert "anaemia" not in heading.lower()
+    assert "alkaline" in heading.lower()
+    assert "trend" in heading.lower()
+
     assert not is_member_question("Do you have any new symptoms or medication or supplement changes?")
     assert is_member_question("Could new symptoms or a medicine change affect this result?")
     assert is_member_question("Why is my HbA1c high?")

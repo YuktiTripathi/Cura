@@ -34,6 +34,27 @@ from app.retrieval.medical import is_servable, render_medical_evidence_answer
 
 logger = logging.getLogger("cura.reasoning")
 
+_COMPLETE_END = re.compile(r"[.!?।%0-9]$")
+
+
+def trim_incomplete_tail(text: str) -> str:
+    """Drop a trailing fragment when earlier sentences are complete.
+
+    A finish reason of length already fails the model call. This covers a finished
+    JSON answer whose last line stops mid-clause. One incomplete line is left as-is.
+    """
+    lines = (text or "").rstrip().splitlines()
+    if len(lines) < 2:
+        return text
+    last = lines[-1].strip()
+    if not last or _COMPLETE_END.search(last):
+        return text
+    kept = lines[:-1]
+    while kept and not kept[-1].strip():
+        kept.pop()
+    repaired = "\n".join(kept).strip()
+    return repaired or text
+
 
 _CLINICAL_CHANGE = re.compile(
     r"\b(improved|improvement|better|worse|worsened|right direction|clinically meaningful)\b",
@@ -458,7 +479,7 @@ class ReasoningService:
             try:
                 llm_result, answer_client, _tier, fallback = completer(messages, plan, budget=budget)
                 return ReasoningResult(
-                    answer=llm_result.answer,
+                    answer=trim_incomplete_tail(llm_result.answer),
                     llm_result=llm_result,
                     llm_called=True,
                     llm_mode=settings.resolved_llm_provider() if settings.enable_llm else "deterministic_mock",
@@ -504,7 +525,7 @@ class ReasoningService:
             perf.count("prompt_chars", sum(len(m.get("content") or "") for m in messages))
             try:
                 llm_result, answer_client, used_tier, fallback = completer(messages, plan, budget=budget)
-                answer = llm_result.answer
+                answer = trim_incomplete_tail(llm_result.answer)
                 escalated = False
                 escalation_reason = None
                 next_tier = {
@@ -532,7 +553,7 @@ class ReasoningService:
                             llm_result, answer_client, used_tier, _up_fallback = completer(
                                 messages, up_plan, budget=budget
                             )
-                            answer = llm_result.answer
+                            answer = trim_incomplete_tail(llm_result.answer)
                             escalated = True
                             escalation_reason = ", ".join(gate.flags[:4]) or "quality_gate"
                         except LLMUnavailableError:
@@ -589,6 +610,26 @@ class ReasoningService:
                 from app.pipeline.evidence_inventory import classify_marker_trends, render_partial_trend
 
                 coverage = classify_marker_trends(message, context.markers, context.comparisons)
+                asks_change = bool(re.search(r"\b(changed|change|since|previous|trend|compare)\b", message or "", re.I))
+                if asks_change and context.comparisons:
+                    from app.pipeline.evidence_inventory import requested_marker_keys
+                    from app.pipeline.renderer import render_trend_sentence
+
+                    named = set(requested_marker_keys(message))
+                    rows = [
+                        row for row in context.comparisons
+                        if not named or (getattr(row, "topic", None) or "").replace("_", "") in {
+                            key.replace("_", "") for key in named
+                        }
+                    ]
+                    if rows:
+                        return ReasoningResult(
+                            answer=render_trend_sentence(context, rows[0]),
+                            llm_called=False,
+                            llm_mode="deterministic_fallback",
+                            fallback_reason="privacy" if privacy else "model_unavailable",
+                            latency_ms=int((time.perf_counter() - started) * 1000),
+                        )
                 partial = render_partial_trend(message, context.markers, context.comparisons) if coverage["support"] in {"partial", "full"} else None
                 if partial:
                     return ReasoningResult(

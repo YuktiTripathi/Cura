@@ -156,11 +156,19 @@ def _source_status(plan: QueryPlan, context: HealthContext, source: str) -> Evid
     return EvidenceStatus.not_retrieved
 
 
-def _select_measurements(kind: str, message: str, markers: list) -> list:
+def _select_measurements(kind: str, message: str, markers: list, *, broad: bool = False) -> list:
     text = (message or "").lower()
     chosen = list(markers or [])
     if kind == "BIO_AI_SCORE_LIST":
         return []
+    named = set(requested_marker_keys(message))
+    if named and not broad and kind not in {"ABNORMAL_LIST", "PRIORITIZED_CONCERNS", "SYMPTOM_CONTEXT"}:
+        chosen = [
+            item
+            for item in chosen
+            if _key(getattr(item, "key", None)) in named or _key(getattr(item, "name", None)) in named
+        ]
+        return chosen[:8]
     if kind == "MARKER_LOOKUP":
         keys = set(requested_marker_keys(message))
         chosen = [
@@ -203,9 +211,28 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
     contract = plan.task_contract or {}
     kind = contract.get("response_type")
     message = contract.get("original_message") or plan.raw_message or ""
-    measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers)]
-    measurements = _with_history(measurements, context)
-    risks = [_risk_row(item) for item in _select_risks(kind, message, context.bio_ai_risks)]
+    broad = bool(contract.get("broad_summary")) or getattr(plan.intent, "value", "") in {
+        "report_explanation", "broad_health_summary", "health_scenario",
+    }
+    measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers, broad=broad)]
+    measurements = _with_history(measurements, context, include=_wants_history(plan, message))
+    if (
+        getattr(plan.intent, "value", "") == "bio_ai_score"
+        and not requested_marker_keys(message)
+        and not (contract.get("broad_summary"))
+    ):
+        measurements = []
+    selected_risks = _select_risks(kind, message, context.bio_ai_risks)
+    if getattr(plan.intent, "value", "") == "bio_ai_score" and not broad:
+        asked = message.lower()
+        matched = [
+            item for item in selected_risks
+            if (getattr(item, "name", None) or "").lower() in asked
+            or str(getattr(item, "code", "") or "").replace("_", " ") in asked
+        ]
+        if matched:
+            selected_risks = matched
+    risks = [_risk_row(item) for item in selected_risks]
     questionnaire = _questionnaire_rows(plan, context, message)
     measurements, questionnaire, restored, unavailable = _complete_required_facts(
         measurements, questionnaire, plan, context, message
@@ -297,8 +324,11 @@ def _complete_required_facts(
     unavailable: list[str] = []
     present = {row.get("fact_id") for row in measurements}
     required: list[dict] = []
-    for row in context.comparisons or []:
+    named = set(requested_marker_keys(message))
+    for row in context.comparisons or [] if _wants_history(plan, message) else []:
         topic = getattr(row, "topic", None)
+        if named and _key(topic) not in named:
+            continue
         for value, when in (
             (getattr(row, "previous_value", None), getattr(row, "previous_date", None)),
             (getattr(row, "current_value", None), getattr(row, "current_date", None)),
@@ -347,12 +377,24 @@ def _complete_required_facts(
     return measurements, questionnaire, restored, unavailable
 
 
-def _with_history(measurements: list[dict], context: HealthContext) -> list[dict]:
+def _wants_history(plan: QueryPlan, message: str | None) -> bool:
+    goal = (plan.task_contract or {}).get("goal")
+    if goal == "compare":
+        return True
+    return bool(re.search(r"\b(changed|change|since|previous|trend|compare)\b", message or "", re.I))
+
+
+def _with_history(measurements: list[dict], context: HealthContext, *, include: bool = True) -> list[dict]:
     """A comparison already built in context is evidence. Do not leave only the latest point."""
+    if not include:
+        return measurements
     seen = {(row.get("key"), str(row.get("report_date") or ""), row.get("value")) for row in measurements}
+    allowed = {row.get("key") for row in measurements}
     extra: list[dict] = []
     for row in context.comparisons or []:
         topic = getattr(row, "topic", None)
+        if allowed and topic not in allowed:
+            continue
         for value, when in (
             (getattr(row, "previous_value", None), getattr(row, "previous_date", None)),
             (getattr(row, "current_value", None), getattr(row, "current_date", None)),
@@ -512,6 +554,8 @@ def omitted_supported_facts(message: str | None, markers: list | None, answer: s
             current = latest.get(key)
             if current is None or str(getattr(marker, "measured_at", "") or "") >= str(getattr(current, "measured_at", "") or ""):
                 latest[key] = marker
+        named = set(requested_marker_keys(message))
+        latest = {key: marker for key, marker in latest.items() if key in named} if named else {}
         if 0 < len(latest) <= 2:
             for marker in latest.values():
                 if _number_present(answer, getattr(marker, "value", None)):

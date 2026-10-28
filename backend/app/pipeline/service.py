@@ -52,7 +52,7 @@ from app.llm.factory import get_llm_client
 from app.llm.registry import answer_timeout_for_tier, estimate_cost_usd, fallback_tiers, model_id_for_tier, provider_for_model, uses_answer_llm
 from app.llm.structured import looks_like_structured_json, public_answer_text
 from app.memory.conversation import FollowUpMemory
-from app.pipeline.conversation_state import ConversationStateResolver, persistable_state
+from app.pipeline.conversation_state import ConversationStateResolver, persistable_state, stated_measurement_keys
 from app.contracts.conversation_state import ExpectedReplyType
 from app.pipeline.context_builder import ContextBuilder
 from app.core import perf
@@ -1590,6 +1590,7 @@ class ChatService:
             response_depth=experience.depth.value,
             conversation_goal=experience.goal.value,
             explained_entities=list(experience.relevant.requested_keys),
+            stated_measurements=stated_measurement_keys(answer, context.markers),
             topic_summary=experience.topic_summary.text if experience.topic_summary else None,
         )
         self.repo.update_conversation_state(

@@ -165,22 +165,63 @@ def drop_unverified_claims(answer: str, context: HealthContext) -> str:
     if not answer:
         return answer
     catalog = GroundingChecker()._catalog(context)
-    bio_values = {value for values in catalog["bio"].values() for value in values}
     kept = []
     for line in answer.splitlines():
         issues = _attribution_issues(line, catalog)
         if issues:
-            numbers = set()
-            for _sentence, number in issues:
-                try:
-                    numbers.add(_norm(float(number)))
-                except (TypeError, ValueError):
-                    numbers.add(None)
-            if not numbers or not numbers <= bio_values:
-                continue
+            repaired = _without_unverified_clauses(line, issues)
+            restored = _restore_verified_measurements(line, repaired or "", context)
+            if restored:
+                kept.append(restored)
+            continue
         kept.append(line)
     text = "\n".join(kept).strip()
     return text or answer
+
+
+def _without_unverified_clauses(line: str, issues: list[tuple[str, str]]) -> str | None:
+    """Keep clauses that state a verified fact. Drop only the clause with an unsupported number."""
+    bad: set[str] = set()
+    for _sentence, number in issues:
+        try:
+            bad.add(_norm(float(number)))
+        except (TypeError, ValueError):
+            bad.add(number)
+    parts = re.split(r"\s*(?:,|;|\band\b|\bbut\b)\s*", line)
+    kept = []
+    for part in parts:
+        norms = []
+        for raw in re.findall(r"\d+(?:\.\d+)?", part):
+            try:
+                norms.append(_norm(float(raw)))
+            except (TypeError, ValueError):
+                continue
+        if any(number in bad for number in norms):
+            continue
+        if part.strip():
+            kept.append(part.strip())
+    if not kept:
+        return None
+    return ", ".join(kept)
+
+
+def _restore_verified_measurements(original: str, repaired: str, context: HealthContext) -> str:
+    """A clause that mixes a real result with an unsupported one must not take the real result with it."""
+    extras = []
+    for marker in list(context.markers or []) + list(getattr(context, "panel_markers", None) or []):
+        if getattr(marker, "value", None) is None:
+            continue
+        token = f"{float(marker.value):g}"
+        if not re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", original or ""):
+            continue
+        if re.search(rf"(?<![\d.]){re.escape(token)}(?![\d.])", repaired or ""):
+            continue
+        unit = marker.unit or ""
+        shown = f"{token}{unit}" if unit.startswith("%") else f"{token} {unit}".strip()
+        extras.append(f"{marker.name or marker.key} is {shown}.")
+    if not extras:
+        return repaired
+    return "\n".join(part for part in (repaired, *extras) if part).strip()
 
 
 def _canonical_code(name: str) -> str:

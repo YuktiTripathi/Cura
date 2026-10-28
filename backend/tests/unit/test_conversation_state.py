@@ -285,3 +285,68 @@ def test_thyroid_reference_sequence_refetches_values():
     fourth_ops = {str(item).upper() for item in (fourth["meta"].get("operations") or [])}
     assert "TREND" in fourth_ops or "INTERPRET" in fourth_ops or fourth["meta"]["intent"] in {"trend", "blood_marker_explanation", "previous_result"}
     assert debug.get("retrieval_performed") is True
+
+
+def test_named_marker_does_not_inherit_the_previous_topic():
+    state = ConversationState(
+        turn_type=TurnType.follow_up_question,
+        active_domain="red_cell_anaemia_health",
+        active_entities=["hemoglobin", "mcv"],
+        prior_personal=True,
+    )
+    plan = build_query_plan("Has my alkaline phosphatase changed since my last report?")
+    bound = apply_to_query_plan(plan, state)
+    assert "hemoglobin" not in (bound.requested_metrics or [])
+    assert "mcv" not in (bound.requested_metrics or [])
+    assert bound.domains != ["red_cell_anaemia_health"]
+
+
+def test_a_first_explanation_is_in_everyday_words():
+    from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS, _asked_task
+
+    assert "explain it in the same sentence" in SAFETY_INSTRUCTIONS
+    assert "not how serious it is" in SAFETY_INSTRUCTIONS
+    for question in (
+        "What does my alkaline phosphatase mean?",
+        "What does my HbA1c mean?",
+        "What does my LDL mean?",
+        "What does my vitamin D mean?",
+        "What does my TSH mean?",
+        "What does my creatinine mean?",
+        "What does my Dyslipidemia score mean?",
+    ):
+        hint = _asked_task(question)
+        assert "everyday words" in hint, question
+        assert "another test" in hint or "chance of disease" in hint
+    plain = _asked_task("What is cholesterol?")
+    assert "no medical background" in plain
+    assert "no personal results" in plain
+
+
+def test_a_follow_up_knows_the_value_was_already_stated():
+    state = ConversationState(
+        turn_type=TurnType.follow_up_question,
+        active_entities=["iron"],
+        explained_entities=["iron"],
+        biomarkers_already_discussed=["iron"],
+        prior_personal=True,
+    )
+    plan = apply_to_query_plan(build_query_plan("Why is it low?"), state)
+    spec = plan.task_contract or {}
+    assert spec.get("continuation") is True
+    assert spec.get("measurement_already_stated") is True
+    from app.pipeline.prompt_builder import _asked_task
+    from app.contracts.health_context import HealthContext
+    note = _asked_task("Why is it low?", HealthContext(intent=IntentType.blood_marker_explanation, answer_depth=AnswerDepth.simple, task_contract=spec))
+    assert "Do not repeat the definition" in note
+    value = _asked_task("What is my exact value?", HealthContext(intent=IntentType.blood_marker_explanation, answer_depth=AnswerDepth.simple, task_contract=spec))
+    assert "Give the value" in value
+    assert "Do not repeat the definition or the number" not in value
+
+
+def test_medication_chips_are_not_suggested():
+    from app.pipeline.followup_generator import valid_question, FollowUpBrief
+    brief = FollowUpBrief()
+    assert valid_question("Should I start a statin?", brief) is False
+    assert valid_question("Do I need medicine for this?", brief) is False
+    assert valid_question("Why is it low?", brief) is True
