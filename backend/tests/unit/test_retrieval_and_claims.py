@@ -44,7 +44,8 @@ def test_generic_heart_health_does_not_retrieve_unrelated_condition_passages():
         "What do you mean by heart health in general terms?",
         topic="cardiac_health",
     )
-    assert hits == []
+    # A cardiac_health passage now exists in app/retrieval/content. Only passages on that topic may come back.
+    assert all("cardiac_health" in doc.topics for doc in hits)
 
 
 def test_limit_is_three_by_default_and_capped_at_five():
