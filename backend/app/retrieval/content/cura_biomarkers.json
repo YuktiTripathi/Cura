@@ -1,0 +1,2871 @@
+[
+  {
+    "name": "Cura knowledge base: Hemoglobin (Hb)",
+    "title": "Hemoglobin (Hb)",
+    "url": "",
+    "topics": [
+      "hemoglobin"
+    ],
+    "keywords": [
+      "hemoglobin (hb)",
+      "hemoglobin"
+    ],
+    "excerpt": "The protein inside red blood cells that carries oxygen from your lungs to the rest of your body. It tells you how well your blood can carry oxygen. Low levels are the main sign of anemia and often cause tiredness. If it is high: Can happen with dehydration, living at high altitude, smoking, lung disease, or too many red cells made by the body. A doctor may want to look further if it stays high. If it is low: Low hemoglobin means anemia. You may feel tired, weak, dizzy, breathless, or look pale. Common causes are low iron, low B12 or folate, blood loss, or long term illness.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Red Blood Cells (RBC)",
+    "title": "Red Blood Cells (RBC)",
+    "url": "",
+    "topics": [
+      "rbc"
+    ],
+    "keywords": [
+      "red blood cells (rbc)",
+      "red blood cells",
+      "rbc",
+      "red cell count",
+      "erythrocyte count"
+    ],
+    "excerpt": "The number of red blood cells in a small sample of your blood. These cells carry oxygen. Along with hemoglobin and MCV, RBC count helps tell what kind of anemia you may have. If it is high: Can be due to dehydration, smoking, living at altitude, or thalassemia trait where many small red cells are made. If it is low: Low RBC goes with anemia. You may feel tired, weak or short of breath.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: PCV / Hematocrit",
+    "title": "PCV / Hematocrit",
+    "url": "",
+    "topics": [
+      "pcv",
+      "hematocrit"
+    ],
+    "keywords": [
+      "pcv / hematocrit",
+      "hematocrit",
+      "packed cell volume"
+    ],
+    "excerpt": "The share of your blood made up of red blood cells. It shows how thick or thin your blood is and moves up and down with hemoglobin and hydration. If it is high: Often from dehydration. It can also come from smoking, low oxygen, or too many red cells. Thick blood can raise clot risk if very high. If it is low: Low value goes with anemia or too much fluid in the body.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: MCV (Mean Corpuscular Volume)",
+    "title": "MCV (Mean Corpuscular Volume)",
+    "url": "",
+    "topics": [
+      "mcv"
+    ],
+    "keywords": [
+      "mcv (mean corpuscular volume)",
+      "mcv",
+      "mean corpuscular volume",
+      "mean cell volume"
+    ],
+    "excerpt": "The average size of your red blood cells. It helps find the type of anemia. Small cells often point to low iron or thalassemia trait. Big cells often point to low B12 or folate. If it is high: Large red cells are often linked to low vitamin B12 or folate, alcohol use, thyroid problems or liver problems. If it is low: Small red cells are often linked to low iron or thalassemia trait.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: MCH (Mean Corpuscular Hemoglobin)",
+    "title": "MCH (Mean Corpuscular Hemoglobin)",
+    "url": "",
+    "topics": [
+      "mch"
+    ],
+    "keywords": [
+      "mch (mean corpuscular hemoglobin)",
+      "mch",
+      "mean corpuscular hemoglobin"
+    ],
+    "excerpt": "The average amount of hemoglobin inside one red blood cell. It moves along with MCV. Low MCH means pale cells, which is common in low iron. If it is high: Often seen with large red cells, as in low B12 or folate. If it is low: Pale red cells, commonly from low iron or thalassemia trait.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: MCHC (Mean Corpuscular Hemoglobin Concentration)",
+    "title": "MCHC (Mean Corpuscular Hemoglobin Concentration)",
+    "url": "",
+    "topics": [
+      "mchc"
+    ],
+    "keywords": [
+      "mchc (mean corpuscular hemoglobin concentration)",
+      "mchc",
+      "mean corpuscular hemoglobin concentration"
+    ],
+    "excerpt": "How packed with hemoglobin your red blood cells are. Low MCHC means pale cells. It supports the picture of low iron. If it is high: A high value is uncommon. It can be a lab artefact, or seen in some inherited red cell conditions. If it is low: Pale red cells, most often from low iron.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: RDW",
+    "title": "RDW",
+    "url": "",
+    "topics": [
+      "rdw"
+    ],
+    "keywords": [
+      "rdw",
+      "rdw-sd",
+      "red cell distribution width"
+    ],
+    "excerpt": "How much your red blood cells differ in size from each other. RDW-SD is the width in fL. Some labs show the same idea as RDW-CV in percent. A high RDW means the cells are of very mixed sizes. It is often an early sign of low iron, B12 or folate, even before hemoglobin drops. If it is high: Mixed cell sizes. Common in early iron, B12 or folate shortage and some other anemias. If it is low: A low RDW is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: RDW-CV",
+    "title": "RDW-CV",
+    "url": "",
+    "topics": [
+      "rdw_cv"
+    ],
+    "keywords": [
+      "rdw-cv",
+      "red cell distribution width cv"
+    ],
+    "excerpt": "The spread in size of your red blood cells, shown as a percent of the average size. A higher value means more mixed sizes, an early clue for low iron, B12 or folate. If it is high: Mixed cell sizes, often from early nutrient shortage. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Mentzer Index (MCV/RBC)",
+    "title": "Mentzer Index (MCV/RBC)",
+    "url": "",
+    "topics": [
+      "mentzer_index",
+      "mentzer"
+    ],
+    "keywords": [
+      "mentzer index (mcv/rbc)",
+      "mentzer index",
+      "mcv/rbc",
+      "mentzer ratio"
+    ],
+    "excerpt": "A simple calculation, MCV divided by RBC count, used to guess the reason for small red cells. It helps tell low iron from thalassemia trait. It is only a screening hint, not a diagnosis. If it is high: A higher index points toward iron deficiency. If it is low: A lower index points toward thalassemia trait.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: GK Index (Green and King Index)",
+    "title": "GK Index (Green and King Index)",
+    "url": "",
+    "topics": [
+      "gk_index"
+    ],
+    "keywords": [
+      "gk index (green and king index)",
+      "gk index",
+      "green and king index",
+      "green king index"
+    ],
+    "excerpt": "A calculation from MCV, RDW and hemoglobin used to tell iron deficiency from thalassemia trait. It adds a second hint on the cause of small red cells. It is a screening aid only. If it is high: A higher score points toward iron deficiency. If it is low: A lower score points toward thalassemia trait.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: RDWI (RDW Index)",
+    "title": "RDWI (RDW Index)",
+    "url": "",
+    "topics": [
+      "rdwi"
+    ],
+    "keywords": [
+      "rdwi (rdw index)",
+      "rdwi",
+      "rdw index"
+    ],
+    "excerpt": "A calculation using MCV, RDW and RBC count to separate iron deficiency from thalassemia trait. Another hint for the cause of small red cells. It does not replace a proper test. If it is high: A higher score points toward iron deficiency. If it is low: A lower score points toward thalassemia trait.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Platelet Count",
+    "title": "Platelet Count",
+    "url": "",
+    "topics": [
+      "platelets"
+    ],
+    "keywords": [
+      "platelet count",
+      "thrombocytes"
+    ],
+    "excerpt": "Tiny cell pieces that help your blood clot when you bleed. Too few can cause easy bleeding or bruising. Too many can raise the chance of clots. If it is high: Often rises with infection, inflammation, iron deficiency or after surgery. Very high counts need a doctor's review. If it is low: Common with viral infections like dengue, some medicines, alcohol, liver disease or low B12. You may bruise easily or bleed longer.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: MPV (Mean Platelet Volume)",
+    "title": "MPV (Mean Platelet Volume)",
+    "url": "",
+    "topics": [
+      "mpv"
+    ],
+    "keywords": [
+      "mpv (mean platelet volume)",
+      "mpv",
+      "mean platelet volume"
+    ],
+    "excerpt": "The average size of your platelets. Bigger platelets are younger and more active. MPV helps doctors understand why the platelet count is high or low. If it is high: Bigger platelets may be seen when the body is making many new platelets, and are sometimes linked with higher heart and clot risk. If it is low: Smaller platelets can be seen when the bone marrow makes fewer platelets.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: WBC (White Blood Cell Count)",
+    "title": "WBC (White Blood Cell Count)",
+    "url": "",
+    "topics": [
+      "wbc"
+    ],
+    "keywords": [
+      "wbc (white blood cell count)",
+      "wbc",
+      "white blood cell count",
+      "total leucocyte count",
+      "white cell count"
+    ],
+    "excerpt": "The total number of white blood cells, the cells of your immune system that fight infection. It shows if your body may be fighting an infection or inflammation. If it is high: Usually from infection, stress, smoking, steroid medicines, or inflammation. Very high counts need a doctor's review. If it is low: Can happen with some viral infections, certain medicines, low B12, or bone marrow problems. You may catch infections more easily.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Neutrophils",
+    "title": "Neutrophils",
+    "url": "",
+    "topics": [
+      "neutrophils_pct"
+    ],
+    "keywords": [
+      "neutrophils",
+      "polymorphs",
+      "segmented neutrophils"
+    ],
+    "excerpt": "The most common white blood cells. They are the first responders to bacterial infection. A high percent usually points to a bacterial infection or stress. A low percent can raise infection risk. If it is high: Often from bacterial infection, inflammation, smoking, stress or steroid use. If it is low: Can follow viral infections or be due to some medicines or low B12.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Lymphocytes",
+    "title": "Lymphocytes",
+    "url": "",
+    "topics": [
+      "lymphocytes_pct"
+    ],
+    "keywords": [
+      "lymphocytes"
+    ],
+    "excerpt": "White blood cells that fight viruses and remember past infections. A high percent is common in viral infections. A low percent can mean the immune system is stressed. If it is high: Common after viral infections. Some chronic infections can also raise it. If it is low: Can occur with stress, steroid use, or some infections and illnesses.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Monocytes",
+    "title": "Monocytes",
+    "url": "",
+    "topics": [
+      "monocytes_pct"
+    ],
+    "keywords": [
+      "monocytes"
+    ],
+    "excerpt": "White blood cells that clean up germs and dead cells and help the immune system. A high percent can show the body is recovering from infection or has ongoing inflammation. If it is high: Can be seen in recovery from infection, long term infection or inflammation. If it is low: A low value is usually not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Eosinophils",
+    "title": "Eosinophils",
+    "url": "",
+    "topics": [
+      "eosinophils_pct"
+    ],
+    "keywords": [
+      "eosinophils"
+    ],
+    "excerpt": "White blood cells linked to allergies and parasite infections. A high percent often points to allergy, asthma or worm infection. If it is high: Common with allergies, asthma, eczema, hay fever, worm infections and some medicines. If it is low: A low value is usually not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Basophils",
+    "title": "Basophils",
+    "url": "",
+    "topics": [
+      "basophils_pct"
+    ],
+    "keywords": [
+      "basophils"
+    ],
+    "excerpt": "The rarest white blood cells. They take part in allergic reactions. It is usually very low. A high value is uncommon. If it is high: Can be seen with allergies, some inflammation or thyroid problems. Persistent high values need a doctor's review. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Absolute Neutrophil Count",
+    "title": "Absolute Neutrophil Count",
+    "url": "",
+    "topics": [
+      "abs_neutrophils",
+      "absolute_neutrophil_count"
+    ],
+    "keywords": [
+      "absolute neutrophil count"
+    ],
+    "excerpt": "The actual number of neutrophils in your blood, worked out from WBC and neutrophil percent. It is a more reliable way to judge infection-fighting strength than the percent alone. If it is high: Usually from bacterial infection, inflammation, smoking, stress or steroids. If it is low: Low counts raise the risk of infection. Causes include viral illness, some medicines and low B12.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Absolute Lymphocyte Count",
+    "title": "Absolute Lymphocyte Count",
+    "url": "",
+    "topics": [
+      "abs_lymphocytes"
+    ],
+    "keywords": [
+      "absolute lymphocyte count"
+    ],
+    "excerpt": "The actual number of lymphocytes in your blood. It reflects how well your immune system is working against viruses. If it is high: Often after viral infections. Persistent high counts need review. If it is low: Can come from stress, illness, poor nutrition, or some medicines.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Absolute Monocyte Count",
+    "title": "Absolute Monocyte Count",
+    "url": "",
+    "topics": [
+      "abs_monocytes"
+    ],
+    "keywords": [
+      "absolute monocyte count"
+    ],
+    "excerpt": "The actual number of monocytes in your blood. A raised count can mean ongoing infection or inflammation. If it is high: Seen in recovery from infection, long term infection or inflammation. If it is low: Usually not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Absolute Eosinophils Count",
+    "title": "Absolute Eosinophils Count",
+    "url": "",
+    "topics": [
+      "abs_eosinophils",
+      "absolute_eosinophil_count"
+    ],
+    "keywords": [
+      "absolute eosinophils count"
+    ],
+    "excerpt": "The actual number of eosinophils in your blood. It is useful to confirm allergy or worm infection. If it is high: Common with allergies, asthma, skin allergy, worm infection and some medicines. If it is low: Usually not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Absolute Basophils Count",
+    "title": "Absolute Basophils Count",
+    "url": "",
+    "topics": [
+      "abs_basophils",
+      "absolute_basophils_count"
+    ],
+    "keywords": [
+      "absolute basophils count"
+    ],
+    "excerpt": "The actual number of basophils in your blood. Usually very low. It matters only if persistently high. If it is high: Can be seen with allergy, inflammation or rare blood conditions. If it is low: Not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: ESR (Erythrocyte Sedimentation Rate)",
+    "title": "ESR (Erythrocyte Sedimentation Rate)",
+    "url": "",
+    "topics": [
+      "esr"
+    ],
+    "keywords": [
+      "esr (erythrocyte sedimentation rate)",
+      "esr",
+      "erythrocyte sedimentation rate",
+      "esr automated",
+      "sed rate"
+    ],
+    "excerpt": "How fast red blood cells settle at the bottom of a test tube in one hour. Faster settling can mean inflammation in the body. It is a general sign of inflammation. It does not point to one cause, so it is read along with other tests. If it is high: Raised in infection, long term inflammation, autoimmune conditions, anemia and some cancers. Pregnancy and older age also raise it. If it is low: A low ESR is usually not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine pH",
+    "title": "Urine pH",
+    "url": "",
+    "topics": [
+      "urine_ph"
+    ],
+    "keywords": [
+      "urine ph"
+    ],
+    "excerpt": "How acidic or alkaline your urine is. It gives clues about kidney stone risk, urine infection and diet. If it is high: Alkaline urine can come from a vegetarian diet, some urine infections or certain medicines. It may favour some kinds of kidney stones. If it is low: Acidic urine can come from a high protein diet, dehydration, diabetes or long fasting. It may favour uric acid stones.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urobilinogen",
+    "title": "Urobilinogen",
+    "url": "",
+    "topics": [
+      "urobilinogen"
+    ],
+    "keywords": [
+      "urobilinogen",
+      "urine urobilinogen"
+    ],
+    "excerpt": "A natural substance made in the gut from bilirubin, partly passed in urine. A change can hint at liver or bile duct problems or faster breakdown of red cells. If it is high: May point to liver stress, hepatitis or faster red cell breakdown (hemolysis). If it is low: Absent or very low can be seen when the bile duct is blocked.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Colour",
+    "title": "Urine Colour",
+    "url": "",
+    "topics": [
+      "urine_colour"
+    ],
+    "keywords": [
+      "urine colour",
+      "urine color"
+    ],
+    "excerpt": "The color of your urine, from pale straw to dark amber. Color gives a quick clue about hydration and sometimes about liver, kidney or other problems. If it is high: Dark urine is most often from not drinking enough water. Brown or tea colored urine can be a liver or muscle problem. If it is low: Very pale urine usually means you are drinking a lot of water.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Transparency",
+    "title": "Urine Transparency",
+    "url": "",
+    "topics": [
+      "urine_transparency"
+    ],
+    "keywords": [
+      "urine transparency",
+      "appearance",
+      "clarity"
+    ],
+    "excerpt": "How clear or cloudy your urine looks. Cloudy urine can be from infection, crystals or cells, but it can also be harmless. If it is high: Cloudy urine can come from pus cells, bacteria, crystals, mucus or blood.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Sugar",
+    "title": "Urine Sugar",
+    "url": "",
+    "topics": [
+      "urine_sugar"
+    ],
+    "keywords": [
+      "urine sugar",
+      "urine glucose"
+    ],
+    "excerpt": "Whether there is sugar (glucose) in your urine. Sugar appears in urine when blood sugar gets very high. It can be an early clue to diabetes. If it is high: Usually means blood sugar is high, as in diabetes. It can also appear with some kidney conditions or SGLT2 type medicines.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Blood",
+    "title": "Urine Blood",
+    "url": "",
+    "topics": [
+      "urine_blood"
+    ],
+    "keywords": [
+      "urine blood",
+      "hematuria",
+      "occult blood"
+    ],
+    "excerpt": "Whether the dipstick detects blood in your urine. Blood in urine can come from the kidney, bladder, stones, infection or the genital area. It should be checked. If it is high: Can be due to urine infection, kidney stones, kidney or bladder conditions, hard exercise, or periods in women.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine RBC",
+    "title": "Urine RBC",
+    "url": "",
+    "topics": [
+      "urine_rbc"
+    ],
+    "keywords": [
+      "urine rbc",
+      "red cells in urine"
+    ],
+    "excerpt": "Red blood cells seen under the microscope in urine. Confirms if blood is truly present in urine. If it is high: Often from stones, infection, kidney disease, or contamination during periods.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Pus Cells",
+    "title": "Pus Cells",
+    "url": "",
+    "topics": [
+      "pus_cells"
+    ],
+    "keywords": [
+      "pus cells",
+      "leucocytes",
+      "wbc in urine"
+    ],
+    "excerpt": "White blood cells seen in urine under the microscope. Many pus cells usually mean infection or inflammation in the urinary tract. If it is high: Usually a urinary tract infection (UTI). Sometimes from contamination, stones or kidney inflammation.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Epithelial Cells",
+    "title": "Epithelial Cells",
+    "url": "",
+    "topics": [
+      "epithelial_cells"
+    ],
+    "keywords": [
+      "epithelial cells",
+      "squamous cells"
+    ],
+    "excerpt": "Cells that line the urinary tract and skin, seen under the microscope. A few are normal. Many suggest the sample was not collected cleanly. If it is high: Usually means contamination from the skin or genital area. Rarely linked to inflammation.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Crystals",
+    "title": "Crystals",
+    "url": "",
+    "topics": [
+      "urine_crystals"
+    ],
+    "keywords": [
+      "crystals",
+      "urinary crystals"
+    ],
+    "excerpt": "Tiny crystals formed by minerals and salts in urine. Some are harmless. A few types are linked with kidney stones. If it is high: Often from low water intake, diet, or high uric acid. Repeated crystals can lead to stones in some people.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Casts",
+    "title": "Casts",
+    "url": "",
+    "topics": [
+      "urine_casts"
+    ],
+    "keywords": [
+      "casts",
+      "urinary casts"
+    ],
+    "excerpt": "Tiny tube shaped particles formed in the kidney tubules and seen under a microscope. Some types point to kidney stress or disease, so they are worth noting. If it is high: Hyaline casts can appear after exercise or dehydration. Other types such as granular or cellular casts may indicate kidney disease.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Bacteria",
+    "title": "Bacteria",
+    "url": "",
+    "topics": [
+      "urine_bacteria"
+    ],
+    "keywords": [
+      "bacteria"
+    ],
+    "excerpt": "Bacteria seen in your urine under the microscope. Together with pus cells and nitrite, it helps confirm a urine infection. If it is high: May mean a urinary tract infection, or the sample may be contaminated.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Yeast Cells",
+    "title": "Yeast Cells",
+    "url": "",
+    "topics": [
+      "yeast_cells"
+    ],
+    "keywords": [
+      "yeast cells",
+      "candida"
+    ],
+    "excerpt": "Fungal cells (usually Candida) seen in urine. They can show a fungal infection, and are more common when blood sugar is high. If it is high: Linked to high blood sugar, antibiotic use, or vaginal yeast infection contamination.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Nitrite",
+    "title": "Nitrite",
+    "url": "",
+    "topics": [
+      "nitrite"
+    ],
+    "keywords": [
+      "nitrite",
+      "urine nitrite"
+    ],
+    "excerpt": "A chemical made when certain bacteria are present in urine. A positive result suggests a urinary tract infection by some bacteria. If it is high: Common in urine infection. A negative result does not rule out infection.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Ketones",
+    "title": "Urine Ketones",
+    "url": "",
+    "topics": [
+      "urine_ketones"
+    ],
+    "keywords": [
+      "urine ketones",
+      "ketone bodies"
+    ],
+    "excerpt": "Substances made when the body burns fat for energy instead of sugar. They show up with fasting, low carb diets, or uncontrolled diabetes. If it is high: May be harmless with fasting, a very low carb diet or vomiting. In diabetes, high ketones can be dangerous.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Protein",
+    "title": "Urine Protein",
+    "url": "",
+    "topics": [
+      "urine_protein"
+    ],
+    "keywords": [
+      "urine protein",
+      "albuminuria",
+      "proteinuria"
+    ],
+    "excerpt": "Whether protein, mostly albumin, leaks into your urine. Healthy kidneys keep protein in the blood. Protein in urine can be an early sign of kidney stress. If it is high: Can be due to kidney disease, diabetes, high blood pressure, infection, fever or hard exercise.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Leucocyte Esterase",
+    "title": "Leucocyte Esterase",
+    "url": "",
+    "topics": [
+      "leucocyte_esterase"
+    ],
+    "keywords": [
+      "leucocyte esterase"
+    ],
+    "excerpt": "A chemical released by white blood cells, tested on the urine dipstick. It is a quick sign of pus cells and likely urinary infection. If it is high: Positive in urine infection or inflammation of the urinary tract.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Bile Pigments",
+    "title": "Bile Pigments",
+    "url": "",
+    "topics": [
+      "bile_pigments"
+    ],
+    "keywords": [
+      "bile pigments",
+      "urine bilirubin"
+    ],
+    "excerpt": "Bilirubin in urine, a yellow pigment from the liver. Normally none is found in urine. If present, it can point to a liver or bile duct problem. If it is high: Linked to hepatitis, liver disease or a blocked bile duct.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Specific Gravity",
+    "title": "Specific Gravity",
+    "url": "",
+    "topics": [
+      "specific_gravity"
+    ],
+    "keywords": [
+      "specific gravity"
+    ],
+    "excerpt": "How concentrated your urine is compared to water. It shows how well the kidneys concentrate urine and how hydrated you are. If it is high: Concentrated urine usually means you need more water. Sugar or protein in urine can also push it up. If it is low: Dilute urine can be from drinking a lot of water, diabetes insipidus or kidney concentration problems.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urine Volume",
+    "title": "Urine Volume",
+    "url": "",
+    "topics": [
+      "urine_volume"
+    ],
+    "keywords": [
+      "urine volume"
+    ],
+    "excerpt": "How much urine was collected or passed. For a random sample it only shows the amount tested. Over 24 hours, total volume reflects hydration and kidney function. If it is high: Large volumes can be from drinking a lot, diabetes, or some medicines. If it is low: Low volume can be from dehydration, kidney problems or a blocked urine flow.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Others (Urine)",
+    "title": "Others (Urine)",
+    "url": "",
+    "topics": [
+      "urine_others"
+    ],
+    "keywords": [
+      "others (urine)",
+      "others",
+      "urine"
+    ],
+    "excerpt": "Other findings seen on urine microscopy, such as mucus, amorphous material, spermatozoa or other items. Most are harmless and often come from the sample itself. If it is high: Usually reflects the sample and not a disease.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Homocysteine",
+    "title": "Homocysteine",
+    "url": "",
+    "topics": [
+      "homocysteine"
+    ],
+    "keywords": [
+      "homocysteine"
+    ],
+    "excerpt": "A by-product of protein digestion in your body. B vitamins help clear it from the blood. High levels can irritate blood vessel walls and are linked with higher risk of heart disease, stroke and clots. If it is high: Often means low vitamin B12, B6 or folate. Also linked to kidney or thyroid problems, smoking and some medicines. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: hs-CRP (High-Sensitivity C-Reactive Protein)",
+    "title": "hs-CRP (High-Sensitivity C-Reactive Protein)",
+    "url": "",
+    "topics": [
+      "hscrp",
+      "crp"
+    ],
+    "keywords": [
+      "hs-crp (high-sensitivity c-reactive protein)",
+      "hs-crp",
+      "high-sensitivity c-reactive protein",
+      "crp",
+      "high sensitivity crp"
+    ],
+    "excerpt": "A protein made by the liver when there is inflammation in the body. The high-sensitivity test can detect low levels. Silent, long term inflammation harms blood vessels. hs-CRP helps estimate heart disease risk. If it is high: Can be due to belly fat, smoking, poor sleep, gum disease, infection, injury, or long term inflammation. If it is low: A low value is good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Magnesium",
+    "title": "Magnesium",
+    "url": "",
+    "topics": [
+      "magnesium"
+    ],
+    "keywords": [
+      "magnesium",
+      "serum magnesium"
+    ],
+    "excerpt": "A mineral that helps nerves, muscles, sleep, heartbeat and blood sugar work properly. Low magnesium is linked with poor sleep, cramps, tiredness and higher risk of diabetes and high blood pressure. If it is high: High levels are uncommon and mostly seen with kidney problems or too many magnesium antacids or supplements. If it is low: May cause muscle cramps, twitching, poor sleep, tiredness, anxiety or an irregular heartbeat.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Zinc",
+    "title": "Zinc",
+    "url": "",
+    "topics": [
+      "zinc"
+    ],
+    "keywords": [
+      "serum zinc"
+    ],
+    "excerpt": "A mineral needed for immunity, wound healing, taste, smell, hormones and good sleep. Low zinc can affect immunity, skin, hair, sleep and mood. If it is high: Too much zinc from supplements can cause nausea and can lower copper. If it is low: May cause frequent infections, slow wound healing, hair loss, loss of taste and low appetite.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Serum Iron",
+    "title": "Serum Iron",
+    "url": "",
+    "topics": [
+      "serum_iron",
+      "iron"
+    ],
+    "keywords": [
+      "serum iron"
+    ],
+    "excerpt": "The amount of iron travelling in your blood right now. Iron is needed to make hemoglobin. Low iron is a common cause of tiredness and anemia. If it is high: Can happen from iron tablets, frequent transfusions, liver disease, or iron overload conditions. If it is low: Common with low iron intake, heavy periods, blood loss, pregnancy or poor absorption.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: TIBC (Total Iron Binding Capacity)",
+    "title": "TIBC (Total Iron Binding Capacity)",
+    "url": "",
+    "topics": [
+      "tibc"
+    ],
+    "keywords": [
+      "tibc (total iron binding capacity)",
+      "tibc",
+      "total iron binding capacity"
+    ],
+    "excerpt": "How much iron your blood proteins (mainly transferrin) can carry. When iron stores are low, the body makes more carriers, so TIBC goes up. If it is high: A high TIBC usually means low iron stores. If it is low: A low TIBC can occur with long term illness, malnutrition, liver disease or iron overload.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: UIBC (Unsaturated Iron Binding Capacity)",
+    "title": "UIBC (Unsaturated Iron Binding Capacity)",
+    "url": "",
+    "topics": [
+      "uibc"
+    ],
+    "keywords": [
+      "uibc (unsaturated iron binding capacity)",
+      "uibc",
+      "unsaturated iron binding capacity"
+    ],
+    "excerpt": "The spare carrying space left on your blood proteins that has no iron on it yet. It shows how much more iron the blood could carry. It is high when iron is low. If it is high: A high value suggests low iron stores. If it is low: A low value can suggest iron overload or long term illness.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Transferrin Saturation",
+    "title": "Transferrin Saturation",
+    "url": "",
+    "topics": [
+      "transferrin_saturation",
+      "transferrin"
+    ],
+    "keywords": [
+      "transferrin saturation",
+      "iron saturation"
+    ],
+    "excerpt": "The percent of your iron carrier proteins that are carrying iron. It shows if you have too little or too much iron available for the body. If it is high: A high value can point to iron overload, liver disease or too many iron supplements. If it is low: A low value suggests iron deficiency, often with anemia.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Albumin",
+    "title": "Albumin",
+    "url": "",
+    "topics": [
+      "albumin"
+    ],
+    "keywords": [
+      "albumin"
+    ],
+    "excerpt": "The main protein made by your liver. It keeps fluid inside your blood vessels and carries hormones, medicines and nutrients. Low albumin can show poor liver or kidney health or poor nutrition. If it is high: High albumin is usually from dehydration. If it is low: Can come from liver disease, kidney protein loss, poor diet or long term inflammation. You may notice swelling in feet or face.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Alkaline Phosphatase (ALP)",
+    "title": "Alkaline Phosphatase (ALP)",
+    "url": "",
+    "topics": [
+      "alp",
+      "alkaline_phosphatase"
+    ],
+    "keywords": [
+      "alkaline phosphatase (alp)",
+      "alkaline phosphatase",
+      "alk phos"
+    ],
+    "excerpt": "An enzyme found mainly in the liver, bile ducts and bones. A raised ALP can point to bile duct or liver problems, or to bone activity. If it is high: Common causes are bile duct blockage, liver conditions, bone disease, vitamin D deficiency, or growing bones in teenagers. If it is low: Low ALP is uncommon. It can be from zinc deficiency, hypothyroidism or malnutrition.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Direct Bilirubin",
+    "title": "Direct Bilirubin",
+    "url": "",
+    "topics": [
+      "direct_bilirubin"
+    ],
+    "keywords": [
+      "direct bilirubin",
+      "conjugated bilirubin"
+    ],
+    "excerpt": "Bilirubin that the liver has already processed and is ready to leave the body through bile. A rise points toward a problem draining bile, such as blocked bile ducts or liver inflammation. If it is high: Can come from gallstones, hepatitis, bile duct blockage or certain medicines. Skin and eyes may look yellow.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Total Bilirubin",
+    "title": "Total Bilirubin",
+    "url": "",
+    "topics": [
+      "total_bilirubin",
+      "bilirubin"
+    ],
+    "keywords": [
+      "total bilirubin",
+      "serum bilirubin"
+    ],
+    "excerpt": "A yellow substance made when old red blood cells are broken down. The liver clears it from the blood. High levels turn the eyes and skin yellow (jaundice) and may point to liver, bile duct or red cell problems. If it is high: Can be from Gilbert syndrome (harmless), hepatitis, gallstones, alcohol, or faster breakdown of red cells. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Indirect Bilirubin",
+    "title": "Indirect Bilirubin",
+    "url": "",
+    "topics": [
+      "indirect_bilirubin"
+    ],
+    "keywords": [
+      "indirect bilirubin",
+      "unconjugated bilirubin"
+    ],
+    "excerpt": "Bilirubin that has not yet been processed by the liver. A rise points to faster breakdown of red cells or a slower liver clearing step. If it is high: Common in Gilbert syndrome, hemolysis (red cells breaking down quickly) or after fasting.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: GGTP / GGT",
+    "title": "GGTP / GGT",
+    "url": "",
+    "topics": [
+      "ggt"
+    ],
+    "keywords": [
+      "ggtp / ggt",
+      "gamma gt",
+      "gamma glutamyl transferase"
+    ],
+    "excerpt": "An enzyme in the liver and bile ducts that rises with alcohol, fatty liver and some medicines. It is a sensitive early sign of liver stress. It is also linked with higher heart and diabetes risk. If it is high: Linked with alcohol, fatty liver, bile duct problems, obesity and some medicines. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Total Serum Proteins",
+    "title": "Total Serum Proteins",
+    "url": "",
+    "topics": [
+      "total_protein",
+      "proteins_serum"
+    ],
+    "keywords": [
+      "total serum proteins",
+      "total protein"
+    ],
+    "excerpt": "The sum of albumin and globulin, the main proteins in your blood. It gives a broad look at nutrition, liver function and immune proteins. If it is high: High values can be from dehydration, long term infection or inflammation. If it is low: Low values can be from poor nutrition, liver disease or kidney protein loss.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: SGOT (AST)",
+    "title": "SGOT (AST)",
+    "url": "",
+    "topics": [
+      "sgot",
+      "ast"
+    ],
+    "keywords": [
+      "sgot (ast)",
+      "sgot",
+      "aspartate aminotransferase"
+    ],
+    "excerpt": "An enzyme found in the liver, heart and muscles. Also called AST. It rises when liver or muscle cells are damaged. If it is high: Common causes are fatty liver, alcohol, hepatitis, medicines, hard exercise or muscle injury. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: SGPT (ALT)",
+    "title": "SGPT (ALT)",
+    "url": "",
+    "topics": [
+      "sgpt",
+      "alt"
+    ],
+    "keywords": [
+      "sgpt (alt)",
+      "sgpt",
+      "alanine aminotransferase"
+    ],
+    "excerpt": "An enzyme found mostly in the liver. Also called ALT. It is one of the best early signs of liver cell stress, especially from fatty liver. If it is high: Most often due to fatty liver. Also alcohol, hepatitis, some medicines and supplements. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Globulin",
+    "title": "Globulin",
+    "url": "",
+    "topics": [
+      "globulin"
+    ],
+    "keywords": [
+      "globulin"
+    ],
+    "excerpt": "A group of proteins in your blood, many of which are part of your immune system. It helps show immune activity and long term inflammation or infection. If it is high: Raised in long term infection, inflammation and some blood conditions. If it is low: Low in poor nutrition or weak immunity.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: A/G Ratio",
+    "title": "A/G Ratio",
+    "url": "",
+    "topics": [
+      "ag_ratio"
+    ],
+    "keywords": [
+      "a/g ratio",
+      "albumin globulin ratio"
+    ],
+    "excerpt": "The balance between albumin and globulin in your blood. A change can hint at liver, kidney or immune system issues. If it is high: A high ratio is usually not a concern. If it is low: A low ratio can be due to low albumin or high globulin, as in liver disease or long term inflammation.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: SGOT/SGPT Ratio",
+    "title": "SGOT/SGPT Ratio",
+    "url": "",
+    "topics": [
+      "sgot_sgpt_ratio"
+    ],
+    "keywords": [
+      "sgot/sgpt ratio",
+      "ast/alt ratio",
+      "de ritis ratio"
+    ],
+    "excerpt": "AST divided by ALT. It helps tell what kind of liver stress may be present. A ratio above 1 may suggest alcohol related liver stress or more advanced scarring. Below 1 is typical in early fatty liver. If it is high: A high ratio can point to alcohol, cirrhosis (scarring) or muscle injury.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Total Cholesterol",
+    "title": "Total Cholesterol",
+    "url": "",
+    "topics": [
+      "total_cholesterol",
+      "cholesterol"
+    ],
+    "keywords": [
+      "total cholesterol"
+    ],
+    "excerpt": "The total amount of cholesterol in your blood, from both good and bad types. Cholesterol is needed by the body, but too much of the wrong type can clog arteries. If it is high: Raised by a diet high in saturated and trans fats, extra weight, low activity, an underactive thyroid, diabetes and family history. If it is low: Very low levels are uncommon. They can occur with an overactive thyroid, malnutrition or liver disease.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: HDL Cholesterol",
+    "title": "HDL Cholesterol",
+    "url": "",
+    "topics": [
+      "hdl"
+    ],
+    "keywords": [
+      "hdl cholesterol",
+      "hdl-c"
+    ],
+    "excerpt": "The good cholesterol. It carries extra cholesterol away from your arteries back to the liver. Higher HDL is generally protective for the heart. Low HDL goes with higher risk. If it is high: Very high levels are not always better and are usually not a concern. If it is low: Linked with extra belly fat, low activity, smoking, high triglycerides, diabetes and a high carb diet.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Triglycerides",
+    "title": "Triglycerides",
+    "url": "",
+    "topics": [
+      "triglycerides"
+    ],
+    "keywords": [
+      "triglycerides",
+      "triglyceride"
+    ],
+    "excerpt": "The most common type of fat in your blood. Extra calories, sugar and alcohol are turned into triglycerides. High triglycerides raise the risk of heart disease, fatty liver and, when very high, pancreatitis. If it is high: Linked with sugar, sweets, refined carbs, alcohol, extra weight, diabetes and fatty liver. If it is low: A low value is not a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Non-HDL Cholesterol",
+    "title": "Non-HDL Cholesterol",
+    "url": "",
+    "topics": [
+      "non_hdl"
+    ],
+    "keywords": [
+      "non-hdl cholesterol",
+      "non hdl"
+    ],
+    "excerpt": "Total cholesterol minus HDL. It covers all the cholesterol that can clog arteries (LDL, VLDL and others). It is a strong, simple predictor of heart risk, and does not need fasting. If it is high: Rises with high LDL and high triglycerides.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Total Cholesterol/HDL Ratio",
+    "title": "Total Cholesterol/HDL Ratio",
+    "url": "",
+    "topics": [
+      "tc_hdl_ratio"
+    ],
+    "keywords": [
+      "total cholesterol/hdl ratio",
+      "tc/hdl ratio",
+      "cholesterol hdl ratio"
+    ],
+    "excerpt": "Total cholesterol divided by HDL cholesterol. It gives a quick view of heart risk balance. Lower is better. If it is high: A higher ratio means more bad cholesterol relative to good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: LDL Cholesterol (Calculated)",
+    "title": "LDL Cholesterol (Calculated)",
+    "url": "",
+    "topics": [
+      "ldl"
+    ],
+    "keywords": [
+      "ldl cholesterol (calculated)",
+      "ldl cholesterol",
+      "calculated",
+      "ldl"
+    ],
+    "excerpt": "The bad cholesterol. It deposits fat in artery walls and builds plaque. This value is calculated from other lipid values. LDL is the main target when reducing heart attack and stroke risk. If it is high: Raised by saturated and trans fat, extra weight, low activity, underactive thyroid and family history. If it is low: Very low LDL is not usually a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: VLDL Cholesterol",
+    "title": "VLDL Cholesterol",
+    "url": "",
+    "topics": [
+      "vldl"
+    ],
+    "keywords": [
+      "vldl cholesterol",
+      "vldl"
+    ],
+    "excerpt": "Very low density lipoprotein. It carries triglycerides in the blood and is estimated as triglycerides divided by 5. High VLDL goes with high triglycerides and raises heart and fatty liver risk. If it is high: Rises when triglycerides rise, with sugar, alcohol, extra weight or diabetes.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: LDL/HDL Ratio",
+    "title": "LDL/HDL Ratio",
+    "url": "",
+    "topics": [
+      "ldl_hdl_ratio"
+    ],
+    "keywords": [
+      "ldl/hdl ratio"
+    ],
+    "excerpt": "LDL cholesterol divided by HDL cholesterol. It compares bad to good cholesterol. Lower is better. If it is high: A higher ratio means more bad cholesterol than good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: HDL/LDL Ratio",
+    "title": "HDL/LDL Ratio",
+    "url": "",
+    "topics": [
+      "hdl_ldl_ratio"
+    ],
+    "keywords": [
+      "hdl/ldl ratio"
+    ],
+    "excerpt": "HDL cholesterol divided by LDL cholesterol. It is the flip of the LDL/HDL ratio. A higher ratio is better because it means more good cholesterol compared to bad. If it is low: A low ratio means more bad cholesterol than good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Lipoprotein(a), Lp(a)",
+    "title": "Lipoprotein(a), Lp(a)",
+    "url": "",
+    "topics": [
+      "lpa"
+    ],
+    "keywords": [
+      "lipoprotein(a), lp(a)",
+      "lipoprotein, lp",
+      "lp(a)",
+      "lipoprotein a"
+    ],
+    "excerpt": "A type of cholesterol particle mostly decided by your genes. It stays about the same all your life. High Lp(a) raises the risk of heart attack, stroke and narrowing of the heart valve, even when other cholesterol is normal. If it is high: Mostly inherited. Lifestyle changes do not change it much, so other risks like LDL, BP and sugar should be kept very well controlled. If it is low: Low values are good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Apolipoprotein B (ApoB)",
+    "title": "Apolipoprotein B (ApoB)",
+    "url": "",
+    "topics": [
+      "apob"
+    ],
+    "keywords": [
+      "apolipoprotein b (apob)",
+      "apolipoprotein b",
+      "apob",
+      "apo b"
+    ],
+    "excerpt": "A protein found on every bad cholesterol particle (LDL, VLDL and others). One ApoB equals one particle. It counts the number of artery clogging particles. It can be a better risk guide than LDL alone. If it is high: Often high with high LDL, high triglycerides, insulin resistance, extra weight and underactive thyroid. If it is low: Low is good.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Fasting Blood Glucose",
+    "title": "Fasting Blood Glucose",
+    "url": "",
+    "topics": [
+      "fasting_glucose",
+      "fasting_blood_glucose"
+    ],
+    "keywords": [
+      "fasting blood glucose",
+      "fasting blood sugar"
+    ],
+    "excerpt": "The sugar level in your blood after at least 8 hours without food. Sugar is your body's fuel. A high fasting level is an early sign of prediabetes or diabetes. If it is high: Your body may not be using insulin well. Over time high sugar can harm eyes, kidneys, nerves and heart. If it is low: Can cause shakiness, sweating, hunger, confusion and weakness. More common in people on diabetes medicines or after long gaps between meals.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: HbA1c (Glycated Hemoglobin)",
+    "title": "HbA1c (Glycated Hemoglobin)",
+    "url": "",
+    "topics": [
+      "hba1c"
+    ],
+    "keywords": [
+      "hba1c (glycated hemoglobin)",
+      "hba1c",
+      "glycated hemoglobin",
+      "a1c",
+      "glycosylated hemoglobin"
+    ],
+    "excerpt": "Your average blood sugar over the last 2 to 3 months, measured by how much sugar is stuck to hemoglobin. It gives the long term picture and is used to find and track prediabetes and diabetes. If it is high: Means your average sugar has been high. Long term high sugar harms eyes, kidneys, nerves and heart. If it is low: Low values can occur with anemia, blood loss, or too much diabetes medicine.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Fasting Insulin",
+    "title": "Fasting Insulin",
+    "url": "",
+    "topics": [
+      "fasting_insulin"
+    ],
+    "keywords": [
+      "fasting insulin",
+      "serum insulin"
+    ],
+    "excerpt": "The amount of insulin in your blood after fasting. Insulin moves sugar from the blood into cells. High fasting insulin is one of the earliest signs of insulin resistance, often years before sugar rises. If it is high: Often means the body is making extra insulin to keep sugar normal. Linked with belly fat, fatty liver, PCOS and prediabetes. If it is low: Low insulin with high sugar can occur in type 1 diabetes or late stage type 2 diabetes.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Vitamin B12",
+    "title": "Vitamin B12",
+    "url": "",
+    "topics": [
+      "vitamin_b12"
+    ],
+    "keywords": [
+      "vitamin b12",
+      "cobalamin"
+    ],
+    "excerpt": "A vitamin that helps make red blood cells, keeps nerves healthy and supports DNA. It comes mainly from animal foods. Low B12 can cause tiredness, tingling, memory problems and anemia. It is very common in vegetarians in India. If it is high: Usually from B12 supplements. Rarely, it can reflect liver or blood conditions. If it is low: Causes tiredness, weakness, tingling in hands and feet, mouth ulcers, memory trouble, low mood and anemia.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Vitamin D Total (25-Hydroxy)",
+    "title": "Vitamin D Total (25-Hydroxy)",
+    "url": "",
+    "topics": [
+      "vitamin_d"
+    ],
+    "keywords": [
+      "vitamin d total (25-hydroxy)",
+      "vitamin d total",
+      "25-hydroxy",
+      "25-oh vitamin d",
+      "25 hydroxy vitamin d",
+      "vit d"
+    ],
+    "excerpt": "The main storage form of vitamin D in your blood. Your skin makes it from sunlight. It keeps bones and muscles strong and supports immunity, mood and metabolism. Deficiency is very common in India. If it is high: Usually from taking too many supplements. Very high levels can cause high calcium. If it is low: Causes bone pain, muscle weakness, tiredness, frequent infections and low mood. Can weaken bones over time.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Vitamin C",
+    "title": "Vitamin C",
+    "url": "",
+    "topics": [
+      "vitamin_c"
+    ],
+    "keywords": [
+      "vitamin c",
+      "ascorbic acid"
+    ],
+    "excerpt": "A vitamin that supports immunity, skin, wound healing and iron absorption. It also works as an antioxidant. Low vitamin C can cause tiredness, bleeding gums and slow healing. If it is high: Very high levels come from large supplement doses and may upset the stomach. If it is low: Can cause tiredness, bleeding or swollen gums, easy bruising, dry skin, slow wound healing and frequent infections.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Total Testosterone",
+    "title": "Total Testosterone",
+    "url": "",
+    "topics": [
+      "testosterone"
+    ],
+    "keywords": [
+      "total testosterone",
+      "testosterone",
+      "serum testosterone"
+    ],
+    "excerpt": "A hormone made mainly in the testes in men and in smaller amounts in the ovaries and adrenal glands in women. In men it supports muscle, energy, mood, sex drive and bone. In women, high levels can point to PCOS and cause acne, extra facial hair or irregular periods. If it is high: In women, high levels are often linked with PCOS, causing acne, extra hair growth, scalp hair thinning and irregular periods. In men, very high levels may come from supplements or steroids. If it is low: In men, low levels can cause tiredness, low sex drive, low mood, weak muscles and belly fat gain. In women, low levels can reduce energy and sex drive.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Luteinizing Hormone (LH)",
+    "title": "Luteinizing Hormone (LH)",
+    "url": "",
+    "topics": [
+      "lh"
+    ],
+    "keywords": [
+      "luteinizing hormone (lh)",
+      "luteinizing hormone",
+      "lutropin"
+    ],
+    "excerpt": "A hormone from the brain that tells the ovaries to release an egg and make hormones. It helps check ovulation, periods and PCOS. In PCOS, LH is often higher than FSH. If it is high: High values are seen in PCOS, around ovulation, and after menopause. If it is low: Low values can occur with very low body weight, high stress, heavy exercise or pituitary problems.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Follicle-Stimulating Hormone (FSH)",
+    "title": "Follicle-Stimulating Hormone (FSH)",
+    "url": "",
+    "topics": [
+      "fsh"
+    ],
+    "keywords": [
+      "follicle-stimulating hormone (fsh)",
+      "follicle-stimulating hormone",
+      "follitropin"
+    ],
+    "excerpt": "A hormone from the brain that helps eggs grow in the ovaries. FSH helps judge ovarian reserve, fertility and menopause. If it is high: High FSH can show that the ovaries are getting less responsive, as in menopause or early ovarian aging. If it is low: Low FSH can be seen in PCOS, very low weight, heavy exercise or pituitary problems.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Cortisol",
+    "title": "Cortisol",
+    "url": "",
+    "topics": [
+      "cortisol"
+    ],
+    "keywords": [
+      "cortisol",
+      "serum cortisol",
+      "morning cortisol"
+    ],
+    "excerpt": "The body's main stress hormone, made by the adrenal glands. It follows a daily rhythm, high in the morning and low at night. It helps manage stress, blood sugar, blood pressure and energy. Imbalances affect sleep, weight and mood. If it is high: Long term stress, poor sleep, obesity, or certain medicines like steroids can raise it. Rarely, a gland problem causes very high levels. If it is low: Low values can cause tiredness, low blood pressure, dizziness and weight loss. Rarely, it is a sign of adrenal insufficiency.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Prolactin",
+    "title": "Prolactin",
+    "url": "",
+    "topics": [
+      "prolactin"
+    ],
+    "keywords": [
+      "prolactin"
+    ],
+    "excerpt": "A hormone from the pituitary gland that helps make breast milk. It is also involved in periods and fertility. High prolactin can stop periods, reduce fertility and cause milk discharge when not pregnant. If it is high: Raised by stress, sleep, some medicines, an underactive thyroid, PCOS in some women, or a small pituitary growth. If it is low: A low value is uncommon and rarely a concern.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: DHEAS (Dehydroepiandrosterone Sulfate)",
+    "title": "DHEAS (Dehydroepiandrosterone Sulfate)",
+    "url": "",
+    "topics": [
+      "dheas"
+    ],
+    "keywords": [
+      "dheas (dehydroepiandrosterone sulfate)",
+      "dheas",
+      "dehydroepiandrosterone sulfate",
+      "dhea-s",
+      "dhea sulfate"
+    ],
+    "excerpt": "A hormone made by the adrenal glands that the body turns into sex hormones. It falls steadily with age. It helps show adrenal health and is checked in PCOS, acne and excess hair growth. If it is high: In women, high levels can point to PCOS or an adrenal cause of excess hair growth and irregular periods. If it is low: Low levels are common with age and long term stress, or after steroid use. They may go with low energy.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: IGF-1 (Insulin-Like Growth Factor 1)",
+    "title": "IGF-1 (Insulin-Like Growth Factor 1)",
+    "url": "",
+    "topics": [
+      "igf1"
+    ],
+    "keywords": [
+      "igf-1 (insulin-like growth factor 1)",
+      "igf-1",
+      "insulin-like growth factor 1",
+      "somatomedin c",
+      "igf1"
+    ],
+    "excerpt": "A hormone made mainly by the liver in response to growth hormone. It supports growth, muscle and tissue repair. It reflects growth hormone activity over time and can be linked to ageing, nutrition and metabolic health. If it is high: Very high levels may suggest too much growth hormone. Mildly high levels can occur in young adults. If it is low: Low levels can come from poor nutrition, liver disease, an underactive thyroid, uncontrolled diabetes, or low growth hormone.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Parathyroid Hormone (PTH)",
+    "title": "Parathyroid Hormone (PTH)",
+    "url": "",
+    "topics": [
+      "pth"
+    ],
+    "keywords": [
+      "parathyroid hormone (pth)",
+      "parathyroid hormone",
+      "intact pth",
+      "parathormone"
+    ],
+    "excerpt": "A hormone from four small glands near the thyroid. It controls calcium and vitamin D balance and keeps bones healthy. A high PTH is often the body's response to low vitamin D or low calcium. It can also signal an overactive parathyroid gland. If it is high: Very common with vitamin D deficiency or low calcium. Also seen in kidney disease, and rarely with an overactive parathyroid gland. If it is low: Low PTH can cause low calcium, with tingling, cramps or muscle spasms.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: CA 125",
+    "title": "CA 125",
+    "url": "",
+    "topics": [
+      "ca125"
+    ],
+    "keywords": [
+      "ca 125",
+      "ca-125",
+      "cancer antigen 125"
+    ],
+    "excerpt": "A protein that can be higher in some ovarian conditions and other problems affecting the lining of the belly and pelvis. It is used with scans and symptoms to follow certain ovarian conditions. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Often raised by harmless things like periods, endometriosis, fibroids, pelvic infection, pregnancy, and liver problems. Rarely by ovarian cancer. If it is low: A low value is normal.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: CA 15-3",
+    "title": "CA 15-3",
+    "url": "",
+    "topics": [
+      "ca153"
+    ],
+    "keywords": [
+      "ca 15-3",
+      "ca 15.3",
+      "cancer antigen 15-3"
+    ],
+    "excerpt": "A protein that can be higher in some breast conditions. It is mainly used to follow people already treated for breast problems. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Mildly raised in many harmless conditions such as liver disease, benign breast disease or lung disease. Rarely a sign of cancer. If it is low: A low value is normal.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: CA 19-9",
+    "title": "CA 19-9",
+    "url": "",
+    "topics": [
+      "ca199"
+    ],
+    "keywords": [
+      "ca 19-9",
+      "ca19.9",
+      "cancer antigen 19-9"
+    ],
+    "excerpt": "A protein that can be higher in some conditions of the pancreas, bile ducts, stomach and gut. It is mostly used to follow people with pancreas or bile duct conditions. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Raised by gallstones, pancreatitis, liver disease, diabetes and blocked bile ducts. Rarely by pancreatic or gut cancer. If it is low: A low value is normal. Some people cannot make this marker at all.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: CEA (Carcinoembryonic Antigen)",
+    "title": "CEA (Carcinoembryonic Antigen)",
+    "url": "",
+    "topics": [
+      "cea"
+    ],
+    "keywords": [
+      "cea (carcinoembryonic antigen)",
+      "carcinoembryonic antigen"
+    ],
+    "excerpt": "A protein that can be higher in some conditions of the gut, lung and other organs. It is mostly used to follow people treated for gut cancers. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Smoking is a common cause. Also raised in gut inflammation, liver disease, infections and some cancers. If it is low: A low value is normal.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: AFP (Alpha-Fetoprotein)",
+    "title": "AFP (Alpha-Fetoprotein)",
+    "url": "",
+    "topics": [
+      "afp"
+    ],
+    "keywords": [
+      "afp (alpha-fetoprotein)",
+      "afp",
+      "alpha-fetoprotein",
+      "alpha fetoprotein"
+    ],
+    "excerpt": "A protein made by the liver of a growing baby. In adults, levels are normally very low. In non pregnant adults it is used to check for liver conditions. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Can rise with hepatitis, cirrhosis, liver injury or, rarely, a liver growth. It is normally higher in pregnancy. If it is low: A low value is normal.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: PSA (Prostate-Specific Antigen)",
+    "title": "PSA (Prostate-Specific Antigen)",
+    "url": "",
+    "topics": [
+      "psa"
+    ],
+    "keywords": [
+      "psa (prostate-specific antigen)",
+      "prostate-specific antigen",
+      "prostate specific antigen"
+    ],
+    "excerpt": "A protein made by the prostate gland, found in a man's blood. It is used with an exam to check prostate health. A tumor marker is not a test to diagnose cancer. Many harmless conditions can raise it, and some cancers do not raise it. If it is high: Raised by prostate enlargement, infection, recent ejaculation, cycling, a urine catheter or rarely prostate cancer. If it is low: A low value is normal.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Calcium",
+    "title": "Calcium",
+    "url": "",
+    "topics": [
+      "calcium"
+    ],
+    "keywords": [
+      "calcium",
+      "total calcium",
+      "serum calcium"
+    ],
+    "excerpt": "A mineral that keeps bones and teeth strong and helps muscles, nerves and the heart work. Blood calcium is tightly controlled. Out of range values can point to vitamin D, parathyroid, kidney or bone problems. If it is high: Can be due to an overactive parathyroid gland, too much vitamin D or calcium supplements, dehydration, or rarely cancer. May cause thirst, constipation, kidney stones and tiredness. If it is low: Can be due to low vitamin D, low albumin, kidney disease or low magnesium. May cause cramps, tingling and weak bones.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Creatinine",
+    "title": "Creatinine",
+    "url": "",
+    "topics": [
+      "creatinine"
+    ],
+    "keywords": [
+      "creatinine",
+      "serum creatinine"
+    ],
+    "excerpt": "A waste product from normal muscle use. Healthy kidneys filter it out of your blood. It is the key marker of kidney filtering. A rising level means the kidneys may not be clearing waste well. If it is high: Can be due to kidney disease, dehydration, high meat or protein supplement intake, hard exercise, or certain medicines. If it is low: Low levels may be seen with low muscle mass, older age or pregnancy.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: eGFR (Estimated Glomerular Filtration Rate)",
+    "title": "eGFR (Estimated Glomerular Filtration Rate)",
+    "url": "",
+    "topics": [
+      "egfr"
+    ],
+    "keywords": [
+      "egfr (estimated glomerular filtration rate)",
+      "estimated glomerular filtration rate",
+      "estimated gfr"
+    ],
+    "excerpt": "An estimate of how well your kidneys filter blood, calculated from creatinine, age and sex. It is the best single number to track kidney health and find early kidney disease. If it is high: A high eGFR is usually normal. If it is low: Low eGFR means the kidneys are filtering less. Early kidney disease often has no symptoms.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urea",
+    "title": "Urea",
+    "url": "",
+    "topics": [
+      "urea"
+    ],
+    "keywords": [
+      "serum urea",
+      "blood urea"
+    ],
+    "excerpt": "A waste product made by the liver when protein is broken down. Kidneys remove it in urine. A high level can show dehydration, a high protein diet or reduced kidney function. If it is high: Common with dehydration, high protein diets, bleeding in the gut, infections and kidney disease. If it is low: Low levels can come from a very low protein diet, liver disease or overhydration.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: BUN (Blood Urea Nitrogen)",
+    "title": "BUN (Blood Urea Nitrogen)",
+    "url": "",
+    "topics": [
+      "bun"
+    ],
+    "keywords": [
+      "bun (blood urea nitrogen)",
+      "blood urea nitrogen"
+    ],
+    "excerpt": "The nitrogen part of urea in your blood. It is just another way of reporting urea. Like urea, it shows how well the kidneys clear waste and how hydrated you are. If it is high: Common with dehydration, high protein diets, gut bleeding and kidney disease. If it is low: Low levels can come from low protein intake, liver disease or overhydration.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: BUN/Creatinine Ratio",
+    "title": "BUN/Creatinine Ratio",
+    "url": "",
+    "topics": [
+      "bun_creat_ratio"
+    ],
+    "keywords": [
+      "bun/creatinine ratio",
+      "bun creatinine ratio"
+    ],
+    "excerpt": "BUN divided by creatinine. It helps tell the cause of a raised kidney marker. A high ratio often points to dehydration or reduced blood flow to the kidneys, not damage in the kidney itself. If it is high: Common with dehydration, a high protein diet or gut bleeding. If it is low: Can be seen with low protein diet, liver disease or overhydration.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Urea/Creatinine Ratio",
+    "title": "Urea/Creatinine Ratio",
+    "url": "",
+    "topics": [
+      "urea_creat_ratio"
+    ],
+    "keywords": [
+      "urea/creatinine ratio"
+    ],
+    "excerpt": "Urea divided by creatinine. It is the urea version of the BUN to creatinine ratio. It helps tell if a raised urea is due to dehydration or to kidney damage. If it is high: A high ratio often points to dehydration or reduced blood flow to the kidneys. If it is low: A low ratio can be due to low protein intake or liver disease.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Uric Acid",
+    "title": "Uric Acid",
+    "url": "",
+    "topics": [
+      "uric_acid"
+    ],
+    "keywords": [
+      "uric acid",
+      "serum uric acid",
+      "urate"
+    ],
+    "excerpt": "A waste product made when the body breaks down purines found in some foods. Kidneys remove most of it. High uric acid can cause gout, joint pain and kidney stones, and is linked with fatty liver, high blood pressure and heart disease. If it is high: Linked with a diet high in red meat, organ meats, seafood, sugary drinks and alcohol, along with extra weight, kidney problems and some medicines. If it is low: Low levels are uncommon and not usually a problem.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Sodium",
+    "title": "Sodium",
+    "url": "",
+    "topics": [
+      "sodium"
+    ],
+    "keywords": [
+      "sodium",
+      "serum sodium"
+    ],
+    "excerpt": "A key salt in your blood that controls water balance, nerves, muscles and blood pressure. Out of range sodium can cause confusion, weakness and headaches and needs prompt attention. If it is high: Often from not drinking enough water or losing fluid through sweating, diarrhoea or vomiting. If it is low: Can be due to too much water, some medicines like diuretics, heart, liver or kidney problems, or hormone issues. May cause headache, nausea and confusion.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Potassium",
+    "title": "Potassium",
+    "url": "",
+    "topics": [
+      "potassium"
+    ],
+    "keywords": [
+      "potassium",
+      "serum potassium"
+    ],
+    "excerpt": "A mineral that helps your heart, muscles and nerves work. Both low and high potassium can disturb heart rhythm, so it is carefully watched. If it is high: Can be due to kidney disease, certain medicines, or a hemolysed (damaged) sample. May cause weakness and irregular heartbeat. If it is low: Can be due to diarrhoea, vomiting, sweating, diuretics or low intake. May cause cramps, weakness and palpitations.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Chloride",
+    "title": "Chloride",
+    "url": "",
+    "topics": [
+      "chloride"
+    ],
+    "keywords": [
+      "chloride",
+      "serum chloride"
+    ],
+    "excerpt": "A salt in your blood that helps balance fluids and acid base levels. It usually moves along with sodium and helps find fluid or acid base problems. If it is high: Often due to dehydration or too much salt, or acid base problems. If it is low: Often due to vomiting, diarrhoea, sweating or some medicines.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Inorganic Phosphorus",
+    "title": "Inorganic Phosphorus",
+    "url": "",
+    "topics": [
+      "phosphorus"
+    ],
+    "keywords": [
+      "inorganic phosphorus",
+      "phosphate",
+      "serum phosphorus"
+    ],
+    "excerpt": "A mineral that works with calcium to build bones and helps in energy production. Together with calcium and PTH, it shows bone and kidney health. If it is high: Common in kidney disease, or with too much vitamin D, or low PTH. If it is low: Can be due to low vitamin D, poor intake, alcohol use or gut problems.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: TSH (Thyroid-Stimulating Hormone)",
+    "title": "TSH (Thyroid-Stimulating Hormone)",
+    "url": "",
+    "topics": [
+      "tsh"
+    ],
+    "keywords": [
+      "tsh (thyroid-stimulating hormone)",
+      "tsh",
+      "thyroid-stimulating hormone",
+      "thyrotropin",
+      "thyroid stimulating hormone"
+    ],
+    "excerpt": "A hormone from the brain that tells the thyroid how much hormone to make. It is the first test for thyroid problems. A thyroid that is too slow or too fast affects energy, weight, mood, heart rate, periods and cholesterol. If it is high: A high TSH means the thyroid is underactive (hypothyroidism). You may feel tired, cold, gain weight, have dry skin, constipation and heavy periods. If it is low: A low TSH means the thyroid may be overactive (hyperthyroidism). You may feel anxious, lose weight, sweat, have a fast heartbeat and tremor.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: T4 (Thyroxine)",
+    "title": "T4 (Thyroxine)",
+    "url": "",
+    "topics": [
+      "t4"
+    ],
+    "keywords": [
+      "t4 (thyroxine)",
+      "thyroxine",
+      "total t4"
+    ],
+    "excerpt": "The main hormone made by the thyroid gland. It controls your metabolism. It shows how much thyroid hormone is in your blood. It is read along with TSH. If it is high: A high T4 with low TSH suggests an overactive thyroid. If it is low: A low T4 with high TSH suggests an underactive thyroid.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: T3 (Triiodothyronine)",
+    "title": "T3 (Triiodothyronine)",
+    "url": "",
+    "topics": [
+      "t3"
+    ],
+    "keywords": [
+      "t3 (triiodothyronine)",
+      "triiodothyronine",
+      "total t3"
+    ],
+    "excerpt": "The active thyroid hormone. T4 turns into T3, which acts on your cells. It helps confirm an overactive thyroid. It is less useful for underactive thyroid. If it is high: A high T3 suggests an overactive thyroid. If it is low: Low T3 can come from underactive thyroid or from serious illness or crash dieting.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  }
+]

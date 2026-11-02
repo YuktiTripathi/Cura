@@ -1,0 +1,280 @@
+[
+  {
+    "name": "Cura knowledge base: Dyslipidemia (Cholesterol Imbalance)",
+    "title": "Dyslipidemia (Cholesterol Imbalance)",
+    "url": "",
+    "topics": [
+      "dyslipidemia"
+    ],
+    "keywords": [
+      "dyslipidemia (cholesterol imbalance)",
+      "dyslipidemia",
+      "cholesterol imbalance",
+      "high cholesterol",
+      "abnormal lipids",
+      "atherogenic dyslipidemia"
+    ],
+    "excerpt": "Too much of the bad fats (LDL and triglycerides) or too little of the good fat (HDL) in your blood, which slowly clogs arteries. Dyslipidemia means your blood fats are out of balance. It can be high LDL (bad cholesterol), high triglycerides, low HDL (good cholesterol), or a mix. It usually causes no symptoms, so a blood test is the only way to know. Look at LDL, non-HDL and ApoB for the amount of artery clogging particles. Triglycerides and HDL often show insulin resistance and fatty liver. A high TSH can push cholesterol up, so thyroid is worth checking.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Stroke Risk",
+    "title": "Stroke Risk",
+    "url": "",
+    "topics": [
+      "stroke"
+    ],
+    "keywords": [
+      "stroke risk",
+      "brain attack",
+      "cerebrovascular accident"
+    ],
+    "excerpt": "A stroke happens when blood flow to part of the brain is blocked or a blood vessel in the brain bursts. Your risk can be lowered long before it happens. A stroke is a medical emergency in which part of the brain is suddenly cut off from blood. Most strokes are caused by a clot or narrowed artery (ischemic). Others are caused by bleeding in the brain (hemorrhagic). Risk builds slowly over years from high blood pressure, sugar, cholesterol and smoking. High blood pressure is the biggest driver. High sugar, high cholesterol particles (ApoB, LDL, Lp(a)), high homocysteine and inflammation add to risk and make clots and plaque more likely.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Heart Disease Risk (Cardiac Health)",
+    "title": "Heart Disease Risk (Cardiac Health)",
+    "url": "",
+    "topics": [
+      "cardiac_health"
+    ],
+    "keywords": [
+      "heart disease risk (cardiac health)",
+      "heart disease risk",
+      "cardiac health",
+      "coronary artery disease",
+      "heart attack risk",
+      "cvd risk"
+    ],
+    "excerpt": "Your chance of developing blocked heart arteries, heart attack or other heart problems, based on your blood tests, blood pressure and lifestyle. Cardiac health risk looks at how likely you are to get heart disease, mostly caused by narrowed heart arteries (coronary artery disease). It builds silently for years. Early action can prevent a heart attack. ApoB and LDL show how many artery clogging particles you carry. Lp(a) is an inherited extra risk. hs-CRP and homocysteine show inflammation and vessel stress. Sugar and blood pressure damage the vessel walls and speed everything up.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: PCOS / PCOD",
+    "title": "PCOS / PCOD",
+    "url": "",
+    "topics": [
+      "pcos"
+    ],
+    "keywords": [
+      "pcos / pcod",
+      "polycystic ovary syndrome",
+      "polycystic ovarian disease",
+      "pcos"
+    ],
+    "excerpt": "A common hormone condition in women that can cause irregular periods, extra hair growth, acne and difficulty getting pregnant. PCOS is a hormone imbalance in women of reproductive age. The ovaries may not release eggs regularly, and the body makes more male type hormones (androgens) than usual. It is closely linked to insulin resistance. High testosterone or DHEAS point to extra androgens. LH is often higher than FSH. High fasting insulin and sugar show the insulin resistance behind it. Thyroid and prolactin are checked to rule out other causes.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Metabolic Syndrome",
+    "title": "Metabolic Syndrome",
+    "url": "",
+    "topics": [
+      "metabolic_syndrome"
+    ],
+    "keywords": [
+      "metabolic syndrome",
+      "syndrome x",
+      "insulin resistance syndrome"
+    ],
+    "excerpt": "A group of warning signs, like belly fat, high sugar and high blood pressure, that show up together and raise the risk of diabetes and heart disease. Metabolic syndrome is not one disease. It is a cluster of problems that appear together. You are said to have it when you have three or more of five signs. A big waist, high triglycerides, low HDL, high BP and high sugar are the five defining signs. High insulin, high uric acid, high ALT and high hs-CRP often come along because of the same root cause.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Hypothyroidism (Underactive Thyroid)",
+    "title": "Hypothyroidism (Underactive Thyroid)",
+    "url": "",
+    "topics": [
+      "hypothyroidism",
+      "thyroid"
+    ],
+    "keywords": [
+      "hypothyroidism (underactive thyroid)",
+      "hypothyroidism",
+      "underactive thyroid",
+      "low thyroid",
+      "hashimoto's thyroiditis"
+    ],
+    "excerpt": "A condition where the thyroid gland makes too little hormone, slowing down the body. The thyroid is a butterfly shaped gland in the neck that controls how fast your body uses energy. In hypothyroidism it makes too little hormone, so many body functions slow down. It is common, especially in women. A high TSH with a low T4 is the main sign. Cholesterol, triglycerides and homocysteine can rise because of the slowdown. B12 and prolactin are sometimes checked as well.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Obesity and Excess Body Fat",
+    "title": "Obesity and Excess Body Fat",
+    "url": "",
+    "topics": [
+      "obesity"
+    ],
+    "keywords": [
+      "obesity and excess body fat",
+      "overweight",
+      "adiposity",
+      "central obesity"
+    ],
+    "excerpt": "Having more body fat than is healthy, especially around the belly, which raises the chance of many diseases. Obesity means too much body fat. For South Asians, health risks start at a lower weight than in other groups, so Asian BMI and waist limits are used. Belly fat is more harmful than fat under the skin. Extra belly fat is linked to higher insulin, sugar, triglycerides, ALT and hs-CRP, and lower HDL and vitamin D. Thyroid is checked to rule out a hormone cause.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Type 2 Diabetes",
+    "title": "Type 2 Diabetes",
+    "url": "",
+    "topics": [
+      "type_2_diabetes"
+    ],
+    "keywords": [
+      "type 2 diabetes",
+      "diabetes",
+      "high blood sugar",
+      "prediabetes"
+    ],
+    "excerpt": "A long term condition in which the body cannot control blood sugar properly. It usually starts with prediabetes, which can often be reversed. In type 2 diabetes, the body does not respond well to insulin (insulin resistance) and eventually cannot make enough of it, so sugar builds up in the blood. Prediabetes is the stage before, when sugar is higher than normal but not yet in the diabetes range. Fasting sugar shows today's control and HbA1c shows the last 3 months. Fasting insulin shows insulin resistance early. Kidney markers and urine protein show if sugar has begun to affect the kidneys. B12 can be low in people taking metformin.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: High Blood Pressure (Hypertension)",
+    "title": "High Blood Pressure (Hypertension)",
+    "url": "",
+    "topics": [
+      "hypertension"
+    ],
+    "keywords": [
+      "high blood pressure (hypertension)",
+      "high blood pressure",
+      "hypertension",
+      "high bp",
+      "silent killer"
+    ],
+    "excerpt": "A long term condition in which the force of blood on your artery walls stays too high, silently straining the heart, brain and kidneys. Blood pressure is the force of blood pushing against your artery walls. It is written as two numbers, like 120/80. Hypertension means it stays high over time. It usually has no symptoms, which is why it is called the silent killer. Sodium and potassium show salt balance. Creatinine, eGFR and urine protein show if blood pressure has begun to affect the kidneys. Uric acid, sugar and cholesterol often rise with BP and add to heart risk. Cortisol is checked if a hormone cause is suspected.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  },
+  {
+    "name": "Cura knowledge base: Fatty Liver (MASLD / NAFLD)",
+    "title": "Fatty Liver (MASLD / NAFLD)",
+    "url": "",
+    "topics": [
+      "masld",
+      "nafld"
+    ],
+    "keywords": [
+      "fatty liver (masld / nafld)",
+      "fatty liver",
+      "masld / nafld",
+      "non-alcoholic fatty liver disease",
+      "nafld",
+      "metabolic dysfunction associated steatotic liver disease"
+    ],
+    "excerpt": "A buildup of extra fat in the liver that is not caused by alcohol. It is very common and closely tied to weight, sugar and cholesterol. MASLD is the newer name for NAFLD. It means more than 5 percent of the liver is fat, along with signs like extra weight, high sugar, high triglycerides or high blood pressure. At first it is silent and reversible. Over years, it can cause inflammation (MASH), scarring and cirrhosis. A raised ALT and GGT show liver cell stress. High triglycerides, low HDL and high insulin show the metabolic root. Low platelets and low albumin can point to more advanced scarring and need a doctor's attention.",
+    "source_type": "cura_knowledge_base",
+    "tier": 2,
+    "content_kind": "cura_summary",
+    "publication_date": "2026-11-02",
+    "licence_status": "own_content",
+    "region": "IN",
+    "provenance": "cura_knowledge_base",
+    "version": "cura-kb-v1",
+    "review_status": "draft",
+    "reviewer": null,
+    "reviewed_on": null,
+    "expires_on": null
+  }
+]
