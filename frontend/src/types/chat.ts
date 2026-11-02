@@ -33,6 +33,7 @@ export type ContextRef = {
   risk_code?: string | null;
   report_id?: string | null;
   document_id?: string | null;
+  entry_point?: "blood_report_overview" | null;
 };
 
 export type Recommendation = {

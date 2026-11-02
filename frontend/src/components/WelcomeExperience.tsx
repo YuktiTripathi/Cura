@@ -38,6 +38,7 @@ export function WelcomeExperience({
               onSend("Help me understand my latest blood report", [], {
                 type: "blood_report",
                 source: "supershyft",
+                entry_point: "blood_report_overview",
               })
             }
           >

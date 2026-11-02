@@ -1,6 +1,6 @@
 import re
 
-from app.contracts.common import IntentType, KnowledgeScope, QuerySource
+from app.contracts.common import AnswerDepth, IntentType, KnowledgeScope, QuerySource
 from app.contracts.query import QueryPlan
 from app.pipeline.intent import BIO_KEYS, classify_intent, knowledge_scope_for
 from app.pipeline.ontology import attach_ontology
@@ -272,6 +272,13 @@ def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:
             needs_general=False,
             source=QuerySource.blood,
         )
+        if ref.entry_point == "blood_report_overview":
+            update.update(
+                entry_point="blood_report_overview",
+                answer_depth=AnswerDepth.broad,
+                topic=None,
+                requested_metrics=[],
+            )
     elif ref.type == "bio_ai_risk":
         update.update(
             intent=IntentType.bio_ai_explanation,

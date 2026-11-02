@@ -20,6 +20,8 @@ class ContextRef(BaseModel):
     risk_code: str | None = Field(default=None, max_length=128)
     report_id: str | None = Field(default=None, max_length=128)
     document_id: str | None = Field(default=None, max_length=36)
+    # Set only by an explicit entry point. Message text must not infer this.
+    entry_point: Literal["blood_report_overview"] | None = None
 
     @model_validator(mode="after")
     def validate_identifiers(self) -> "ContextRef":

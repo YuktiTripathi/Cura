@@ -37,6 +37,7 @@ class QueryPlan(BaseModel):
     follow_up: bool = False
     raw_message: str = ""
     explicit_source_ref: bool = False
+    entry_point: str | None = None
     personal_reference: bool = False
     medical_evidence_required: bool = False
     data_sources: list[str] = Field(default_factory=list)
