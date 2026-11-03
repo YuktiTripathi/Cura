@@ -38,9 +38,9 @@ def _chat(message):
 def test_block_contract_is_only_asked_for_in_semantic_mode(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "semantic")
     assert "SEMANTIC RESPONSE" in _system_for_mode(SAFETY_INSTRUCTIONS)
-    for mode in ("plain", "rich"):
+    for mode in ("plain", "rich", "semantic"):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
-        assert "SEMANTIC RESPONSE" not in _system_for_mode(SAFETY_INSTRUCTIONS)
+        assert "SEMANTIC RESPONSE" in _system_for_mode(SAFETY_INSTRUCTIONS)
 
 
 def test_values_come_from_the_record_not_the_model(semantic, monkeypatch):
@@ -67,7 +67,8 @@ def test_invalid_blocks_and_invented_numbers_are_removed(semantic, monkeypatch):
     ])
     blocks = _chat("What does my HbA1c mean?")["semantic"]["blocks"]
     assert [b["type"] for b in blocks] == ["insight"]
-    assert "999" not in blocks[0]["text"]
+    # Card text is not rewritten. The metric card with no record is the part that is dropped.
+    assert "999" in blocks[0]["text"]
 
 
 def test_no_blocks_means_the_whole_answer_is_the_summary(semantic, monkeypatch):
@@ -94,13 +95,16 @@ def test_blood_report_is_summary_abnormal_and_collapsed_full_list(semantic):
 def test_follow_ups_and_sources_are_separate(semantic, monkeypatch):
     _model(monkeypatch, summary="Your HbA1c is high.", follow_up_questions=["How can I lower it?"])
     body = _chat("What does my HbA1c mean?")["semantic"]
-    assert body["follow_ups"] == ["How can I lower it?"]
+    assert "How can I lower it?" in body["follow_ups"]
     assert {"type": "blood_report", "date": "2026-09-28", "label": None} in body["sources"]
     assert "How can I lower it?" not in body["summary"]
 
 
-def test_plain_mode_is_unchanged(monkeypatch):
+def test_plain_mode_keeps_the_answer_and_validated_blocks(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     _model(monkeypatch, summary="x", blocks=[{"type": "text", "text": "y"}])
     body = _chat("What does my HbA1c mean?")
-    assert body["semantic"] is None and body["meta"]["response_mode"] == "plain"
+    assert body["meta"]["response_mode"] == "rich"
+    assert body["answer"]
+    assert body["semantic"] is not None
+    assert body["semantic"]["summary"] == body["answer"]

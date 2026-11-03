@@ -52,19 +52,50 @@ class SuperShyftUserProvider:
 
 
 class SuperShyftBloodProvider:
-    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BloodReport]:
+    def load_for_cache(self, principal: AuthenticatedPrincipal, scope: str) -> list[BloodReport]:
+        from integrations.supershyft.ihr import load_member_blood
+
+        return load_member_blood(principal, history=scope == "history")
+
+    def apply_plan(self, reports: list[BloodReport], plan: QueryPlan) -> list[BloodReport]:
+        from integrations.supershyft.ihr import shape_blood_reports
+
         blood_plan = plan if plan.needs_blood else plan.model_copy(update={"needs_blood": True})
-        return IhrRepository().get_ihr_data_for_query(principal, blood_plan).blood_reports
+        return shape_blood_reports(reports, blood_plan)
+
+    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BloodReport]:
+        scope = "history" if plan.history or plan.compare or plan.report_id or plan.time_operation in {"trend", "previous", "compare"} else "standard"
+        return self.apply_plan(self.load_for_cache(principal, scope), plan)
 
 
 class SuperShyftBioAIProvider:
-    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BioAIReport]:
+    def load_for_cache(self, principal: AuthenticatedPrincipal, scope: str) -> list[BioAIReport]:
+        from integrations.supershyft.ihr import load_member_bio
+
+        return load_member_bio(principal, history=scope == "history")
+
+    def apply_plan(self, reports: list[BioAIReport], plan: QueryPlan) -> list[BioAIReport]:
+        from integrations.supershyft.ihr import shape_bio_reports
+
         bio_plan = plan if plan.needs_bio_ai else plan.model_copy(update={"needs_bio_ai": True})
-        return IhrRepository().get_ihr_data_for_query(principal, bio_plan).bio_ai_reports
+        return shape_bio_reports(reports, bio_plan)
+
+    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[BioAIReport]:
+        scope = "history" if plan.history or plan.compare or plan.report_id or plan.time_operation in {"trend", "previous", "compare"} else "standard"
+        return self.apply_plan(self.load_for_cache(principal, scope), plan)
 
 
 class SuperShyftLifestyleProvider:
+    def load_for_cache(self, principal: AuthenticatedPrincipal, scope: str) -> LifestyleContext | None:
+        return self._read(principal)
+
+    def apply_plan(self, payload: LifestyleContext | None, plan: QueryPlan) -> LifestyleContext | None:
+        return payload
+
     def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> LifestyleContext | None:
+        return self._read(principal)
+
+    def _read(self, principal: AuthenticatedPrincipal) -> LifestyleContext | None:
         uid = _user_id(principal)
         row = run_readonly(
             text("SELECT diet_preference, allergies FROM user_preferences WHERE user_id = :uid"),

@@ -111,47 +111,24 @@ def _usable_response(row: dict) -> bool:
     return _completed(row) or (row.get("completed_at") is None and _stored_answer(row))
 
 
-def fetch_questionnaire_instances(
-    principal: AuthenticatedPrincipal,
-    plan: QueryPlan,
-) -> list[QuestionnaireInstance]:
+def _instances_from_rows(principal: AuthenticatedPrincipal, rows: list[dict]) -> list[QuestionnaireInstance]:
+    """Every usable answer. Plan filtering happens later so the cache can be reused."""
     uid = _user_id(principal)
-    rows = run_readonly(_RESPONSE_SELECT, {"uid": uid}) or []
     owned = [row for row in rows if int(row.get("user_id") or 0) == uid]
     completed = [row for row in owned if _usable_response(row)]
-    if not completed:
-        return []
-
     by_instance: dict[int, list[dict]] = {}
     for row in completed:
         by_instance.setdefault(int(row["assessment_instance_id"]), []).append(row)
     ordered_ids = sorted(
         by_instance,
-        key=lambda iid: (
-            str(by_instance[iid][0].get("completed_at") or ""),
-            iid,
-        ),
+        key=lambda iid: (str(by_instance[iid][0].get("completed_at") or ""), iid),
     )
-    wanted = keys_for_plan(plan.topic, plan.requested_metrics, plan.raw_message or "")
-    wanted_set = set(wanted)
-    if not (plan.history or plan.compare or plan.time_operation in {"trend", "previous", "compare"}):
-        matching = [
-            iid
-            for iid in ordered_ids
-            if any(row.get("question_key") in wanted_set for row in by_instance[iid])
-        ]
-        ordered_ids = (matching[-1:] if matching else ordered_ids[-1:])
-
     instances: list[QuestionnaireInstance] = []
     for instance_id in ordered_ids:
-        answers: list[QuestionnaireAnswer] = []
         header = by_instance[instance_id][0]
+        answers: list[QuestionnaireAnswer] = []
         for row in by_instance[instance_id]:
             categories = _category_ids(row.get("category_ids"))
-            if set(categories) & _LAB_LIKE_CATEGORIES and row["question_key"] not in wanted_set:
-                continue
-            if row["question_key"] not in wanted_set:
-                continue
             value, unit = _display_value(int(row["question_id"]), row.get("answer"), row.get("question_type") or "")
             answers.append(
                 QuestionnaireAnswer(
@@ -183,6 +160,39 @@ def fetch_questionnaire_instances(
     return instances
 
 
+def select_questionnaire_instances(
+    instances: list[QuestionnaireInstance],
+    plan: QueryPlan,
+) -> list[QuestionnaireInstance]:
+    """Same selection as before: latest matching instance, unless the plan asks for history."""
+    wanted = set(keys_for_plan(plan.topic, plan.requested_metrics, plan.raw_message or ""))
+    chosen = list(instances)
+    if not (plan.history or plan.compare or plan.time_operation in {"trend", "previous", "compare"}):
+        matching = [item for item in chosen if any(answer.question_key in wanted for answer in item.answers)]
+        chosen = (matching[-1:] if matching else chosen[-1:]) if chosen else []
+    selected: list[QuestionnaireInstance] = []
+    for instance in chosen:
+        answers = []
+        for answer in instance.answers:
+            categories = {int(item) for item in answer.category_keys if str(item).lstrip("-").isdigit()}
+            if categories & _LAB_LIKE_CATEGORIES and answer.question_key not in wanted:
+                continue
+            if answer.question_key not in wanted:
+                continue
+            answers.append(answer.model_copy(deep=True))
+        selected.append(instance.model_copy(update={"answers": answers}))
+    return selected
+
+
+def fetch_questionnaire_instances(
+    principal: AuthenticatedPrincipal,
+    plan: QueryPlan,
+) -> list[QuestionnaireInstance]:
+    uid = _user_id(principal)
+    rows = run_readonly(_RESPONSE_SELECT, {"uid": uid}) or []
+    return select_questionnaire_instances(_instances_from_rows(principal, rows), plan)
+
+
 def _category_ids(raw) -> list[int]:
     if raw is None:
         return []
@@ -198,7 +208,15 @@ def _category_ids(raw) -> list[int]:
 
 
 class SuperShyftQuestionnaireProvider:
-    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[QuestionnaireInstance]:
+    def load_for_cache(self, principal: AuthenticatedPrincipal, scope: str) -> list[QuestionnaireInstance]:
         if not (principal.subject_id or "").strip():
             raise ProviderUnavailableError("Authenticated user required", reason=DB_QUERY_FAILED)
-        return fetch_questionnaire_instances(principal, plan)
+        uid = _user_id(principal)
+        rows = run_readonly(_RESPONSE_SELECT, {"uid": uid}) or []
+        return _instances_from_rows(principal, rows)
+
+    def apply_plan(self, instances: list[QuestionnaireInstance], plan: QueryPlan) -> list[QuestionnaireInstance]:
+        return select_questionnaire_instances(instances, plan)
+
+    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[QuestionnaireInstance]:
+        return self.apply_plan(self.load_for_cache(principal, "standard"), plan)

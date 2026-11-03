@@ -61,13 +61,15 @@ def collect_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegist
     blood_plan = QueryPlan(
         intent=IntentType.latest_result,
         needs_blood=True,
-        history=True,
+        history=False,
+        time_operation="latest_marker",
         knowledge_scope=KnowledgeScope.personal,
     )
     bio_plan = QueryPlan(
         intent=IntentType.bio_ai_score,
         needs_bio_ai=True,
-        history=True,
+        history=False,
+        time_operation="latest_marker",
         knowledge_scope=KnowledgeScope.personal,
     )
     life_plan = QueryPlan(

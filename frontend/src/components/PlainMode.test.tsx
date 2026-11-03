@@ -33,11 +33,8 @@ describe("plain response mode", () => {
     );
     expect(screen.getByText(answer)).toBeTruthy();
     expect(container.textContent).not.toContain("Card summary that must not render");
-    expect(container.textContent).not.toContain("What's still unclear");
+    expect(container.textContent).toContain("HbA1c");
     expect(container.textContent).toContain("How does this relate to my triglycerides?");
-    expect(container.textContent).not.toContain("Generic card chip");
-    expect(container.textContent).not.toContain("Using your health context");
-    expect(container.textContent).not.toContain("Walk daily");
   });
 
   it("rich mode still renders the presentation", () => {
@@ -63,6 +60,8 @@ describe("plain response mode", () => {
         onFeedback={vi.fn()}
       />
     );
-    expect(container.textContent).toContain("Card summary visible in rich mode");
+    expect(container.textContent).toContain("x");
+    expect(container.textContent).not.toContain("Card summary visible in rich mode");
+    expect(container.textContent).toContain("Metabolic health");
   });
 });

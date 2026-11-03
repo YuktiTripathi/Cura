@@ -75,6 +75,11 @@ class EvidencePackage(BaseModel):
             payload["report_counts"] = self.report_counts
         if self.comparisons:
             payload["comparisons"] = self.comparisons
+        from app.retrieval.relationship_map import group_measurements
+
+        groups = group_measurements(self.measurements)
+        if groups:
+            payload["groups"] = groups
         return payload
 
 
@@ -168,6 +173,7 @@ def _select_measurements(kind: str, message: str, markers: list, *, broad: bool 
             for item in chosen
             if _key(getattr(item, "key", None)) in named or _key(getattr(item, "name", None)) in named
         ]
+        chosen = _with_related(message, chosen, markers)
         return chosen[:8]
     if kind == "MARKER_LOOKUP":
         keys = set(requested_marker_keys(message))
@@ -191,6 +197,24 @@ def _select_measurements(kind: str, message: str, markers: list, *, broad: bool 
         unrelated = {"mcv", "mch", "rdw", "basophils", "eosinophils", "calcium", "bilirubin"}
         chosen = [item for item in chosen if _key(getattr(item, "key", None)) not in unrelated]
     return chosen[:24]
+
+
+def _with_related(message: str, chosen: list, pool: list) -> list:
+    """Add related markers from the relationship map when they are already on the record."""
+    from app.retrieval.relationship_map import related_keys
+
+    asked = [_key(getattr(item, "key", None)) for item in chosen]
+    extra = set(related_keys(asked, message))
+    if not extra:
+        return chosen
+    have = set(asked)
+    added = []
+    for item in pool or []:
+        key = _key(getattr(item, "key", None))
+        if key in extra and key not in have:
+            have.add(key)
+            added.append(item)
+    return [*chosen, *added]
 
 
 def _select_risks(kind: str, message: str, risks: list) -> list:

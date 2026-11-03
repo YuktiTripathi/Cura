@@ -92,7 +92,7 @@ def test_rich_mode_keeps_theme_contract(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "rich")
     ctx, _ = _evidence(COMPANION, "How am I doing overall?")
     system = PromptBuilder().build(ctx, "", "How am I doing overall?")[0]["content"]
-    assert "overall_summary" in system and "`themes`" in system
+    assert "overall_summary" in system and "themes" in system
 
 
 FORMAT_DIVERSITY = [

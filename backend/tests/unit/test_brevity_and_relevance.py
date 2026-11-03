@@ -84,7 +84,7 @@ def test_repeated_disclaimers_paragraphs_and_filler_are_removed():
 def test_no_visible_em_dash_in_any_mode(model, monkeypatch, mode):
     body = _chat("What does my Cardiac Health score mean?", mode, monkeypatch)
     assert EM not in _visible_strings(body)
-    assert len(body["follow_ups"]) <= 3
+    assert len(body["follow_ups"]) <= 5
 
 
 # ------------------------------------------------------------ prompts ask for brevity

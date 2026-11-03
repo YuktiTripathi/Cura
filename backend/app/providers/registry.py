@@ -92,11 +92,13 @@ def build_registry() -> ProviderRegistry:
     from integrations.mock.questionnaire_provider import MockQuestionnaireProvider
     from integrations.mock.user_provider import MockUserProvider
 
+    from app.providers.cache import cached_bio_ai, cached_blood, cached_lifestyle, cached_questionnaires
+
     users = MockUserProvider()
-    blood = MockBloodProvider()
-    bio_ai = MockBioAIProvider()
-    lifestyle = MockLifestyleProvider()
-    questionnaires = MockQuestionnaireProvider()
+    blood = cached_blood(MockBloodProvider())
+    bio_ai = cached_bio_ai(MockBioAIProvider())
+    lifestyle = cached_lifestyle(MockLifestyleProvider())
+    questionnaires = cached_questionnaires(MockQuestionnaireProvider())
     return ProviderRegistry(
         auth=auth,
         users=users,

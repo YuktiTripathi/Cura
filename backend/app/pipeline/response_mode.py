@@ -11,6 +11,7 @@ from __future__ import annotations
 from app.core.config import settings
 from app.llm.structured import looks_like_structured_json, public_answer_text
 from app.pipeline.presentation import prefer_report_range, sanitize_internal_ids
+from app.pipeline.visible_output import remove_em_dashes
 
 
 def response_mode() -> str:
@@ -96,35 +97,14 @@ def plain_answer(answer: str, path: str | None, context) -> str:
     text = answer or ""
     if looks_like_structured_json(text):
         text = public_answer_text(text)
-    text = sanitize_internal_ids(prefer_report_range(text, context)).strip()
-    if path == "structured_blood" and getattr(context.intent, "value", "") == "latest_result":
-        natural = _natural_lookup(context)
-        if natural:
-            return natural
-    if path == "structured_report_overview":
-        listing = _report_listing(context)
-        if listing:
-            text = f"{text}\n\n{listing}".strip()
-    return text
+    # The safety-approved answer is the prose. Lookups and report listings stay in cards.
+    return remove_em_dashes(sanitize_internal_ids(prefer_report_range(text, context))).strip()
 
 
 def apply_response_mode(response, model_follow_ups: list[str] | None = None):
-    """Strip presentation widgets in plain mode. Rich mode returns the response unchanged."""
+    """One response shape. The config mode no longer strips cards or replaces follow-ups."""
+    del model_follow_ups
     if response is None or getattr(response, "meta", None) is None:
         return response
-    if not plain_mode():
-        response.meta.response_mode = "rich"
-        return response
-    response.meta.response_mode = response_mode()  # plain | semantic
-    response.presentation = None
-    response.experience = None
-    response.testing_option = None
-    response.recommendations = []
-    # Suggestions are the model's own, specific to this conversation (0-3); nothing generic.
-    from app.contracts.followup import FollowUpSuggestion
-
-    response.follow_ups = [
-        FollowUpSuggestion(text=text, category="suggested", handling_path="CONTINUE_INTERPRETATION")
-        for text in (model_follow_ups or [])[:3]
-    ]
+    response.meta.response_mode = "rich"
     return response

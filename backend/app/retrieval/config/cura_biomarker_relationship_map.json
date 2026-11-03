@@ -1,0 +1,1249 @@
+{
+  "schema_version": "1.0.0",
+  "name": "CURA Biomarker Relationship Map",
+  "purpose": "Metadata-driven configuration for selecting clinically relevant related biomarkers during health-question evidence retrieval.",
+  "usage_notes": [
+    "Relationships identify candidate evidence to retrieve; they are not diagnostic rules or causal claims.",
+    "Only retrieve a related marker when it is available in the user's health record and relevant to the question intent.",
+    "Conditional relationships must only be activated when the stated question context applies.",
+    "Never infer, calculate, or fabricate a missing biomarker value.",
+    "Preserve the source report's value, unit, reference interval, date, and provenance.",
+    "Do not retrieve every marker in a panel for every question; apply intent-sensitive expansion and configured caps.",
+    "The supplied inventory is treated as the available marker catalogue. Ferritin is not present in that inventory."
+  ],
+  "retrieval_policy": {
+    "expand_for_intents": [
+      "interpretation",
+      "possible_causes",
+      "relationship",
+      "comparison",
+      "trend",
+      "recommendation"
+    ],
+    "avoid_expansion_for_intents": [
+      "definition",
+      "simple_unit_or_abbreviation"
+    ],
+    "max_additional_markers_default": 6,
+    "max_additional_markers_for_cross_system_question": 8,
+    "deduplicate_by_canonical_id": true,
+    "require_record_availability": true,
+    "require_question_relevance": true,
+    "preserve_lab_reference_range": true,
+    "knowledge_base_reference_ranges_override_lab_range": false
+  },
+  "panels": [
+    {
+      "id": "complete_hemogram",
+      "label": "Complete Hemogram",
+      "markers": [
+        "absolute_basophils_count",
+        "absolute_eosinophils_count",
+        "absolute_lymphocyte_count",
+        "absolute_monocyte_count",
+        "absolute_neutrophil_count",
+        "esr_automated",
+        "hemoglobin",
+        "mch",
+        "mchc",
+        "mcv",
+        "mpv",
+        "pcv_hematocrit",
+        "platelet_count",
+        "wbc",
+        "rdw",
+        "neutrophils",
+        "eosinophils",
+        "lymphocytes",
+        "monocytes",
+        "basophils",
+        "rdw_cv",
+        "mentzer_index",
+        "rbc",
+        "gk_index",
+        "rdwi"
+      ]
+    },
+    {
+      "id": "urine_routine_microscopy",
+      "label": "Urine Routine and Microscopy",
+      "markers": [
+        "urine_ph",
+        "urobilinogen",
+        "urine_colour",
+        "urine_transparency",
+        "urine_sugar",
+        "urine_blood",
+        "urine_rbc",
+        "pus_cells",
+        "epithelial_cells",
+        "crystals",
+        "casts",
+        "bacteria",
+        "yeast_cells",
+        "nitrite",
+        "urine_ketones",
+        "urine_protein",
+        "leucocyte_esterase",
+        "bile_pigments",
+        "specific_gravity",
+        "urine_volume",
+        "others_urine"
+      ]
+    },
+    {
+      "id": "inflammatory",
+      "label": "Inflammatory",
+      "markers": [
+        "homocysteine",
+        "hs_crp",
+        "esr"
+      ]
+    },
+    {
+      "id": "sleep_as_listed",
+      "label": "Sleep (as supplied in inventory)",
+      "markers": [
+        "magnesium",
+        "zinc"
+      ]
+    },
+    {
+      "id": "iron_studies",
+      "label": "Iron Studies",
+      "markers": [
+        "serum_iron",
+        "tibc",
+        "uibc",
+        "transferrin_saturation"
+      ]
+    },
+    {
+      "id": "liver_profile",
+      "label": "Liver Profile",
+      "markers": [
+        "albumin",
+        "alkaline_phosphatase",
+        "direct_bilirubin",
+        "total_bilirubin",
+        "ggtp",
+        "total_serum_proteins",
+        "ast",
+        "alt",
+        "indirect_bilirubin",
+        "globulin",
+        "ag_ratio",
+        "ast_alt_ratio"
+      ]
+    },
+    {
+      "id": "lipid_profile",
+      "label": "Lipid Profile",
+      "markers": [
+        "total_cholesterol",
+        "hdl_cholesterol",
+        "triglycerides",
+        "non_hdl_cholesterol",
+        "total_cholesterol_hdl_ratio",
+        "ldl_cholesterol_calculated",
+        "vldl_cholesterol",
+        "ldl_hdl_ratio",
+        "hdl_ldl_ratio"
+      ]
+    },
+    {
+      "id": "heart_health_c_suite",
+      "label": "Heart Health C-Suite",
+      "markers": [
+        "lipoprotein_a",
+        "apolipoprotein_b"
+      ]
+    },
+    {
+      "id": "diabetes_profile_pro",
+      "label": "Diabetes Profile Pro+",
+      "markers": [
+        "fasting_blood_glucose",
+        "hba1c",
+        "fasting_insulin"
+      ]
+    },
+    {
+      "id": "vitamins_c_suite",
+      "label": "Vitamins C-Suite",
+      "markers": [
+        "vitamin_b12",
+        "vitamin_d_total",
+        "vitamin_c"
+      ]
+    },
+    {
+      "id": "hormones_c_suite_female",
+      "label": "Hormones C-Suite Female",
+      "markers": [
+        "total_testosterone",
+        "lh",
+        "fsh",
+        "cortisol",
+        "prolactin",
+        "dheas",
+        "igf_1",
+        "pth"
+      ]
+    },
+    {
+      "id": "cancer_female_c_suite",
+      "label": "Cancer Female C-Suite",
+      "markers": [
+        "ca_125",
+        "ca_15_3",
+        "ca_19_9",
+        "cea",
+        "afp"
+      ]
+    },
+    {
+      "id": "bone_health",
+      "label": "Bone Health",
+      "markers": [
+        "calcium"
+      ]
+    },
+    {
+      "id": "kidney_function_with_k",
+      "label": "Kidney Function with K",
+      "markers": [
+        "bun",
+        "total_calcium",
+        "chloride",
+        "creatinine",
+        "sodium",
+        "urea",
+        "uric_acid",
+        "bun_creatinine_ratio",
+        "urea_creatinine_ratio",
+        "egfr",
+        "inorganic_phosphorus",
+        "potassium"
+      ]
+    },
+    {
+      "id": "thyroid_profile",
+      "label": "Thyroid Profile",
+      "markers": [
+        "t3",
+        "t4",
+        "tsh"
+      ]
+    },
+    {
+      "id": "hormones_c_suite_male",
+      "label": "Hormones C-Suite Male",
+      "markers": [
+        "total_testosterone",
+        "dheas",
+        "igf_1",
+        "cortisol",
+        "pth"
+      ]
+    },
+    {
+      "id": "cancer_male_c_suite",
+      "label": "Cancer Male C-Suite",
+      "markers": [
+        "psa",
+        "cea",
+        "afp",
+        "ca_19_9"
+      ]
+    }
+  ],
+  "marker_catalog": {
+    "absolute_basophils_count": "Complete Hemogram",
+    "absolute_eosinophils_count": "Complete Hemogram",
+    "absolute_lymphocyte_count": "Complete Hemogram",
+    "absolute_monocyte_count": "Complete Hemogram",
+    "absolute_neutrophil_count": "Complete Hemogram",
+    "esr_automated": "Complete Hemogram",
+    "hemoglobin": "Complete Hemogram",
+    "mch": "Complete Hemogram",
+    "mchc": "Complete Hemogram",
+    "mcv": "Complete Hemogram",
+    "mpv": "Complete Hemogram",
+    "pcv_hematocrit": "Complete Hemogram",
+    "platelet_count": "Complete Hemogram",
+    "wbc": "Complete Hemogram",
+    "rdw": "Complete Hemogram",
+    "neutrophils": "Complete Hemogram",
+    "eosinophils": "Complete Hemogram",
+    "lymphocytes": "Complete Hemogram",
+    "monocytes": "Complete Hemogram",
+    "basophils": "Complete Hemogram",
+    "rdw_cv": "Complete Hemogram",
+    "mentzer_index": "Complete Hemogram",
+    "rbc": "Complete Hemogram",
+    "gk_index": "Complete Hemogram",
+    "rdwi": "Complete Hemogram",
+    "urine_ph": "Urine Routine and Microscopy",
+    "urobilinogen": "Urine Routine and Microscopy",
+    "urine_colour": "Urine Routine and Microscopy",
+    "urine_transparency": "Urine Routine and Microscopy",
+    "urine_sugar": "Urine Routine and Microscopy",
+    "urine_blood": "Urine Routine and Microscopy",
+    "urine_rbc": "Urine Routine and Microscopy",
+    "pus_cells": "Urine Routine and Microscopy",
+    "epithelial_cells": "Urine Routine and Microscopy",
+    "crystals": "Urine Routine and Microscopy",
+    "casts": "Urine Routine and Microscopy",
+    "bacteria": "Urine Routine and Microscopy",
+    "yeast_cells": "Urine Routine and Microscopy",
+    "nitrite": "Urine Routine and Microscopy",
+    "urine_ketones": "Urine Routine and Microscopy",
+    "urine_protein": "Urine Routine and Microscopy",
+    "leucocyte_esterase": "Urine Routine and Microscopy",
+    "bile_pigments": "Urine Routine and Microscopy",
+    "specific_gravity": "Urine Routine and Microscopy",
+    "urine_volume": "Urine Routine and Microscopy",
+    "others_urine": "Urine Routine and Microscopy",
+    "homocysteine": "Inflammatory",
+    "hs_crp": "Inflammatory",
+    "esr": "Inflammatory",
+    "magnesium": "Sleep (as supplied in inventory)",
+    "zinc": "Sleep (as supplied in inventory)",
+    "serum_iron": "Iron Studies",
+    "tibc": "Iron Studies",
+    "uibc": "Iron Studies",
+    "transferrin_saturation": "Iron Studies",
+    "albumin": "Liver Profile",
+    "alkaline_phosphatase": "Liver Profile",
+    "direct_bilirubin": "Liver Profile",
+    "total_bilirubin": "Liver Profile",
+    "ggtp": "Liver Profile",
+    "total_serum_proteins": "Liver Profile",
+    "ast": "Liver Profile",
+    "alt": "Liver Profile",
+    "indirect_bilirubin": "Liver Profile",
+    "globulin": "Liver Profile",
+    "ag_ratio": "Liver Profile",
+    "ast_alt_ratio": "Liver Profile",
+    "total_cholesterol": "Lipid Profile",
+    "hdl_cholesterol": "Lipid Profile",
+    "triglycerides": "Lipid Profile",
+    "non_hdl_cholesterol": "Lipid Profile",
+    "total_cholesterol_hdl_ratio": "Lipid Profile",
+    "ldl_cholesterol_calculated": "Lipid Profile",
+    "vldl_cholesterol": "Lipid Profile",
+    "ldl_hdl_ratio": "Lipid Profile",
+    "hdl_ldl_ratio": "Lipid Profile",
+    "lipoprotein_a": "Heart Health C-Suite",
+    "apolipoprotein_b": "Heart Health C-Suite",
+    "fasting_blood_glucose": "Diabetes Profile Pro+",
+    "hba1c": "Diabetes Profile Pro+",
+    "fasting_insulin": "Diabetes Profile Pro+",
+    "vitamin_b12": "Vitamins C-Suite",
+    "vitamin_d_total": "Vitamins C-Suite",
+    "vitamin_c": "Vitamins C-Suite",
+    "total_testosterone": "Hormones C-Suite Female / Male",
+    "lh": "Hormones C-Suite Female",
+    "fsh": "Hormones C-Suite Female",
+    "cortisol": "Hormones C-Suite Female / Male",
+    "prolactin": "Hormones C-Suite Female",
+    "dheas": "Hormones C-Suite Female / Male",
+    "igf_1": "Hormones C-Suite Female / Male",
+    "pth": "Hormones C-Suite Female / Male",
+    "ca_125": "Cancer Female C-Suite",
+    "ca_15_3": "Cancer Female C-Suite",
+    "ca_19_9": "Cancer Female / Male C-Suite",
+    "cea": "Cancer Female / Male C-Suite",
+    "afp": "Cancer Female / Male C-Suite",
+    "calcium": "Bone Health",
+    "bun": "Kidney Function with K",
+    "total_calcium": "Kidney Function with K",
+    "chloride": "Kidney Function with K",
+    "creatinine": "Kidney Function with K",
+    "sodium": "Kidney Function with K",
+    "urea": "Kidney Function with K",
+    "uric_acid": "Kidney Function with K",
+    "bun_creatinine_ratio": "Kidney Function with K",
+    "urea_creatinine_ratio": "Kidney Function with K",
+    "egfr": "Kidney Function with K",
+    "inorganic_phosphorus": "Kidney Function with K",
+    "potassium": "Kidney Function with K",
+    "t3": "Thyroid Profile",
+    "t4": "Thyroid Profile",
+    "tsh": "Thyroid Profile",
+    "psa": "Cancer Male C-Suite"
+  },
+  "relationships": [
+    {
+      "primary": "ferritin",
+      "aliases": [
+        "ferritin",
+        "serum ferritin"
+      ],
+      "available_in_supplied_inventory": false,
+      "related": [
+        {
+          "marker": "serum_iron",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "tibc",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "uibc",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "transferrin_saturation",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "hemoglobin",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "mcv",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        },
+        {
+          "marker": "rdw",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        }
+      ],
+      "notes": "Ferritin is not listed in the supplied biomarker inventory. Retrieve it only if present in the user's actual record; otherwise explain that it is unavailable. Related iron and CBC markers may provide context but are not substitutes for ferritin."
+    },
+    {
+      "primary": "ldl_cholesterol_calculated",
+      "aliases": [
+        "ldl",
+        "ldl cholesterol",
+        "calculated ldl"
+      ],
+      "related": [
+        {
+          "marker": "hdl_cholesterol",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "triglycerides",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "total_cholesterol",
+          "when": [
+            "interpretation",
+            "comparison",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "non_hdl_cholesterol",
+          "when": [
+            "interpretation",
+            "comparison",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "apolipoprotein_b",
+          "when": [
+            "interpretation",
+            "relationship",
+            "risk_context"
+          ]
+        },
+        {
+          "marker": "lipoprotein_a",
+          "when": [
+            "interpretation",
+            "relationship",
+            "risk_context"
+          ]
+        },
+        {
+          "marker": "tsh",
+          "when": [
+            "relationship"
+          ],
+          "condition": "User explicitly asks about thyroid function or a thyroid relationship."
+        }
+      ]
+    },
+    {
+      "primary": "hba1c",
+      "aliases": [
+        "HbA1c",
+        "glycated hemoglobin",
+        "A1c"
+      ],
+      "related": [
+        {
+          "marker": "fasting_blood_glucose",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "fasting_insulin",
+          "when": [
+            "relationship",
+            "possible_causes"
+          ],
+          "condition": "Only when insulin resistance or metabolic relationship is relevant to the question."
+        }
+      ]
+    },
+    {
+      "primary": "creatinine",
+      "aliases": [
+        "serum creatinine"
+      ],
+      "related": [
+        {
+          "marker": "egfr",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "bun",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "urea",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "sodium",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "potassium",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "chloride",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "uric_acid",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the question concerns uric acid, gout, or a broader kidney/metabolic relationship."
+        }
+      ]
+    },
+    {
+      "primary": "alt",
+      "aliases": [
+        "ALT",
+        "SGPT"
+      ],
+      "related": [
+        {
+          "marker": "ast",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "ggtp",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "alkaline_phosphatase",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "total_bilirubin",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "direct_bilirubin",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ],
+          "condition": "When bilirubin pattern is relevant."
+        },
+        {
+          "marker": "albumin",
+          "when": [
+            "interpretation",
+            "relationship"
+          ],
+          "condition": "When broader liver function or synthetic function is being discussed."
+        }
+      ]
+    },
+    {
+      "primary": "ast",
+      "aliases": [
+        "AST",
+        "SGOT"
+      ],
+      "related": [
+        {
+          "marker": "alt",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "ggtp",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "alkaline_phosphatase",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "total_bilirubin",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "albumin",
+          "when": [
+            "interpretation",
+            "relationship"
+          ],
+          "condition": "When broader liver function is being discussed."
+        }
+      ]
+    },
+    {
+      "primary": "vitamin_d_total",
+      "aliases": [
+        "vitamin D",
+        "25-hydroxy vitamin D",
+        "25(OH)D"
+      ],
+      "related": [
+        {
+          "marker": "calcium",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "recommendation"
+          ]
+        },
+        {
+          "marker": "inorganic_phosphorus",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "pth",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ],
+          "condition": "When calcium balance, bone health, or parathyroid relationship is relevant."
+        }
+      ]
+    },
+    {
+      "primary": "hemoglobin",
+      "aliases": [
+        "Hb",
+        "haemoglobin"
+      ],
+      "related": [
+        {
+          "marker": "rbc",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "mcv",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "mch",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        },
+        {
+          "marker": "mchc",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        },
+        {
+          "marker": "rdw",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        },
+        {
+          "marker": "rdw_cv",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        },
+        {
+          "marker": "serum_iron",
+          "when": [
+            "possible_causes",
+            "relationship"
+          ],
+          "condition": "When iron deficiency is a question or plausible context."
+        },
+        {
+          "marker": "transferrin_saturation",
+          "when": [
+            "possible_causes",
+            "relationship"
+          ],
+          "condition": "When iron deficiency is a question or plausible context."
+        }
+      ]
+    },
+    {
+      "primary": "tsh",
+      "aliases": [
+        "thyroid stimulating hormone"
+      ],
+      "related": [
+        {
+          "marker": "t3",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "t4",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "total_testosterone",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the user asks about reproductive hormones or a relevant endocrine relationship."
+        },
+        {
+          "marker": "ldl_cholesterol_calculated",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the user explicitly asks about thyroid function and cholesterol together."
+        },
+        {
+          "marker": "hdl_cholesterol",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the user explicitly asks about thyroid function and cholesterol together."
+        },
+        {
+          "marker": "triglycerides",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the user explicitly asks about thyroid function and cholesterol together."
+        },
+        {
+          "marker": "total_cholesterol",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the user explicitly asks about thyroid function and cholesterol together."
+        }
+      ]
+    },
+    {
+      "primary": "globulin",
+      "aliases": [
+        "serum globulin"
+      ],
+      "related": [
+        {
+          "marker": "albumin",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "total_serum_proteins",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "ag_ratio",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "ast",
+          "when": [
+            "possible_causes",
+            "relationship"
+          ],
+          "condition": "Only if the question asks about liver context."
+        },
+        {
+          "marker": "creatinine",
+          "when": [
+            "possible_causes",
+            "relationship"
+          ],
+          "condition": "Only if the question asks about kidney/protein loss context."
+        }
+      ]
+    },
+    {
+      "primary": "hs_crp",
+      "aliases": [
+        "hs-CRP",
+        "high sensitivity CRP"
+      ],
+      "related": [
+        {
+          "marker": "homocysteine",
+          "when": [
+            "interpretation",
+            "risk_context",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "esr",
+          "when": [
+            "interpretation",
+            "relationship"
+          ],
+          "condition": "When comparing inflammatory markers."
+        }
+      ]
+    },
+    {
+      "primary": "urine_protein",
+      "aliases": [
+        "urine protein",
+        "proteinuria"
+      ],
+      "related": [
+        {
+          "marker": "urine_blood",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "urine_rbc",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "pus_cells",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "casts",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "creatinine",
+          "when": [
+            "relationship"
+          ],
+          "condition": "When kidney function context is requested."
+        },
+        {
+          "marker": "egfr",
+          "when": [
+            "relationship"
+          ],
+          "condition": "When kidney function context is requested."
+        }
+      ]
+    },
+    {
+      "primary": "urine_sugar",
+      "aliases": [
+        "urine glucose"
+      ],
+      "related": [
+        {
+          "marker": "hba1c",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "fasting_blood_glucose",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "urine_ketones",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        }
+      ]
+    },
+    {
+      "primary": "urine_blood",
+      "aliases": [
+        "blood in urine",
+        "hematuria"
+      ],
+      "related": [
+        {
+          "marker": "urine_rbc",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "pus_cells",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "urine_protein",
+          "when": [
+            "relationship"
+          ]
+        },
+        {
+          "marker": "casts",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        }
+      ]
+    },
+    {
+      "primary": "vitamin_b12",
+      "aliases": [
+        "B12",
+        "cobalamin"
+      ],
+      "related": [
+        {
+          "marker": "hemoglobin",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "mcv",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "rdw",
+          "when": [
+            "interpretation",
+            "possible_causes"
+          ]
+        }
+      ]
+    },
+    {
+      "primary": "calcium",
+      "aliases": [
+        "serum calcium",
+        "total calcium"
+      ],
+      "related": [
+        {
+          "marker": "inorganic_phosphorus",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "pth",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "vitamin_d_total",
+          "when": [
+            "interpretation",
+            "possible_causes",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "creatinine",
+          "when": [
+            "relationship"
+          ],
+          "condition": "When kidney function context is relevant."
+        }
+      ]
+    },
+    {
+      "primary": "triglycerides",
+      "aliases": [
+        "TG"
+      ],
+      "related": [
+        {
+          "marker": "hdl_cholesterol",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "ldl_cholesterol_calculated",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "total_cholesterol",
+          "when": [
+            "interpretation",
+            "relationship",
+            "comparison"
+          ]
+        },
+        {
+          "marker": "hba1c",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when the question asks about metabolic or glucose context."
+        },
+        {
+          "marker": "fasting_insulin",
+          "when": [
+            "relationship"
+          ],
+          "condition": "Only when insulin resistance context is requested."
+        }
+      ]
+    },
+    {
+      "primary": "platelet_count",
+      "aliases": [
+        "platelets"
+      ],
+      "related": [
+        {
+          "marker": "mpv",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "wbc",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "hemoglobin",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        },
+        {
+          "marker": "rdw",
+          "when": [
+            "interpretation",
+            "relationship"
+          ]
+        }
+      ]
+    }
+  ],
+  "aliases": {
+    "sgot": "ast",
+    "sgpt": "alt",
+    "haemoglobin": "hemoglobin",
+    "hb": "hemoglobin",
+    "a1c": "hba1c",
+    "ldl": "ldl_cholesterol_calculated",
+    "hdl": "hdl_cholesterol",
+    "ggtp": "ggtp",
+    "gammagt": "ggtp",
+    "egfr": "egfr",
+    "25_oh_vitamin_d": "vitamin_d_total",
+    "hscrp": "hs_crp",
+    "crp_high_sensitivity": "hs_crp",
+    "tibc": "tibc",
+    "u_i_b_c": "uibc"
+  },
+  "not_in_supplied_inventory": [
+    {
+      "canonical_id": "ferritin",
+      "display_name": "Ferritin",
+      "note": "Mentioned as a primary marker in the proposed relationship examples but absent from the supplied marker inventory. Do not assume it is available."
+    },
+    {
+      "canonical_id": "postprandial_glucose",
+      "display_name": "Postprandial glucose",
+      "note": "Mentioned as a potentially useful related marker but absent from the supplied inventory."
+    }
+  ]
+}

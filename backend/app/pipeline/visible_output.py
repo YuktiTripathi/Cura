@@ -228,21 +228,32 @@ def finalize_response(response, message: str, plan=None, context=None):
         return response
     escalated = bool(getattr(getattr(response, "meta", None), "escalation", None))
     asked_about_clinician = bool(re.search(r"\b(?:doctor|clinician|physician|gp)\b", message or "", re.I))
-    response.answer = clean_text(response.answer, keep_clinician=escalated or asked_about_clinician) or response.answer
+    mode = getattr(getattr(response, "meta", None), "response_mode", None)
+    semantic_mode = mode == "semantic"
+    # Rich and semantic keep the safety-checked prose. Plain still gets one cleanup pass.
+    if mode not in {"semantic", "rich"}:
+        response.answer = clean_text(response.answer, keep_clinician=escalated or asked_about_clinician) or response.answer
+    from app.pipeline.presentation import sanitize_internal_ids
+
+    response.answer = sanitize_internal_ids(response.answer or "") or response.answer
+    presentation = getattr(response, "presentation", None)
+    if presentation is not None and getattr(presentation, "summary", None):
+        presentation.summary = sanitize_internal_ids(presentation.summary) or presentation.summary
     trim_presentation(getattr(response, "presentation", None), message, plan, context, response.answer or "")
     for field in ("presentation", "experience", "testing_option"):
         if getattr(response, field, None) is not None:
             _walk(getattr(response, field))
     semantic = getattr(response, "semantic", None)
-    if semantic is not None:
+    if semantic is not None and not semantic_mode:
         semantic.summary = clean_text(semantic.summary) or semantic.summary
+    if semantic is not None and semantic.summary:
+        semantic.summary = sanitize_internal_ids(semantic.summary) or semantic.summary
         for block in semantic.blocks:
             block.text = clean_text(block.text) if block.text else block.text
             block.title = remove_em_dashes(block.title) if block.title else block.title
             for item in block.items:
                 item.title = clean_text(item.title) if item.title else item.title
                 item.text = clean_text(item.text) if item.text else item.text
-        semantic.follow_ups = [remove_em_dashes(f) for f in semantic.follow_ups][:3]
     # Symptom / medication / supplement questions only when this conversation is about them.
     topical = bool(_CARE_TOPIC.search(f"{message or ''} {response.answer or ''}"))
     generic = (lambda text: False) if topical else (lambda text: bool(_GENERIC_FOLLOW_UP.search(text or "")))
@@ -250,7 +261,9 @@ def finalize_response(response, message: str, plan=None, context=None):
     for follow in follow_ups:
         if getattr(follow, "text", None):
             follow.text = remove_em_dashes(follow.text)
-    response.follow_ups = follow_ups[:3]
+    response.follow_ups = follow_ups[:4]
+    if semantic is not None:
+        semantic.follow_ups = [follow.text for follow in response.follow_ups if getattr(follow, "text", None)]
     presentation = getattr(response, "presentation", None)
     if presentation is not None and getattr(presentation, "suggestion_chips", None):
         presentation.suggestion_chips = [c for c in presentation.suggestion_chips if not generic(str(getattr(c, "text", c)))][:3]

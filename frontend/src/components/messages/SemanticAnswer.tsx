@@ -8,10 +8,27 @@ import { RangeBar } from "./RangeBar";
  * Presentation only: no medical decisions, no values that the backend did not send, and
  * unknown block types render nothing (the summary always stands alone).
  */
-export function SemanticAnswer({ response }: { response: SemanticResponse }) {
+export function SemanticBlocks({ blocks, answer }: { blocks: ResponseBlock[]; answer?: string }) {
+  const prose = (answer || "").trim();
+  const visible = blocks.filter((block) => {
+    if (block.type === "text" && (block.text || "").trim() === prose) return false;
+    return true;
+  });
+  return (
+    <>
+      {visible.map((block, index) => (
+        <Block key={index} block={block} />
+      ))}
+    </>
+  );
+}
+
+export function SemanticAnswer({ response, answer }: { response: SemanticResponse; answer?: string }) {
+  // The chat answer is the explanation. summary is the same text; render it once.
+  const prose = (answer || "").trim() || response.summary;
   return (
     <div className="semantic-answer">
-      <MarkdownAnswer content={response.summary} />
+      <MarkdownAnswer content={prose} />
       {response.blocks.map((block, index) => (
         <Block key={index} block={block} />
       ))}

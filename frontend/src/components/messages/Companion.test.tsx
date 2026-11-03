@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, within } from "@testing-library/react";
+import { cleanup, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import type { StructuredResponse } from "../../types/chat";
 import { MessageList } from "../MessageList";
@@ -67,21 +67,9 @@ describe("in-chat companion pieces", () => {
     expect(screen.queryByText("Worth considering")).toBeNull();
   });
 
-  it("opens a printable doctor summary and copies it as text", async () => {
-    const writeText = vi.fn(async (_text: string) => undefined);
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
-    const print = vi.spyOn(window, "print").mockImplementation(() => undefined);
+  it("does not offer a doctor summary under the answer", () => {
     renderAnswer();
-    fireEvent.click(screen.getByRole("button", { name: "Doctor summary" }));
-    const dialog = await screen.findByRole("dialog");
-    expect(within(dialog).getByText("LDL cholesterol 138.0 mg/dL (high)")).toBeTruthy();
-    expect(within(dialog).getByText("Which findings warrant follow-up first?")).toBeTruthy();
-    expect(within(dialog).queryByText("Relevant context")).toBeNull();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Print" }));
-    expect(print).toHaveBeenCalled();
-    fireEvent.click(within(dialog).getByRole("button", { name: "Copy as text" }));
-    await vi.waitFor(() => expect(writeText).toHaveBeenCalled());
-    expect(writeText.mock.calls[0][0]).toContain("Key findings:\n- LDL cholesterol 138.0 mg/dL (high)");
+    expect(screen.queryByRole("button", { name: "Doctor summary" })).toBeNull();
   });
 
   it("offers no doctor summary without key findings", () => {

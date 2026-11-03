@@ -16,6 +16,16 @@ function show(response: Partial<SemanticResponse>) {
 afterEach(cleanup);
 
 describe("SemanticAnswer", () => {
+  it("renders the canonical answer once, ahead of the cards", () => {
+    const answer = "First paragraph.\n\nSecond paragraph stays.";
+    show({ summary: answer, blocks: [{ type: "metric", values: [hba1c] }] });
+    const root = document.querySelector(".semantic-answer");
+    expect(root?.textContent).toContain("First paragraph.");
+    expect(root?.textContent).toContain("Second paragraph stays.");
+    expect(root?.textContent?.indexOf("First paragraph.")).toBeLessThan(root?.textContent?.indexOf("9.1%") ?? 0);
+    expect(document.querySelectorAll(".markdown-answer")).toHaveLength(1);
+  });
+
   it("summary alone stands on its own", () => {
     show({ summary: "Your **HbA1c** is above range." });
     expect(screen.getByText("HbA1c").tagName).toBe("STRONG");

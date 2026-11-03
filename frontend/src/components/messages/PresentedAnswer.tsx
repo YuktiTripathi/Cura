@@ -22,10 +22,13 @@ export function PresentedAnswer({
   presentation,
   fallback,
   testingOption,
+  hideProse = false,
 }: {
   presentation: StructuredResponse;
   fallback: string;
   testingOption?: TestingOption | null;
+  /** The assistant message already rendered `answer`. Do not repeat it. */
+  hideProse?: boolean;
 }) {
   const narrative = presentation.summary_style === "NARRATIVE_HEALTH_SUMMARY" || Boolean(presentation.themes && presentation.themes.length > 0);
   const showHeadline =
@@ -66,7 +69,7 @@ export function PresentedAnswer({
         <p className="safety-notice" role="status">This answer follows CURA's safety guidance. It is not a diagnosis.</p>
       ) : null}
       {showHeadline ? <h3 className="answer-headline">{presentation.headline}</h3> : null}
-      {presentation.overall_summary || presentation.summary ? (
+      {!hideProse && (presentation.overall_summary || presentation.summary) ? (
         <div className="answer-summary">
           <MarkdownAnswer content={presentation.overall_summary || presentation.summary || ""} />
         </div>
@@ -113,7 +116,7 @@ export function PresentedAnswer({
           </div>
         </section>
       ) : null}
-      {!narrative && presentation.interpretation && !isScoreList(presentation.interpretation) ? (
+      {!hideProse && !narrative && presentation.interpretation && !isScoreList(presentation.interpretation) ? (
         <div className="answer-summary">
           <MarkdownAnswer content={presentation.interpretation} />
         </div>
@@ -133,7 +136,7 @@ export function PresentedAnswer({
           {item}
         </p>
       ))}
-      {!presentation.summary && !presentation.overall_summary && !findings.length && !presentation.interpretation && !narrative ? (
+      {!hideProse && !presentation.summary && !presentation.overall_summary && !findings.length && !presentation.interpretation && !narrative ? (
         <p>
           <AssistantBody content={fallback} />
         </p>

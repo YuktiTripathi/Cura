@@ -167,13 +167,8 @@ def modules_for(context: HealthContext, message: str) -> list[str]:
     if _value(context.conversation_turn) in {"FOLLOW_UP_QUESTION", "STYLE_REQUEST", "CLARIFICATION_REPLY"} or "FOLLOW_UP" in goals:
         names.append("CONVERSATIONAL_FOLLOW_UP")
 
-    from app.pipeline.response_mode import response_mode
-
-    mode = response_mode()
-    if mode == "rich":
-        names.append("RICH_RESPONSE")
-    elif mode == "semantic":
-        names.append("SEMANTIC_RESPONSE")
+    names.append("RICH_RESPONSE")
+    names.append("SEMANTIC_RESPONSE")
 
     ordered: list[str] = []
     for name in names:

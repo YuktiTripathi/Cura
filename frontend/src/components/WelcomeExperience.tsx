@@ -35,7 +35,7 @@ export function WelcomeExperience({
           <button
             type="button"
             onClick={() =>
-              onSend("Help me understand my latest blood report", [], {
+              onSend("What does my lab report say about my health?", [], {
                 type: "blood_report",
                 source: "supershyft",
                 entry_point: "blood_report_overview",
@@ -50,7 +50,7 @@ export function WelcomeExperience({
           <button
             type="button"
             onClick={() =>
-              onSend("Help me understand my latest Bio-AI report and its main findings.", [], {
+              onSend("Help me understand my latest Bio-AI report and its findings.", [], {
                 type: "bio_ai_report",
                 source: "supershyft",
               })

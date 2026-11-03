@@ -61,7 +61,7 @@ from app.pipeline.semantic_plan import build_semantic_plan
 from app.pipeline.urgency_guard import strip_unsupported_urgency
 from app.pipeline.semantic_blocks import build_semantic_response
 from app.pipeline.visible_output import finalize_response
-from app.pipeline.response_mode import apply_response_mode, plain_answer, plain_mode, response_mode
+from app.pipeline.response_mode import apply_response_mode, plain_answer, plain_mode
 from app.pipeline.context_merger import ContextMerger, attach_medical_evidence
 from app.pipeline.personalized_followups import PersonalizedFollowUpEngine, build_inventory
 from app.pipeline.prompt_builder import PromptBuilder
@@ -150,6 +150,23 @@ from app.routing.model_tier import assess_answer_complexity, promote_for_retriev
 logger = logging.getLogger("cura.pipeline")
 
 
+def _topic_follow_ups(items, message: str, answer: str):
+    """Keep model and engine chips that stay on this question. Drops repeats."""
+    from app.pipeline.followup_generator import on_topic
+
+    texts = [getattr(item, "text", "") or "" for item in items or []]
+    allowed = set(on_topic([text for text in texts if text.strip()], message, answer))
+    kept = []
+    seen: set[str] = set()
+    for item in items or []:
+        text = (getattr(item, "text", "") or "").strip()
+        key = text.lower()
+        if text in allowed and key not in seen:
+            kept.append(item)
+            seen.add(key)
+    return kept
+
+
 class ChatService:
     def __init__(self, db: Session, registry: ProviderRegistry):
         self.db = db
@@ -235,7 +252,7 @@ class ChatService:
         try:
             response = self._execute_chat(principal, payload, request_id, eval_turn)
             response = apply_response_mode(response, eval_turn.get("model_follow_ups"))
-            if response_mode() == "semantic" and eval_turn.get("context") is not None:
+            if eval_turn.get("context") is not None:
                 try:
                     response.semantic = build_semantic_response(
                         response,
@@ -243,6 +260,10 @@ class ChatService:
                         eval_turn.get("llm_result"),
                         (eval_turn.get("answer_stages") or {}).get("path"),
                     )
+                    from app.pipeline.semantic_blocks import ensure_bio_ai_clarification, suppress_duplicate_findings
+
+                    suppress_duplicate_findings(response.presentation, response.semantic)
+                    ensure_bio_ai_clarification(response)
                 except Exception:  # noqa: BLE001 - the Markdown answer is always there
                     logger.warning("semantic_response_failed request_id=%s", request_id, exc_info=True)
             # Last pass over everything visible: no em dashes, repeated disclaimers, duplicate
@@ -374,6 +395,9 @@ class ChatService:
         )
         if pre_safety.blocked:
             return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety)
+        from app.pipeline.me_service import schedule_entry_preload
+
+        schedule_entry_preload(principal, self.registry, payload.context_ref)
         if (
             payload.context_ref
             and payload.context_ref.document_id
@@ -1260,7 +1284,13 @@ class ChatService:
             # Three passages by default, five for broader "what should I do" questions (plan 4.5).
             limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
             with perf.stage("knowledge_lookup"):
-                medical_hits = self.medical_knowledge.query(payload.message, plan.topic, limit=limit)
+                from app.pipeline.evidence_inventory import requested_marker_keys
+                from app.retrieval.relationship_map import related_keys
+
+                focus = " ".join(related_keys(requested_marker_keys(payload.message), payload.message)[:6])
+                medical_hits = self.medical_knowledge.query(
+                    f"{payload.message} {focus}".strip(), plan.topic, limit=limit
+                )
             context.medical_passages = [passage_label(doc) for doc in medical_hits]
             attach_medical_evidence(context, medical_hits)
             ContextMerger().merge_into(context, plan, principal.subject_id)
@@ -1432,7 +1462,7 @@ class ChatService:
 
         inventory = build_inventory(principal, self.registry, plan, conv, context)
         with perf.stage("recommendation"):
-            suggestions = self.followups.generate(plan, answer, context, inventory)
+            suggestions = _topic_follow_ups(self.followups.generate(plan, answer, context, inventory), payload.message, answer)
         experience = build_experience_plan(
             payload.message,
             plan,
@@ -1450,22 +1480,18 @@ class ChatService:
                 ):
                     continue
                 llm_follow.append(text)
-        from app.pipeline.followup_generator import is_member_question
+        from app.pipeline.followup_generator import is_member_question, on_topic
 
         llm_follow = [q for q in llm_follow if is_member_question(q)]
-        eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)][:3]
+        llm_follow = on_topic(llm_follow, payload.message, answer)
+        suggestions = _topic_follow_ups(suggestions, payload.message, answer)
+        eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)]
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
         pre_compose_answer = answer
-        if plain_mode():
-            # Plain mode skips card/table/chip assembly entirely; only the answer is returned.
-            from app.contracts.presentation import StructuredResponse
-
-            suggestions, presentation = [], StructuredResponse()
-        else:
-            with perf.stage("composition"):
-                answer, suggestions, presentation = self.composer.compose(
+        with perf.stage("composition"):
+            answer, suggestions, presentation = self.composer.compose(
                     answer,
                     plan=plan,
                     context=context,
@@ -1481,13 +1507,16 @@ class ChatService:
                     shown_follow_ups=list(getattr(conv_state, "suggested_follow_ups", None) or []),
                     member_findings=self._member_findings(principal, plan, context),
                 )
+        suggestions = _topic_follow_ups(suggestions, payload.message, pre_compose_answer)
+        if presentation is not None:
+            presentation.suggestion_chips = [item.text for item in suggestions if getattr(item, "text", None)]
+            if presentation.summary and presentation.summary.strip() != (answer or "").strip():
+                presentation.summary = answer
+            presentation.overall_summary = None
         self._progress.measure("compose")
         eval_turn.setdefault("answer_stages", {})["post_safety_answer"] = pre_compose_answer
         eval_turn["answer_stages"]["post_composer_answer"] = answer
-        if plain_mode():
-            # Plain mode: the conversational answer is the answer. The composer's presentation is
-            # kept internally (sources, metadata) but its text assembly is bypassed.
-            answer = plain_answer(pre_compose_answer, reasoned.llm_mode, context)
+        answer = plain_answer(answer, reasoned.llm_mode, context)
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
         safety_caution = getattr(pre_safety, "caution", None)

@@ -1,19 +1,14 @@
 import { useState } from "react";
 import type { ContextRef } from "../types/chat";
 import type { ChatMessage } from "../hooks/useCuraChat";
-import { AssistantBody } from "./messages/AssistantBody";
 import { EscalationNote, FollowUpChips, Recommendations } from "./messages/MessageExtras";
 import { MessageActions, type FeedbackRating } from "./messages/MessageActions";
 import { SourceViewer } from "./SourceViewer";
 import { groupEvidence } from "../lib/sources";
-import { mergeSuggestions, readHandoff, readInsights } from "../lib/companion";
-import { DoctorSummary } from "./DoctorSummary";
+import { mergeSuggestions, readInsights } from "../lib/companion";
 import { InsightNote } from "./messages/InsightNote";
 import { MarkdownAnswer } from "./messages/MarkdownAnswer";
-import { SemanticAnswer } from "./messages/SemanticAnswer";
-import { debugMode } from "./messages/debug";
-import type { SemanticResponse } from "../types/semantic";
-import { displayAssistantText } from "../types/chat";
+import { SemanticBlocks } from "./messages/SemanticAnswer";
 import { PresentedAnswer } from "./messages/PresentedAnswer";
 import { PreviewAnswer } from "./messages/PreviewAnswer";
 import { ProvenanceLine } from "./messages/ProvenanceLine";
@@ -46,7 +41,6 @@ export function MessageList({
   onAskContext: _onAskContext,
   onFeedback,
   onEditQuestion,
-  onRegenerate,
   editingDisabled = false,
 }: {
   messages: ChatMessage[];
@@ -54,15 +48,11 @@ export function MessageList({
   onAskContext: (value: string, contextRef: ContextRef) => void;
   onFeedback: (rating: FeedbackRating, comment?: string) => void;
   onEditQuestion?: (index: number, text: string) => void;
-  /** Re-ask the question behind the assistant message at this index. Offered on the latest answer. */
-  onRegenerate?: (index: number) => void;
   editingDisabled?: boolean;
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
   const [sourcesIndex, setSourcesIndex] = useState<number | null>(null);
-  const [handoffIndex, setHandoffIndex] = useState<number | null>(null);
-  const latestAssistant = messages.map((m) => m.role).lastIndexOf("assistant");
   const sourceGroups = sourcesIndex != null ? groupEvidence(messages[sourcesIndex]?.evidence) : [];
 
   function startEdit(index: number, content: string) {
@@ -107,35 +97,34 @@ export function MessageList({
                 onSave={saveEdit}
                 onCancel={() => setEditingIndex(null)}
               />
-            ) : m.role === "assistant" && isSemantic(m) && m.semantic ? (
-              // Semantic mode: CURA's summary plus the optional blocks it chose; values come
-              // from the backend. Dev builds can flip to the raw answer for comparison.
-              <SemanticOrRaw semantic={m.semantic} raw={m.content} />
-            ) : m.role === "assistant" && isPlain(m) ? (
-              // Plain response mode: the conversational answer only (no cards, tables or widgets).
-              <MarkdownAnswer content={m.content} />
-            ) : m.role === "assistant" && m.presentation ? (
-              <PresentedAnswer
-                presentation={m.presentation}
-                fallback={m.content}
-                testingOption={m.testingOption || m.presentation.testing_option}
-              />
-            ) : m.role === "assistant" && m.experienceBlocks?.length ? (
-              <StreamingExperience blocks={m.experienceBlocks} />
+            ) : m.role === "assistant" ? (
+              <>
+                <MarkdownAnswer content={m.content} />
+                {m.semantic?.blocks?.length ? <SemanticBlocks blocks={m.semantic.blocks} answer={m.content} /> : null}
+                {m.presentation ? (
+                  <PresentedAnswer
+                    presentation={m.presentation}
+                    fallback={m.content}
+                    testingOption={m.testingOption || m.presentation.testing_option}
+                    hideProse
+                  />
+                ) : null}
+                {!m.presentation && m.experienceBlocks?.length ? <StreamingExperience blocks={m.experienceBlocks} /> : null}
+              </>
             ) : (
-              <p>{m.role === "assistant" ? <AssistantBody content={m.content} /> : m.content}</p>
+              <p>{m.content}</p>
             )}
             {m.role === "user" && editingIndex !== i && onEditQuestion && (
               <UserQuestionActions disabled={editingDisabled} onEdit={() => startEdit(i, m.content)} />
             )}
-            {m.role === "assistant" && !isPlain(m) && m.presentation && !(m.testingOption || m.presentation.testing_option) ? (
+            {m.role === "assistant" && m.presentation && !(m.testingOption || m.presentation.testing_option) ? (
               // One proactive element per turn: a testing card already is that element.
               <InsightNote insights={readInsights(m.presentation.proactive_insights, 1)} />
             ) : null}
-            {!isPlain(m) && m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
-            {!isPlain(m) && m.recommendations && <Recommendations items={m.recommendations} />}
+            {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
+            {m.recommendations && <Recommendations items={m.recommendations} />}
             {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} contacts={m.meta.emergency_contacts} />}
-            {m.role === "assistant" && !isPlain(m) && (
+            {m.role === "assistant" && (
               <ProvenanceLine
                 provenance={m.provenance}
                 findings={
@@ -147,32 +136,21 @@ export function MessageList({
             )}
             {m.role === "assistant" && m.content && (
               <MessageActions
-                text={displayAssistantText(m.content)}
                 onFeedback={onFeedback}
-                onRegenerate={onRegenerate && i === latestAssistant ? () => onRegenerate(i) : undefined}
-                disabled={editingDisabled}
                 sourceCount={groupEvidence(m.evidence).length}
                 onViewSources={() => setSourcesIndex(i)}
-                onDoctorSummary={!isPlain(m) && readHandoff(m.presentation?.clinician_handoff) ? () => setHandoffIndex(i) : undefined}
               />
             )}
             {m.role === "assistant" ? (
               // Plain mode: only the model's own conversation-specific suggestions (0-3).
               <FollowUpChips
-                items={isPlain(m) ? mergeSuggestions(m.followUps || [], []) : mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])}
+                items={mergeSuggestions(m.followUps || [], m.presentation?.suggestion_chips || [])}
                 onPick={onFollowUp}
               />
             ) : null}
           </article>
         );
       })}
-      <DoctorSummary
-        handoff={handoffIndex != null ? readHandoff(messages[handoffIndex]?.presentation?.clinician_handoff) : null}
-        open={handoffIndex != null}
-        onOpenChange={(open) => {
-          if (!open) setHandoffIndex(null);
-        }}
-      />
       <SourceViewer
         groups={sourceGroups}
         open={sourcesIndex != null && sourceGroups.length > 0}
@@ -191,19 +169,4 @@ export function isPlain(m: { role: string; meta?: { response_mode?: string | nul
 
 export function isSemantic(m: { role: string; meta?: { response_mode?: string | null } | null }): boolean {
   return m.role === "assistant" && m.meta?.response_mode === "semantic";
-}
-
-/** Structured rendering, with a development-only switch to the raw conversational answer. */
-function SemanticOrRaw({ semantic, raw }: { semantic: SemanticResponse; raw: string }) {
-  const [showRaw, setShowRaw] = useState(false);
-  return (
-    <>
-      {showRaw ? <MarkdownAnswer content={raw} /> : <SemanticAnswer response={semantic} />}
-      {debugMode() ? (
-        <button type="button" className="sem-toggle sem-debug-toggle" onClick={() => setShowRaw((v) => !v)}>
-          {showRaw ? "Show structured view" : "Show raw answer"}
-        </button>
-      ) : null}
-    </>
-  );
 }

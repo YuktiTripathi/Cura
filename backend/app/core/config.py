@@ -160,8 +160,14 @@ class Settings(BaseSettings):
     medical_require_reviewed: bool | None = None
     # Read-only SuperShyft session guards (defence in depth behind the read-only role).
     supershyft_statement_timeout_ms: int = 5000
-    # Reuse a member's Supershyft reads for this long (plan 5.5). 0 disables.
-    health_data_cache_seconds: int = 90
+    # Reuse one member's SuperShyft provider reads for this long. 0 disables the cache.
+    # The key is member id + data kind + standard|history. There is no tenant id on the
+    # principal, so this is not tenant-isolated beyond the member id.
+    # SuperShyft writes happen outside CURA. A new report is picked up when this TTL
+    # expires or when invalidate_health_data is called. Nothing here deletes keys on save.
+    health_data_cache_seconds: int = 600
+    health_data_cache_lock_seconds: int = 20
+    health_data_cache_wait_seconds: float = 5.0
     health_data_cache_version: str = "1"
     document_encryption_key: str = ""
     document_retention_days: int = 90

@@ -56,7 +56,9 @@ _MEANING = re.compile(
     re.I,
 )
 _INTERNAL_ID = re.compile(
-    r"\b(?:eval-blood-\d+|blood-j-\d+|blood-\d+|bioai-[a-z0-9]+|bio-9|doc-[a-z0-9]+)\b",
+    r"\b(?:eval-blood-\d+|blood-j-\d+|blood-\d+|bioai-[a-z0-9]+|bio-9|doc-[a-z0-9]+)\b"
+    r"|\s*\((?:bioai|blood)\.[a-z0-9_]+(?:\.[a-z0-9_]+)?\)"
+    r"|\b(?:bioai|blood)\.[a-z0-9_]+(?:\.[a-z0-9_]+)?\b",
     re.I,
 )
 _REPORT_PAREN = re.compile(

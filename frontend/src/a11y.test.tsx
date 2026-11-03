@@ -62,7 +62,6 @@ describe("accessibility (axe)", () => {
         onFollowUp={vi.fn()}
         onAskContext={vi.fn()}
         onFeedback={vi.fn()}
-        onRegenerate={vi.fn()}
         onEditQuestion={vi.fn()}
       />
     );

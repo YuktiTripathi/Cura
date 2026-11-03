@@ -38,6 +38,11 @@ def test_me_uses_auth_header_not_hardcoded_user():
 
 
 def test_me_mock_user_first_name_and_greeting():
+    from app.auth.models import AuthenticatedPrincipal
+    from app.pipeline.me_service import preload_latest
+    from app.providers.registry import get_registry
+
+    preload_latest(AuthenticatedPrincipal(subject_id="demo-user-001"), get_registry())
     res = client.get("/api/v1/me", headers={"X-Cura-User-Id": "demo-user-001"})
     assert res.status_code == 200
     body = res.json()
@@ -129,6 +134,37 @@ def test_me_profile_from_provider_not_auth_map():
         assert body["greeting"] == "Hi Yukti 👋"
         assert body["user_id"] == 5
         assert body["capabilities"]["has_blood_report"] is False
+    finally:
+        set_registry(None)
+
+
+def test_me_does_not_wait_for_a_slow_health_read():
+    import time
+
+    class Slow:
+        def query(self, *args, **kwargs):
+            time.sleep(2)
+            return []
+
+    class Named:
+        def get_profile(self, principal):
+            return UserProfile(subject_id=principal.subject_id, display_name="Yukti", first_name="Yukti")
+
+        def available_topics(self, principal):
+            return []
+
+    reg = build_registry()
+    reg.users = Named()
+    reg.blood = Slow()
+    reg.bio_ai = Slow()
+    set_registry(reg)
+    try:
+        started = time.perf_counter()
+        res = client.get("/api/v1/me", headers={"X-Cura-User-Id": "slow-user"})
+        elapsed = time.perf_counter() - started
+        assert res.status_code == 200
+        assert elapsed < 1.0
+        assert res.json()["capabilities"]["has_blood_report"] is False
     finally:
         set_registry(None)
 

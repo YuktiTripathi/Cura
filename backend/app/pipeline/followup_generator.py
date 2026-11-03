@@ -346,6 +346,34 @@ def _named_tests_present(text: str, brief: FollowUpBrief) -> bool:
     return all(f"{float(n):g}" in known for n in numbers)
 
 
+def on_topic(questions: list[str], message: str, answer: str = "") -> list[str]:
+    """Keep suggestions that stay on the latest question. A named lab outside that topic is dropped."""
+    from app.pipeline.lab_parameters import match_lab_keys
+    from app.retrieval.relationship_map import panel_keys_for_text, related_keys
+
+    asked = list(dict.fromkeys([*match_lab_keys(message), *panel_keys_for_text(message)]))
+    broad = bool(re.search(r"\b(report|my health|overall|diet|meal plan|foods)\b", message or "", re.I))
+    allowed = set(asked) | set(related_keys(asked, message or "", intent="interpretation", ignore_conditions=True))
+    if broad or not asked:
+        allowed |= set(match_lab_keys(answer or ""))
+    kept: list[str] = []
+    for text in questions:
+        cleaned = re.sub(r"\s+", " ", (text or "").strip())
+        if not cleaned:
+            continue
+        named = set(match_lab_keys(cleaned))
+        if named and allowed and not named <= allowed:
+            continue
+        if named and not allowed:
+            continue
+        if len(_tokens(message)) > 2 and _similar(cleaned, message):
+            continue
+        if any(_similar(cleaned, seen) for seen in kept):
+            continue
+        kept.append(cleaned)
+    return kept
+
+
 def is_member_question(text: str) -> bool:
     """A clickable chip must be something the member would ask Cura, not a question Cura asks them."""
     q = (text or "").strip()
@@ -423,6 +451,25 @@ FALLBACK = {
         "What should a complete blood report include?",
     ),
 }
+
+
+def general_continuations(message: str) -> list[str]:
+    """Two or three next questions that stay on a general topic. None if the topic is unclear."""
+    subject = re.sub(
+        r"^(?:what(?:'s| is| are)|how does|how do|tell me about|explain)\s+",
+        "",
+        (message or "").strip().rstrip("?.!"),
+        flags=re.I,
+    )
+    subject = re.sub(r"^(?:a|an|the)\s+", "", subject, flags=re.I).strip()
+    if not subject or len(subject.split()) > 8:
+        return []
+    phrase = subject[0].lower() + subject[1:]
+    return [
+        f"What does {phrase} mean in everyday terms?",
+        f"What can affect {phrase}?",
+        f"How is {phrase} usually checked?",
+    ]
 
 
 def fallback_questions(

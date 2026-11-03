@@ -256,6 +256,30 @@ class RequestControlStore:
                     self._memory.pop(old, None)
             self._memory[key] = _Entry(time.time() + ttl, value)
 
+    def _delete(self, key: str) -> None:
+        client = self._client()
+        if client:
+            client.delete(key)
+            return
+        with self._lock:
+            self._memory.pop(key, None)
+
+    def _compare_delete(self, key: str, token: str) -> None:
+        """Drop a single-flight lock only if this caller still owns it."""
+        client = self._client()
+        if client:
+            client.eval(
+                "if redis.call('get', KEYS[1]) == ARGV[1] then return redis.call('del', KEYS[1]) else return 0 end",
+                1,
+                key,
+                token,
+            )
+            return
+        with self._lock:
+            entry = self._memory.get(key)
+            if entry is not None and entry.value == token:
+                self._memory.pop(key, None)
+
     def _set_nx(self, key: str, value: str, ttl: int) -> bool:
         client = self._client()
         if client:

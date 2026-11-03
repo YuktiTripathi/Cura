@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import time
 from datetime import date
 
 from sqlalchemy import text
@@ -36,9 +35,6 @@ _BLOOD_SELECT = text(
     """
 )
 
-_cache: dict[int, tuple[float, list[dict]]] = {}
-
-
 def _user_id(principal: AuthenticatedPrincipal) -> int:
     try:
         return int(str(principal.subject_id).strip())
@@ -58,17 +54,13 @@ def fetch_blood_booking_rows(principal: AuthenticatedPrincipal) -> list[dict]:
     if not (settings.supershyft_database_url or "").strip():
         return []
     uid = _user_id(principal)
-    now = time.monotonic()
-    hit = _cache.get(uid)
-    if hit and now - hit[0] < 30.0:
-        return hit[1]
-    rows = run_readonly(_BLOOD_SELECT, {"uid": uid}) or []
-    _cache[uid] = (now, rows)
-    return rows
+    # Row reuse lives in the provider cache (member + kind + scope), not a second 30s dict.
+    return run_readonly(_BLOOD_SELECT, {"uid": uid}) or []
 
 
 def reset_blood_cache() -> None:
-    _cache.clear()
+    """No process-local booking cache remains. Callers may still call this."""
+    return None
 
 
 def mapped_booking_reports(principal: AuthenticatedPrincipal) -> list[BloodReport]:

@@ -1,19 +1,15 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { t } from "../../i18n";
 
 export type FeedbackRating = "up" | "down";
 
-/** Copy, regenerate, view sources and feedback for one assistant answer. */
+/** Feedback, and sources when the answer has them. */
 export function MessageActions({
-  text,
   onFeedback,
-  onRegenerate,
   sourceCount = 0,
   onViewSources,
-  onDoctorSummary,
-  disabled = false,
 }: {
-  text: string;
+  text?: string;
   onFeedback: (rating: FeedbackRating, comment?: string) => void;
   onRegenerate?: () => void;
   sourceCount?: number;
@@ -21,25 +17,9 @@ export function MessageActions({
   onDoctorSummary?: () => void;
   disabled?: boolean;
 }) {
-  const [copied, setCopied] = useState(false);
   const [rated, setRated] = useState<FeedbackRating | null>(null);
   const [askingReason, setAskingReason] = useState(false);
   const [reason, setReason] = useState("");
-
-  useEffect(() => {
-    if (!copied) return;
-    const id = window.setTimeout(() => setCopied(false), 2000);
-    return () => window.clearTimeout(id);
-  }, [copied]);
-
-  async function copy() {
-    try {
-      await navigator.clipboard.writeText(text);
-      setCopied(true);
-    } catch {
-      /* clipboard blocked: nothing to do */
-    }
-  }
 
   function rate(rating: FeedbackRating) {
     if (rating === "down") {
@@ -59,22 +39,9 @@ export function MessageActions({
   return (
     <div className="message-actions">
       <div className="message-actions-row">
-        <button type="button" className="text-button" onClick={() => void copy()}>
-          {copied ? "Copied" : "Copy"}
-        </button>
-        {onRegenerate ? (
-          <button type="button" className="text-button" onClick={onRegenerate} disabled={disabled}>
-            Regenerate
-          </button>
-        ) : null}
         {sourceCount > 0 && onViewSources ? (
           <button type="button" className="text-button" onClick={onViewSources}>
             View sources ({sourceCount})
-          </button>
-        ) : null}
-        {onDoctorSummary ? (
-          <button type="button" className="text-button" onClick={onDoctorSummary}>
-            Doctor summary
           </button>
         ) : null}
         <span className="message-actions-spacer" />

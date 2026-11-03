@@ -94,19 +94,16 @@ class _Index:
         return value
 
 
-def _clean_text(text, context) -> str | None:
-    """Same treatment as the answer: report ranges win, no internal ids, no unsupported numbers."""
-    if not isinstance(text, str) or not text.strip():
+def _plain(text, *, limit: int | None = None) -> str | None:
+    """Structural trim only. Does not rewrite, ground, or shorten an explanation."""
+    if not isinstance(text, str):
         return None
-    from app.pipeline.grounding import GroundingChecker
-    from app.pipeline.presentation import prefer_report_range, sanitize_internal_ids
-    from app.pipeline.validator import _drop_unsupported
-
-    cleaned = sanitize_internal_ids(prefer_report_range(text.strip(), context))
-    issues = GroundingChecker().unsupported_number_sentences(cleaned, context)
-    if issues:
-        cleaned = _drop_unsupported(cleaned, issues)
-    return cleaned.strip() or None
+    cleaned = text.strip()
+    if not cleaned:
+        return None
+    if limit is not None:
+        cleaned = cleaned[:limit]
+    return cleaned
 
 
 def _keys(raw) -> list[str]:
@@ -132,12 +129,13 @@ def _strings(raw, limit=8) -> list[str]:
 
 
 def validate_block(raw: dict, index: _Index, context) -> ResponseBlock | None:
+    """Validate one optional card. A rejected card never changes the canonical answer."""
+    del context  # evidence is resolved from the index; card prose is not re-grounded
     kind = str(raw.get("type") or "").strip().lower()
     if kind not in BLOCK_TYPES:
         return None
-    title = _clean_text(raw.get("title"), context)
-    title = title[:80] if title else None
-    text = _clean_text(raw.get("text"), context)
+    title = _plain(raw.get("title"), limit=80)
+    text = _plain(raw.get("text"))
     block = ResponseBlock(type=kind, title=title)
     if kind in _VALUE_BLOCKS:
         evidence, values = _resolve_all(
@@ -163,8 +161,8 @@ def validate_block(raw: dict, index: _Index, context) -> ResponseBlock | None:
                 item = {"title": item}
             if not isinstance(item, dict):
                 continue
-            item_title = _clean_text(item.get("title"), context)
-            item_text = _clean_text(item.get("text"), context)
+            item_title = _plain(item.get("title"), limit=80)
+            item_text = _plain(item.get("text"))
             if not (item_title or item_text):
                 continue
             keys, values = _resolve_all(index, _keys(item.get("evidence")))
@@ -175,7 +173,7 @@ def validate_block(raw: dict, index: _Index, context) -> ResponseBlock | None:
         return block
     if kind == "nutrition":
         block.increase, block.reduce = _strings(raw.get("increase")), _strings(raw.get("reduce"))
-        block.text = text or _clean_text(raw.get("why_it_matters"), context)
+        block.text = text or _plain(raw.get("why_it_matters"))
         if not (block.increase or block.reduce):
             return None
         return block
@@ -207,15 +205,8 @@ def _lookup_blocks(index: _Index, context) -> list[ResponseBlock]:
     return [ResponseBlock(type=kind, values=values, evidence=[v.key for v in values])]
 
 
-def _first_paragraph(text: str) -> str:
-    parts = [p.strip() for p in re.split(r"\n\s*\n", text or "") if p.strip()]
-    if not parts:
-        return ""
-    first = parts[0]
-    if first.startswith(("-", "*", "1.", "#", "|")):
-        return first
-    sentences = re.split(r"(?<=[.!?])\s+", first)
-    return " ".join(sentences[:3]).strip()
+def _has_value_card(blocks: list[ResponseBlock]) -> bool:
+    return any(block.type in {"metric", "metric_group", "comparison", "risk"} for block in blocks)
 
 
 _SOURCE_TYPES = {
@@ -244,51 +235,145 @@ def _sources(response, context) -> list[ResponseSource]:
     return out[:8]
 
 
-def _model_answer_shown(response, llm_result) -> bool:
-    """Model blocks are only shown with the model's own answer, never next to a safety or
-    validation replacement."""
-    if llm_result is None or not (llm_result.answer or "").strip():
+def _model_blocks_allowed(response, llm_result) -> bool:
+    """Model cards are hidden only when safety replaced or blocked the answer.
+
+    This does not compare the answer text. A wording difference is not a reason to drop cards,
+    and it is never a reason to change the explanation.
+    """
+    if llm_result is None:
         return False
-    meta = response.meta
-    if getattr(meta, "escalation", None) or getattr(meta, "status", None) in {"safety_block", "clarification_required"}:
+    meta = getattr(response, "meta", None)
+    if getattr(meta, "escalation", None):
         return False
-    final, raw = (response.answer or "").strip(), llm_result.answer.strip()
-    probe = re.sub(r"\W+", " ", raw[:80]).strip().lower()[:50]
-    return bool(probe) and probe in re.sub(r"\W+", " ", final).lower()
+    if getattr(meta, "status", None) in {"safety_block", "clarification_required"}:
+        return False
+    return True
+
+
+def _append_data_cards(blocks: list[ResponseBlock], extra: list[ResponseBlock]) -> list[ResponseBlock]:
+    if _has_value_card(blocks):
+        return blocks
+    combined = list(blocks)
+    for block in extra:
+        if len(combined) >= MAX_BLOCKS:
+            break
+        combined.append(block)
+    return combined
+
+
+_CODE = re.compile(r"^(?:blood\.([a-z0-9_]+)\.(?:latest|trend)|bioai\.([a-z0-9_]+))$", re.I)
+BIO_AI_CLARIFICATION = "A Bio-AI score is a risk estimate, not a diagnosis."
+_ALREADY_CLEAR = re.compile(r"risk estimate|not a diagnosis|not diagnoses", re.I)
+
+
+def _codes_from_keys(keys) -> set[str]:
+    codes: set[str] = set()
+    for key in keys:
+        match = _CODE.match(str(key or ""))
+        if match:
+            codes.add((match.group(1) or match.group(2)).lower())
+    return codes
+
+
+def structured_evidence_codes(semantic) -> set[str]:
+    """Canonical ids already shown as metric, comparison, or risk blocks."""
+    if semantic is None:
+        return set()
+    codes: set[str] = set()
+    for block in semantic.blocks or []:
+        if block.type not in {"metric", "metric_group", "comparison", "risk"}:
+            continue
+        keys = list(block.evidence or [])
+        for value in block.values or []:
+            keys.append(getattr(value, "key", None))
+        for item in block.items or []:
+            keys.extend(item.evidence or [])
+            for value in item.values or []:
+                keys.append(getattr(value, "key", None))
+        codes |= _codes_from_keys(keys)
+    return codes
+
+
+def suppress_duplicate_findings(presentation, semantic):
+    """Drop rich finding cards whose canonical id is already a structured block.
+
+    Cards with no canonical id are kept. The answer is not touched.
+    """
+    if presentation is None:
+        return presentation
+    covered = structured_evidence_codes(semantic)
+    if not covered:
+        return presentation
+
+    def keep(finding):
+        key = (getattr(finding, "canonical_key", None) or "").strip().lower()
+        return not key or key not in covered
+
+    presentation.findings = [item for item in presentation.findings or [] if keep(item)]
+    presentation.related_findings = [item for item in presentation.related_findings or [] if keep(item)]
+    return presentation
+
+
+def _shows_bio_ai(presentation, semantic) -> bool:
+    for block in getattr(semantic, "blocks", None) or []:
+        if block.type == "risk":
+            return True
+        if any(getattr(value, "kind", None) == "bio_ai" for value in block.values or []):
+            return True
+    for finding in list(getattr(presentation, "findings", None) or []) + list(getattr(presentation, "related_findings", None) or []):
+        if (getattr(finding, "source_type", None) or "") in {"bio_ai_report", "bio_ai"}:
+            return True
+    return False
+
+
+def ensure_bio_ai_clarification(response):
+    """One estimate notice beside a Bio-AI score. Does not change the answer."""
+    presentation = getattr(response, "presentation", None)
+    semantic = getattr(response, "semantic", None)
+    if not _shows_bio_ai(presentation, semantic):
+        return response
+    answer = getattr(response, "answer", None) or ""
+    if _ALREADY_CLEAR.search(answer):
+        return response
+    existing = []
+    if semantic is not None:
+        existing.extend((block.text or "") for block in semantic.blocks or [])
+    if presentation is not None:
+        existing.extend(presentation.uncertainties or [])
+    if any(_ALREADY_CLEAR.search(text or "") for text in existing):
+        return response
+    if semantic is None:
+        return response
+    semantic.blocks.append(ResponseBlock(type="warning", text=BIO_AI_CLARIFICATION))
+    return response
 
 
 def build_semantic_response(response, context, llm_result=None, path: str | None = None) -> SemanticResponse:
+    """summary is the safety-approved answer. Blocks only add verified data beside it."""
     index = _Index(context)
-    follow_ups = [f.text for f in (getattr(response, "follow_ups", None) or []) if getattr(f, "text", None)][:3]
+    follow_ups = [f.text for f in (getattr(response, "follow_ups", None) or []) if getattr(f, "text", None)]
     sources = _sources(response, context)
-    answer = (response.answer or "").strip()
-
-    if path == "structured_report_overview":
-        head = answer.split("\n\n")[0].strip()
-        return SemanticResponse(summary=head or answer, blocks=_report_blocks(index), follow_ups=follow_ups, sources=sources)
-    if path == "structured_blood":
-        return SemanticResponse(summary=answer, blocks=_lookup_blocks(index, context), follow_ups=follow_ups, sources=sources)
+    answer = response.answer or ""
 
     blocks: list[ResponseBlock] = []
-    summary = None
-    if _model_answer_shown(response, llm_result):
-        summary = _clean_text(llm_result.summary, context)
+    if _model_blocks_allowed(response, llm_result):
         for raw in llm_result.blocks or []:
+            if not isinstance(raw, dict):
+                continue
             block = validate_block(raw, index, context)
             if block is not None:
                 blocks.append(block)
             if len(blocks) >= MAX_BLOCKS:
                 break
+    if path == "structured_report_overview":
+        blocks = _append_data_cards(blocks, _report_blocks(index))
+    elif path == "structured_blood":
+        blocks = _append_data_cards(blocks, _lookup_blocks(index, context))
+    elif not blocks:
         goal = ((getattr(context, "semantic_plan", None) or {}).get("primary_goal") or "").upper()
         asked = [k for k in (getattr(context, "display_entity_codes", None) or []) if k in index.markers]
         value_question = getattr(getattr(context, "intent", None), "value", "") == "latest_result" or goal in {"LOOKUP", "ASSESS"}
-        if not blocks and value_question and 0 < len(asked) <= 2:
-            blocks = _lookup_blocks(index, context)  # "What is my Vitamin D?" / "Is my TSH normal?" show the value
-    if not blocks:
-        summary = answer  # summary only: the whole conversational answer, nothing hidden
-    return SemanticResponse(
-        summary=summary or _first_paragraph(answer) or answer,
-        blocks=blocks,
-        follow_ups=follow_ups,
-        sources=sources,
-    )
+        if value_question and 0 < len(asked) <= 2:
+            blocks = _lookup_blocks(index, context)
+    return SemanticResponse(summary=answer, blocks=blocks, follow_ups=follow_ups, sources=sources)

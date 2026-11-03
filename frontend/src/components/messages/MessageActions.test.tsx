@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen, waitFor } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { MessageList } from "../MessageList";
 import { MessageActions } from "./MessageActions";
@@ -9,13 +9,11 @@ describe("MessageActions", () => {
     vi.unstubAllGlobals();
   });
 
-  it("copies the answer text", async () => {
-    const writeText = vi.fn(async () => undefined);
-    vi.stubGlobal("navigator", { ...navigator, clipboard: { writeText } });
-    render(<MessageActions text="Your LDL is 138 mg/dL." onFeedback={vi.fn()} />);
-    fireEvent.click(screen.getByRole("button", { name: "Copy" }));
-    await waitFor(() => expect(screen.getByRole("button", { name: "Copied" })).toBeTruthy());
-    expect(writeText).toHaveBeenCalledWith("Your LDL is 138 mg/dL.");
+  it("does not offer copy, regenerate, or a doctor summary", () => {
+    render(<MessageActions text="Your LDL is 138 mg/dL." onFeedback={vi.fn()} onRegenerate={vi.fn()} onDoctorSummary={vi.fn()} />);
+    expect(screen.queryByRole("button", { name: "Copy" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Regenerate" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Doctor summary" })).toBeNull();
   });
 
   it("sends 👍 straight away and asks an optional reason for 👎", () => {
@@ -34,25 +32,19 @@ describe("MessageActions", () => {
     expect(onFeedback).toHaveBeenLastCalledWith("down", "Missing my HDL");
   });
 
-  it("offers regenerate only on the latest answer", () => {
-    const onRegenerate = vi.fn();
+  it("does not show regenerate under answers", () => {
     render(
       <MessageList
         messages={[
           { role: "user", content: "What is my LDL?" },
           { role: "assistant", content: "Your LDL is 138 mg/dL." },
-          { role: "user", content: "And HDL?" },
-          { role: "assistant", content: "Your HDL is 41 mg/dL." },
         ]}
         onFollowUp={vi.fn()}
         onAskContext={vi.fn()}
         onFeedback={vi.fn()}
-        onRegenerate={onRegenerate}
       />
     );
-    const buttons = screen.getAllByRole("button", { name: "Regenerate" });
-    expect(buttons).toHaveLength(1);
-    fireEvent.click(buttons[0]);
-    expect(onRegenerate).toHaveBeenCalledWith(3);
+    expect(screen.queryByRole("button", { name: "Regenerate" })).toBeNull();
+    expect(screen.queryByRole("button", { name: "Copy" })).toBeNull();
   });
 });
