@@ -73,8 +73,9 @@ SECTION_LIMITS = {
     "important findings": 4,
     "reassuring findings": 2,
     "what these results mean": 3,
-    "practical recommendations": 3,
-    "when to consult a doctor": 1,
+    "how your findings fit together": 2,
+    "practical recommendations": 4,
+    "when to consult a doctor": 2,
 }
 
 

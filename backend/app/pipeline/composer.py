@@ -145,7 +145,7 @@ def _journey_follow_ups(
 
 
 def _staged_follow_ups(llm_questions, plan, context, history, shown) -> list[FollowUpSuggestion]:
-    """The five staged questions the house prompt asks for, on whole report answers only."""
+    """The three questions the house prompt asks for (understanding, personal relevance, action), on whole report answers."""
     if settings.cura_prompt_variant != "house" or plan.intent not in _OVERVIEW_INTENTS:
         return []
     if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
@@ -158,7 +158,7 @@ def _staged_follow_ups(llm_questions, plan, context, history, shown) -> list[Fol
         if not text.endswith("?") or len(text.split()) > 16 or key in seen or key in {re.sub(r"\W+", " ", c.lower()).strip() for c in chosen}:
             continue
         chosen.append(text)
-    if len(chosen) < 4:
+    if len(chosen) < 3:
         return []
     return [
         FollowUpSuggestion(
@@ -168,7 +168,7 @@ def _staged_follow_ups(llm_questions, plan, context, history, shown) -> list[Fol
             knowledge_scope="personal",
             handling_path="CONTINUE_INTERPRETATION",
         )
-        for i, text in enumerate(chosen[:5], 1)
+        for i, text in enumerate(chosen[:3], 1)
     ]
 
 
@@ -267,7 +267,7 @@ class ResponseComposer:
             chips = list(combined)
         staged = _staged_follow_ups(llm_follow_ups, plan, context, history, shown_follow_ups) if not answer_turn else []
         if staged:
-            # House flow: five questions, Understand, Explore, Connect, Act, Personalise.
+            # House flow: three questions, Understanding, Personal relevance, Action.
             question, chips = [], staged
             combined = list(staged)
         follow_text = question[0].text if question else None

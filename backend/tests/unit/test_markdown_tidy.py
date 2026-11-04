@@ -30,9 +30,9 @@ def test_glued_headings_return_to_their_own_line():
 def test_report_sections_are_capped_and_other_text_is_untouched():
     from app.pipeline.markdown_tidy import cap_report_sections
 
-    text = "## Overall Health Summary\n\n- 1\n- 2\n- 3\n\n## When to Consult a Doctor\n\n- a\n- b"
+    text = "## Overall Health Summary\n\n- 1\n- 2\n- 3\n\n## When to Consult a Doctor\n\n- a\n- b\n- c"
     out = cap_report_sections(text)
-    assert "- 3" not in out and "- b" not in out and "- 2" in out
+    assert "- 3" not in out and "- c" not in out and "- 2" in out and "- b" in out
     plain = "- one\n- two\n- three\n- four"
     assert cap_report_sections(plain) == plain
 

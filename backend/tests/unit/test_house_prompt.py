@@ -75,16 +75,17 @@ def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     assert f"User question: {message}" in user
 
 
-def test_house_follow_up_instruction_asks_for_five_varied_questions(house):
+def test_house_follow_up_instruction_asks_for_three_kinds_of_question(house):
     system, _user = _build("What does my HbA1c mean?")
-    assert "exactly 5 questions" in system
-    stages = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understand", "Explore", "Connect", "Act", "Personalise"), 1)]
-    assert stages == sorted(stages)
+    assert "exactly 3 questions" in system
+    kinds = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understanding", "Personal relevance", "Action"), 1)]
+    assert kinds == sorted(kinds)
     assert re.search(r"never repeat", system, re.I)
+    assert "Never assume a symptom" in system
 
 
 def test_house_report_sections_come_in_the_required_order():
-    order = ["Overall Health Summary", "Important Findings", "Reassuring Findings", "What These Results Mean", "Practical Recommendations", "When to Consult a Doctor"]
+    order = ["Overall Health Summary", "Important Findings", "Reassuring Findings", "What These Results Mean", "How Your Findings Fit Together", "Practical Recommendations", "When to Consult a Doctor"]
     positions = [HOUSE_CORE.index(f"## {name}") for name in order]
     assert positions == sorted(positions)
 
@@ -116,7 +117,7 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
 def test_house_prompt_uses_twelve_year_old_voice_and_short_report_limits():
     assert "12 year old" in HOUSE_CORE and "5 year old" not in HOUSE_CORE
     assert "at most 3 bullets" in HOUSE_CORE
-    assert "under about 160 words" in HOUSE_CORE
+    assert "under about 260 words" in HOUSE_CORE
 
 
 def test_house_prompt_picks_the_shape_from_the_question():
@@ -134,3 +135,14 @@ def test_findings_are_ranked_by_distance_outside_their_range():
     big = PresentedFinding(label="b", numeric_value=178.8, reference_low=0, reference_high=100)
     inside = PresentedFinding(label="c", numeric_value=50, reference_low=0, reference_high=100)
     assert _distance_outside_range(big) > _distance_outside_range(mild) > _distance_outside_range(inside) == 0
+
+
+def test_house_prompt_carries_the_spec_safety_and_bio_ai_rules():
+    for phrase in (
+        "universal sunlight duration",
+        "laboratory reference range",
+        "Do not invent a scale, threshold or method",
+        "does not rule out a condition",
+        "Answer the question first",
+    ):
+        assert phrase in HOUSE_CORE
