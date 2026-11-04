@@ -306,8 +306,12 @@ class PromptBuilder:
             user = (
                 "Mode: GENERAL_HEALTH\n"
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
-                "Open with one short sentence. If there is more than one point, continue with 2 to 4 plain Markdown bullets, each on its own line starting with \"- \", and do not start a bullet with a bold label.\n"
-                "Answer from the retrieved medical evidence below when present. "
+                + (
+                    ""
+                    if _house()
+                    else "Open with one short sentence. If there is more than one point, continue with 2 to 4 plain Markdown bullets, each on its own line starting with \"- \", and do not start a bullet with a bold label.\n"
+                )
+                + "Answer from the retrieved medical evidence below when present. "
                 "Do not invent personal SuperShyft values. "
                 "Do not name any organization that is not in the retrieved evidence. "
                 "Do not write a Source line.\n"
@@ -344,7 +348,11 @@ class PromptBuilder:
         system = GENERAL_HEALTH_INSTRUCTIONS if not personal else _system_for_mode(SAFETY_INSTRUCTIONS)
         from app.core.config import settings
 
-        if settings.cura_prompt_variant == "modular":
+        if settings.cura_prompt_variant == "house":
+            from app.pipeline.prompt_modules import house_system
+
+            system = house_system(context, user_message)
+        elif settings.cura_prompt_variant == "modular":
             from app.pipeline.prompt_modules import compose_system, length_note, modules_for
 
             system = compose_system(context, user_message)
@@ -362,6 +370,13 @@ class PromptBuilder:
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ]
+
+
+def _house() -> bool:
+    """The house variant removes the per-question brevity and no-advice hints that fight its voice."""
+    from app.core.config import settings
+
+    return settings.cura_prompt_variant == "house"
 
 
 _ASKS_ACTION = re.compile(
@@ -388,6 +403,8 @@ _COMPARISON = re.compile(r"\b(improved|compared|comparison|trend|changed|over ti
 
 
 def _narrative_target(context: HealthContext, user_message: str) -> str:
+    if _house():
+        return ""
     text = user_message or ""
     if _WANTS_DETAIL.search(text) or _WHOLE_REPORT.search(text):
         band = "as many short bullets as the important findings need; do not pad or list every value"
@@ -456,8 +473,16 @@ _SCOPE_NOTES = {
 }
 
 
+_HOUSE_SCOPE_NOTES = {
+    "urgent": _SCOPE_NOTES["urgent"],
+    "cross_source": _SCOPE_NOTES["cross_source"],
+    "follow_up": "follow-up. Build on the last answer and do not define things again.",
+}
+
+
 def _scope_line(context: HealthContext, user_message: str) -> str:
-    note = _SCOPE_NOTES.get(question_scope(context, user_message))
+    notes = _HOUSE_SCOPE_NOTES if _house() else _SCOPE_NOTES
+    note = notes.get(question_scope(context, user_message))
     return f"QUESTION SCOPE: {note}\n" if note else ""
 
 
@@ -482,6 +507,8 @@ def _presentation_line(context: HealthContext, user_message: str) -> str:
             )
         )
     personal = context.knowledge_scope == KnowledgeScope.personal
+    if _house():
+        return contract
     return contract + _narrative_target(context, user_message) + presentation_note(user_message, kind, personal=personal)
 
 
@@ -774,6 +801,10 @@ def _adaptive_response_brief(context: HealthContext) -> str:
     lines = []
     spec = context.task_contract or {}
     goal = spec.get("goal") or ""
+    if _house():
+        if explained:
+            lines.append(f"Already explained: {explained}. Do not define these again.")
+        return ("RESPONSE BRIEF: " + " ".join(lines) + "\n") if lines else ""
     if goal == "explain" and spec.get("personal_context") != "required":
         lines.append("Use 1 or 2 bullets. Do not use this person's results.")
     elif goal in {"lookup", "interpret"} and not spec.get("broad_summary"):
@@ -824,6 +855,8 @@ def _asked_task(message: str, context: HealthContext | None = None) -> str:
 
     text = message or ""
     note = _continuation_note(text, context)
+    if _house():
+        return note
     kind = question_kind(text)
     if kind == "foods":
         return (
@@ -857,6 +890,8 @@ def _asked_task(message: str, context: HealthContext | None = None) -> str:
 
 
 def _depth_instruction(context: HealthContext) -> str:
+    if _house():
+        return ""
     ops = {str(item).upper() for item in (context.operations or [])}
     if ops & {"CORRELATE", "IDENTIFY_PATTERN", "SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"}:
         return "Depth: synthesis. Cover each requested entity or say it is missing; group related findings."

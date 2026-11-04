@@ -44,21 +44,22 @@ class Settings(BaseSettings):
     jev_timeout_seconds: int = 10
     llm_timeout_seconds: int = 30
     llm_max_retries: int = 1
-    llm_max_output_tokens: int = 800
+    llm_max_output_tokens: int = 1200
     # Reasoning models (plan 6.6): effort and the output cap that includes hidden reasoning.
     # Reuse a model answer for an identical prompt (same data, question and context). 0 disables.
     answer_cache_ttl_seconds: int = 86400
     # Reuse an identical prompt's answer. Turn off for cold-latency measurement and evals.
     answer_cache_enabled: bool = True
     answer_prompt_compact: bool = False
-    # legacy keeps the current system text. modular uses the compact core plus task modules.
-    cura_prompt_variant: str = "legacy"
+    # house (default): the SuperShyft Health Assistant voice, warm and complete, no hidden
+    # brevity hints. legacy keeps the old system text. modular uses the compact core plus task modules.
+    cura_prompt_variant: str = "house"
     # Diagnostic package cards and retest suggestions. Clinical policy still decides
     # whether a card is allowed; this only turns the feature off.
     cura_test_suggestions_enabled: bool = True
     # CURA_RESPONSE_MODE: "rich" (cards, tables, chips) or "plain" (the conversational answer
     # only). Plain mode debugs answer quality separately from presentation.
-    cura_response_mode: str = "rich"
+    cura_response_mode: str = "plain"
     # Plain mode: value lookups ("what is my LDL?") are answered by the model at minimal
     # density so the reply can say how much the value matters. False keeps the template.
     plain_lookups_use_model: bool = True
@@ -68,6 +69,8 @@ class Settings(BaseSettings):
     deterministic_definitions_enabled: bool = True
     # Bump to invalidate every cached answer, for example after a prompt or model change.
     answer_cache_version: str = "1"
+    # House variant only: sampling temperature for structured answers (was pinned to 0).
+    answer_temperature: float = 0.3
     llm_reasoning_effort: str = "low"
     llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False
