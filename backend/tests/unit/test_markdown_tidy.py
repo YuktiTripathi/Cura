@@ -70,3 +70,11 @@ def test_plain_answer_keeps_report_headings_but_strips_them_for_narrow_questions
         assert "##" not in plain_answer(text, None, None, whole_report=False)
     finally:
         settings.cura_prompt_variant = old
+
+
+def test_whole_report_bullets_are_capped_in_total():
+    from app.pipeline.markdown_tidy import cap_total_bullets
+
+    text = "\n".join(f"- {i}" for i in range(15))
+    out = cap_total_bullets(text, 10)
+    assert out.count("- ") == 10 and "- 9" in out and "- 10" not in out

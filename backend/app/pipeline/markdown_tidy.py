@@ -137,3 +137,19 @@ def strip_headings(text: str) -> str:
     """Narrow questions get plain bullets: remove every heading line."""
     lines = [line for line in text.split("\n") if not re.match(r"^#{1,6}\s", line)]
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
+
+
+MAX_REPORT_BULLETS = 10
+
+
+def cap_total_bullets(text: str, limit: int = MAX_REPORT_BULLETS) -> str:
+    """A whole report answer keeps at most `limit` bullets. Bullets are written most important first."""
+    kept = 0
+    out: list[str] = []
+    for line in text.split("\n"):
+        if line.startswith("- "):
+            kept += 1
+            if kept > limit:
+                continue
+        out.append(line)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()

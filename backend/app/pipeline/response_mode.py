@@ -12,6 +12,7 @@ from app.core.config import settings
 from app.llm.structured import looks_like_structured_json, public_answer_text
 from app.pipeline.markdown_tidy import (
     cap_report_sections,
+    cap_total_bullets,
     drop_empty_headings,
     friendly_text,
     strip_headings,
@@ -109,7 +110,7 @@ def plain_answer(answer: str, path: str | None, context, *, whole_report: bool =
     if settings.cura_prompt_variant == "house":
         cleaned = friendly_text(tidy_markdown(cleaned))
         if whole_report:
-            cleaned = cap_report_sections(drop_empty_headings(cleaned))
+            cleaned = cap_total_bullets(cap_report_sections(drop_empty_headings(cleaned)))
         else:
             cleaned = strip_headings(cleaned)
     return cleaned

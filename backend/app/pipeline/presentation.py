@@ -1058,15 +1058,16 @@ def strip_lookup_disclaimers(text: str, mode: ResponseMode) -> str:
 
 
 def _distance_outside_range(item) -> float:
-    """How far a result sits outside its own range, as a share of the range. In range is 0."""
+    """How far a result sits outside its own range, as a share of the limit it crossed. In range is 0.
+
+    A share of the crossed limit (not of the range width) keeps a narrow range from inflating a small miss."""
     value, low, high = item.numeric_value, item.reference_low, item.reference_high
     if value is None:
         return 0.0
-    span = (high - low) if (high is not None and low is not None and high > low) else abs(high if high is not None else (low or 0)) or 1.0
     if high is not None and value > high:
-        return (value - high) / span
+        return (value - high) / (abs(high) or 1.0)
     if low is not None and value < low:
-        return (low - value) / span
+        return (low - value) / (abs(low) or 1.0)
     return 0.0
 
 

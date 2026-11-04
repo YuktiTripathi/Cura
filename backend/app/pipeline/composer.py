@@ -346,6 +346,12 @@ class ResponseComposer:
         if settings.cura_prompt_variant == "house":
             # No "missing information" notes, and no change banners unless the person asked about change.
             presentation.blocks = [b for b in presentation.blocks if b.get("kind") != "missing_info"]
+            from app.pipeline.markdown_tidy import friendly_text
+
+            for group in (presentation.findings, getattr(presentation, "raw_findings", None)):
+                for finding in group or []:
+                    if getattr(finding, "label", None):
+                        finding.label = friendly_text(finding.label)
             if plan.intent not in {IntentType.trend, IntentType.previous_result, IntentType.bio_ai_comparison}:
                 presentation.proactive_insights = []
         presentation.related_findings = _related_findings(context, experience)
