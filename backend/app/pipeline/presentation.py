@@ -5,6 +5,7 @@ from __future__ import annotations
 import re
 from datetime import date, datetime
 
+from app.core.config import settings
 from app.contracts.common import IntentType, KnowledgeScope, MarkerFlag
 from app.contracts.health_context import HealthContext
 from app.contracts.presentation import PresentedFinding, ResponseMode, StructuredResponse, SummaryStyle
@@ -682,6 +683,9 @@ def build_structured_response(
     others = [item for item in findings if item.source_type != "bio_ai_report"]
     if risks:
         findings = sorted(risks, key=lambda item: _attention(item.status)) + others
+    if settings.cura_prompt_variant == "house":
+        others = sorted(others, key=_distance_outside_range, reverse=True)
+        findings = (sorted(risks, key=lambda item: _attention(item.status)) if risks else []) + others
     explicit_dates = re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")
     if (
         mode == ResponseMode.single_value
@@ -1051,6 +1055,19 @@ def strip_lookup_disclaimers(text: str, mode: ResponseMode) -> str:
     else:
         out = _LOOKUP_DISCLAIMER.sub("", text)
     return re.sub(r"[ \t]{2,}", " ", out).strip()
+
+
+def _distance_outside_range(item) -> float:
+    """How far a result sits outside its own range, as a share of the range. In range is 0."""
+    value, low, high = item.numeric_value, item.reference_low, item.reference_high
+    if value is None:
+        return 0.0
+    span = (high - low) if (high is not None and low is not None and high > low) else abs(high if high is not None else (low or 0)) or 1.0
+    if high is not None and value > high:
+        return (value - high) / span
+    if low is not None and value < low:
+        return (low - value) / span
+    return 0.0
 
 
 def sanitize_internal_ids(text: str) -> str:

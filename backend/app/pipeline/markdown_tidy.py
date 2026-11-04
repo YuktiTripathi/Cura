@@ -98,3 +98,41 @@ def cap_report_sections(text: str) -> str:
                 continue
         out.append(line)
     return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+
+
+_MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
+_ISO_DATE = re.compile(r"\b(20\d{2})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\b")
+_RANGE_DASH = re.compile(r"(?<=\d)\s*[\u2013\u2014]\s*(?=\d)")
+_DL = re.compile(r"(?<=[A-Za-z])/dl\b")
+_NAME_FIXES = (("Cholestrol", "Cholesterol"), ("cholestrol", "cholesterol"))
+
+
+def friendly_text(text: str) -> str:
+    """Dates in words, ranges with 'to', units with a capital L, common lab misspellings fixed."""
+    if not text:
+        return text
+    text = _ISO_DATE.sub(lambda m: f"{int(m.group(3))} {_MONTHS[int(m.group(2)) - 1]} {m.group(1)}", text)
+    text = _RANGE_DASH.sub(" to ", text)
+    text = _DL.sub("/dL", text)
+    for wrong, right in _NAME_FIXES:
+        text = text.replace(wrong, right)
+    return text
+
+
+def drop_empty_headings(text: str) -> str:
+    """A heading with no bullet under it is removed."""
+    lines = text.split("\n")
+    out: list[str] = []
+    for i, line in enumerate(lines):
+        if line.startswith("## "):
+            follow = next((x for x in lines[i + 1:] if x.strip()), "")
+            if not follow.startswith("- "):
+                continue
+        out.append(line)
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+
+
+def strip_headings(text: str) -> str:
+    """Narrow questions get plain bullets: remove every heading line."""
+    lines = [line for line in text.split("\n") if not re.match(r"^#{1,6}\s", line)]
+    return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()

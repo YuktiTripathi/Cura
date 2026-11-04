@@ -167,6 +167,22 @@ def _topic_follow_ups(items, message: str, answer: str):
     return kept
 
 
+# Questions about one result, one topic or a general matter: plain bullets with no report headings.
+_NARROW_INTENTS = frozenset({
+    IntentType.latest_result,
+    IntentType.previous_result,
+    IntentType.trend,
+    IntentType.blood_marker_explanation,
+    IntentType.follow_up,
+    IntentType.general_health_question,
+    IntentType.nutrition_guidance,
+    IntentType.questionnaire_lookup,
+    IntentType.personal_profile,
+    IntentType.health_goal_progress,
+    IntentType.casual_conversation,
+})
+
+
 class ChatService:
     def __init__(self, db: Session, registry: ProviderRegistry):
         self.db = db
@@ -1524,7 +1540,12 @@ class ChatService:
         self._progress.measure("compose")
         eval_turn.setdefault("answer_stages", {})["post_safety_answer"] = pre_compose_answer
         eval_turn["answer_stages"]["post_composer_answer"] = answer
-        answer = plain_answer(answer, reasoned.llm_mode, context)
+        answer = plain_answer(
+            answer,
+            reasoned.llm_mode,
+            context,
+            whole_report=plan.intent not in _NARROW_INTENTS,
+        )
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
         safety_caution = getattr(pre_safety, "caution", None)
@@ -1767,7 +1788,8 @@ class ChatService:
             answer=answer,
             evidence=evidence,
             follow_ups=suggestions,
-            recommendations=approved_recommendations,
+            # The house answer already carries advice tied to the findings; separate cards would repeat it.
+            recommendations=[] if (settings.cura_prompt_variant == "house" and plan.knowledge_scope == KnowledgeScope.personal) else approved_recommendations,
             presentation=presentation,
             experience=turn_experience,
             testing_option=testing_option,

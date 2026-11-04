@@ -10,7 +10,13 @@ from __future__ import annotations
 
 from app.core.config import settings
 from app.llm.structured import looks_like_structured_json, public_answer_text
-from app.pipeline.markdown_tidy import cap_report_sections, tidy_markdown
+from app.pipeline.markdown_tidy import (
+    cap_report_sections,
+    drop_empty_headings,
+    friendly_text,
+    strip_headings,
+    tidy_markdown,
+)
 from app.pipeline.presentation import prefer_report_range, sanitize_internal_ids
 from app.pipeline.visible_output import remove_em_dashes
 
@@ -94,14 +100,18 @@ def _natural_lookup(context) -> str:
     return f"From your report{(' ' + when.strip()[len('on your report '):]) if when else ''}: " + "; ".join(sentences) + "."
 
 
-def plain_answer(answer: str, path: str | None, context) -> str:
+def plain_answer(answer: str, path: str | None, context, *, whole_report: bool = True) -> str:
     text = answer or ""
     if looks_like_structured_json(text):
         text = public_answer_text(text)
     # The safety-approved answer is the prose. Lookups and report listings stay in cards.
     cleaned = remove_em_dashes(sanitize_internal_ids(prefer_report_range(text, context))).strip()
     if settings.cura_prompt_variant == "house":
-        cleaned = cap_report_sections(tidy_markdown(cleaned))
+        cleaned = friendly_text(tidy_markdown(cleaned))
+        if whole_report:
+            cleaned = cap_report_sections(drop_empty_headings(cleaned))
+        else:
+            cleaned = strip_headings(cleaned)
     return cleaned
 
 

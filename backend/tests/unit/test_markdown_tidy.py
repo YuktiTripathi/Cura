@@ -41,3 +41,32 @@ def test_sanitize_internal_ids_keeps_line_breaks():
     from app.pipeline.presentation import sanitize_internal_ids
 
     assert sanitize_internal_ids("## A\n\n- x\n- y") == "## A\n\n- x\n- y"
+
+
+def test_friendly_text_fixes_dates_ranges_units_and_names():
+    from app.pipeline.markdown_tidy import friendly_text
+
+    out = friendly_text("LDL Cholestrol 178.8 mg/dl on 2026-09-03, sun 10–20 minutes")
+    assert out == "LDL Cholesterol 178.8 mg/dL on 3 Sep 2026, sun 10 to 20 minutes"
+
+
+def test_empty_headings_and_narrow_headings_are_removed():
+    from app.pipeline.markdown_tidy import drop_empty_headings, strip_headings
+
+    text = "## Plan\n\n- a\n\n## When to Consult a Doctor\n"
+    assert drop_empty_headings(text) == "## Plan\n\n- a"
+    assert strip_headings("## Overall Health Summary\n\n- a\n\n## Important Findings\n\n- b") == "- a\n\n- b"
+
+
+def test_plain_answer_keeps_report_headings_but_strips_them_for_narrow_questions():
+    from app.core.config import settings
+    from app.pipeline.response_mode import plain_answer
+
+    old = settings.cura_prompt_variant
+    settings.cura_prompt_variant = "house"
+    try:
+        text = "## Overall Health Summary\n\n- a\n\n## Important Findings\n\n- b"
+        assert "## Important Findings" in plain_answer(text, None, None, whole_report=True)
+        assert "##" not in plain_answer(text, None, None, whole_report=False)
+    finally:
+        settings.cura_prompt_variant = old

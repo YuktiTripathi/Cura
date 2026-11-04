@@ -117,3 +117,20 @@ def test_house_prompt_uses_twelve_year_old_voice_and_short_report_limits():
     assert "12 year old" in HOUSE_CORE and "5 year old" not in HOUSE_CORE
     assert "at most 3 bullets" in HOUSE_CORE
     assert "under about 160 words" in HOUSE_CORE
+
+
+def test_house_prompt_picks_the_shape_from_the_question():
+    assert "SHAPE 1" in HOUSE_CORE and "SHAPE 2" in HOUSE_CORE
+    assert "NO headings" in HOUSE_CORE
+    assert "Check direction before you explain a cause" in HOUSE_CORE
+    assert "Never list missing tests" in HOUSE_CORE
+
+
+def test_findings_are_ranked_by_distance_outside_their_range():
+    from app.contracts.presentation import PresentedFinding
+    from app.pipeline.presentation import _distance_outside_range
+
+    mild = PresentedFinding(label="a", numeric_value=5.22, reference_low=3.5, reference_high=5.2)
+    big = PresentedFinding(label="b", numeric_value=178.8, reference_low=0, reference_high=100)
+    inside = PresentedFinding(label="c", numeric_value=50, reference_low=0, reference_high=100)
+    assert _distance_outside_range(big) > _distance_outside_range(mild) > _distance_outside_range(inside) == 0

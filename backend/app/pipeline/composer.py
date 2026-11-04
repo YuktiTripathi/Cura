@@ -343,6 +343,11 @@ class ResponseComposer:
         if presentation.overall_summary:
             presentation.overall_summary = separate_answer_layout(presentation.overall_summary)
         presentation.blocks = [item.model_dump(mode="json") for item in experience_blocks_from_answer(text, experience, context)]
+        if settings.cura_prompt_variant == "house":
+            # No "missing information" notes, and no change banners unless the person asked about change.
+            presentation.blocks = [b for b in presentation.blocks if b.get("kind") != "missing_info"]
+            if plan.intent not in {IntentType.trend, IntentType.previous_result, IntentType.bio_ai_comparison}:
+                presentation.proactive_insights = []
         presentation.related_findings = _related_findings(context, experience)
         presentation.suggestion_chips = [item.text for item in chips]
         if experience.topic_summary and not is_explicit_catalog_lookup(plan.raw_message or ""):
