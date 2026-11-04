@@ -111,3 +111,9 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
     settings.cura_prompt_variant = "legacy"
     payload = client._build_payload([{"role": "user", "content": "hi"}], "json_object")
     assert payload["temperature"] == 0
+
+
+def test_house_prompt_uses_twelve_year_old_voice_and_short_report_limits():
+    assert "12 year old" in HOUSE_CORE and "5 year old" not in HOUSE_CORE
+    assert "at most 3 bullets" in HOUSE_CORE
+    assert "under about 160 words" in HOUSE_CORE

@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import re
 
+from app.core.config import settings
 from app.contracts.common import IntentType, KnowledgeScope
 from app.contracts.conversation_experience import ConversationExperiencePlan
 from app.contracts.followup import FollowUpSuggestion
@@ -77,6 +78,12 @@ def _valid_follow_up(item: FollowUpSuggestion, plan: QueryPlan, context: HealthC
     return True
 
 
+def _marker_out_of_range(marker) -> bool:
+    from app.pipeline.report_explainer import _out_of_range
+
+    return _out_of_range(marker)
+
+
 _OVERVIEW_INTENTS = {
     IntentType.report_explanation,
     IntentType.broad_health_summary,
@@ -135,6 +142,34 @@ def _journey_follow_ups(
         return None
     # The member's own next questions first; Cura's clinical-context question last.
     return [*to_suggestions(questions), *kept]
+
+
+def _staged_follow_ups(llm_questions, plan, context, history, shown) -> list[FollowUpSuggestion]:
+    """The five staged questions the house prompt asks for, on whole report answers only."""
+    if settings.cura_prompt_variant != "house" or plan.intent not in _OVERVIEW_INTENTS:
+        return []
+    if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
+        return []
+    seen = {re.sub(r"\W+", " ", t.lower()).strip() for t in [*(history or []), *(shown or [])]}
+    chosen: list[str] = []
+    for raw in llm_questions or []:
+        text = re.sub(r"\s+", " ", (raw or "").strip())
+        key = re.sub(r"\W+", " ", text.lower()).strip()
+        if not text.endswith("?") or len(text.split()) > 16 or key in seen or key in {re.sub(r"\W+", " ", c.lower()).strip() for c in chosen}:
+            continue
+        chosen.append(text)
+    if len(chosen) < 4:
+        return []
+    return [
+        FollowUpSuggestion(
+            text=text,
+            category=f"stage_{i}",
+            requires_personal_context=True,
+            knowledge_scope="personal",
+            handling_path="CONTINUE_INTERPRETATION",
+        )
+        for i, text in enumerate(chosen[:5], 1)
+    ]
 
 
 class ResponseComposer:
@@ -230,6 +265,11 @@ class ResponseComposer:
                 for label in response_plan.next_actions
             ]
             chips = list(combined)
+        staged = _staged_follow_ups(llm_follow_ups, plan, context, history, shown_follow_ups) if not answer_turn else []
+        if staged:
+            # House flow: five questions, Understand, Explore, Connect, Act, Personalise.
+            question, chips = [], staged
+            combined = list(staged)
         follow_text = question[0].text if question else None
         from app.pipeline.narrative import format_units_in_text
 
@@ -246,6 +286,12 @@ class ResponseComposer:
             llm_themes=list(llm_result.themes) if llm_result and llm_result.themes else None,
             llm_overall=llm_result.overall_summary if llm_result else None,
         )
+        if settings.cura_prompt_variant == "house" and plan.intent in _OVERVIEW_INTENTS and presentation.headline:
+            # One result's name must not title a card that holds several results.
+            if plan.intent.value.startswith("bio_ai"):
+                presentation.headline = "Your Bio-AI scores"
+            elif sum(1 for m in (context.markers or []) if _marker_out_of_range(m)) > 1:
+                presentation.headline = "Results outside your range"
         if response_plan.kind == "report_overview":
             presentation.headline = "Your latest blood report"
             presentation.summary = response_plan.direct_answer
@@ -342,7 +388,7 @@ class ResponseComposer:
         # A reply to Cura's own question stays lean, and "show me my report" keeps its
         # concrete actions; every other personal answer gets grounded follow-ups.
         try:
-            journey = None if answer_turn or response_plan.kind == "report_overview" else _journey_follow_ups(
+            journey = None if answer_turn or staged or response_plan.kind == "report_overview" else _journey_follow_ups(
                 plan, context, llm_follow_ups=llm_follow_ups, history=history, shown=shown_follow_ups,
                 # The clinical-context question is asked once per conversation, not after every answer.
                 keep=[
@@ -354,7 +400,11 @@ class ResponseComposer:
         except Exception:  # noqa: BLE001 - suggestions must never break or delay the answer
             logger.warning("follow_up_generation_failed", exc_info=True)
             journey = None
-        if journey is not None:
+        if staged:
+            combined = list(staged)
+            presentation.suggestion_chips = [item.text for item in staged]
+            presentation.follow_up = None
+        elif journey is not None:
             combined = journey
             presentation.suggestion_chips = [item.text for item in journey]
             presentation.follow_up = None
