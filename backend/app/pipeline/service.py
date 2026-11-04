@@ -1280,7 +1280,15 @@ class ChatService:
             self._progress.measure("context")
 
         medical_hits = []
-        if getattr(plan, "medical_evidence_required", False) or general_answer:
+        # Report answers rest on the person's own results only. The knowledge base is for general questions.
+        report_question = bool(
+            (getattr(plan, "needs_blood", False) or getattr(plan, "needs_bio_ai", False))
+            and getattr(plan, "needs_personal_data", False)
+        )
+        use_knowledge = (
+            getattr(plan, "medical_evidence_required", False) or general_answer
+        ) and (settings.report_use_knowledge_base or not report_question)
+        if use_knowledge:
             # Three passages by default, five for broader "what should I do" questions (plan 4.5).
             limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
             with perf.stage("knowledge_lookup"):

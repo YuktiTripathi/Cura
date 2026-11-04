@@ -71,6 +71,8 @@ class Settings(BaseSettings):
     answer_cache_version: str = "1"
     # House variant only: sampling temperature for structured answers (was pinned to 0).
     answer_temperature: float = 0.3
+    # Blood and Bio-AI report answers use only the person's own results unless this is turned on.
+    report_use_knowledge_base: bool = False
     llm_reasoning_effort: str = "low"
     llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False

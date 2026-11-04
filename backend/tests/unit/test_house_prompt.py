@@ -68,7 +68,7 @@ def test_house_core_is_much_smaller_than_the_legacy_system_prompt():
 def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     system, user = _build(message)
     assert system.startswith("You are the SuperShyft Health Assistant")
-    for phrase in ("5 year old", "bullet points only", "**Name: value unit**", "Indian", "## Overall Health Summary", "## When to Consult a Doctor"):
+    for phrase in ("12 year old", "bullet points only", "**Name: value unit**", "Indian", "## Overall Health Summary", "## When to Consult a Doctor"):
         assert phrase in system
     for hint in HIDDEN_HINTS:
         assert hint not in system and hint not in user, hint
