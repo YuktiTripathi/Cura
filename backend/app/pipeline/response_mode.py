@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from app.core.config import settings
 from app.llm.structured import looks_like_structured_json, public_answer_text
+from app.pipeline.markdown_tidy import tidy_markdown
 from app.pipeline.presentation import prefer_report_range, sanitize_internal_ids
 from app.pipeline.visible_output import remove_em_dashes
 
@@ -98,7 +99,10 @@ def plain_answer(answer: str, path: str | None, context) -> str:
     if looks_like_structured_json(text):
         text = public_answer_text(text)
     # The safety-approved answer is the prose. Lookups and report listings stay in cards.
-    return remove_em_dashes(sanitize_internal_ids(prefer_report_range(text, context))).strip()
+    cleaned = remove_em_dashes(sanitize_internal_ids(prefer_report_range(text, context))).strip()
+    if settings.cura_prompt_variant == "house":
+        cleaned = tidy_markdown(cleaned)
+    return cleaned
 
 
 def apply_response_mode(response, model_follow_ups: list[str] | None = None):

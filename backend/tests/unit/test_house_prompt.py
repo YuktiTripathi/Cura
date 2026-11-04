@@ -68,7 +68,7 @@ def test_house_core_is_much_smaller_than_the_legacy_system_prompt():
 def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     system, user = _build(message)
     assert system.startswith("You are the SuperShyft Health Assistant")
-    for phrase in ("verdict", "**Name: value unit**", "Indian food", "one specific sentence on when to talk to a doctor"):
+    for phrase in ("5 year old", "bullet points only", "**Name: value unit**", "Indian", "## Overall Health Summary", "## When to Consult a Doctor"):
         assert phrase in system
     for hint in HIDDEN_HINTS:
         assert hint not in system and hint not in user, hint
@@ -77,9 +77,16 @@ def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
 
 def test_house_follow_up_instruction_asks_for_five_varied_questions(house):
     system, _user = _build("What does my HbA1c mean?")
-    assert "5 questions" in system
-    assert "different angles" in system
+    assert "exactly 5 questions" in system
+    stages = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understand", "Explore", "Connect", "Act", "Personalise"), 1)]
+    assert stages == sorted(stages)
     assert re.search(r"never repeat", system, re.I)
+
+
+def test_house_report_sections_come_in_the_required_order():
+    order = ["Overall Health Summary", "Important Findings", "Reassuring Findings", "What These Results Mean", "Practical Recommendations", "When to Consult a Doctor"]
+    positions = [HOUSE_CORE.index(f"## {name}") for name in order]
+    assert positions == sorted(positions)
 
 
 def test_legacy_variant_is_unchanged_and_still_available():
