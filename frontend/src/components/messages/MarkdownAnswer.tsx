@@ -28,7 +28,7 @@ const TABLE_ROW = /^\s*\|.*\|\s*$/;
 const TABLE_RULE = /^\s*\|?\s*:?-{2,}:?\s*(\|\s*:?-{2,}:?\s*)*\|?\s*$/;
 
 export function parseMarkdown(text: string): Block[] {
-  const normalized = (text || "").replace(/\r\n/g, "\n").replace(/([^\n])[ \t]+([-*•])[ \t]+/g, "$1\n$2 ");
+  const normalized = (text || "").replace(/\r\n/g, "\n").replace(/([.!?:;])[ \t]+([-*•])[ \t]+(?=[A-Z*])/g, "$1\n$2 ");
   const lines = normalized.split("\n");
   const blocks: Block[] = [];
   let i = 0;

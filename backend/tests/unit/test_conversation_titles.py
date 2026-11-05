@@ -44,4 +44,4 @@ def test_chat_persists_useful_title_and_lists_it():
 
 
 def test_diet_starter_gets_the_nutrition_title():
-    assert conversation_title("How can I optimize my diet based on my Blood Reports?") == "Nutrition guidance"
+    assert conversation_title("What does my nutrition data say, and what should I improve?") == "Nutrition guidance"

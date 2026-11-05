@@ -333,7 +333,7 @@ def is_nutrition_overview(message: str) -> bool:
 
 NUTRITION_OVERVIEW = (
     "THIS QUESTION IS A NUTRITION OVERVIEW. Use this layout instead of SHAPE 2: "
-    "(1) one opening bullet of two short sentences: which parts of the person's results connect to food and which of those look fine, using within_range_by_body_system. "
+    "(1) one opening bullet of two short sentences: what the person's own nutrition information says (diet preference and eating habits, when supplied; say \"you told us\" for a habit), then which of their results connect to food and which of those look fine. "
     "(2) Then up to 3 sections, each starting with a \"## \" heading in plain words (use body_system, for example ## Heart and blood vessels, ## Bones and vitamins, ## Blood sugar, ## Blood and iron), only for areas outside the range that food can influence. "
     "Under each heading exactly two bullets with no bold label: first the one to three results with number, unit and report range; second what food does to that number and which everyday foods matter, in plain words. "
     "(3) A final \"## What to do next\" with at most 3 bullets, each naming specific foods, how much or how often, and the reason, respecting the diet preference. "
@@ -341,8 +341,14 @@ NUTRITION_OVERVIEW = (
 )
 
 
+_NO_FIELD_NAMES = (
+    "Never write a field name from the supplied data (any word with an underscore) and never say \"the member\"; say \"your report\". "
+    "If something you were asked to use is not supplied, leave that part out without saying so."
+)
+
+
 def house_system(context: HealthContext, message: str) -> str:
-    parts = [HOUSE_CORE.strip()]
+    parts = [HOUSE_CORE.strip(), _NO_FIELD_NAMES]
     if is_nutrition_overview(message):
         parts.append(NUTRITION_OVERVIEW)
     for name in modules_for(context, message):

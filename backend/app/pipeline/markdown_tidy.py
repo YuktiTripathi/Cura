@@ -84,6 +84,7 @@ def tidy_markdown(text: str) -> str:
             line = _fix_labels("- " + _fix_units(bullet.group(1).strip()))
         else:
             line = _fix_units(line.strip())
+        line = re.sub(r"[ \t]+-$", "", line)  # a stray bullet dash left at the end of a line
         line = re.sub(r"\*\*\s*\*\*", "", line)
         line = re.sub(r"(?<!\*)\*\*(?!\*)([^*]*)$", r"\1", line) if line.count("**") % 2 else line
         out.append(line)
@@ -133,7 +134,7 @@ def cap_report_sections(text: str) -> str:
 
 _MONTHS = ("Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec")
 _ISO_DATE = re.compile(r"\b(20\d{2})-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])\b")
-_RANGE_DASH = re.compile(r"(?<=\d)\s*[\u2013\u2014]\s*(?=\d)")
+_RANGE_DASH = re.compile(r"(?<=\d)\s*[\u2013\u2014]\s*(?=\d)|(?<=\d)\s+-\s+(?=\d)")
 _DL = re.compile(r"(?<=[A-Za-z])/dl\b")
 _NAME_FIXES = (("Cholestrol", "Cholesterol"), ("cholestrol", "cholesterol"))
 

@@ -64,7 +64,7 @@ export function WelcomeExperience({
           <button
             type="button"
             onClick={() =>
-              onSend("How can I optimize my diet based on my Blood Reports?", [], {
+              onSend("What does my nutrition data say, and what should I improve?", [], {
                 type: "nutrition_item",
                 source: "supershyft",
               })

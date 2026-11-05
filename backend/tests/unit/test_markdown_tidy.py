@@ -103,3 +103,18 @@ def test_labels_are_bold_with_a_space_after_them():
         "- **What to do first:** eat oats",
         "- **When to see a doctor:** soon",
     ]
+
+
+def test_spaced_hyphen_ranges_read_as_to_and_stray_dashes_go():
+    from app.pipeline.markdown_tidy import friendly_text, tidy_markdown
+
+    out = friendly_text(tidy_markdown("- Iron is 68.6 ug/dL (range 70.0 - 180.0) and low. -\n- Next."))
+    assert "70.0 to 180.0" in out
+    assert not out.splitlines()[0].endswith("-")
+
+
+def test_leaked_field_names_are_scrubbed():
+    from app.pipeline.presentation import sanitize_internal_ids
+
+    out = sanitize_internal_ids("The member's report does not include within_range_by_body_system.")
+    assert "within_range_by_body_system" not in out and "member" not in out

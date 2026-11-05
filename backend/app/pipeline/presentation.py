@@ -1076,6 +1076,8 @@ def sanitize_internal_ids(text: str) -> str:
     out = re.sub(r"(?i)^\s*general information:\s*", "", out)
     out = _REPORT_CLAUSE.sub("the retrieved report", out)
     out = _INTERNAL_ID.sub("", out)
+    out = re.sub(r"\b(?:within_range_by_body_system|report_counts|measured_results|body_system|laboratory_status)\b", "your report", out)
+    out = re.sub(r"(?i)\bthe member's\b", "your", out)
     # Spaces and tabs only: line breaks carry the Markdown layout (headings, bullets).
     out = re.sub(r"[ \t]{2,}", " ", out)
     out = re.sub(r"[ \t]+([,.])", r"\1", out)
