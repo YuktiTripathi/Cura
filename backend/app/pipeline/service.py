@@ -2494,7 +2494,7 @@ class ChatService:
                     "themes_selected": [
                         item.title for item in (getattr(response.presentation, "themes", None) or [])
                     ],
-                    "followups": [getattr(item, "text", item) for item in (response.follow_ups or [])][:3],
+                    "followups": [getattr(item, "text", item) for item in (response.follow_ups or [])][:4],
                     "package_suggestion": bool(response.testing_option),
                     "quiet_mode": bool(getattr(response.presentation, "quiet_mode", False)) if response.presentation else False,
                 },

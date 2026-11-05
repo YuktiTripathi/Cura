@@ -117,7 +117,7 @@ def _journey_follow_ups(
     if not (markers or risks):
         # No blood or Bio-AI report on record: useful general questions, never personal claims.
         general = fallback_questions(
-            FollowUpBrief(asked=list(history or []), shown=list(shown or [])), count=3, current=plan.raw_message,
+            FollowUpBrief(asked=list(history or []), shown=list(shown or [])), count=4, current=plan.raw_message,
         )
         return to_suggestions(general, personal=False) if general else None
     brief = build_brief(
@@ -139,7 +139,7 @@ def _journey_follow_ups(
         brief,
         current_question=plan.raw_message,
         model_questions=list(llm_follow_ups or []),
-        count=(4 if overview else 3) - len(kept),
+        count=4 - len(kept),
     )
     if len(kept) + len(questions) < 2:
         return None
@@ -158,7 +158,7 @@ def _diet_on_record(context) -> str | None:
 
 
 def _staged_follow_ups(llm_questions, plan, context, history, shown, answer_text="") -> list[FollowUpSuggestion]:
-    """The three questions the house prompt asks for (understanding, personal relevance, action), on whole report answers."""
+    """The four questions the house prompt asks for (understanding, personal relevance, action, explore), on whole report answers."""
     if settings.cura_prompt_variant != "house" or plan.intent not in _OVERVIEW_INTENTS:
         return []
     if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
@@ -176,7 +176,7 @@ def _staged_follow_ups(llm_questions, plan, context, history, shown, answer_text
         diet=_diet_on_record(context),
         answer_text=answer_text,
     )
-    questions = select_followups(brief, current_question=plan.raw_message, model_questions=list(llm_questions or []), count=3)
+    questions = select_followups(brief, current_question=plan.raw_message, model_questions=list(llm_questions or []), count=4)
     if len(questions) < 3:
         return []
     return to_suggestions(questions)
@@ -277,7 +277,7 @@ class ResponseComposer:
             chips = list(combined)
         staged = _staged_follow_ups(llm_follow_ups, plan, context, history, shown_follow_ups, answer) if not answer_turn else []
         if staged:
-            # House flow: three questions, Understanding, Personal relevance, Action.
+            # House flow: four questions, Understanding, Personal relevance, Action, Explore.
             question, chips = [], staged
             combined = list(staged)
         follow_text = question[0].text if question else None
@@ -467,7 +467,7 @@ class ResponseComposer:
 
             general = fallback_questions(
                 FollowUpBrief(asked=list(history or []), shown=list(shown_follow_ups or [])),
-                count=3, current=plan.raw_message,
+                count=4, current=plan.raw_message,
             )
             combined = to_suggestions(general, personal=False)
             presentation.suggestion_chips = [item.text for item in combined]

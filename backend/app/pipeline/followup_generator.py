@@ -313,6 +313,15 @@ def _similar(a: str, b: str) -> bool:
     return len(ta & tb) / max(1, min(len(ta), len(tb))) >= 0.75
 
 
+def _near_duplicate(a: str, b: str) -> bool:
+    """Same question reworded: overlap measured against the longer one, so a short topic message such as
+    "What is fatty liver?" does not make every on-topic question look like a repeat."""
+    ta, tb = _tokens(a), _tokens(b)
+    if not ta or not tb:
+        return False
+    return len(ta & tb) / max(len(ta), len(tb)) >= 0.75
+
+
 _ACRONYM = re.compile(r"\b[A-Z][A-Z0-9]{1,4}\b")
 _NOT_TESTS = {"AI", "BIO", "OK", "I", "BMI", "BP"}
 
@@ -442,6 +451,7 @@ FALLBACK = {
         "Which of my Bio-AI scores deserve attention?",
         "What can I do to lower my highest risk score?",
         "Which score should I discuss with my doctor first?",
+        "What can I do to keep my healthy scores healthy?",
     ),
     "both": (
         "Which of my results should I focus on first?",
@@ -453,6 +463,7 @@ FALLBACK = {
         "Can I upload a clearer copy of my report?",
         "Which results could you read from my report?",
         "What should a complete blood report include?",
+        "Which tests are usually in a full blood report?",
     ),
 }
 
@@ -473,11 +484,12 @@ def general_continuations(message: str) -> list[str]:
         f"What does {phrase} mean in everyday terms?",
         f"What can affect {phrase}?",
         f"How is {phrase} usually checked?",
+        f"When should someone see a doctor about {phrase}?",
     ]
 
 
 def fallback_questions(
-    brief: FollowUpBrief, *, count: int = 3, current: str | None = None, chosen: list[str] = (), kind: str | None = None,
+    brief: FollowUpBrief, *, count: int = 4, current: str | None = None, chosen: list[str] = (), kind: str | None = None,
 ) -> list[str]:
     out: list[str] = []
     for text in FALLBACK[kind or brief.data_kind]:
@@ -580,7 +592,7 @@ def _select_base(
     *,
     current_question: str | None,
     model_questions: list[str] | None = None,
-    count: int = 3,
+    count: int = 4,
 ) -> list[str]:
     current_stage = stage_of(current_question)
     if current_question:
@@ -619,7 +631,14 @@ def _select_base(
             chosen.append(text)
             stages_used.add(stage)
             per_test[subject] = per_test.get(subject, 0) + 1
-    if len(chosen) < min(2, count):
+    if len(chosen) < count:
+        # Pad to the full row with questions about areas not yet offered, then the safe set.
+        for tq, _area in theme_questions(brief):
+            if len(chosen) >= count:
+                break
+            if valid_question(tq, brief, current=current_question, chosen=chosen):
+                chosen.append(tq)
+    if len(chosen) < count:
         chosen += fallback_questions(brief, count=count, current=current_question, chosen=chosen)
     return chosen
 
@@ -677,7 +696,7 @@ def select_followups(
     *,
     current_question: str | None,
     model_questions: list[str] | None = None,
-    count: int = 3,
+    count: int = 4,
 ) -> list[str]:
     chosen = _select_base(brief, current_question=current_question, model_questions=model_questions, count=count)
     out = _diversify(chosen, brief, current_question)
@@ -691,7 +710,7 @@ def select_followups(
 def general_follow_ups(
     model_questions: list[str] | None, *, message: str, asked: list[str] | None = None, shown: list[str] | None = None,
 ) -> list[str]:
-    """Up to three next questions on THIS general topic, taken from the model's own questions.
+    """Up to four next questions on THIS general topic, taken from the model's own questions.
 
     General answers hold no personal result, so a question must not claim one ("my ..."), name a report, ask Cura
     for medicines or doses, or drift to unrelated topics. Repeats of the question just asked, of earlier chips and of
@@ -711,11 +730,18 @@ def general_follow_ups(
             r"\b(routine blood test|overall health|health check)", message or "", re.I
         ):
             continue
-        if any(seen_q and _similar(q, seen_q) for seen_q in [*seen, *out]):
+        if any(seen_q and _near_duplicate(q, seen_q) for seen_q in [*seen, *out]):
             continue
         out.append(q)
-        if len(out) == 3:
+        if len(out) == 4:
             break
+    if len(out) >= 2 and re.match(r"\s*(?:what(?:'s| is| are)|tell me about|explain)\s", message or "", re.I):
+        # Top the row up to four with on-topic questions built from the subject itself.
+        for q in general_continuations(message):
+            if len(out) >= 4:
+                break
+            if not any(_near_duplicate(q, seen_q) for seen_q in [*seen, *out] if seen_q):
+                out.append(q)
     return out if len(out) >= 2 else []
 
 
@@ -732,7 +758,7 @@ def to_suggestions(questions: list[str], *, personal: bool = True) -> list[Follo
     ]
 
 
-def document_followups(facts, *, message: str | None, count: int = 3) -> list[FollowUpSuggestion]:
+def document_followups(facts, *, message: str | None, count: int = 4) -> list[FollowUpSuggestion]:
     """Grounded follow-ups for an uploaded report, from its extracted values."""
     from app.contracts.blood import BloodMarker
 

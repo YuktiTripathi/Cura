@@ -16,16 +16,30 @@ _PERCENT_GAP = re.compile(r"(\d)\s+%")
 _UNIT_STICKY_SLASH = re.compile(r"(\d)\s*(mg|g|ng|pg|ug|mcg|mIU|uIU|IU|U|mmol|mEq)\s*/\s*(dL|mL|L)\b", re.I)
 
 
-_KNOWN_LABELS = ("What to do first", "Then", "Looking good", "When to see a doctor", "What the numbers show", "What it means")
+_KNOWN_LABELS = ("What to do first", "Then", "Looking good", "When to see a doctor", "What the numbers show", "What it means", "How to read the scores")
+# Labels that are no longer shown: the sentence stays, the bold heading goes.
+_DROPPED_LABELS = ("what the numbers show", "what it means", "how to read the scores", "looking good", "then")
 _LABEL = re.compile(r"^- \*{0,2}(" + "|".join(_KNOWN_LABELS) + r")\*{0,2}\s*:\s*\*{0,2}\s*(?=\S)", re.I)
+_ANY_LABEL = re.compile(r"^- \*\*([A-Za-z][A-Za-z ,&'-]{1,40}):\*\*\s*")
+_KEPT_LABELS = {"what to do first", "when to see a doctor"}
 _BOLD_LABEL_GLUED = re.compile(r"^(- \*\*[^*\n]{1,60}:\*\*)(?=\S)")
 
 
 def _fix_labels(line: str) -> str:
     """The same bold label style on every bullet, with a space after it."""
     canon = {label.lower(): label for label in _KNOWN_LABELS}
-    line = _LABEL.sub(lambda m: f"- **{canon[m.group(1).lower()]}:** ", line)
-    return _BOLD_LABEL_GLUED.sub(r"\1 ", line)
+    def _swap(m):
+        if m.group(1).lower() in _DROPPED_LABELS:
+            return "- "
+        return f"- **{canon[m.group(1).lower()]}:** "
+
+    line = _LABEL.sub(_swap, line)
+    line = _BOLD_LABEL_GLUED.sub(r"\1 ", line)
+    # Any other short bold lead in label (for example "Body protection:") is dropped too; only the kept labels stay.
+    m = _ANY_LABEL.match(line)
+    if m and m.group(1).strip().lower() not in _KEPT_LABELS:
+        return "- " + line[m.end():]
+    return line
 
 
 def _fix_units(line: str) -> str:

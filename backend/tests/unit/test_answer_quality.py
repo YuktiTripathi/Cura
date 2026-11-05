@@ -270,7 +270,7 @@ def test_at_most_one_proactive_element_and_three_chips():
     p, trace = apply_presentation_policy(p, follow_up_count=1)
     assert len(p.proactive_insights) == 1
     assert trace["proactive_element_selected"] == "proactive_insight"
-    assert len(p.suggestion_chips) + 1 <= 3
+    assert len(p.suggestion_chips) + 1 <= 4
     assert p.next_steps == ["walk", "sleep", "fibre"]
 
 
@@ -296,7 +296,7 @@ def score_response(answer: str, *, mode: str, evidence_keys: set[str], other_key
     score += max(0, 4 - 2 * mentioned_other)
     score += 4 if lo <= words <= hi else 2 if words <= hi * 1.3 else 0
     score += 0 if re.search(r"\byou have (diabetes|fatty liver|heart disease)\b|\bcaused by your\b", lower) else 4
-    score += (2 if chips <= 3 else 0) + (2 if proactive <= 1 else 0)
+    score += (2 if chips <= 4 else 0) + (2 if proactive <= 1 else 0)
     return score
 
 

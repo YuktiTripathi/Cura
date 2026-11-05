@@ -266,5 +266,5 @@ def finalize_response(response, message: str, plan=None, context=None):
         semantic.follow_ups = [follow.text for follow in response.follow_ups if getattr(follow, "text", None)]
     presentation = getattr(response, "presentation", None)
     if presentation is not None and getattr(presentation, "suggestion_chips", None):
-        presentation.suggestion_chips = [c for c in presentation.suggestion_chips if not generic(str(getattr(c, "text", c)))][:3]
+        presentation.suggestion_chips = [c for c in presentation.suggestion_chips if not generic(str(getattr(c, "text", c)))][:4]
     return response

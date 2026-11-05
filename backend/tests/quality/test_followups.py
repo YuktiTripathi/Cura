@@ -64,7 +64,7 @@ def test_chat_follow_ups_are_personal_and_change_over_the_conversation():
     assert not any(t in {"What should I do next?", "Explain this pattern", "What is missing?"} for t in texts1)
     second = ask("demo-user-001", texts1[0], first["conversation_id"])
     texts2 = [f["text"] for f in second["follow_ups"]]
-    assert 2 <= len(texts2) <= 3
+    assert 2 <= len(texts2) <= 4
     assert not set(texts2) & set(texts1[:1])
 
 

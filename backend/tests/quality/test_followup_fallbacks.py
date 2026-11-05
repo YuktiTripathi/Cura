@@ -88,7 +88,7 @@ def test_chat_member_without_reports_still_gets_general_questions():
 
     body = ask("member-without-reports", "Help me understand my latest blood report")
     texts = [f["text"] for f in body["follow_ups"]]
-    assert 2 <= len(texts) <= 3
+    assert 2 <= len(texts) <= 4
     assert not any(w in t.lower() for t in texts for w in ("hba1c", "ldl", "vitamin d", "score"))
 
 

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from app.contracts.presentation import ResponseMode, StructuredResponse
 
-MAX_CHIPS = 3
+MAX_CHIPS = 4
 MAX_NEXT_STEPS = 3
 _LOOKUP_MODES = {ResponseMode.single_value, ResponseMode.result_list}
 _OVERVIEW_MODES = {ResponseMode.health_overview, ResponseMode.narrative_health_summary}
@@ -67,7 +67,7 @@ def apply_presentation_policy(
     )
 
     chips = list(dict.fromkeys(c for c in presentation.suggestion_chips if c and c.strip()))
-    # Follow-up questions and suggestion chips render as one row: three in total.
+    # Follow-up questions and suggestion chips render as one row: four in total.
     room = max(0, MAX_CHIPS - follow_up_count)
     _note("suggestion_chips", len(presentation.suggestion_chips), min(len(chips), room))
     presentation.suggestion_chips = chips[:room]

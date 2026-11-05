@@ -83,3 +83,14 @@ def test_general_follow_ups_return_nothing_when_fewer_than_two_are_usable():
 
     assert general_follow_ups(["What does a routine blood test usually check?", "Anything else?"], message="What is iron?") == []
     assert general_follow_ups(None, message="What is iron?") == []
+
+
+def test_general_answer_chips_are_four_and_on_topic():
+    from app.pipeline.followup_generator import general_follow_ups
+
+    out = general_follow_ups(
+        ["How does fatty liver form?", "What are early signs of fatty liver?"],
+        message="What is fatty liver?",
+    )
+    assert len(out) == 4
+    assert all("fatty liver" in q.lower() for q in out)

@@ -237,7 +237,7 @@ def test_paraphrased_b12_multi_turn_experience():
     assert "154" in first["answer"] or "b12" in first["answer"].lower()
     assert first["meta"].get("conversation_goal") in {None, "UNDERSTAND", "QUICK_ANSWER", "FOLLOW_UP"}
     chips = first.get("follow_ups") or []
-    assert len(chips) <= 3
+    assert len(chips) <= 4
     assert any("supplement" in (item.get("text") or "").lower() or "symptom" in (item.get("text") or "").lower() for item in chips)
     cid = first["conversation_id"]
 
@@ -288,7 +288,7 @@ def test_suggested_actions_are_data_aware():
     body = chat("What is my LDL cholesterol?")
     chips = [item.get("text", "") for item in (body.get("follow_ups") or [])]
     joined = " ".join(chips).lower()
-    assert len(chips) <= 3
+    assert len(chips) <= 4
     if chips:
         assert "weather" not in joined
         assert any(token in joined for token in ("previous", "pattern", "missing", "ldl", "mean", "changed", "related", "next"))

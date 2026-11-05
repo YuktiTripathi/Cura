@@ -93,13 +93,13 @@ def test_body_system_sections_keep_two_bullets_plus_one_and_next_steps_three():
 
 def test_system_headings_and_label_style_survive_tidy():
     out = tidy_markdown("### Heart and blood vessels:\n- what the numbers show: triglycerides 206 mg/dl\n- **What it means:**Fats in blood")
-    assert out == "## Heart and blood vessels\n\n- **What the numbers show:** triglycerides 206 mg/dl\n- **What it means:** Fats in blood"
+    assert out == "## Heart and blood vessels\n\n- triglycerides 206 mg/dl\n- Fats in blood"
 
 
 def test_labels_are_bold_with_a_space_after_them():
     out = tidy_markdown("- **Looking good:**NAFLD is fine\n- what to do first: eat oats\n- **When to see a doctor**: soon")
     assert out.split("\n") == [
-        "- **Looking good:** NAFLD is fine",
+        "- NAFLD is fine",
         "- **What to do first:** eat oats",
         "- **When to see a doctor:** soon",
     ]

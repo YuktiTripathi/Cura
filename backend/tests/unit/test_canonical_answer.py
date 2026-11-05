@@ -71,7 +71,7 @@ def test_general_question_gets_topic_follow_ups():
 
     chips = general_continuations("What is insulin resistance?")
     assert chips
-    assert len(chips) <= 3
+    assert len(chips) <= 4
     kept = on_topic(chips, "What is insulin resistance?", "Insulin resistance means cells respond less to insulin.")
     assert kept
 

@@ -372,7 +372,7 @@ def discipline_follow_ups(
         return question, extra
     for item in usable:
         chips.append(item)
-        if len(chips) >= 3:
+        if len(chips) >= 4:
             break
     existing = {item.text.lower() for item in chips}
     for prompt in extra_chips or []:
@@ -387,9 +387,9 @@ def discipline_follow_ups(
             )
         )
         existing.add(prompt.lower())
-        if len(chips) >= 3:
+        if len(chips) >= 4:
             break
-    return question, chips[:3]
+    return question, chips[:4]
 
 
 def _lead_sentence(answer: str) -> str:

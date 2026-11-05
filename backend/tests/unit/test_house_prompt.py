@@ -68,29 +68,29 @@ def test_house_core_is_smaller_than_the_legacy_system_prompt():
 def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     system, user = _build(message)
     assert system.startswith("You are the SuperShyft Health Assistant")
-    for phrase in ("12 year old", "bullet points only", "Indian", "**What the numbers show:**", "**What it means:**", "## What to do next"):
+    for phrase in ("12 year old", "bullet points only", "Indian", "no bold label at the start of either", "## What to do next"):
         assert phrase in system
     for hint in HIDDEN_HINTS:
         assert hint not in system and hint not in user, hint
     assert f"User question: {message}" in user
 
 
-def test_house_follow_up_instruction_asks_for_three_kinds_of_question(house):
+def test_house_follow_up_instruction_asks_for_four_kinds_of_question(house):
     system, _user = _build("What does my HbA1c mean?")
-    assert "exactly 3 questions" in system
-    kinds = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understanding", "Personal relevance", "Action"), 1)]
+    assert "exactly 4 questions" in system
+    kinds = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understanding", "Personal relevance", "Action", "Explore"), 1)]
     assert kinds == sorted(kinds)
     assert re.search(r"never repeat", system, re.I)
     assert "Never assume a symptom" in system
 
 
 def test_house_report_parts_come_in_the_required_order():
-    order = ["SHAPE 1A", "One opening bullet", "**What the numbers show:**", "**What it means:**", "## What to do next", "SHAPE 1B, a Bio-AI report"]
+    order = ["SHAPE 1A", "One opening bullet", "First bullet, the numbers", "Second bullet, the meaning", "## What to do next", "SHAPE 1B, a Bio-AI report"]
     positions = [HOUSE_CORE.index(part) for part in order]
     assert positions == sorted(positions)
     assert "Teach the body system first, the biomarker second, the medical term third" in HOUSE_CORE
     assert "report_counts" in HOUSE_CORE and "within_range_by_body_system" in HOUSE_CORE
-    assert "**Looking good:**" in HOUSE_CORE
+    assert "**What the numbers show:**" not in HOUSE_CORE and "**What it means:**" not in HOUSE_CORE
 
 
 def test_legacy_variant_is_unchanged_and_still_available():
@@ -165,7 +165,8 @@ def test_bio_ai_layout_states_the_scale_and_the_disclaimer_once():
     assert "AT MOST ONCE" in HOUSE_CORE
     for band in ("Healthy (0 to 25)", "Increased Risk (26 to 50)", "High Risk (51 to 75)", "Very High Risk (76 to 100)"):
         assert band in HOUSE_CORE
-    assert "**How to read the scores:**" in HOUSE_CORE
+    assert "**How to read the scores:**" not in HOUSE_CORE and "**Then:**" not in HOUSE_CORE
+    assert "**What to do first:**" in HOUSE_CORE
     assert "64 out of 100" in HOUSE_CORE
     assert "Say this here and nowhere else" in HOUSE_CORE
 
