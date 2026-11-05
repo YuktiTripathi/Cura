@@ -66,7 +66,9 @@ def apply_presentation_policy(
         else None
     )
 
-    chips = list(dict.fromkeys(c for c in presentation.suggestion_chips if c and c.strip()))
+    from app.pipeline.followup_generator import is_cross_source
+
+    chips = list(dict.fromkeys(c for c in presentation.suggestion_chips if c and c.strip() and not is_cross_source(c)))
     # Follow-up questions and suggestion chips render as one row: four in total.
     room = max(0, MAX_CHIPS - follow_up_count)
     _note("suggestion_chips", len(presentation.suggestion_chips), min(len(chips), room))

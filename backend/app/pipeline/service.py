@@ -1534,6 +1534,9 @@ class ChatService:
                     member_findings=self._member_findings(principal, plan, context),
                 )
         suggestions = _topic_follow_ups(suggestions, payload.message, pre_compose_answer)
+        from app.pipeline.followup_generator import is_cross_source
+
+        suggestions = [item for item in suggestions if not is_cross_source(getattr(item, "text", "") or "")]
         if presentation is not None:
             presentation.suggestion_chips = [item.text for item in suggestions if getattr(item, "text", None)]
             if presentation.summary and presentation.summary.strip() != (answer or "").strip():

@@ -395,11 +395,21 @@ def is_member_question(text: str) -> bool:
     return not (_CURA_VOICE.search(q) or _GENERIC.search(q))
 
 
+CROSS_SOURCE = re.compile(
+    r"\b(?:blood|lab)\b[^?]{0,60}\bbio-?\s?ai\b|\bbio-?\s?ai\b[^?]{0,60}\b(?:blood|lab)\b", re.I
+)
+
+
+def is_cross_source(text: str) -> bool:
+    """A question that asks how the Bio-AI report and the blood results compare or relate. Never offered as a chip."""
+    return bool(CROSS_SOURCE.search(text or ""))
+
+
 def valid_question(text: str, brief: FollowUpBrief, *, current: str | None = None, chosen: list[str] = ()) -> bool:
     q = (text or "").strip()
     if not q.endswith("?") or len(q) > 90 or len(q.split()) > 12 or len(q.split()) < 3:
         return False
-    if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q):
+    if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q):
         return False
     for seen in [*(brief.asked or []), *(brief.shown or []), *([current] if current else []), *chosen]:
         if seen and _similar(q, seen):
@@ -455,7 +465,6 @@ FALLBACK = {
     ),
     "both": (
         "Which of my results should I focus on first?",
-        "How do my blood results relate to my Bio-AI scores?",
         "What should I focus on improving?",
         "Which of these results should I discuss with my doctor?",
     ),
@@ -722,7 +731,7 @@ def general_follow_ups(
         words = q.split()
         if not q.endswith("?") or not 3 <= len(words) <= 14:
             continue
-        if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q):
+        if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q):
             continue
         if re.search(r"\b(my|mine|me)\b|\b(report|results?|scores?)\b", q, re.I):
             continue

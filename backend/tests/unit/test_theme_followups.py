@@ -94,3 +94,19 @@ def test_general_answer_chips_are_four_and_on_topic():
     )
     assert len(out) == 4
     assert all("fatty liver" in q.lower() for q in out)
+
+
+def test_blood_versus_bio_ai_comparison_is_never_a_chip():
+    from app.pipeline.followup_generator import is_cross_source
+
+    assert is_cross_source("How does my Bio-AI report compare with my blood results?")
+    assert is_cross_source("Why are my blood and Bio-AI cardiac health values different?")
+    assert not is_cross_source("What does my Bio-AI score mean?")
+
+
+def test_bio_ai_versus_blood_questions_are_never_offered():
+    from app.pipeline.followup_generator import is_cross_source
+
+    assert is_cross_source("Why are my blood and Bio-AI cardiac health values different?")
+    assert is_cross_source("How does my Bio-AI report compare with my blood results?")
+    assert not is_cross_source("What does a Healthy Cardiac Health Bio-AI score mean?")

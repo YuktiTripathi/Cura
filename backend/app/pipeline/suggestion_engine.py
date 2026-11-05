@@ -49,14 +49,6 @@ def candidates_for(snap: HealthSnapshot) -> list[Suggestion]:
     if snap.has_bio:
         rows.append(Suggestion("bio.overview", "What do my Bio-AI scores mean?", "bio_ai"))
         rows.append(Suggestion("bio.attention", "Which of my Bio-AI scores deserve attention?", "bio_ai"))
-    if snap.has_bio and snap.has_blood:
-        rows.append(
-            Suggestion(
-                "cross.blood_bio",
-                "How does my Bio-AI report compare with my blood results?",
-                "comparison",
-            )
-        )
     topics = set(getattr(snap, "lifestyle_topics", set()) or [])
     if snap.has_nutrition or "diet" in topics:
         rows.append(Suggestion("life.nutrition", "What does my eating pattern suggest?", "lifestyle"))

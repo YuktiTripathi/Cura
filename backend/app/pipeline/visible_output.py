@@ -257,7 +257,12 @@ def finalize_response(response, message: str, plan=None, context=None):
     # Symptom / medication / supplement questions only when this conversation is about them.
     topical = bool(_CARE_TOPIC.search(f"{message or ''} {response.answer or ''}"))
     generic = (lambda text: False) if topical else (lambda text: bool(_GENERIC_FOLLOW_UP.search(text or "")))
-    follow_ups = [f for f in (getattr(response, "follow_ups", None) or []) if not generic(getattr(f, "text", "") or "")]
+    from app.pipeline.followup_generator import is_cross_source
+
+    follow_ups = [
+        f for f in (getattr(response, "follow_ups", None) or [])
+        if not generic(getattr(f, "text", "") or "") and not is_cross_source(getattr(f, "text", "") or "")
+    ]
     for follow in follow_ups:
         if getattr(follow, "text", None):
             follow.text = remove_em_dashes(follow.text)
@@ -266,5 +271,10 @@ def finalize_response(response, message: str, plan=None, context=None):
         semantic.follow_ups = [follow.text for follow in response.follow_ups if getattr(follow, "text", None)]
     presentation = getattr(response, "presentation", None)
     if presentation is not None and getattr(presentation, "suggestion_chips", None):
-        presentation.suggestion_chips = [c for c in presentation.suggestion_chips if not generic(str(getattr(c, "text", c)))][:4]
+        from app.pipeline.followup_generator import is_cross_source
+
+        presentation.suggestion_chips = [
+            c for c in presentation.suggestion_chips
+            if not generic(str(getattr(c, "text", c))) and not is_cross_source(str(getattr(c, "text", c)))
+        ][:4]
     return response
