@@ -61,3 +61,25 @@ def test_food_questions_use_the_diet_on_record():
     picks = select_followups(_brief(diet="Vegetarian"), current_question="Explain my report", count=3)
     assert not any(q.startswith("What can I eat to") for q in picks)
     assert any(q.startswith("Which vegetarian foods can help my") for q in picks)
+
+
+def test_general_follow_ups_use_the_models_on_topic_questions_and_drop_stock_ones():
+    from app.pipeline.followup_generator import general_follow_ups
+
+    model = [
+        "What causes kidney function to drop over time?",
+        "Which signs mean I should see a doctor?",
+        "What foods are kinder to the kidneys?",
+        "What does a routine blood test usually check?",
+        "How is my creatinine doing?",
+        "What does kidney function tests look at?",
+    ]
+    out = general_follow_ups(model, message="What do kidney function tests look at?", asked=[], shown=[])
+    assert out == model[:3]
+
+
+def test_general_follow_ups_return_nothing_when_fewer_than_two_are_usable():
+    from app.pipeline.followup_generator import general_follow_ups
+
+    assert general_follow_ups(["What does a routine blood test usually check?", "Anything else?"], message="What is iron?") == []
+    assert general_follow_ups(None, message="What is iron?") == []

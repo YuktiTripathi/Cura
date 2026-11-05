@@ -435,6 +435,22 @@ class ResponseComposer:
             combined = [item for item in combined if item.text not in shown_follow_ups]
             presentation.suggestion_chips = [t for t in presentation.suggestion_chips if t not in shown_follow_ups]
         if (
+            settings.cura_prompt_variant == "house"
+            and plan.knowledge_scope != KnowledgeScope.personal
+            and context.status != "ambiguous"
+            and (not answer_turn or (plan.raw_message or "").strip().endswith("?"))
+        ):
+            # A general answer's chips come from the model's own questions about this topic, not stock questions.
+            from app.pipeline.followup_generator import general_follow_ups, to_suggestions as _to_suggestions
+
+            on_topic_chips = general_follow_ups(
+                llm_follow_ups, message=plan.raw_message or "", asked=list(history or []), shown=list(shown_follow_ups or []),
+            )
+            if on_topic_chips:
+                combined = _to_suggestions(on_topic_chips, personal=False)
+                presentation.suggestion_chips = [item.text for item in combined]
+                presentation.follow_up = None
+        if (
             not combined
             and not answer_turn
             and context.status != "ambiguous"

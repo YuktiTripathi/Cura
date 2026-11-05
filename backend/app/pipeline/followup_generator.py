@@ -688,6 +688,37 @@ def select_followups(
     return out
 
 
+def general_follow_ups(
+    model_questions: list[str] | None, *, message: str, asked: list[str] | None = None, shown: list[str] | None = None,
+) -> list[str]:
+    """Up to three next questions on THIS general topic, taken from the model's own questions.
+
+    General answers hold no personal result, so a question must not claim one ("my ..."), name a report, ask Cura
+    for medicines or doses, or drift to unrelated topics. Repeats of the question just asked, of earlier chips and of
+    each other are dropped. Fewer than two good ones returns []: the caller then uses its template fallback."""
+    out: list[str] = []
+    seen = [*(asked or []), *(shown or []), message or ""]
+    for raw in model_questions or []:
+        q = re.sub(r"\s+", " ", (raw or "").strip())
+        words = q.split()
+        if not q.endswith("?") or not 3 <= len(words) <= 14:
+            continue
+        if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q):
+            continue
+        if re.search(r"\b(my|mine|me)\b|\b(report|results?|scores?)\b", q, re.I):
+            continue
+        if re.search(r"\b(routine blood test|overall health|health checks?)\b", q, re.I) and not re.search(
+            r"\b(routine blood test|overall health|health check)", message or "", re.I
+        ):
+            continue
+        if any(seen_q and _similar(q, seen_q) for seen_q in [*seen, *out]):
+            continue
+        out.append(q)
+        if len(out) == 3:
+            break
+    return out if len(out) >= 2 else []
+
+
 def to_suggestions(questions: list[str], *, personal: bool = True) -> list[FollowUpSuggestion]:
     return [
         FollowUpSuggestion(

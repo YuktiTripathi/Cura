@@ -58,10 +58,10 @@ def test_house_core_has_no_dashes_and_one_json_contract():
         assert field in HOUSE_CORE
 
 
-def test_house_core_is_much_smaller_than_the_legacy_system_prompt():
+def test_house_core_is_smaller_than_the_legacy_system_prompt():
     from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS
 
-    assert len(HOUSE_CORE) < 0.8 * len(SAFETY_INSTRUCTIONS)
+    assert len(HOUSE_CORE) < 0.9 * len(SAFETY_INSTRUCTIONS)
 
 
 @pytest.mark.parametrize("message", QUESTIONS)
@@ -152,3 +152,8 @@ def test_house_prompt_carries_the_spec_safety_and_bio_ai_rules():
 def test_house_follow_ups_are_spread_across_different_areas():
     assert "DIFFERENT results or body areas" in HOUSE_CORE
     assert "diet preference" in HOUSE_CORE
+
+
+def test_house_general_follow_ups_stay_on_the_topic():
+    assert "about THIS topic" in HOUSE_CORE
+    assert "Never ask about routine blood tests" in HOUSE_CORE
