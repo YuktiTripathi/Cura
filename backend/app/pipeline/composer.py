@@ -86,6 +86,8 @@ def _marker_out_of_range(marker) -> bool:
 
 from app.pipeline.prompt_modules import is_nutrition_overview  # noqa: E402
 
+_CARD_TITLES = {"Results linked to your diet", "Results outside your range", "Your Bio-AI scores"}
+
 _OVERVIEW_INTENTS = {
     IntentType.report_explanation,
     IntentType.broad_health_summary,
@@ -306,6 +308,17 @@ class ResponseComposer:
                 presentation.headline = "Results outside your range"
         if settings.cura_prompt_variant == "house" and is_nutrition_overview(plan.raw_message) and presentation.headline:
             presentation.headline = "Results linked to your diet"
+        if settings.cura_prompt_variant == "house" and presentation.headline in _CARD_TITLES and not presentation.findings:
+            # A card title with no card under it is just a stray heading.
+            presentation.headline = None
+        if (
+            settings.cura_prompt_variant == "house"
+            and plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
+            and llm_result is not None
+            and (llm_result.answer or "").strip()
+        ):
+            # The answer already explains each body system. Theme cards would say the same thing again.
+            presentation.themes = []
         if response_plan.kind == "report_overview":
             presentation.headline = "Your latest blood report"
             presentation.summary = response_plan.direct_answer

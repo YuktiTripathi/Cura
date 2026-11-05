@@ -184,3 +184,34 @@ def cap_total_bullets(text: str, limit: int = MAX_REPORT_BULLETS) -> str:
                 continue
         out.append(line)
     return re.sub(r"\n{3,}", "\n\n", "\n".join(out)).strip()
+
+
+_LIMIT_SENTENCE = re.compile(
+    r"\b(?:cannot|can't|can not|does not|doesn't|do not)\s+(?:by itself\s+)?(?:confirm|diagnos|identify|rule out|prove|tell)|"
+    r"\bnot a diagnosis\b|\brisk estimate\b|\bnot (?:a )?(?:medical )?diagnos",
+    re.I,
+)
+
+
+def drop_repeated_limits(text: str) -> str:
+    """The limit of what a report can tell ("it cannot confirm a disease", "a risk estimate, not a diagnosis") is
+    said once. Later sentences that only restate it are dropped, and a bullet left empty goes with them."""
+    if not text:
+        return text
+    seen = False
+    out: list[str] = []
+    for line in text.split("\n"):
+        if not line.startswith("- "):
+            out.append(line)
+            continue
+        kept: list[str] = []
+        for sentence in re.split(r"(?<=[.!?])\s+", line):
+            if _LIMIT_SENTENCE.search(sentence):
+                if seen:
+                    continue
+                seen = True
+            kept.append(sentence)
+        joined = " ".join(kept).strip()
+        if joined and joined != "-" and len(joined.split()) > 1:
+            out.append(joined)
+    return "\n".join(out)

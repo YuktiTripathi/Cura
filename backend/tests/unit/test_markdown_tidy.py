@@ -118,3 +118,18 @@ def test_leaked_field_names_are_scrubbed():
 
     out = sanitize_internal_ids("The member's report does not include within_range_by_body_system.")
     assert "within_range_by_body_system" not in out and "member" not in out
+
+
+def test_the_limit_of_a_report_is_said_once():
+    from app.pipeline.markdown_tidy import drop_repeated_limits
+
+    text = (
+        "- Oxidative stress is **53 out of 100, High**. This is a risk estimate, not a diagnosis.\n"
+        "- Your liver filters blood. This pattern does not identify a disease by itself.\n"
+        "- Your report can show patterns, but it cannot confirm the cause or diagnose a condition.\n"
+        "- See a doctor soon."
+    )
+    out = drop_repeated_limits(text)
+    assert out.count("risk estimate") == 1
+    assert "cannot confirm" not in out and "does not identify" not in out
+    assert "Your liver filters blood." in out and "See a doctor soon." in out

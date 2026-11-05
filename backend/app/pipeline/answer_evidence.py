@@ -923,6 +923,40 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
     }
 
 
+def build_focus_brief(context: HealthContext) -> dict:
+    """Blood results and Bio-AI assessments of ONE report set, gathered under the body system they belong to,
+    so a "what should I focus on" answer explains each system once, with both sources together."""
+    systems: dict[str, dict] = {}
+
+    def slot(name: str) -> dict:
+        return systems.setdefault(name, {"body_system": name, "blood_results": [], "bio_ai": [], "weight": 0})
+
+    for marker in context.markers or []:
+        flag = _flag(marker)
+        if flag in {"critical", "high", "low"}:
+            row = slot(body_system_of_marker(marker))
+            row["blood_results"].append({**_marker_fact(marker), "laboratory_status": flag})
+            row["weight"] += 100 if flag == "critical" else 10
+    for risk in context.bio_ai_risks or []:
+        if _risk_raised(risk):
+            row = slot(body_system_of_risk(risk) or "Whole body (cells and their protection)")
+            row["bio_ai"].append(_risk_fact(risk))
+            row["weight"] += 20 + int(getattr(risk, "score", 0) or 0) // 10
+    ranked = sorted(systems.values(), key=lambda r: -r["weight"])
+    for row in ranked:
+        row.pop("weight")
+        row["blood_results"] = row["blood_results"][:4]
+    healthy_bio = [r.name for r in (context.bio_ai_risks or []) if not _risk_raised(r) and getattr(r, "name", None)]
+    return {
+        "kind": "focus_overview",
+        "systems_to_focus_on": ranked[:4],
+        "blood_counts": _blood_counts(context, list(context.markers or [])),
+        "within_range_by_body_system": _within_range_by_system(list(context.markers or [])),
+        "bio_ai_healthy_areas": healthy_bio[:6],
+        "note": "Bio-AI scores are risk estimates, blood results are measurements. Never merge them into one number.",
+    }
+
+
 def _risk_raised(risk) -> bool:
     return (getattr(risk, "status", None) or "").lower() in {"critical", "very high", "high", "elevated", "moderate", "medium"}
 

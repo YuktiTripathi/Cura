@@ -277,6 +277,7 @@ class PromptBuilder:
                 f"Data source: {context.data_source}\n"
                 + _fact_kind_blocks(context)
                 + _clinical_brief_block(context, user_message)
+                + _focus_brief_block(context)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{compact_json(payload)}\n"
                 + _selected_upload_block(context)
                 + (
@@ -590,6 +591,19 @@ def _general_personal_context(context: HealthContext) -> dict:
     for _rank, _diversity, group, item in selected:
         payload.setdefault(group, []).append(item)
     return payload
+
+
+def _focus_brief_block(context: HealthContext) -> str:
+    """Both a blood report and Bio-AI scores, asked as a priority question: one brief grouped by body system."""
+    from app.contracts.common import IntentType
+
+    if getattr(context, "intent", None) not in {IntentType.health_scenario, IntentType.broad_health_summary}:
+        return ""
+    if not (context.markers and context.bio_ai_risks):
+        return ""
+    from app.pipeline.answer_evidence import build_focus_brief
+
+    return f"FOCUS BRIEF JSON:\n{compact_json(build_focus_brief(context))}\n"
 
 
 def _clinical_brief_block(context: HealthContext, user_message: str) -> str:

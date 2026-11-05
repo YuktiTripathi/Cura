@@ -341,16 +341,33 @@ NUTRITION_OVERVIEW = (
 )
 
 
+FOCUS_SHAPE = (
+    'SHAPE 1C, a priority question on a person who has both a blood report and Bio-AI scores ("what should I focus on", "what needs attention", "how is my health") when a FOCUS BRIEF JSON is supplied. Explain by body system so the two sources join up: one section for each of the first 3 entries of systems_to_focus_on, most important first. Each section starts with a "## " heading that is the body system in plain words, then exactly three bullets with no bold label: (a) what that organ does, in one simple sentence with a small everyday comparison; (b) what the person\'s results show there, blood numbers with the range on the report and the Bio-AI score once as **64 out of 100, High**, said as pointing the same way and never as proof; (c) what that means for them and one specific food or habit with how much or how often. Start with one bullet that counts the outside range results (blood_counts) and names the Bio-AI areas that are raised, and end with one bullet on how soon to see a doctor. State "risk estimate, not a diagnosis" once, never repeat a result in another section, and never join a Bio-AI score with an unrelated organ. Under about 260 words.'
+)
+
+
 _NO_FIELD_NAMES = (
     "Never write a field name from the supplied data (any word with an underscore) and never say \"the member\"; say \"your report\". "
     "If something you were asked to use is not supplied, leave that part out without saying so."
 )
 
 
+def has_focus_brief(context) -> bool:
+    from app.contracts.common import IntentType
+
+    return (
+        getattr(context, "intent", None) in {IntentType.health_scenario, IntentType.broad_health_summary}
+        and bool(getattr(context, "markers", None))
+        and bool(getattr(context, "bio_ai_risks", None))
+    )
+
+
 def house_system(context: HealthContext, message: str) -> str:
     parts = [HOUSE_CORE.strip(), _NO_FIELD_NAMES]
     if is_nutrition_overview(message):
         parts.append(NUTRITION_OVERVIEW)
+    if has_focus_brief(context):
+        parts.append(FOCUS_SHAPE)
     for name in modules_for(context, message):
         if name in _HOUSE_MODULES:
             parts.append(_HOUSE_MODULES[name])
