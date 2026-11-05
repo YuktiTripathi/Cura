@@ -84,6 +84,8 @@ def _marker_out_of_range(marker) -> bool:
     return _out_of_range(marker)
 
 
+from app.pipeline.prompt_modules import is_nutrition_overview  # noqa: E402
+
 _OVERVIEW_INTENTS = {
     IntentType.report_explanation,
     IntentType.broad_health_summary,
@@ -159,7 +161,7 @@ def _diet_on_record(context) -> str | None:
 
 def _staged_follow_ups(llm_questions, plan, context, history, shown, answer_text="") -> list[FollowUpSuggestion]:
     """The four questions the house prompt asks for (understanding, personal relevance, action, explore), on whole report answers."""
-    if settings.cura_prompt_variant != "house" or plan.intent not in _OVERVIEW_INTENTS:
+    if settings.cura_prompt_variant != "house" or not (plan.intent in _OVERVIEW_INTENTS or is_nutrition_overview(plan.raw_message)):
         return []
     if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
         return []
@@ -302,6 +304,8 @@ class ResponseComposer:
                 presentation.headline = "Your Bio-AI scores"
             elif sum(1 for m in (context.markers or []) if _marker_out_of_range(m)) > 1:
                 presentation.headline = "Results outside your range"
+        if settings.cura_prompt_variant == "house" and is_nutrition_overview(plan.raw_message) and presentation.headline:
+            presentation.headline = "Results linked to your diet"
         if response_plan.kind == "report_overview":
             presentation.headline = "Your latest blood report"
             presentation.summary = response_plan.direct_answer

@@ -175,3 +175,12 @@ def test_advice_is_specific_and_adult():
     assert "thoughtful dietitian" in HOUSE_CORE
     assert "Never vague advice" in HOUSE_CORE
     assert "name the foods, how much or how often" in HOUSE_CORE
+
+
+def test_nutrition_overview_is_detected_and_gets_its_own_layout():
+    from app.pipeline.prompt_modules import NUTRITION_OVERVIEW, is_nutrition_overview
+
+    assert is_nutrition_overview("What should I know about my nutrition?")
+    assert not is_nutrition_overview("What can I eat to lower my LDL?")
+    assert not is_nutrition_overview("What is a balanced diet?")
+    assert "What to do next" in NUTRITION_OVERVIEW and "no bold label" in NUTRITION_OVERVIEW

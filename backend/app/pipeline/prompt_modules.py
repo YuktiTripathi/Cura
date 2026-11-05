@@ -317,8 +317,34 @@ _HOUSE_MODULES = {
 }
 
 
+_NUTRITION_WORD = re.compile(r"\b(nutrition|diet|eating habits?|my food)\b", re.I)
+
+
+def is_nutrition_overview(message: str) -> bool:
+    """A broad question about the person's own nutrition ("What should I know about my nutrition?").
+    A question that names one result ("What can I eat to lower my LDL?") is not an overview."""
+    text = message or ""
+    if not _NUTRITION_WORD.search(text) or not re.search(r"\b(my|i|me)\b", text, re.I):
+        return False
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    return not match_lab_keys(text)
+
+
+NUTRITION_OVERVIEW = (
+    "THIS QUESTION IS A NUTRITION OVERVIEW. Use this layout instead of SHAPE 2: "
+    "(1) one opening bullet of two short sentences: which parts of the person's results connect to food and which of those look fine, using within_range_by_body_system. "
+    "(2) Then up to 3 sections, each starting with a \"## \" heading in plain words (use body_system, for example ## Heart and blood vessels, ## Bones and vitamins, ## Blood sugar, ## Blood and iron), only for areas outside the range that food can influence. "
+    "Under each heading exactly two bullets with no bold label: first the one to three results with number, unit and report range; second what food does to that number and which everyday foods matter, in plain words. "
+    "(3) A final \"## What to do next\" with at most 3 bullets, each naming specific foods, how much or how often, and the reason, respecting the diet preference. "
+    "Never vague advice, no supplements or doses, and never invent a result or a habit the person did not report."
+)
+
+
 def house_system(context: HealthContext, message: str) -> str:
     parts = [HOUSE_CORE.strip()]
+    if is_nutrition_overview(message):
+        parts.append(NUTRITION_OVERVIEW)
     for name in modules_for(context, message):
         if name in _HOUSE_MODULES:
             parts.append(_HOUSE_MODULES[name])

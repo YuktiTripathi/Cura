@@ -168,6 +168,8 @@ def _topic_follow_ups(items, message: str, answer: str):
 
 
 # Questions about one result, one topic or a general matter: plain bullets with no report headings.
+from app.pipeline.prompt_modules import is_nutrition_overview  # noqa: E402
+
 _NARROW_INTENTS = frozenset({
     IntentType.latest_result,
     IntentType.previous_result,
@@ -1544,7 +1546,7 @@ class ChatService:
             answer,
             reasoned.llm_mode,
             context,
-            whole_report=plan.intent not in _NARROW_INTENTS,
+            whole_report=plan.intent not in _NARROW_INTENTS or is_nutrition_overview(payload.message),
         )
         if looks_like_structured_json(answer):
             answer = public_answer_text(answer)
