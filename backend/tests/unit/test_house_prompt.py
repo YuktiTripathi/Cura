@@ -85,12 +85,12 @@ def test_house_follow_up_instruction_asks_for_three_kinds_of_question(house):
 
 
 def test_house_report_parts_come_in_the_required_order():
-    order = ["SHAPE 1A", "One opening bullet", "**What the numbers show:**", "**What it means:**", "## What to do next", "SHAPE 1B"]
+    order = ["SHAPE 1A", "One opening bullet", "**What the numbers show:**", "**What it means:**", "## What to do next", "SHAPE 1B, a Bio-AI report"]
     positions = [HOUSE_CORE.index(part) for part in order]
     assert positions == sorted(positions)
     assert "Teach the body system first, the biomarker second, the medical term third" in HOUSE_CORE
     assert "report_counts" in HOUSE_CORE and "within_range_by_body_system" in HOUSE_CORE
-    assert 'SHAPE 1B' in HOUSE_CORE and "**Looking good:**" in HOUSE_CORE
+    assert "**Looking good:**" in HOUSE_CORE
 
 
 def test_legacy_variant_is_unchanged_and_still_available():
@@ -144,7 +144,7 @@ def test_house_prompt_carries_the_spec_safety_and_bio_ai_rules():
     for phrase in (
         "universal sunlight duration",
         "laboratory reference range",
-        "Do not invent a scale, threshold or method",
+        "never invent another scale",
         "does not rule out a condition",
         "Answer the question first",
     ):
@@ -159,3 +159,18 @@ def test_house_follow_ups_are_spread_across_different_areas():
 def test_house_general_follow_ups_stay_on_the_topic():
     assert "about THIS topic" in HOUSE_CORE
     assert "Never ask about routine blood tests" in HOUSE_CORE
+
+
+def test_bio_ai_layout_states_the_scale_and_the_disclaimer_once():
+    assert "AT MOST ONCE" in HOUSE_CORE
+    for band in ("Healthy (0 to 25)", "Increased Risk (26 to 50)", "High Risk (51 to 75)", "Very High Risk (76 to 100)"):
+        assert band in HOUSE_CORE
+    assert "**How to read the scores:**" in HOUSE_CORE
+    assert "64 out of 100" in HOUSE_CORE
+    assert "Say this here and nowhere else" in HOUSE_CORE
+
+
+def test_advice_is_specific_and_adult():
+    assert "thoughtful dietitian" in HOUSE_CORE
+    assert "Never vague advice" in HOUSE_CORE
+    assert "name the foods, how much or how often" in HOUSE_CORE
