@@ -33,7 +33,7 @@ _PERSONAL_TEMPLATES = {
     "how": "How is my {name} level?",
     "trend": "Has my {name} changed over time?",
     "bio": "What does my {name} score mean?",
-    "nutrition": "What should I know about my nutrition?",
+    "nutrition": "How can I optimize my diet based on my Blood Reports?",
 }
 
 

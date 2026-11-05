@@ -41,3 +41,7 @@ def test_chat_persists_useful_title_and_lists_it():
     assert row["title"] == "Understanding my HbA1c"
     stolen = client.get("/api/v1/conversations", headers={"X-Cura-User-Id": "demo-user-002"}).json()
     assert cid not in {item["id"] for item in stolen}
+
+
+def test_diet_starter_gets_the_nutrition_title():
+    assert conversation_title("How can I optimize my diet based on my Blood Reports?") == "Nutrition guidance"

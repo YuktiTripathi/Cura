@@ -10,6 +10,7 @@ _MAX_LEN = 48
 GENERIC_TITLES = {"", "Cura conversation", "New conversation"}
 
 _RULES: list[tuple[re.Pattern[str], str]] = [
+    (re.compile(r"\b(?:diet|nutrition|what should i eat)\b", re.I), "Nutrition guidance"),
     (re.compile(r"blood report|lab report", re.I), "My Blood Report"),
     (re.compile(r"bio[- ]?ai", re.I), "My Bio-AI Report"),
     (re.compile(r"\bldl\b", re.I), "Understanding LDL"),
