@@ -73,7 +73,14 @@ async def chat_stream(
     progress reaches the client through an asyncio queue, so a stream no longer holds an
     extra raw thread plus a pool thread blocked on a queue (readiness plan 5.3)."""
     request_id = request.headers.get("X-Request-Id") or request.state.request_id
-    cached = await run_in_threadpool(_stream_prelude, principal, payload, idempotency_key)
+    # The independent checks (consent, rate limit, token budget) run side by side, so the stream opens after
+    # the slowest one and not after the sum of all three. Any of them can still reject the request.
+    await asyncio.gather(
+        run_in_threadpool(_check_consent, principal),
+        run_in_threadpool(request_controls.check_rate_limit, principal.subject_id),
+        run_in_threadpool(request_controls.check_token_budget, principal.subject_id),
+    )
+    cached = await run_in_threadpool(_stream_idempotency, principal, payload, idempotency_key)
     headers = {"Cache-Control": "no-cache", "X-Accel-Buffering": "no"}
     if cached:
 
@@ -147,20 +154,28 @@ async def chat_stream(
 _RUNNING: set[asyncio.Future] = set()
 
 
-def _stream_prelude(principal: AuthenticatedPrincipal, payload: ChatRequest, idempotency_key: str | None):
-    """Blocking checks (database, Redis) kept off the event loop."""
+def _check_consent(principal: AuthenticatedPrincipal) -> None:
     consent_session = SessionLocal()
     try:
         require_consent(consent_session, principal.subject_id)
     finally:
         consent_session.close()
-    request_controls.check_rate_limit(principal.subject_id)
-    request_controls.check_token_budget(principal.subject_id)
+
+
+def _stream_idempotency(principal: AuthenticatedPrincipal, payload: ChatRequest, idempotency_key: str | None):
     cached = request_controls.begin_idempotency(principal.subject_id, idempotency_key, payload)
     if cached:
         cached.meta.cache_hit = True
         return _client_view(cached)
     return None
+
+
+def _stream_prelude(principal: AuthenticatedPrincipal, payload: ChatRequest, idempotency_key: str | None):
+    """Blocking checks (database, Redis) kept off the event loop."""
+    _check_consent(principal)
+    request_controls.check_rate_limit(principal.subject_id)
+    request_controls.check_token_budget(principal.subject_id)
+    return _stream_idempotency(principal, payload, idempotency_key)
 
 
 def _event(name: str, payload: dict) -> str:

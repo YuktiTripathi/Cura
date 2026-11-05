@@ -497,8 +497,16 @@ class ChatService:
                 conversation_state=conv_state,
             )
         plan, jev_trace = routed.plan, routed.jev_trace
-        if classifier_future is not None:
-            # Join the model classifier before any personal data is fetched.
+        safety_joined = classifier_future is None
+
+        def _join_safety():
+            """Join the model classifier. It runs beside routing and planning; this is called just before the first
+            step that reads personal data or calls an answer model, so a flagged message never reaches either.
+            Returns a block response when the classifier blocks, else None."""
+            nonlocal pre_safety, safety_joined
+            if safety_joined:
+                return None
+            safety_joined = True
             try:
                 pre_safety = classifier_future.result(timeout=float(settings.safety_classifier_timeout_seconds) + 2)
             except Exception:  # noqa: BLE001 - keep the rule decision and flag the outage
@@ -506,6 +514,8 @@ class ChatService:
             eval_turn["pre_safety"] = pre_safety
             if pre_safety.blocked:
                 return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety, conv=conv)
+            return None
+
         # Semantic plan: goal x topics x personalization x time need. Deterministic, built on
         # the Jev answers when present (same routing call, no extra model call). It corrects
         # needless clarification and personal questions routed as general, then retrieval
@@ -784,6 +794,9 @@ class ChatService:
             )
 
         if is_lab_source_compare(plan):
+            blocked = _join_safety()
+            if blocked is not None:
+                return blocked
             return self._cross_source(
                 principal,
                 payload,
@@ -895,6 +908,9 @@ class ChatService:
             use_docs = False
 
         if use_docs:
+            blocked = _join_safety()
+            if blocked is not None:
+                return blocked
             self._progress.emit(ProcessingStage.reading_document, plan=plan)
             resolved = list(plan.document_ids or attached.document_ids)
             if not resolved:
@@ -1362,6 +1378,9 @@ class ChatService:
         # pay for STANDARD_MEDICAL and then a second DEEP generation.
         plan = promote_for_retrieved_complexity(plan, context)
         eval_turn["routing_plan"] = plan
+        blocked = _join_safety()
+        if blocked is not None:
+            return blocked
         self._progress.set_context(plan, follow_up=follow_up)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
