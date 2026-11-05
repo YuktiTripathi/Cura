@@ -213,6 +213,7 @@ class ChatService:
 
         policy = openrouter_policy()
         policy.assert_privacy_for_health(personal_health=bool(plan.needs_personal_data))
+        stream_cb = getattr(self, "_stream_cb", None)
         last_error = None
         remaining = budget.remaining() if budget is not None else float(settings.llm_timeout_seconds)
         for index, tier in enumerate(fallback_tiers(plan.answer_model_tier, plan.complexity_score)):
@@ -232,6 +233,10 @@ class ChatService:
                 break
             started = time.perf_counter()
             try:
+                if stream_cb is not None and index == 0:
+                    # Only the first model attempt streams; a fallback model answers quietly, then the
+                    # checked answer replaces whatever draft the client already holds.
+                    client.answer_delta_callback = stream_cb
                 result = client.complete_structured(messages)
                 logger.info(
                     "answer_llm tier=%s model=%s provider=%s fallback=%s latency_ms=%s",
@@ -1384,6 +1389,13 @@ class ChatService:
         self._progress.set_context(plan, follow_up=follow_up)
         self._progress.emit(ProcessingStage.reasoning, plan=plan)
         self._progress.mark("reasoner")
+        self._stream_cb = None
+        if settings.chat_streaming_mode == "tokens_answer" and settings.enable_llm:
+            from app.pipeline.topic_risk import is_high_risk_topic
+
+            token_cb = getattr(self._progress, "token_callback", None)
+            if token_cb is not None and not is_high_risk_topic(payload.message):
+                self._stream_cb = token_cb
         with perf.stage("reasoner"):
             reasoned = self.reasoner.run(
                 message=payload.message,

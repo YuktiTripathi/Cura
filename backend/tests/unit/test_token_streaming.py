@@ -73,3 +73,34 @@ def test_default_mode_does_not_stream(streaming, monkeypatch):
     monkeypatch.setattr(settings, "chat_streaming_mode", "complete_only")
     events = _events("How much sleep do adults need?")
     assert not [1 for kind, _ in events if kind == "token"]
+
+
+def _json_sse(answer: str, size: int = 6) -> bytes:
+    raw = json.dumps({"answer": answer, "claims": [], "recommendation_candidates": [], "follow_up_questions": [], "safety_flags": [], "escalation": None})
+    lines = [f"data: {json.dumps({'choices': [{'delta': {'content': raw[i:i + size]}}]})}\n\n" for i in range(0, len(raw), size)]
+    lines.append(f"data: {json.dumps({'choices': [{'delta': {}, 'finish_reason': 'stop'}]})}\n\n")
+    lines.append(f"data: {json.dumps({'choices': [], 'usage': {'prompt_tokens': 50, 'completion_tokens': 9}})}\n\n")
+    lines.append("data: [DONE]\n\n")
+    return "".join(lines).encode()
+
+
+def test_structured_answer_text_streams_while_the_json_is_written(monkeypatch):
+    answer = "- Sleep needs change with age.\n- Most adults do well with seven to nine hours."
+    monkeypatch.setattr(openai_compatible.OpenAICompatibleLLMClient, "complete", openai_compatible.OpenAICompatibleLLMClient._real_complete)
+    monkeypatch.setattr(settings, "chat_streaming_mode", "tokens_answer")
+    monkeypatch.setattr(settings, "enable_llm", True)
+    monkeypatch.setattr(settings, "openrouter_api_key", "sk-or-test")
+    monkeypatch.setattr(settings, "require_zdr_for_personal_health", False)
+
+    def handler(request):
+        body = json.loads(request.content)
+        if body.get("stream"):
+            return httpx.Response(200, content=_json_sse(answer), headers={"Content-Type": "text/event-stream"})
+        return httpx.Response(500)
+
+    monkeypatch.setattr(openai_compatible, "get_http_client", lambda: httpx.Client(transport=httpx.MockTransport(handler)))
+    events = _events("How much sleep do adults need?")
+    streamed = "".join(data["text"] for kind, data in events if kind == "token")
+    assert streamed == answer
+    complete = next(data for kind, data in events if kind == "complete")
+    assert "sleep" in complete["answer"].lower()

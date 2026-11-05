@@ -77,8 +77,9 @@ export function useCuraChat() {
     let pending: ProcessingEvent | null = null;
     let timer: number | null = null;
     let finished = false;
+    let streaming = false;
     const show = (event: ProcessingEvent) => {
-      if (finished) return;
+      if (finished || streaming) return;
       lastShown = Date.now();
       setProcessing(event);
       setProcessingSteps((steps) => [...steps, event]);
@@ -111,6 +112,12 @@ export function useCuraChat() {
         documentIds,
         contextRef,
         (token) => {
+          if (!streaming && token) {
+            // The answer has started to appear: the progress steps have done their job.
+            streaming = true;
+            if (timer) window.clearTimeout(timer);
+            setProcessing(null);
+          }
           setMessages((current) => {
             const next = [...current];
             const last = next.length - 1;

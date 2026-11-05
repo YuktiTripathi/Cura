@@ -267,6 +267,8 @@ class OpenAICompatibleLLMClient:
         attempts = max(1, int(settings.llm_max_retries) + 1)
         client = get_http_client()
         started = time.perf_counter()
+        if getattr(self, "answer_delta_callback", None) and fmt != "plain" and not getattr(self, "_answer_streamed", False):
+            return self._send_streaming(url, headers, payload, fmt, started)
         for attempt in range(attempts):
             timeout = self._remaining()
             if timeout < 0.5:
@@ -352,6 +354,75 @@ class OpenAICompatibleLLMClient:
             raise LLMUnavailableError("LLM returned an empty answer")
         openrouter_breaker.record_success()
         logger.info("llm_complete model=%s format=%s latency_ms=%s", self.model, fmt, latency_ms)
+        return cleaned
+
+    def _send_streaming(self, url: str, headers: dict, payload: dict, fmt: str, started: float) -> str:
+        """The same request as _send, read as it is written. The answer text reaches answer_delta_callback while the
+        rest of the JSON is still arriving; the full text is returned once, exactly as the normal path would."""
+        from app.llm.answer_stream import AnswerFieldStreamer
+
+        timeout = self._remaining()
+        if timeout < 0.5:
+            openrouter_breaker.record_failure()
+            raise LLMUnavailableError("LLM time budget exhausted")
+        perf.count("provider_attempts")
+        body = dict(payload)
+        body["stream"] = True
+        body["stream_options"] = {"include_usage": True}
+        streamer = AnswerFieldStreamer(self.answer_delta_callback)
+        parts: list[str] = []
+        usage: dict = {}
+        finish_reason = ""
+        try:
+            with get_http_client().stream("POST", url, headers=headers, json=body, timeout=timeout) as response:
+                if response.status_code == 400:
+                    logger.warning("llm_http_error status=400 model=%s format=%s", self.model, fmt)
+                    raise LLMUnavailableError("LLM request format was rejected")
+                if response.status_code >= 400:
+                    openrouter_breaker.record_failure()
+                    raise LLMUnavailableError("LLM provider returned an error")
+                for line in response.iter_lines():
+                    if not line.startswith("data:"):
+                        continue
+                    data = line[5:].strip()
+                    if data == "[DONE]":
+                        break
+                    try:
+                        chunk = json.loads(data)
+                    except ValueError:
+                        continue
+                    usage = chunk.get("usage") or usage
+                    for choice in chunk.get("choices") or []:
+                        finish_reason = choice.get("finish_reason") or finish_reason
+                        delta = (choice.get("delta") or {}).get("content") or ""
+                        if delta:
+                            parts.append(delta)
+                            streamer.feed(delta)
+                            if streamer.emitted:
+                                self._answer_streamed = True
+        except httpx.HTTPError as exc:
+            openrouter_breaker.record_failure()
+            raise LLMUnavailableError("LLM request failed") from exc
+        self.http_requests = int(getattr(self, "http_requests", 0)) + 1
+        self.last_usage = {
+            "input_tokens": usage.get("prompt_tokens"),
+            "output_tokens": usage.get("completion_tokens"),
+            "cached_tokens": (usage.get("prompt_tokens_details") or {}).get("cached_tokens"),
+            "reasoning_tokens": (usage.get("completion_tokens_details") or {}).get("reasoning_tokens"),
+            "provider_cost": usage.get("cost"),
+            "usage_reported": bool(usage),
+        }
+        self.last_usage_detail = dict(self.last_usage)
+        self.last_finish_reason = str(finish_reason or "")
+        cleaned = message_text({"content": "".join(parts)})
+        latency_ms = int((time.perf_counter() - started) * 1000)
+        if self.last_finish_reason in {"length", "max_tokens"}:
+            logger.warning("llm_truncated model=%s format=%s latency_ms=%s", self.model, fmt, latency_ms)
+            raise LLMUnavailableError("LLM output was truncated")
+        if not cleaned:
+            raise LLMUnavailableError("LLM returned an empty answer")
+        openrouter_breaker.record_success()
+        logger.info("llm_complete_streamed model=%s format=%s latency_ms=%s", self.model, fmt, latency_ms)
         return cleaned
 
     def _complete_with_mode(self, messages: list[dict[str, str]], json_mode: bool) -> str:

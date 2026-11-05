@@ -137,7 +137,9 @@ class Settings(BaseSettings):
     cura_clinical_safety_enabled: bool = True
     cura_package_safety_enabled: bool = True
     request_timeout_seconds: float = 60
-    chat_streaming_mode: str = "complete_only"
+    # complete_only | tokens_low_risk (plain text, general questions) | tokens_answer (the written answer text of
+    # any question outside the high risk topics streams as the model writes it; the checked answer replaces it).
+    chat_streaming_mode: str = "tokens_answer"
     crisis_helpline_text: str = ""
     crisis_helpline_region: str = ""
     # India numbers used by the emergency and self-harm replies and the client call
