@@ -147,3 +147,8 @@ def test_house_prompt_carries_the_spec_safety_and_bio_ai_rules():
         "Answer the question first",
     ):
         assert phrase in HOUSE_CORE
+
+
+def test_house_follow_ups_are_spread_across_different_areas():
+    assert "DIFFERENT results or body areas" in HOUSE_CORE
+    assert "diet preference" in HOUSE_CORE

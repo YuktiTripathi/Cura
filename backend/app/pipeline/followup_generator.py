@@ -119,6 +119,8 @@ class FollowUpBrief:
     shown: list[str] = field(default_factory=list)  # suggested earlier in this conversation
     has_history: bool = False    # an earlier report exists, so change over time can be answered
     has_lifestyle: bool = False  # diet, activity, sleep or symptom answers are on record
+    diet: str | None = None      # diet preference on record, such as vegetarian
+    answer_text: str = ""        # the answer just given, so areas it did not cover come first
 
     @property
     def data_kind(self) -> str:
@@ -180,6 +182,8 @@ def build_brief(
     focus_keys: set[str] | None = None,
     shown: list[str] | None = None,
     has_lifestyle: bool = False,
+    diet: str | None = None,
+    answer_text: str = "",
 ) -> FollowUpBrief:
     from app.pipeline.clinical_thresholds import clinical_note
     from app.pipeline.report_explainer import _concern, _CONCERN, _out_of_range, _theme, _dedupe, related_blood_results
@@ -213,7 +217,7 @@ def build_brief(
                          asked=list(asked or []), focus_keys=set(focus_keys or set()),
                          shown=list(shown or []),
                          has_history=bool(history) or any(f.has_history for f in findings),
-                         has_lifestyle=has_lifestyle)
+                         has_lifestyle=has_lifestyle, diet=diet, answer_text=answer_text or "")
 
 
 # ---------------------------------------------------------------------------- candidates
@@ -484,6 +488,81 @@ def fallback_questions(
     return out
 
 
+
+# ---------------------------------------------------------------------------- breadth across areas
+
+_KINDS = ("action", "understand", "symptoms", "action")
+_DIET_WORD = re.compile(r"\b(vegetarian|vegan|eggetarian|jain)\b", re.I)
+_FOOD_THEMES = {"iron", "vitamins", "lipids", "sugar"}
+
+
+def _names(group: list["Finding"]) -> str:
+    names: list[str] = []
+    for f in group:
+        if f.name not in names:
+            names.append(f.name)
+    return " and ".join(names[:2])
+
+
+def theme_questions(brief: FollowUpBrief) -> list[tuple[str, str]]:
+    """One question per different area of the member's results, in mixed kinds.
+
+    Areas are the body systems with a result outside range plus each raised Bio-AI score. The most
+    important area comes first, then areas the answer did not already explain, so the chips open new ground.
+    (question, area) pairs; no area is asked about twice."""
+    units: list[tuple[str, list["Finding"] | "Risk"]] = []
+    groups: dict[str, list[Finding]] = {}
+    for f in brief.findings:
+        if f.direction != "normal":
+            groups.setdefault(f.theme, []).append(f)
+    for theme, group in groups.items():
+        units.append((theme, group))
+    for r in brief.risks:
+        if r.raised:
+            units.append((f"bio:{r.code}", r))
+    if not units:
+        return []
+    text = (brief.answer_text or "").lower()
+
+    def mentioned(unit) -> bool:
+        group = unit[1]
+        names = [group.name] if isinstance(group, Risk) else [f.name for f in group]
+        return any(n and n.lower() in text for n in names)
+
+    first, rest = units[0], units[1:]
+    rest.sort(key=mentioned)  # stable: areas not yet explained first, importance order kept inside each half
+    ordered = [first, *rest]
+    diet = brief.diet or ""
+    out: list[tuple[str, str]] = []
+    for i, (area, unit) in enumerate(ordered):
+        kind = _KINDS[i % len(_KINDS)]
+        if isinstance(unit, Risk):
+            r = unit
+            if kind == "action":
+                q = f"How can I bring my {r.name} score down?"
+            elif kind == "symptoms" and r.linked:
+                test = _short_name(re.sub(r"\s+[\d.]+.*$", "", r.linked[0].split(" (")[0]))
+                q = f"Is my {test} linked to my {r.name} score?"
+            else:
+                q = f"What does my {r.level or 'raised'} {r.name} score mean in simple words?"
+        else:
+            names, word = _names(unit), ("high" if unit[0].direction == "high" else "low")
+            moves = any(_lifestyle_moves(f) for f in unit)
+            if kind == "action":
+                if moves and _DIET_WORD.search(diet) and area in _FOOD_THEMES:
+                    q = f"Which {_DIET_WORD.search(diet).group(1).lower()} foods can help my {names}?"
+                elif moves:
+                    q = f"What lifestyle changes can help my {names}?"
+                else:
+                    q = f"What should I ask my doctor about my {names}?"
+            elif kind == "symptoms":
+                q = f"What symptoms can occur with {word} {names}?"
+            else:
+                q = f"What does {word} {names} mean for me?"
+        out.append((q, area))
+    return out
+
+
 # ---------------------------------------------------------------------------- selection
 
 def _stage_weight(stage: str, brief: FollowUpBrief, current_stage: str | None) -> int:
@@ -496,7 +575,7 @@ def _stage_weight(stage: str, brief: FollowUpBrief, current_stage: str | None) -
     return 10 - idx
 
 
-def select_followups(
+def _select_base(
     brief: FollowUpBrief,
     *,
     current_question: str | None,
@@ -543,6 +622,70 @@ def select_followups(
     if len(chosen) < min(2, count):
         chosen += fallback_questions(brief, count=count, current=current_question, chosen=chosen)
     return chosen
+
+
+def _area_of(question: str, brief: FollowUpBrief) -> str | None:
+    low = (question or "").lower()
+    for r in brief.risks:
+        if r.name and r.name.lower() in low:
+            return f"bio:{r.code}"
+    for f in brief.findings:
+        if f.name and f.name.lower() in low:
+            return f.theme
+    return None
+
+
+def _diversify(chosen: list[str], brief: FollowUpBrief, current_question: str | None) -> list[str]:
+    """No two chips on the same area while another area of the results has not been offered.
+
+    The lead chip and the order stay as ranked; only a repeat of an area is swapped for a question
+    about an untouched area, never one of a stage already asked or being answered."""
+    current_stage = stage_of(current_question)
+    taken_all = {a for a in (_area_of(q, brief) for q in chosen) if a}
+    spare = [
+        (q, a) for q, a in theme_questions(brief)
+        if a not in taken_all and stage_of(q) != current_stage and stage_of(q) not in brief.covered
+    ]
+    out: list[str] = []
+    seen: set[str] = set()
+    generic = 0
+    for q in chosen:
+        area = _area_of(q, brief)
+        if area is None:
+            generic += 1
+        # A repeat of an area, or a second whole-report question, makes room for an untouched area.
+        if (area is not None and area in seen) or (area is None and generic > 1):
+            for i, (tq, ta) in enumerate(spare):
+                if ta in seen or ta in taken_all:
+                    continue
+                if valid_question(tq, brief, current=current_question, chosen=[*out, *chosen]):
+                    out.append(tq)
+                    seen.add(ta)
+                    spare.pop(i)
+                    break
+            else:
+                out.append(q)
+            continue
+        out.append(q)
+        if area is not None:
+            seen.add(area)
+    return out
+
+
+def select_followups(
+    brief: FollowUpBrief,
+    *,
+    current_question: str | None,
+    model_questions: list[str] | None = None,
+    count: int = 3,
+) -> list[str]:
+    chosen = _select_base(brief, current_question=current_question, model_questions=model_questions, count=count)
+    out = _diversify(chosen, brief, current_question)
+    diet = _DIET_WORD.search(brief.diet or "")
+    if diet:
+        # Food questions fit the member's own diet: "What can I eat to lower my X?" -> "Which vegetarian foods can help my X?"
+        out = [re.sub(r"^What can I eat to (?:lower|raise) my (.+)\?$", rf"Which {diet.group(1).lower()} foods can help my \1?", q) for q in out]
+    return out
 
 
 def to_suggestions(questions: list[str], *, personal: bool = True) -> list[FollowUpSuggestion]:

@@ -102,6 +102,7 @@ def _journey_follow_ups(
     shown: list[str] | None,
     keep: list[FollowUpSuggestion] | None = None,
     member_findings: tuple[list, list] | None = None,
+    answer_text: str = "",
 ) -> list[FollowUpSuggestion] | None:
     """Grounded follow-ups for personal answers (followup_generator); None keeps the old chips."""
     if context.status == "ambiguous" or plan.knowledge_scope != KnowledgeScope.personal:
@@ -127,6 +128,8 @@ def _journey_follow_ups(
         focus_keys={k for k in [plan.topic, context.resolved_topic, *(plan.requested_metrics or [])] if k},
         shown=list(shown or []),
         has_lifestyle=bool(getattr(context, "lifestyle", None) or getattr(context, "questionnaire", None)),
+        diet=_diet_on_record(context),
+        answer_text=answer_text,
     )
     overview = plan.intent in _OVERVIEW_INTENTS and len(context.markers or []) + len(context.bio_ai_risks or []) > 2
     # A clinical-context question (its reply continues the interpretation) and the
@@ -144,32 +147,39 @@ def _journey_follow_ups(
     return [*to_suggestions(questions), *kept]
 
 
-def _staged_follow_ups(llm_questions, plan, context, history, shown) -> list[FollowUpSuggestion]:
+def _diet_on_record(context) -> str | None:
+    from app.pipeline.personalization_context import _lifestyle_value
+
+    diet = _lifestyle_value(context.questionnaire or [], "diet_preference")
+    profile = getattr(context, "profile", None)
+    if not diet and profile and getattr(profile, "dietary_preferences", None):
+        diet = str(profile.dietary_preferences[0].value)
+    return diet
+
+
+def _staged_follow_ups(llm_questions, plan, context, history, shown, answer_text="") -> list[FollowUpSuggestion]:
     """The three questions the house prompt asks for (understanding, personal relevance, action), on whole report answers."""
     if settings.cura_prompt_variant != "house" or plan.intent not in _OVERVIEW_INTENTS:
         return []
     if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
         return []
-    seen = {re.sub(r"\W+", " ", t.lower()).strip() for t in [*(history or []), *(shown or [])]}
-    chosen: list[str] = []
-    for raw in llm_questions or []:
-        text = re.sub(r"\s+", " ", (raw or "").strip())
-        key = re.sub(r"\W+", " ", text.lower()).strip()
-        if not text.endswith("?") or len(text.split()) > 16 or key in seen or key in {re.sub(r"\W+", " ", c.lower()).strip() for c in chosen}:
-            continue
-        chosen.append(text)
-    if len(chosen) < 3:
+    from app.pipeline.followup_generator import build_brief, select_followups, to_suggestions
+
+    brief = build_brief(
+        markers=list(context.markers or []),
+        risks=list(context.bio_ai_risks or []),
+        comparisons=list(context.comparisons or []),
+        asked=list(history or []),
+        focus_keys={k for k in [plan.topic, context.resolved_topic, *(plan.requested_metrics or [])] if k},
+        shown=list(shown or []),
+        has_lifestyle=bool(getattr(context, "lifestyle", None) or getattr(context, "questionnaire", None)),
+        diet=_diet_on_record(context),
+        answer_text=answer_text,
+    )
+    questions = select_followups(brief, current_question=plan.raw_message, model_questions=list(llm_questions or []), count=3)
+    if len(questions) < 3:
         return []
-    return [
-        FollowUpSuggestion(
-            text=text,
-            category=f"stage_{i}",
-            requires_personal_context=True,
-            knowledge_scope="personal",
-            handling_path="CONTINUE_INTERPRETATION",
-        )
-        for i, text in enumerate(chosen[:3], 1)
-    ]
+    return to_suggestions(questions)
 
 
 class ResponseComposer:
@@ -265,7 +275,7 @@ class ResponseComposer:
                 for label in response_plan.next_actions
             ]
             chips = list(combined)
-        staged = _staged_follow_ups(llm_follow_ups, plan, context, history, shown_follow_ups) if not answer_turn else []
+        staged = _staged_follow_ups(llm_follow_ups, plan, context, history, shown_follow_ups, answer) if not answer_turn else []
         if staged:
             # House flow: three questions, Understanding, Personal relevance, Action.
             question, chips = [], staged
@@ -407,6 +417,7 @@ class ResponseComposer:
                     if item.expected_reply_type == "CLINICAL_CONTEXT" and item.text not in (shown_follow_ups or [])
                 ][:1],
                 member_findings=member_findings,
+                answer_text=answer,
             )
         except Exception:  # noqa: BLE001 - suggestions must never break or delay the answer
             logger.warning("follow_up_generation_failed", exc_info=True)
