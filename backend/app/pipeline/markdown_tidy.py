@@ -16,6 +16,18 @@ _PERCENT_GAP = re.compile(r"(\d)\s+%")
 _UNIT_STICKY_SLASH = re.compile(r"(\d)\s*(mg|g|ng|pg|ug|mcg|mIU|uIU|IU|U|mmol|mEq)\s*/\s*(dL|mL|L)\b", re.I)
 
 
+_KNOWN_LABELS = ("What to do first", "Then", "Looking good", "When to see a doctor", "What the numbers show", "What it means")
+_LABEL = re.compile(r"^- \*{0,2}(" + "|".join(_KNOWN_LABELS) + r")\*{0,2}\s*:\s*\*{0,2}\s*(?=\S)", re.I)
+_BOLD_LABEL_GLUED = re.compile(r"^(- \*\*[^*\n]{1,60}:\*\*)(?=\S)")
+
+
+def _fix_labels(line: str) -> str:
+    """The same bold label style on every bullet, with a space after it."""
+    canon = {label.lower(): label for label in _KNOWN_LABELS}
+    line = _LABEL.sub(lambda m: f"- **{canon[m.group(1).lower()]}:** ", line)
+    return _BOLD_LABEL_GLUED.sub(r"\1 ", line)
+
+
 def _fix_units(line: str) -> str:
     line = _PERCENT_GAP.sub(r"\1%", line)
     line = _UNIT_STICKY_SLASH.sub(lambda m: f"{m.group(1)} {m.group(2)}/{m.group(3)}", line)
@@ -55,7 +67,7 @@ def tidy_markdown(text: str) -> str:
             continue
         bullet = _BULLET.match(line)
         if bullet:
-            line = "- " + _fix_units(bullet.group(1).strip())
+            line = _fix_labels("- " + _fix_units(bullet.group(1).strip()))
         else:
             line = _fix_units(line.strip())
         line = re.sub(r"\*\*\s*\*\*", "", line)
@@ -68,6 +80,9 @@ def tidy_markdown(text: str) -> str:
 
 # Most bullets a report section may keep. Bullets are written most important first, so
 # trimming drops the least important ones. Cards under the answer hold every value.
+# A body system section holds its two bullets and, at most, one extra short one.
+DEFAULT_SECTION_LIMIT = 3
+
 SECTION_LIMITS = {
     "overall health summary": 2,
     "important findings": 4,
@@ -76,6 +91,7 @@ SECTION_LIMITS = {
     "how your findings fit together": 2,
     "practical recommendations": 4,
     "when to consult a doctor": 2,
+    "what to do next": 3,
 }
 
 
@@ -89,7 +105,7 @@ def cap_report_sections(text: str) -> str:
     for line in text.split("\n"):
         heading = re.match(r"^##\s+(.+?)\s*$", line)
         if heading:
-            limit = SECTION_LIMITS.get(heading.group(1).strip().lower())
+            limit = SECTION_LIMITS.get(heading.group(1).strip().lower(), DEFAULT_SECTION_LIMIT)
             kept = 0
             out.append(line)
             continue
@@ -139,7 +155,7 @@ def strip_headings(text: str) -> str:
     return re.sub(r"\n{3,}", "\n\n", "\n".join(lines)).strip()
 
 
-MAX_REPORT_BULLETS = 10
+MAX_REPORT_BULLETS = 14
 
 
 def cap_total_bullets(text: str, limit: int = MAX_REPORT_BULLETS) -> str:

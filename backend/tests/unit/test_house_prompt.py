@@ -68,7 +68,7 @@ def test_house_core_is_smaller_than_the_legacy_system_prompt():
 def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     system, user = _build(message)
     assert system.startswith("You are the SuperShyft Health Assistant")
-    for phrase in ("12 year old", "bullet points only", "Indian", "**Looking good:**", "**What to do first:**", "**When to see a doctor:**"):
+    for phrase in ("12 year old", "bullet points only", "Indian", "**What the numbers show:**", "**What it means:**", "## What to do next"):
         assert phrase in system
     for hint in HIDDEN_HINTS:
         assert hint not in system and hint not in user, hint
@@ -85,12 +85,12 @@ def test_house_follow_up_instruction_asks_for_three_kinds_of_question(house):
 
 
 def test_house_report_parts_come_in_the_required_order():
-    order = ["The count line", "One bullet for each body system", "**Looking good:**", "**What to do first:**", "**When to see a doctor:**"]
+    order = ["SHAPE 1A", "One opening bullet", "**What the numbers show:**", "**What it means:**", "## What to do next", "SHAPE 1B"]
     positions = [HOUSE_CORE.index(part) for part in order]
     assert positions == sorted(positions)
-    assert 'NO "##" headings' in HOUSE_CORE
-    assert "the body system first, the biomarker second, the medical term third" in HOUSE_CORE
+    assert "Teach the body system first, the biomarker second, the medical term third" in HOUSE_CORE
     assert "report_counts" in HOUSE_CORE and "within_range_by_body_system" in HOUSE_CORE
+    assert 'SHAPE 1B' in HOUSE_CORE and "**Looking good:**" in HOUSE_CORE
 
 
 def test_legacy_variant_is_unchanged_and_still_available():
@@ -120,7 +120,7 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
 def test_house_prompt_uses_twelve_year_old_voice_and_short_report_limits():
     assert "12 year old" in HOUSE_CORE and "5 year old" not in HOUSE_CORE
     assert "at most 4" in HOUSE_CORE
-    assert "under about 240 words" in HOUSE_CORE
+    assert "under about 230 words" in HOUSE_CORE
 
 
 def test_house_prompt_picks_the_shape_from_the_question():

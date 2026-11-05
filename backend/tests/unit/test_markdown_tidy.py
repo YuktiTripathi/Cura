@@ -78,3 +78,28 @@ def test_whole_report_bullets_are_capped_in_total():
     text = "\n".join(f"- {i}" for i in range(15))
     out = cap_total_bullets(text, 10)
     assert out.count("- ") == 10 and "- 9" in out and "- 10" not in out
+
+
+def test_body_system_sections_keep_two_bullets_plus_one_and_next_steps_three():
+    from app.pipeline.markdown_tidy import cap_report_sections
+
+    text = (
+        "## Blood sugar\n\n- **What the numbers show:** a\n- **What it means:** b\n- c\n- d\n\n"
+        "## What to do next\n\n- 1\n- 2\n- 3\n- 4"
+    )
+    out = cap_report_sections(text)
+    assert "- c" in out and "- d" not in out and "- 3" in out and "- 4" not in out
+
+
+def test_system_headings_and_label_style_survive_tidy():
+    out = tidy_markdown("### Heart and blood vessels:\n- what the numbers show: triglycerides 206 mg/dl\n- **What it means:**Fats in blood")
+    assert out == "## Heart and blood vessels\n\n- **What the numbers show:** triglycerides 206 mg/dl\n- **What it means:** Fats in blood"
+
+
+def test_labels_are_bold_with_a_space_after_them():
+    out = tidy_markdown("- **Looking good:**NAFLD is fine\n- what to do first: eat oats\n- **When to see a doctor**: soon")
+    assert out.split("\n") == [
+        "- **Looking good:** NAFLD is fine",
+        "- **What to do first:** eat oats",
+        "- **When to see a doctor:** soon",
+    ]
