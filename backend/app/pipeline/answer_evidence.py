@@ -805,6 +805,44 @@ def prioritize_findings(markers, risks, goal: str | None) -> list:
     return sorted(abnormal, key=score, reverse=True)
 
 
+# Plain names for the body system a result or assessment belongs to, so an answer can talk organ by organ.
+_ORGAN_BY_THEME = {
+    "sugar": "Blood sugar (pancreas and insulin)",
+    "lipids": "Heart and blood vessels (cholesterol and blood fats)",
+    "iron": "Blood and oxygen carrying (iron and red blood cells)",
+    "liver": "Liver",
+    "kidney": "Kidneys and body salts",
+    "thyroid": "Thyroid (energy and metabolism)",
+    "vitamins": "Bones, muscles and energy (vitamins)",
+    "cells": "Immunity and clotting (white cells and platelets)",
+    "other": "Other results",
+}
+_ORGAN_BY_BIO = (
+    (("nafld", "fatty liver", "liver"), "Liver"),
+    (("cardiac", "heart", "cardio"), "Heart and blood vessels"),
+    (("dyslipid", "lipid", "cholesterol"), "Heart and blood vessels (cholesterol and blood fats)"),
+    (("diabet", "glyc", "insulin", "sugar"), "Blood sugar (pancreas and insulin)"),
+    (("obes", "weight", "bmi", "metabolic"), "Weight and metabolism"),
+    (("thyroid",), "Thyroid (energy and metabolism)"),
+    (("kidney", "renal"), "Kidneys"),
+    (("oxidative", "inflamm"), "Whole body (cells and their protection)"),
+)
+
+
+def body_system_of_marker(marker) -> str:
+    from app.pipeline.report_explainer import _theme
+
+    return _ORGAN_BY_THEME.get(_theme(marker).code, _ORGAN_BY_THEME["other"])
+
+
+def body_system_of_risk(risk) -> str | None:
+    text = f"{getattr(risk, 'code', '')} {getattr(risk, 'name', '')}".lower()
+    for words, label in _ORGAN_BY_BIO:
+        if any(word in text for word in words):
+            return label
+    return None
+
+
 def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str | None) -> dict:
     """Facts for one answer. Laboratory status stays separate from clinical importance.
 
@@ -820,6 +858,9 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
         assessments = []
         for risk in ranked:
             fact = _risk_fact(risk)
+            system = body_system_of_risk(risk)
+            if system:
+                fact["body_system"] = system
             linked = related_blood_results(risk, context.markers or [])
             if linked:
                 fact["related_blood_results"] = linked
@@ -829,6 +870,7 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
             "kind": "risk_estimate",
             # Every assessment in the report: the answer may name only these.
             "assessments": assessments,
+            "report_counts": {"assessment_areas": len(assessments), "raised": sum(1 for r in ranked if _risk_raised(r))},
             "note": "These are model risk estimates, not laboratory measurements and not diagnoses.",
         }
     markers = list(context.markers or [])
@@ -858,7 +900,7 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
             if direction:
                 fact["earlier_report"] = direction
             facts.append(fact)
-        patterns.append({"group": code, "measured_results": facts})
+        patterns.append({"group": code, "body_system": body_system_of_marker(rows[0]), "measured_results": facts})
     in_range = [
         marker.name
         for marker in markers
@@ -869,6 +911,8 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
         "kind": "measured_laboratory_result",
         "patterns": patterns,
         "within_laboratory_range": in_range,
+        "report_counts": _blood_counts(context, markers),
+        "within_range_by_body_system": _within_range_by_system(markers),
         "all_listed_results_within_range": bool(markers) and not ordered,
         # Published guideline ranges (ADA, NCEP, ACC/AHA, Endocrine Society): how far outside.
         "guideline_notes": [note.text for note in notes],
@@ -877,6 +921,29 @@ def build_clinical_evidence_brief(context: HealthContext, *, primary_source: str
             "It is not a clinical-importance score. Do not invent results that are not listed."
         ),
     }
+
+
+def _risk_raised(risk) -> bool:
+    return (getattr(risk, "status", None) or "").lower() in {"critical", "very high", "high", "elevated", "moderate", "medium"}
+
+
+def _blood_counts(context, markers) -> dict:
+    """How many results are outside the range out of all classified, from the report's own flags."""
+    summary = getattr(context, "in_range_summary", None)
+    if summary and (summary.in_range or summary.out_of_range):
+        outside, inside = summary.out_of_range, summary.in_range
+    else:
+        outside = sum(1 for m in markers if _flag(m) in {"high", "low", "critical"})
+        inside = sum(1 for m in markers if _flag(m) == "normal")
+    return {"outside_range": outside, "within_range": inside, "total_results": outside + inside}
+
+
+def _within_range_by_system(markers) -> list[dict]:
+    groups: dict[str, list[str]] = {}
+    for marker in markers:
+        if _flag(marker) == "normal" and marker.name:
+            groups.setdefault(body_system_of_marker(marker), []).append(marker.name)
+    return [{"body_system": system, "results": names[:5], "count": len(names)} for system, names in list(groups.items())[:6]]
 
 
 def _trend_direction(context: HealthContext, key: str) -> str | None:

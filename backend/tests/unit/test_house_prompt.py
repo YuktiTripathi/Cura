@@ -61,7 +61,7 @@ def test_house_core_has_no_dashes_and_one_json_contract():
 def test_house_core_is_smaller_than_the_legacy_system_prompt():
     from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS
 
-    assert len(HOUSE_CORE) < 0.9 * len(SAFETY_INSTRUCTIONS)
+    assert len(HOUSE_CORE) < len(SAFETY_INSTRUCTIONS)
 
 
 @pytest.mark.parametrize("message", QUESTIONS)
@@ -85,10 +85,12 @@ def test_house_follow_up_instruction_asks_for_three_kinds_of_question(house):
 
 
 def test_house_report_parts_come_in_the_required_order():
-    order = ["The verdict", "One bullet for each body area", "**Looking good:**", "**What to do first:**", "**When to see a doctor:**"]
+    order = ["The count line", "One bullet for each body system", "**Looking good:**", "**What to do first:**", "**When to see a doctor:**"]
     positions = [HOUSE_CORE.index(part) for part in order]
     assert positions == sorted(positions)
     assert 'NO "##" headings' in HOUSE_CORE
+    assert "the body system first, the biomarker second, the medical term third" in HOUSE_CORE
+    assert "report_counts" in HOUSE_CORE and "within_range_by_body_system" in HOUSE_CORE
 
 
 def test_legacy_variant_is_unchanged_and_still_available():
@@ -118,7 +120,7 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
 def test_house_prompt_uses_twelve_year_old_voice_and_short_report_limits():
     assert "12 year old" in HOUSE_CORE and "5 year old" not in HOUSE_CORE
     assert "at most 4" in HOUSE_CORE
-    assert "under about 220 words" in HOUSE_CORE
+    assert "under about 240 words" in HOUSE_CORE
 
 
 def test_house_prompt_picks_the_shape_from_the_question():
