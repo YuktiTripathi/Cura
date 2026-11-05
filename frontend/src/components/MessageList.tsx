@@ -35,6 +35,14 @@ function AssistantIdentity({ label, busy = false }: { label: string; busy?: bool
   );
 }
 
+// A topic title with no cards under it (a general answer such as "Vitamin D") reads best above the answer.
+function topHeadline(presentation?: { headline?: string | null; findings?: unknown[]; themes?: unknown[]; mode?: string } | null): string | null {
+  if (!presentation?.headline) return null;
+  const hasCards = (presentation.findings?.length || 0) > 0 || (presentation.themes?.length || 0) > 0;
+  if (hasCards || presentation.mode === "SINGLE_VALUE") return null;
+  return presentation.headline;
+}
+
 export function MessageList({
   messages,
   onFollowUp,
@@ -99,6 +107,7 @@ export function MessageList({
               />
             ) : m.role === "assistant" ? (
               <>
+                {topHeadline(m.presentation) ? <h3 className="answer-headline">{topHeadline(m.presentation)}</h3> : null}
                 <MarkdownAnswer content={m.content} />
                 {m.semantic?.blocks?.length ? <SemanticBlocks blocks={m.semantic.blocks} answer={m.content} /> : null}
                 {m.presentation ? (
@@ -107,6 +116,7 @@ export function MessageList({
                     fallback={m.content}
                     testingOption={m.testingOption || m.presentation.testing_option}
                     hideProse
+                    hideHeadline={Boolean(topHeadline(m.presentation))}
                   />
                 ) : null}
                 {!m.presentation && m.experienceBlocks?.length ? <StreamingExperience blocks={m.experienceBlocks} /> : null}

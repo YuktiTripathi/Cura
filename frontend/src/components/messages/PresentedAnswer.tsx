@@ -23,15 +23,19 @@ export function PresentedAnswer({
   fallback,
   testingOption,
   hideProse = false,
+  hideHeadline = false,
 }: {
   presentation: StructuredResponse;
   fallback: string;
   testingOption?: TestingOption | null;
   /** The assistant message already rendered `answer`. Do not repeat it. */
   hideProse?: boolean;
+  /** The headline is already shown above the answer. */
+  hideHeadline?: boolean;
 }) {
   const narrative = presentation.summary_style === "NARRATIVE_HEALTH_SUMMARY" || Boolean(presentation.themes && presentation.themes.length > 0);
   const showHeadline =
+    !hideHeadline &&
     !narrative &&
     presentation.mode !== "SINGLE_VALUE" &&
     Boolean(presentation.headline) &&
