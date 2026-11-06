@@ -215,3 +215,28 @@ def drop_repeated_limits(text: str) -> str:
         if joined and joined != "-" and len(joined.split()) > 1:
             out.append(joined)
     return "\n".join(out)
+
+
+_DOCTOR_SENTENCE = re.compile(
+    r"\b(?:share|discuss|mention|bring|show|talk)\b[^.!?]*\b(?:doctor|clinician|physician)\b|\b(?:doctor|clinician)\b[^.!?]*\broutine (?:visit|check)",
+    re.I,
+)
+_REASSURING = re.compile(r"\b(?:within (?:the )?range|in range|inside (?:the )?range|healthy|look(?:s)? (?:great|good)|normal)\b", re.I)
+_CONCERN = re.compile(r"\b(?:above|below|outside|high|low|raised|elevated|critical|very high|slightly|needs attention)\b", re.I)
+
+
+def drop_doctor_for_healthy(text: str) -> str:
+    """A "share it with your doctor" sentence belongs only to a result outside its range or a serious pointer.
+    Where a bullet is about results that are within range or Healthy and says nothing of concern, it goes."""
+    if not text:
+        return text
+    out: list[str] = []
+    for line in text.split("\n"):
+        if line.startswith("- ") and _REASSURING.search(line) and not _CONCERN.search(line) and _DOCTOR_SENTENCE.search(line):
+            kept = [x for x in re.split(r"(?<=[.!?])\s+", line) if not _DOCTOR_SENTENCE.search(x)]
+            joined = " ".join(kept).strip()
+            if joined and len(joined.split()) > 2:
+                out.append(joined)
+            continue
+        out.append(line)
+    return "\n".join(out)

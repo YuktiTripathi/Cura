@@ -133,3 +133,12 @@ def test_the_limit_of_a_report_is_said_once():
     assert out.count("risk estimate") == 1
     assert "cannot confirm" not in out and "does not identify" not in out
     assert "Your liver filters blood." in out and "See a doctor soon." in out
+
+
+def test_doctor_line_is_dropped_for_healthy_results_only():
+    from app.pipeline.markdown_tidy import drop_doctor_for_healthy
+
+    kept = "- Your sugar and kidney markers are within range. You can share them with your doctor at your next routine visit."
+    assert "doctor" not in drop_doctor_for_healthy(kept)
+    concern = "- Your LDL is above the range on your report, so discuss it with your doctor within a few weeks."
+    assert drop_doctor_for_healthy(concern) == concern
