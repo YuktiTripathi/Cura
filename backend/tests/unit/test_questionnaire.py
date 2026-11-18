@@ -243,3 +243,26 @@ def test_chat_renders_questionnaire_answers():
         assert "Health Questionnaire" in names
     finally:
         set_registry(None)
+
+
+def test_questionnaire_cache_does_not_reuse_sleep_filter_for_diet_or_alcohol():
+    """A cached sleep question must not erase other questionnaire answers."""
+    from app.providers.cache import cached_questionnaires
+
+    provider = cached_questionnaires(__import__(
+        "integrations.mock.questionnaire_provider", fromlist=["MockQuestionnaireProvider"]
+    ).MockQuestionnaireProvider())
+    sleep = build_query_plan("What did I answer about my sleep?")
+    diet = build_query_plan("What are my dietary habits according to my questionnaire?")
+    alcohol = build_query_plan("What about alcohol?", follow_up_topic="sleep", prior_personal=True)
+    history = build_query_plan("Have my sleep habits changed?")
+
+    def keys(plan):
+        return {answer.question_key for instance in provider.query(Q1, plan) for answer in instance.answers}
+
+    assert "sleeping_hours" in keys(sleep)
+    assert "diet_preference" in keys(diet)
+    assert "alcohol_frequency" in keys(alcohol)
+    assert [item.assessment_instance_id for item in provider.query(Q1, history)] == [
+        "q1-older", "q1-latest"
+    ]
