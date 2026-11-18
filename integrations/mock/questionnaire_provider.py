@@ -9,11 +9,9 @@ class MockQuestionnaireProvider:
     def __init__(self) -> None:
         self._rows = load_json("questionnaires.json")
 
-    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[QuestionnaireInstance]:
+    def load_for_cache(self, principal: AuthenticatedPrincipal, scope: str) -> list[QuestionnaireInstance]:
+        """Cache all questionnaire answers and instances, independent of the question."""
         subject = (principal.subject_id or "").strip()
-        wanted = keys_for_plan(plan.topic, plan.requested_metrics, plan.raw_message or "")
-        wanted_set = set(wanted)
-        keep_history = bool(plan.history or plan.compare or plan.time_operation in {"trend", "previous", "compare"})
         instances: list[QuestionnaireInstance] = []
         for row in self._rows:
             if row.get("subject_id") != subject:
@@ -34,7 +32,6 @@ class MockQuestionnaireProvider:
                         subject_id=subject,
                     )
                     for item in raw.get("answers") or []
-                    if item.get("question_key") in wanted_set
                 ]
                 owned.append(
                     QuestionnaireInstance(
@@ -47,7 +44,13 @@ class MockQuestionnaireProvider:
                     )
                 )
             owned.sort(key=lambda item: (str(item.recorded_at or ""), item.assessment_instance_id))
-            if not keep_history:
-                owned = owned[-1:]
             instances.extend(owned)
         return instances
+
+    def apply_plan(self, instances: list[QuestionnaireInstance], plan: QueryPlan) -> list[QuestionnaireInstance]:
+        from integrations.supershyft.questionnaire import select_questionnaire_instances
+
+        return select_questionnaire_instances(instances, plan)
+
+    def query(self, principal: AuthenticatedPrincipal, plan: QueryPlan) -> list[QuestionnaireInstance]:
+        return self.apply_plan(self.load_for_cache(principal, "history" if plan.history else "latest"), plan)
