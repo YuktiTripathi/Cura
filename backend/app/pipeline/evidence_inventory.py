@@ -239,7 +239,7 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
         "report_explanation", "broad_health_summary", "health_scenario",
     }
     measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers, broad=broad)]
-    measurements = _with_history(measurements, context, include=_wants_history(plan, message))
+    measurements = _with_history(measurements, context, include=_wants_history(plan, message) or bool(context.comparisons))
     if (
         getattr(plan.intent, "value", "") == "bio_ai_score"
         and not requested_marker_keys(message)
@@ -349,7 +349,7 @@ def _complete_required_facts(
     present = {row.get("fact_id") for row in measurements}
     required: list[dict] = []
     named = set(requested_marker_keys(message))
-    for row in context.comparisons or [] if _wants_history(plan, message) else []:
+    for row in context.comparisons or [] if (_wants_history(plan, message) or bool(context.comparisons)) else []:
         topic = getattr(row, "topic", None)
         if named and _key(topic) not in named:
             continue
