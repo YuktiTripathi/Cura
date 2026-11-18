@@ -396,6 +396,32 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
     if len(stamps) <= len({marker.key for marker in markers if marker.key}):
         markers = dedupe_markers(markers)
     spec = plan.task_contract or {}
+    # An explicit personal value lookup is allowed to show the recorded result
+    # even if the semantic task contract says "explain" or limits card context.
+    # This does not run for a generic educational question or an unrequested
+    # reasoning-context biomarker.
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    named = set(match_lab_keys(plan.raw_message or ""))
+    explicitly_requested = named & {
+        canonical_marker_key(marker) for marker in markers
+    }
+    explicitly_requested.update(
+        named & {str(marker.key or "").lower() for marker in markers}
+    )
+    if (
+        plan.needs_personal_data
+        and explicitly_requested
+        and plan.intent in {
+            IntentType.latest_result,
+            IntentType.previous_result,
+            IntentType.blood_marker_explanation,
+        }
+    ):
+        return [
+            marker for marker in markers
+            if marker.key in explicitly_requested or canonical_marker_key(marker) in explicitly_requested
+        ][:6]
     if spec.get("goal") == "explain" and spec.get("personal_context") != "required":
         # A named personal lab lookup still needs its verified result card, even
         # when the task contract describes the surrounding answer as an explanation.
