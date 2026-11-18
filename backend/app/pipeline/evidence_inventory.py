@@ -403,7 +403,11 @@ def _complete_required_facts(
 
 def _wants_history(plan: QueryPlan, message: str | None) -> bool:
     goal = (plan.task_contract or {}).get("goal")
-    if goal == "compare":
+    if goal == "compare" or plan.history or plan.compare:
+        return True
+    if getattr(plan.intent, "value", plan.intent) in {"trend", "comparison"}:
+        return True
+    if plan.time_operation in {"trend", "previous", "compare"}:
         return True
     return bool(re.search(r"\b(changed|change|since|previous|trend|compare)\b", message or "", re.I))
 
