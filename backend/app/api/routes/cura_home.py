@@ -12,14 +12,10 @@ from pydantic import BaseModel
 
 from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
-from app.contracts.bio_ai import BioAIReport
-from app.contracts.blood import BloodReport
-from app.contracts.lifestyle import LifestyleContext
-from app.contracts.questionnaire import QuestionnaireInstance
 from app.pipeline.me_service import schedule_latest_preload
-from app.providers.cache import peek
+from app.providers.cache import storage_key
+from app.core.request_controls import request_controls
 from app.providers.registry import ProviderRegistry, get_registry
-from pydantic import TypeAdapter
 
 router = APIRouter()
 
@@ -47,17 +43,18 @@ def home_readiness(
         return HomeReadiness(status="unavailable", blood_cached=False, bio_ai_cached=False,
                              lifestyle_cached=False, questionnaire_cached=False, refresh_me_when_ready=False)
 
-    blood = peek("blood", principal.subject_id, "latest", TypeAdapter(list[BloodReport]))
-    bio = peek("bio_ai", principal.subject_id, "latest", TypeAdapter(list[BioAIReport]))
-    life = peek("lifestyle", principal.subject_id, "latest", TypeAdapter(LifestyleContext))
-    questionnaire = peek("questionnaire", principal.subject_id, "latest", TypeAdapter(list[QuestionnaireInstance]))
-    # peek returns None on miss, [] on a cached empty result.
-    # An empty list is still a completed provider read.
-    blood_cached = blood is not None
-    bio_cached = bio is not None
+    # Check cache-entry presence rather than payload truthiness: a completed
+    # provider read can legitimately contain [] or null.
+    def present(kind: str) -> bool:
+        try:
+            return request_controls._get(storage_key(kind, principal.subject_id, "latest")) is not None
+        except Exception:  # noqa: BLE001
+            return False
 
-    lifestyle_cached = life is not None
-    questionnaire_cached = questionnaire is not None
+    blood_cached = present("blood")
+    bio_cached = present("bio_ai")
+    lifestyle_cached = present("lifestyle")
+    questionnaire_cached = present("questionnaire")
     cached_count = sum((blood_cached, bio_cached, lifestyle_cached, questionnaire_cached))
     if cached_count == 4:
         status = "ready"
