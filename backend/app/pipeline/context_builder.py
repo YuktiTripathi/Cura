@@ -422,6 +422,12 @@ class ContextBuilder:
         keys = _with_pattern_keys(plan.raw_message or "", keys)
         named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
+        from app.pipeline.narrative import wants_raw_snapshot
+
+        if wants_raw_snapshot(plan.raw_message or "", plan) and not keys:
+            # A direct request to view the report needs all measured rows, even if
+            # the intent router chose a simple latest-result lookup.
+            operation = "latest_report"
         ops = {str(item).upper() for item in (plan.operations or [])}
         selectors = {str(item).upper() for item in (plan.selectors or [])}
         if not keys and (ops & {"SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"} or plan.topic == "bio_ai"):
