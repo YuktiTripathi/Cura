@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import logging
 import threading
+from concurrent.futures import ThreadPoolExecutor
 
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.me import MeCapabilities, MeResponse
@@ -13,6 +14,40 @@ from app.voice.providers import voice_input_available
 from app.core.log_ids import subject_ref
 
 logger = logging.getLogger("cura.me")
+
+# Bound background work; one in-flight preload per member per process.
+_PRELOAD_POOL = ThreadPoolExecutor(max_workers=4, thread_name_prefix="cura-health-preload")
+_PRELOAD_SLOTS = threading.BoundedSemaphore(16)
+_PRELOAD_LOCK = threading.Lock()
+_PRELOAD_ACTIVE: set[str] = set()
+
+
+def _schedule_preload(principal, task, *args) -> None:
+    from app.providers.cache import member_token
+    key = member_token(principal.subject_id)
+    with _PRELOAD_LOCK:
+        if key in _PRELOAD_ACTIVE:
+            return
+        if not _PRELOAD_SLOTS.acquire(blocking=False):
+            logger.warning("health_preload status=capacity_exhausted")
+            return
+        _PRELOAD_ACTIVE.add(key)
+
+    def run():
+        try:
+            task(principal, *args)
+        finally:
+            with _PRELOAD_LOCK:
+                _PRELOAD_ACTIVE.discard(key)
+                _PRELOAD_SLOTS.release()
+
+    try:
+        _PRELOAD_POOL.submit(run)
+    except RuntimeError:
+        with _PRELOAD_LOCK:
+            _PRELOAD_ACTIVE.discard(key)
+            _PRELOAD_SLOTS.release()
+        logger.warning("health_preload status=scheduler_unavailable")
 
 
 def public_user_id(subject_id: str) -> str | int:
@@ -90,9 +125,11 @@ def _apply_lifestyle(snap: HealthSnapshot, principal: AuthenticatedPrincipal, re
 
 
 def preload_latest(principal: AuthenticatedPrincipal, registry: ProviderRegistry) -> None:
-    """Fill blood:latest and bio_ai:latest through the same cache path chat uses."""
+    """Warm all four latest health sources through the existing provider cache."""
     _preload_one(principal, registry, "blood")
     _preload_one(principal, registry, "bio_ai")
+    _preload_one(principal, registry, "lifestyle")
+    _preload_one(principal, registry, "questionnaire")
 
 
 def preload_for_entry(principal: AuthenticatedPrincipal, registry: ProviderRegistry, context_ref) -> None:
@@ -124,6 +161,19 @@ def _preload_one(principal: AuthenticatedPrincipal, registry: ProviderRegistry, 
         except Exception:  # noqa: BLE001
             logger.warning("health_preload status=blood_failed")
         return
+    if kind in {"lifestyle", "questionnaire"}:
+        plan = QueryPlan(
+            intent=IntentType.broad_health_summary if kind == "lifestyle" else IntentType.questionnaire_lookup,
+            knowledge_scope=KnowledgeScope.personal,
+            needs_lifestyle=kind == "lifestyle",
+            needs_questionnaire=kind == "questionnaire",
+        )
+        try:
+            provider = registry.lifestyle if kind == "lifestyle" else registry.questionnaires
+            provider.query(principal, plan)
+        except Exception:  # noqa: BLE001
+            logger.warning("health_preload status=%s_failed", kind)
+        return
     plan = QueryPlan(
         intent=IntentType.bio_ai_score,
         needs_bio_ai=True,
@@ -140,22 +190,12 @@ def _preload_one(principal: AuthenticatedPrincipal, registry: ProviderRegistry, 
 def schedule_entry_preload(principal: AuthenticatedPrincipal, registry: ProviderRegistry, context_ref) -> None:
     if context_ref is None:
         return
-    threading.Thread(
-        target=preload_for_entry,
-        args=(principal, registry, context_ref),
-        name="cura-entry-preload",
-        daemon=True,
-    ).start()
+    _schedule_preload(principal, preload_for_entry, registry, context_ref)
 
 
 def schedule_latest_preload(principal: AuthenticatedPrincipal, registry: ProviderRegistry) -> None:
-    """Start the fill and return. /me must not join this thread."""
-    threading.Thread(
-        target=preload_latest,
-        args=(principal, registry),
-        name="cura-health-preload",
-        daemon=True,
-    ).start()
+    """Schedule a bounded, deduplicated preload without blocking /me."""
+    _schedule_preload(principal, preload_latest, registry)
 
 
 def build_me_response(
