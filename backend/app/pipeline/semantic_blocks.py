@@ -296,9 +296,11 @@ def structured_evidence_codes(semantic) -> set[str]:
 
 
 def suppress_duplicate_findings(presentation, semantic):
-    """Drop rich finding cards whose canonical id is already a structured block.
+    """Avoid repeated *optional* finding cards without losing primary results.
 
-    Cards with no canonical id are kept. The answer is not touched.
+    The rich presentation is an API contract: consumers need its verified
+    values, reference ranges and source ids even when semantic blocks repeat
+    those values. Only auxiliary related-findings cards can be suppressed.
     """
     if presentation is None:
         return presentation
@@ -310,7 +312,6 @@ def suppress_duplicate_findings(presentation, semantic):
         key = (getattr(finding, "canonical_key", None) or "").strip().lower()
         return not key or key not in covered
 
-    presentation.findings = [item for item in presentation.findings or [] if keep(item)]
     presentation.related_findings = [item for item in presentation.related_findings or [] if keep(item)]
     return presentation
 
