@@ -635,6 +635,8 @@ class ContextBuilder:
             if report is None:
                 ctx.missing.append(MissingItem(key=plan.topic or "blood", name=plan.topic_name or "blood", reason="no_reports"))
                 return
+            from app.pipeline.narrative import wants_raw_snapshot
+
             full = list(report.markers)
             markers = list(full)
             if keys:
@@ -642,7 +644,7 @@ class ContextBuilder:
             wanted_flags = _selector_marker_flags(selectors)
             if wanted_flags:
                 markers = [item for item in markers if item.flag in wanted_flags]
-            elif not keys and len(markers) > 24:
+            elif not keys and len(markers) > 24 and not wants_raw_snapshot(plan.raw_message or "", plan):
                 markers = [
                     item for item in markers
                     if item.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and item.value is not None
