@@ -98,20 +98,14 @@ def _snapshot_from_cache(principal: AuthenticatedPrincipal, registry: ProviderRe
 
 def _apply_lifestyle(snap: HealthSnapshot, principal: AuthenticatedPrincipal, registry: ProviderRegistry) -> None:
     """Nutrition is a lifestyle flag, not a blood-history read."""
-    from app.contracts.common import IntentType, KnowledgeScope
-    from app.contracts.query import QueryPlan
+    from pydantic import TypeAdapter
 
-    try:
-        life = registry.lifestyle.query(
-            principal,
-            QueryPlan(
-                intent=IntentType.broad_health_summary,
-                needs_lifestyle=True,
-                knowledge_scope=KnowledgeScope.personal,
-            ),
-        )
-    except Exception:  # noqa: BLE001
-        return
+    from app.contracts.lifestyle import LifestyleContext
+    from app.providers.cache import peek
+
+    # A landing-screen cache miss must never trigger a synchronous database read.
+    # The bounded background preload fills this entry separately.
+    life = peek("lifestyle", principal.subject_id, "latest", TypeAdapter(LifestyleContext))
     if not life or not life.notes:
         return
     blob = " ".join(life.notes).lower()
