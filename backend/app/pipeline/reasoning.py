@@ -211,26 +211,54 @@ def _eligible_for_model_wording(plan: QueryPlan, context: HealthContext) -> bool
 
 
 def _missing_score_note(message: str, context: HealthContext, answer: str) -> str:
-    if not re.search(r"bio-?\s*ai|risk score", message or "", re.I):
+    """Restore an explicitly requested Bio-AI score from verified patient records.
+
+    The model may describe a risk band without repeating its numeric score.
+    Never infer a score from the band or append unrelated assessments.
+    """
+    question = message or ""
+    if not re.search(r"bio[-\s]?ai|risk\s+score|\bscore\b", question, re.I):
         return ""
-    missing = []
-    requested = {str(code).lower() for code in (context.requested_entity_codes or [])}
-    asked = [r for r in context.bio_ai_risks or [] if (r.code or "").lower() in requested]
+
+    risks = [risk for risk in context.bio_ai_risks or [] if getattr(risk, "score", None) is not None]
+    requested = {_key for code in (context.requested_entity_codes or []) if (_key := str(code).strip().lower())}
+    asked = [risk for risk in risks if (risk.code or "").lower() in requested]
+    if not asked:
+        # A single risk is unambiguous for an explicit score question. For multiple
+        # risks, match names/codes mentioned by the user; never add all scores.
+        if len(risks) == 1:
+            asked = risks
+        else:
+            normalized = re.sub(r"[^a-z0-9]+", " ", question.lower()).strip()
+            asked = [
+                risk for risk in risks
+                if any(
+                    label and label in normalized
+                    for label in (
+                        re.sub(r"[^a-z0-9]+", " ", (risk.name or "").lower()).strip(),
+                        re.sub(r"[^a-z0-9]+", " ", (risk.code or "").lower()).strip(),
+                    )
+                )
+            ]
     if not asked:
         return ""
+
+    missing = []
     for risk in asked:
-        score = getattr(risk, "score", None)
+        score = risk.score
         if score is None:
             continue
         token = f"{score:g}"
-        if token not in (answer or ""):
-            name = getattr(risk, "name", None) or risk.code
-            status = getattr(risk, "status", None) or ""
-            missing.append(f"{name} {token} ({status})".strip())
+        if re.search(rf"(?<![\d.]){re.escape(token)}(?:\.0+)?(?!\d)", answer or ""):
+            continue
+        label = getattr(risk, "name", None) or risk.code
+        status = getattr(risk, "status", None)
+        suffix = f" ({status} risk band)" if status else ""
+        missing.append(f"{label}: {token}{suffix}")
     if not missing:
         return ""
-    qualifier = "" if re.search(r"risk estimate", answer or "", re.I) else " These are risk estimates, not diagnoses."
-    return "Your Bio-AI report also shows " + "; ".join(missing) + "." + qualifier
+    qualifier = "" if re.search(r"not (?:a )?diagnos(?:is|es)", answer or "", re.I) else " These are risk estimates, not diagnoses."
+    return "Your Bio-AI report shows " + "; ".join(missing) + "." + qualifier
 
 
 def _model_explains(plan: QueryPlan) -> bool:
