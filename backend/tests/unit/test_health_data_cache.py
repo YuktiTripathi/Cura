@@ -351,3 +351,23 @@ def test_missing_consent_does_not_read_history():
     with pytest.raises(PermissionError):
         cached_blood(inner).query(AuthenticatedPrincipal(subject_id="member-a", consent_scopes=[]), _personal(["ferritin"]))
     assert inner.loads == 0
+
+
+def test_mock_blood_cache_does_not_reuse_previous_question_filter():
+    """A Vitamin D lookup must not hide LDL in a later query for the same member."""
+    from integrations.mock.blood_provider import MockBloodProvider
+
+    inner = MockBloodProvider()
+    blood = cached_blood(inner)
+    vitamin = QueryPlan(
+        intent=IntentType.latest_result,
+        needs_blood=True,
+        requested_metrics=["vitamin_d"],
+        time_operation="latest_marker",
+        knowledge_scope=KnowledgeScope.personal,
+    )
+    ldl = vitamin.model_copy(update={"requested_metrics": ["ldl"]})
+    first = blood.query(AuthenticatedPrincipal(subject_id="demo-user-001"), vitamin)
+    second = blood.query(AuthenticatedPrincipal(subject_id="demo-user-001"), ldl)
+    assert any(marker.key == "vitamin_d" and marker.value == 12.6 for report in first for marker in report.markers)
+    assert any(marker.key == "ldl" and marker.value == 138 for report in second for marker in report.markers)
