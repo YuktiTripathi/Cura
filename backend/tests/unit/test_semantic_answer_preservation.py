@@ -155,3 +155,31 @@ def test_follow_ups_are_capped_once_and_unsafe_ones_stay_rejected():
     brief = FollowUpBrief()
     assert not valid_question("Should I start a statin?", brief)
     assert not valid_question("Should I take a medicine?", brief)
+
+
+def test_semantic_dedup_keeps_primary_measured_finding():
+    from app.contracts.presentation import PresentedFinding, ResponseMode, StructuredResponse
+    from app.pipeline.semantic_blocks import suppress_duplicate_findings
+
+    primary = PresentedFinding(
+        label="LDL", value="142", numeric_value=142.0, unit="mg/dL",
+        reference_high=100.0, canonical_key="ldl",
+        source_type="blood_report", source_id="blood-002",
+    )
+    auxiliary = PresentedFinding(
+        label="LDL", value="142", canonical_key="ldl",
+        source_type="blood_report",
+    )
+    presentation = StructuredResponse(
+        mode=ResponseMode.single_value,
+        findings=[primary],
+        related_findings=[auxiliary],
+    )
+    semantic = SimpleNamespace(blocks=[
+        SimpleNamespace(type="metric", evidence=["blood.ldl.latest"], values=[], items=[]),
+    ])
+    result = suppress_duplicate_findings(presentation, semantic)
+    assert result.findings == [primary]
+    assert result.findings[0].reference_high == 100.0
+    assert result.findings[0].source_id == "blood-002"
+    assert result.related_findings == []
