@@ -245,3 +245,26 @@ def test_numeric_grounding_rejects_an_invented_measurement():
         {"measurements": [{"name": "HbA1c", "value": 6.1, "unit": "%"}]},
     )
     assert flagged
+
+
+def test_missing_bio_ai_score_note_does_not_add_other_risks():
+    from app.pipeline.reasoning import _missing_score_note
+
+    plan = build_query_plan("What is my Bio-AI diabetes score?")
+    ctx = _ctx(plan, risks=[
+        BioAIRisk(code="type_2_diabetes", name="Type 2 diabetes", score=68, status="high"),
+        BioAIRisk(code="dyslipidemia", name="Dyslipidemia", score=46, status="moderate"),
+    ])
+    note = _missing_score_note("What is my Bio-AI diabetes score?", ctx, "The risk is high.")
+    # The request must never cause a dump of every stored risk.
+    assert "Dyslipidemia" not in note
+
+
+def test_missing_bio_ai_score_note_handles_zero_without_guessing():
+    from app.pipeline.reasoning import _missing_score_note
+
+    plan = build_query_plan("What is my Bio-AI score?")
+    ctx = _ctx(plan, risks=[BioAIRisk(code="type_2_diabetes", name="Type 2 diabetes", score=0, status="low")])
+    assert "0" in _missing_score_note("What is my Bio-AI score?", ctx, "Low band.")
+    ctx.bio_ai_risks = []
+    assert _missing_score_note("What is my Bio-AI score?", ctx, "Low band.") == ""
