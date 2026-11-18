@@ -397,6 +397,17 @@ def _visible_markers(plan: QueryPlan, context: HealthContext) -> list:
         markers = dedupe_markers(markers)
     spec = plan.task_contract or {}
     if spec.get("goal") == "explain" and spec.get("personal_context") != "required":
+        # A named personal lab lookup still needs its verified result card, even
+        # when the task contract describes the surrounding answer as an explanation.
+        # General educational questions have no personal-data requirement.
+        explicit = set(plan.display_entities or []) | {
+            key for key in (plan.requested_metrics or []) if is_lab_key(key)
+        }
+        if plan.needs_personal_data and explicit:
+            return [
+                marker for marker in markers
+                if marker.key in explicit or canonical_marker_key(marker) in explicit
+            ][:6]
         return []
     card_keys = set(spec.get("card_keys") or [])
     if not spec.get("broad_summary") and spec.get("goal") in {"advise", "explain", "interpret", "lookup"}:
