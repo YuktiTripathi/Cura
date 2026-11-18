@@ -14,6 +14,8 @@ from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.bio_ai import BioAIReport
 from app.contracts.blood import BloodReport
+from app.contracts.lifestyle import LifestyleContext
+from app.contracts.questionnaire import QuestionnaireInstance
 from app.pipeline.me_service import schedule_latest_preload
 from app.providers.cache import peek
 from app.providers.registry import ProviderRegistry, get_registry
@@ -26,6 +28,8 @@ class HomeReadiness(BaseModel):
     status: Literal["loading", "ready", "partial", "unavailable"]
     blood_cached: bool
     bio_ai_cached: bool
+    lifestyle_cached: bool
+    questionnaire_cached: bool
     # This endpoint does not infer report availability from cache misses.
     # Clients should refresh /me once ready for personalized starter questions.
     refresh_me_when_ready: bool = True
@@ -41,18 +45,23 @@ def home_readiness(
     # With caching disabled, no readiness state can be inferred.
     if settings.health_data_cache_seconds <= 0:
         return HomeReadiness(status="unavailable", blood_cached=False, bio_ai_cached=False,
-                             refresh_me_when_ready=False)
+                             lifestyle_cached=False, questionnaire_cached=False, refresh_me_when_ready=False)
 
     blood = peek("blood", principal.subject_id, "latest", TypeAdapter(list[BloodReport]))
     bio = peek("bio_ai", principal.subject_id, "latest", TypeAdapter(list[BioAIReport]))
+    life = peek("lifestyle", principal.subject_id, "latest", TypeAdapter(LifestyleContext))
+    questionnaire = peek("questionnaire", principal.subject_id, "latest", TypeAdapter(list[QuestionnaireInstance]))
     # peek returns None on miss, [] on a cached empty result.
     # An empty list is still a completed provider read.
     blood_cached = blood is not None
     bio_cached = bio is not None
 
-    if blood_cached and bio_cached:
+    lifestyle_cached = life is not None
+    questionnaire_cached = questionnaire is not None
+    cached_count = sum((blood_cached, bio_cached, lifestyle_cached, questionnaire_cached))
+    if cached_count == 4:
         status = "ready"
-    elif blood_cached or bio_cached:
+    elif cached_count:
         status = "partial"
     else:
         status = "loading"
@@ -60,4 +69,5 @@ def home_readiness(
     if status != "ready":
         schedule_latest_preload(principal, registry)
 
-    return HomeReadiness(status=status, blood_cached=blood_cached, bio_ai_cached=bio_cached)
+    return HomeReadiness(status=status, blood_cached=blood_cached, bio_ai_cached=bio_cached,
+                         lifestyle_cached=lifestyle_cached, questionnaire_cached=questionnaire_cached)
