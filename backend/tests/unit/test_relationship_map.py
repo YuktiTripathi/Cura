@@ -133,7 +133,7 @@ def test_follow_ups_stay_on_the_latest_topic():
     assert kidney == ["What does my creatinine value indicate?"]
 
 
-def test_follow_up_cap_is_five_and_medication_is_still_rejected():
+def test_follow_up_cap_is_four_and_medication_is_still_rejected():
     from app.contracts.chat import ChatMeta, ChatResponse
     from app.contracts.followup import FollowUpSuggestion
     from app.pipeline.followup_generator import FollowUpBrief, valid_question
@@ -146,5 +146,5 @@ def test_follow_up_cap_is_five_and_medication_is_still_rejected():
         meta=ChatMeta(response_mode="rich"),
     )
     finalize_response(response, "Why is my LDL high?")
-    assert len(response.follow_ups) == 5
+    assert len(response.follow_ups) == 4
     assert not valid_question("Should I start a statin?", FollowUpBrief())
