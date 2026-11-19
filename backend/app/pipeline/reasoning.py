@@ -257,7 +257,7 @@ def _missing_score_note(message: str, context: HealthContext, answer: str) -> st
         missing.append(f"{label}: {token}{suffix}")
     if not missing:
         return ""
-    qualifier = "" if re.search(r"not (?:a )?diagnos(?:is|es)", answer or "", re.I) else " These are risk estimates, not diagnoses."
+    qualifier = "" if re.search(r"(?:not (?:a )?diagnos(?:is|es)|risk estimate)", answer or "", re.I) else " These are risk estimates, not diagnoses."
     return "Your Bio-AI report shows " + "; ".join(missing) + "." + qualifier
 
 
