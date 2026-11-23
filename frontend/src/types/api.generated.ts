@@ -1050,8 +1050,34 @@ export interface components {
             status: "looking_good" | "worth_attention" | "needs_closer_attention" | "not_assessed";
             /** Status Label */
             status_label: string;
+            story?: components["schemas"]["CategoryStory"] | null;
             /** Summary */
             summary: string;
+        };
+        /** CategoryStory */
+        CategoryStory: {
+            /** Bio Ai Limitations */
+            bio_ai_limitations: string;
+            /** Biomarker Meanings */
+            biomarker_meanings: {
+                [key: string]: string;
+            };
+            /** Improvement Plan */
+            improvement_plan: components["schemas"]["ActionItem"][];
+            /** Influences */
+            influences: string[];
+            /** Monitoring */
+            monitoring: string[];
+            /** Questions */
+            questions: string[];
+            /** Risk Explanations */
+            risk_explanations: {
+                [key: string]: string;
+            };
+            /** Self Reported */
+            self_reported: components["schemas"]["SelfReportedFactor"][];
+            /** Understand Body */
+            understand_body: string;
         };
         /** ChatMeta */
         ChatMeta: {
@@ -1495,6 +1521,11 @@ export interface components {
          */
         EducationNote: {
             /**
+             * Common Factors
+             * @default
+             */
+            common_factors: string;
+            /**
              * If High
              * @default
              */
@@ -1651,6 +1682,12 @@ export interface components {
             medical_name: string;
             /** Name */
             name: string;
+            /** Previous On */
+            previous_on?: string | null;
+            /** Previous Score */
+            previous_score?: number | null;
+            /** Previous Value */
+            previous_value?: number | null;
             /** Reference High */
             reference_high?: number | null;
             /** Reference Low */
@@ -1671,6 +1708,8 @@ export interface components {
             status: "within_range" | "above_range" | "below_range" | "critical" | "no_range" | "no_value" | "risk_healthy" | "risk_raised" | "risk_unknown";
             /** Status Label */
             status_label: string;
+            /** Status Source */
+            status_source?: ("report_flag" | "reference_range" | "none") | null;
             /** Unit */
             unit?: string | null;
             /** Value */
@@ -2993,6 +3032,31 @@ export interface components {
             score?: number | null;
             /** Status */
             status?: string | null;
+        };
+        /** SelfReportedFactor */
+        SelfReportedFactor: {
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Recorded At */
+            recorded_at?: string | null;
+            /**
+             * Source
+             * @default questionnaire
+             * @enum {string}
+             */
+            source: "questionnaire" | "profile";
+            /**
+             * Source Type
+             * @default self_reported
+             * @constant
+             */
+            source_type: "self_reported";
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value: string;
         };
         /** SemanticResponse */
         SemanticResponse: {

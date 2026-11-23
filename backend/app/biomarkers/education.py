@@ -16,7 +16,12 @@ from app.biomarkers.registry import normalize_label
 from app.contracts.unified_health import EducationNote
 
 _FILE = Path(__file__).parent / "data" / "biomarker_education_v1.json"
-_LABELS = {"What it is": "what_it_is", "If high or positive": "if_high", "If low or negative": "if_low", "What to do next": "next_step"}
+_LABELS = {
+    "What it is": "what_it_is",
+    "If high or positive": "if_high",
+    "If low or negative": "if_low",
+    "What to do next": "next_step",
+}
 # Report test ids whose lab spelling does not match the education name.
 _CANONICAL_OVERRIDES = {
     "urine_rbc": "RBC (Urine)",
@@ -36,7 +41,7 @@ def _load() -> tuple[dict[str, EducationNote], dict[str, str]]:
     by_name: dict[str, EducationNote] = {}
     for item in raw:
         fields = {_LABELS[b["label"]]: b["text"].strip() for b in item["bullets"] if b["label"] in _LABELS}
-        by_name[normalize_label(item["biomarker"])] = EducationNote(name=item["biomarker"], **fields)
+        by_name[normalize_label(item["biomarker"])] = EducationNote(name=item["biomarker"], common_factors=item.get("common_factors", ""), **fields)
     # A test id is only trusted when exactly one education entry resolves to it (the resolver folds
     # "Sugar", "Fasting Sugar" and "Average Blood Glucose" together, so those are matched by name).
     seen: dict[str, list[str]] = {}

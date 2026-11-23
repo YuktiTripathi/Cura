@@ -113,7 +113,10 @@ def _follow_ups(card: CategoryCard, p) -> list[str]:
     qs: list[str] = []
     if out:
         f = out[0]
-        qs.append(f"Why is my {f.name} {'high' if f.status == 'above_range' else 'low'}?")
+        if f.status == "critical":
+            qs.append(f"What does the critical flag on my {f.name} result mean?")
+        else:
+            qs.append(f"Why is my {f.name} {'high' if f.status == 'above_range' else 'low'}?")
     if raised:
         qs.append(f"Why is my {raised[0].name} risk increased?")
     if out and healthy:

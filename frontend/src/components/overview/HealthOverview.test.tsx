@@ -132,3 +132,40 @@ describe("About this test", () => {
     expect(screen.queryByRole("button", { name: "About this test" })).toBeNull();
   });
 });
+
+it("renders the six story sections and keeps each evidence source visible", async () => {
+  const onAsk = vi.fn();
+  vi.spyOn(api, "getHealthCategory").mockResolvedValue({
+    ...detail,
+    story: {
+      understand_body: "Your liver processes food.",
+      bio_ai_limitations: "A prediction cannot diagnose a condition.",
+      risk_explanations: { "risk:nafld": "Your report placed this risk in the healthy band." },
+      influences: ["The results come from two sources."],
+      self_reported: [{ source: "questionnaire", source_type: "self_reported", key: "diet_preference", label: "diet pattern", value: "Vegetarian" }],
+      biomarker_meanings: { a: "This is above the range used by your lab." },
+      improvement_plan: [{ icon: "check", evidence_status: "rule_based_unreviewed", title: "Review your results", detail: "Discuss the report at your next visit." }],
+      monitoring: ["Ask whether the result should be checked again."],
+      questions: ["Why is my bilirubin high?"],
+    },
+  });
+  wrap(<HealthOverviewView onAsk={onAsk} openId="liver_health" onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
+  for (const name of [
+    "Understand your body",
+    "Understand your Bio-AI assessment",
+    "What could influence your health?",
+    "Understand your biomarkers",
+    "Your personal improvement plan",
+    "Your next steps",
+  ]) {
+    expect(await screen.findByRole("heading", { name })).toBeTruthy();
+  }
+  expect(screen.getByText("Self-reported · Questionnaire")).toBeTruthy();
+  expect(screen.getByText("Your report placed this risk in the healthy band.")).toBeTruthy();
+  expect(screen.getByText("This is above the range used by your lab.")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "About this test" }));
+  expect(screen.getByText("If higher than the range")).toBeTruthy();
+  expect(screen.getByText("If lower than the range")).toBeTruthy();
+  fireEvent.click(screen.getByRole("button", { name: "Why is my bilirubin high?" }));
+  expect(onAsk).toHaveBeenCalledWith("Why is my bilirubin high?", expect.objectContaining({ entry_point: "health_area" }));
+});

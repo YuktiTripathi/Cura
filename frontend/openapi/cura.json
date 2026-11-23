@@ -1204,6 +1204,16 @@
             "title": "Status Label",
             "type": "string"
           },
+          "story": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CategoryStory"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "summary": {
             "title": "Summary",
             "type": "string"
@@ -1221,6 +1231,80 @@
           "primary_action"
         ],
         "title": "CategoryDetail",
+        "type": "object"
+      },
+      "CategoryStory": {
+        "properties": {
+          "bio_ai_limitations": {
+            "title": "Bio Ai Limitations",
+            "type": "string"
+          },
+          "biomarker_meanings": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Biomarker Meanings",
+            "type": "object"
+          },
+          "improvement_plan": {
+            "items": {
+              "$ref": "#/components/schemas/ActionItem"
+            },
+            "title": "Improvement Plan",
+            "type": "array"
+          },
+          "influences": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Influences",
+            "type": "array"
+          },
+          "monitoring": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Monitoring",
+            "type": "array"
+          },
+          "questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Questions",
+            "type": "array"
+          },
+          "risk_explanations": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Risk Explanations",
+            "type": "object"
+          },
+          "self_reported": {
+            "items": {
+              "$ref": "#/components/schemas/SelfReportedFactor"
+            },
+            "title": "Self Reported",
+            "type": "array"
+          },
+          "understand_body": {
+            "title": "Understand Body",
+            "type": "string"
+          }
+        },
+        "required": [
+          "understand_body",
+          "bio_ai_limitations",
+          "risk_explanations",
+          "influences",
+          "self_reported",
+          "biomarker_meanings",
+          "improvement_plan",
+          "monitoring",
+          "questions"
+        ],
+        "title": "CategoryStory",
         "type": "object"
       },
       "ChatMeta": {
@@ -2812,6 +2896,11 @@
       "EducationNote": {
         "description": "Reviewed plain-language text about a test. General education, never a reading of this result.",
         "properties": {
+          "common_factors": {
+            "default": "",
+            "title": "Common Factors",
+            "type": "string"
+          },
           "if_high": {
             "default": "",
             "title": "If High",
@@ -3258,6 +3347,39 @@
             "title": "Name",
             "type": "string"
           },
+          "previous_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous On"
+          },
+          "previous_score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Score"
+          },
+          "previous_value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Value"
+          },
           "reference_high": {
             "anyOf": [
               {
@@ -3328,6 +3450,22 @@
           "status_label": {
             "title": "Status Label",
             "type": "string"
+          },
+          "status_source": {
+            "anyOf": [
+              {
+                "enum": [
+                  "report_flag",
+                  "reference_range",
+                  "none"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Status Source"
           },
           "unit": {
             "anyOf": [
@@ -7100,6 +7238,66 @@
           "name"
         ],
         "title": "ScoreOverview",
+        "type": "object"
+      },
+      "SelfReportedFactor": {
+        "properties": {
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          },
+          "source": {
+            "default": "questionnaire",
+            "enum": [
+              "questionnaire",
+              "profile"
+            ],
+            "title": "Source",
+            "type": "string"
+          },
+          "source_type": {
+            "const": "self_reported",
+            "default": "self_reported",
+            "title": "Source Type",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "title": "Value",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "value"
+        ],
+        "title": "SelfReportedFactor",
         "type": "object"
       },
       "SemanticResponse": {

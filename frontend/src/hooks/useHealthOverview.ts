@@ -7,7 +7,7 @@ export function useHealthOverview() {
   return useQuery({ queryKey: queryKeys.healthOverview, queryFn: getHealthOverview, staleTime: 5 * 60_000, retry: false });
 }
 
-/** The same cached wording as the overview, so opening a category makes no extra model request. */
+/** Category detail and its evidence-bound explanation. */
 export function useHealthCategory(categoryId: string | null) {
   return useQuery({
     queryKey: queryKeys.healthCategory(categoryId ?? ""),

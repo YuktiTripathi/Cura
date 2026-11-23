@@ -39,6 +39,7 @@ class EducationNote(BaseModel):
     if_high: str = ""
     if_low: str = ""
     next_step: str = ""
+    common_factors: str = ""
 
 
 class Finding(BaseModel):
@@ -51,6 +52,7 @@ class Finding(BaseModel):
     status_label: str
     # Measured
     value: float | None = None
+    status_source: Literal["report_flag", "reference_range", "none"] | None = None
     unit: str | None = None
     reference_low: float | None = None
     reference_high: float | None = None
@@ -60,6 +62,9 @@ class Finding(BaseModel):
     classification: str | None = None
     measured_on: str | None = None
     report_id: str | None = None
+    previous_score: float | None = None
+    previous_value: float | None = None
+    previous_on: str | None = None
     important: bool = False
     education: EducationNote | None = None
     # How far this finding can be relied on. It follows from what the report supplied, never from a guess.
@@ -144,7 +149,30 @@ class Relationship(BaseModel):
     rules_version: str = ""
 
 
+class SelfReportedFactor(BaseModel):
+    source_type: Literal["self_reported"] = "self_reported"
+    source: Literal["questionnaire", "profile"] = "questionnaire"
+    key: str
+    label: str
+    value: str
+    unit: str | None = None
+    recorded_at: str | None = None
+
+
+class CategoryStory(BaseModel):
+    understand_body: str
+    bio_ai_limitations: str
+    risk_explanations: dict[str, str]
+    influences: list[str]
+    self_reported: list[SelfReportedFactor]
+    biomarker_meanings: dict[str, str]
+    improvement_plan: list[ActionItem]
+    monitoring: list[str]
+    questions: list[str]
+
+
 class CategoryDetail(CategoryCard):
+    story: CategoryStory | None = None
     about: str = ""
     findings: list[Finding] = Field(default_factory=list)
     interpretation: list[str] = Field(default_factory=list)
