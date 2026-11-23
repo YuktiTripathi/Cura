@@ -2776,6 +2776,40 @@
         "title": "DocumentPageOut",
         "type": "object"
       },
+      "EducationNote": {
+        "description": "Reviewed plain-language text about a test. General education, never a reading of this result.",
+        "properties": {
+          "if_high": {
+            "default": "",
+            "title": "If High",
+            "type": "string"
+          },
+          "if_low": {
+            "default": "",
+            "title": "If Low",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "next_step": {
+            "default": "",
+            "title": "Next Step",
+            "type": "string"
+          },
+          "what_it_is": {
+            "title": "What It Is",
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "what_it_is"
+        ],
+        "title": "EducationNote",
+        "type": "object"
+      },
       "EvidenceItem": {
         "properties": {
           "chunk_id": {
@@ -3120,6 +3154,16 @@
               }
             ],
             "title": "Classification"
+          },
+          "education": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/EducationNote"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "explain": {
             "default": "",

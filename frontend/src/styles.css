@@ -1320,3 +1320,7 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .follow-list button { display: flex; justify-content: space-between; text-align: left; border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 12px; background: var(--surface); cursor: pointer; }
 @media (max-width: 520px) { .unified-numbers { grid-template-columns: 1fr; } .finding-row { flex-direction: column; } .finding-side { text-align: left; } }
 .category-lead { margin: 0; font-size: 1.05rem; line-height: 1.5; }
+.finding-row { flex-wrap: wrap; }
+.about-test { flex-basis: 100%; }
+.about-test ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
+.about-test p { margin: 2px 0 0; color: var(--text-muted); }

@@ -1402,6 +1402,31 @@ export interface components {
             /** Text */
             text: string;
         };
+        /**
+         * EducationNote
+         * @description Reviewed plain-language text about a test. General education, never a reading of this result.
+         */
+        EducationNote: {
+            /**
+             * If High
+             * @default
+             */
+            if_high: string;
+            /**
+             * If Low
+             * @default
+             */
+            if_low: string;
+            /** Name */
+            name: string;
+            /**
+             * Next Step
+             * @default
+             */
+            next_step: string;
+            /** What It Is */
+            what_it_is: string;
+        };
         /** EvidenceItem */
         EvidenceItem: {
             /** Chunk Id */
@@ -1509,6 +1534,7 @@ export interface components {
         Finding: {
             /** Classification */
             classification?: string | null;
+            education?: components["schemas"]["EducationNote"] | null;
             /**
              * Explain
              * @default

@@ -276,3 +276,40 @@ def test_unknown_category_is_404_and_empty_member_gets_an_empty_overview(no_mode
     assert http.get("/api/v1/me/health-overview/nope", headers=AS_DEMO).status_code == 404
     body = http.get("/api/v1/me/health-overview", headers={"X-Cura-User-Id": "no-such-member"}).json()
     assert body["state"] == "no_reports" and body["categories"] == []
+
+
+# ---- reviewed test explanations -----------------------------------------------------------
+from app.biomarkers.education import education_for  # noqa: E402
+
+
+def test_explanations_come_from_the_reviewed_file_and_attach_to_measured_findings_only():
+    d = build_category_detail("liver_health", blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
+    alt = next(f for f in d.findings if f.name.startswith("SGPT"))
+    assert alt.education and alt.education.what_it_is.startswith("An enzyme mostly found in liver cells")
+    assert alt.explain and alt.explain.endswith(".")
+    assert next(f for f in d.findings if f.source_type == "predicted_risk").education is None
+
+
+def test_cards_do_not_carry_the_long_explanations():
+    ov = build_unified_overview(blood(LIVER_OUT), None)
+    assert all(f.education is None for c in ov.categories for f in c.important_findings)
+
+
+def test_misspelt_lab_names_and_look_alike_tests_find_the_right_text():
+    assert education_for("hdl_cholesterol_direct", "HDL Cholestrol Direct").name == "HDL Cholesterol Direct"
+    assert education_for("urine_rbc", "RBC").name == "RBC (Urine)"
+    assert education_for("fasting_sugar", "Fasting Sugar").name == "Fasting Sugar"
+    assert education_for("urine_sugar", "Sugar").name == "Sugar"
+    assert education_for(None, "No Such Test") is None
+
+
+def test_the_education_text_never_uses_dashes_and_no_test_says_the_member_is_abnormal():
+    import json
+    from pathlib import Path
+
+    import app.biomarkers.education as edu
+
+    text = Path(edu._FILE).read_text(encoding="utf-8")
+    assert "—" not in text
+    for item in json.loads(text)["biomarkers"]:
+        assert len(item["bullets"]) == 4

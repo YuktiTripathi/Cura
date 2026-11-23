@@ -23,7 +23,7 @@ const overview = {
 const detail = {
   ...card(), about: "Your liver cleans your blood.", interpretation: ["A healthy risk does not cancel abnormal results."], insight: "Different tests tell different things.",
   findings: [
-    { id: "a", source_type: "measured", name: "Direct Bilirubin", status: "above_range", status_label: "Above range", value: 0.5, unit: "mg/dL", reference_low: 0, reference_high: 0.3, important: true },
+    { id: "a", source_type: "measured", name: "Direct Bilirubin", status: "above_range", status_label: "Above range", value: 0.5, unit: "mg/dL", reference_low: 0, reference_high: 0.3, important: true, explain: "A waste substance your liver helps remove.", education: { name: "Bilirubin Direct", what_it_is: "A waste substance your liver has processed.", if_high: "A high result may mean bile is not moving well.", if_low: "A low result is usually not a concern.", next_step: "Discuss it with a doctor." } },
     { id: "risk:nafld", source_type: "predicted_risk", name: "Fatty Liver", status: "risk_healthy", status_label: "Healthy predicted risk", score: 12, classification: "mild", important: false },
     { id: "b", source_type: "measured", name: "Albumin", status: "within_range", status_label: "Within range", value: 4, unit: "g/dL", important: false },
   ],
@@ -81,5 +81,23 @@ describe("My Health Overview", () => {
     vi.spyOn(api, "getHealthOverview").mockResolvedValue({ ...overview, available: false, categories: [] } as unknown as UnifiedOverview);
     wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
     expect(await screen.findByText(/No blood results or Bio-AI report/)).toBeTruthy();
+  });
+});
+
+describe("About this test", () => {
+  const f = detail.findings![0];
+  it("opens reviewed text and shows only the direction the report's range points to", () => {
+    render(<ul><FindingRow f={f} /></ul>);
+    expect(screen.queryByText("A high result may mean bile is not moving well.")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "About this test" }));
+    expect(screen.getByText("A waste substance your liver has processed.")).toBeTruthy();
+    expect(screen.getByText("A high result may mean bile is not moving well.")).toBeTruthy();
+    expect(screen.queryByText("A low result is usually not a concern.")).toBeNull();
+    expect(screen.getByText("Discuss it with a doctor.")).toBeTruthy();
+  });
+
+  it("has no button for a finding without reviewed text", () => {
+    render(<ul><FindingRow f={{ ...f, education: null }} /></ul>);
+    expect(screen.queryByRole("button", { name: "About this test" })).toBeNull();
   });
 });

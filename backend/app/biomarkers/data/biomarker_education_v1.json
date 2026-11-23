@@ -1,0 +1,2340 @@
+{
+  "metadata": {
+    "version": "1.2-bullet-format",
+    "language": "en",
+    "audience": "non-medical readers (simple language)",
+    "marker_count": 105,
+    "important_rules": [
+      "Use the laboratory reference range, units, actual result, and patient context before deciding if a result is high, low, or normal.",
+      "These descriptions are educational, not individual diagnoses or fixed medical advice.",
+      "For qualitative urine tests, interpret positive/negative instead of high/low; some tests require the actual finding.",
+      "Do not infer a disease from a ratio, screening index, or isolated marker.",
+      "Urgent symptoms or critical results require clinical escalation.",
+      "Do not claim a marker is abnormal when no result is available."
+    ],
+    "aliases_and_duplicates": {
+      "Fasting Sugar": "listed twice; one entry",
+      "HbA1c": "listed twice; one entry",
+      "Average Blood Glucose": "listed twice; one entry",
+      "Total Testosterone": "listed twice; one entry",
+      "Cortisol": "listed twice; one entry",
+      "ESR Automated / ESR": "two lab labels retained for matching",
+      "RBC": "disambiguated as Red Blood Cells (RBC) for CBC and RBC (Urine) for urinalysis",
+      "Nitrate": "commonly means urine nitrite; verify lab label",
+      "GK Index": "lab-specific formula/cutoff must be verified"
+    },
+    "description": "Plain-language explanations formatted entirely as bullets. Each marker has four bullets: meaning, high/positive, low/negative, next step. General educational content, not a patient-specific interpretation."
+  },
+  "biomarkers": [
+    {
+      "biomarker": "Albumin",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A protein made by your liver that helps keep fluid in your blood and carries substances around your body. You can think of it as one of the proteins that helps keep fluid where it belongs, inside your blood vessels."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher level often means you may be dehydrated. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower level can happen with poor nutrition, liver or kidney problems, or inflammation. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Review it with total protein, kidney and liver tests; ask a clinician if it stays low. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Alkaline Phosphatase",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme mainly linked to your liver, bile tubes, and bones. Because both bones and the liver make it, this result alone cannot tell which part of the body is responsible."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen when bile flow is blocked or bones are growing or changing; pregnancy can also raise it. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is less common and may relate to nutrition or certain health conditions. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check it alongside GGT and other liver tests; age and pregnancy matter. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Bilirubin Direct",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A waste substance your liver has processed so your body can remove it. Bilirubin starts as waste from old red blood cells. Your liver changes it into a form that can leave your body in bile."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may mean your liver or bile tubes are having trouble moving bilirubin out. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not a concern. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Discuss the result with a doctor and compare it with total bilirubin, ALT, AST, and ALP. Yellow skin or eyes, fever, severe stomach pain, or feeling very unwell needs prompt medical care. Avoid alcohol until the cause is clear."
+        }
+      ]
+    },
+    {
+      "biomarker": "Bilirubin Total",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The total amount of bilirubin, a yellow waste substance, in your blood. Think of this as the combined amount of bilirubin before and after the liver processes it."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can cause yellow eyes or skin and may involve the liver, bile flow, or faster breakdown of red blood cells. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not a concern. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare direct and indirect bilirubin and other liver results; get checked if symptoms appear. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "GGTP",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme also called GGT that helps give clues about your liver and bile tubes. Doctors often check it when another liver-related test is abnormal, because it can help point toward the liver or bile system."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with liver irritation, bile-flow problems, alcohol use, or certain medicines. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not a concern. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with ALP, ALT, and AST and review alcohol and medicines with a clinician. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Proteins Serum",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The total amount of major proteins in your blood, including albumin and globulins. These proteins help your body carry substances, hold on to fluid, and fight infections."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may happen with dehydration or increased immune proteins. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can relate to nutrition, liver problems, kidney protein loss, or other illnesses. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at albumin and globulin separately and discuss persistent changes. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "SGOT (AST)",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme found in the liver, muscles, and other tissues. This substance normally stays inside cells. Higher blood levels can be a clue that some cells have been damaged."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may mean liver or muscle cells have been irritated or injured. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not important. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with ALT, CK, symptoms, and recent hard exercise; do not assume it is only a liver issue. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "SGPT (ALT)",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme mostly found in liver cells. Most ALT is inside liver cells, so a rise can be an early clue that those cells are under strain."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may mean your liver is irritated or injured; medicines and fatty liver are some possible causes. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not important. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with AST and other liver results, and review medicines and alcohol. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Bilirubin Indirect",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The form of bilirubin that has not yet been processed by your liver. This is bilirubin on its way to being handled by the liver, before the liver changes it into a form it can remove."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen when red blood cells break down faster or the liver processes bilirubin more slowly; a harmless inherited pattern is also possible. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not a concern. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret it with total/direct bilirubin and blood counts. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Globulin",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A group of blood proteins, including proteins that help your immune system. Some of these proteins are antibodies, which help your body recognise and fight germs."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may occur with inflammation, infection, or increased immune proteins. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen when certain immune proteins are low or protein is lost. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with albumin, total protein, and the reason for testing. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "A/G Ratio",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison between two groups of blood proteins: albumin and globulin. This is a comparison, not a separate substance in your blood. Either side of the comparison can change the result."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high ratio can mean relatively more albumin or less globulin. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low ratio can mean less albumin or more globulin. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the actual albumin and globulin values; the ratio alone cannot identify a disease. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "SGOT/SGPT Ratio",
+      "category": "liver",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of two enzymes, AST and ALT, that can provide context about liver and muscle health. The ratio compares two results, so it can change even when just one of those numbers moves."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher ratio can occur for several reasons, including muscle injury or some liver conditions. Liver-related results are usually understood together because different tests look at different parts of liver function."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower ratio simply means ALT is higher relative to AST and has no single diagnosis. A result outside the range is a clue, not proof of liver disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Use the actual AST and ALT levels, not the ratio alone. Your clinician may check other liver markers, symptoms, medicines, and past results before deciding whether more testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Cholesterol Total",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The overall amount of cholesterol in your blood. Your body needs some cholesterol, but the different types matter much more than the total on its own."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can point to higher heart and blood-vessel risk, depending on your cholesterol types and other risks. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is often not harmful but can sometimes reflect another health issue. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Focus on LDL, HDL, non-HDL, and overall heart risk rather than this number alone. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "HDL Cholesterol Direct",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Often called good cholesterol; it helps carry some cholesterol away from blood vessels. HDL is often called “good” cholesterol, but it does not cancel out high LDL or other heart risks."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher HDL is often linked with lower heart risk, but very high levels are not always protective. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low HDL can be a sign of higher heart risk. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at LDL, triglycerides, smoking, activity, and overall heart risk. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "Triglycerides",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A type of fat in your blood that stores energy. Your body uses triglycerides for energy and stores the extra for later."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can raise heart risk; very high levels can cause pancreatitis. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level is usually not a concern. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Review food, alcohol, diabetes risk, medicines, and whether the test was fasting. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "Non-HDL Cholesterol",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "All the cholesterol types that can build up in blood vessels, added together. It puts several cholesterol types that can contribute to blocked arteries into one number."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result means more cholesterol that may contribute to clogged arteries. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is generally favorable, though context matters. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Use it with LDL and overall heart risk to decide what needs attention. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "CHOL/HDL Ratio",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of total cholesterol with HDL, the so-called good cholesterol. It compares all cholesterol with HDL. It is not a direct measure of a blocked artery."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher ratio can suggest less favorable cholesterol balance. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower ratio is often more favorable but can hide high LDL. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check LDL and non-HDL directly; the ratio is not a diagnosis. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "LDL Cholesterol Calculated",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Often called bad cholesterol because too much can build up in blood-vessel walls. LDL is often called “bad” cholesterol because too much can help fatty deposits build up in arteries over time."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can increase long-term heart and stroke risk. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level is generally beneficial for heart health. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Discuss your LDL target based on age and heart-risk factors; calculated LDL can be less reliable with high triglycerides. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "VLDL Cholesterol",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A cholesterol-carrying particle linked mainly to triglycerides. VLDL mainly helps move triglycerides through your blood, and the result is often estimated."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result often goes along with high triglycerides and can add to heart risk. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not a concern. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Review triglycerides and non-HDL cholesterol; some labs estimate VLDL rather than measure it. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "LDL/HDL Cholesterol",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of LDL with HDL cholesterol. This number simply compares LDL with HDL, rather than measuring a new kind of cholesterol."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher ratio may suggest a less healthy cholesterol balance. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower ratio is often more favorable, but not always. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Focus on actual LDL and non-HDL levels and overall risk. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "HDL/LDL Cholesterol Ratio",
+      "category": "lipid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of HDL with LDL cholesterol, in the opposite direction from LDL/HDL. This is the same two cholesterol values compared in the opposite order from LDL/HDL."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher ratio often means more HDL relative to LDL, but cannot guarantee protection. Heart health depends on the full cholesterol picture, not one number."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower ratio may mean less HDL compared with LDL. Age, blood pressure, diabetes, smoking, and family history can change how important a result is."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the actual LDL and HDL values rather than relying on this ratio. The most useful next step is to review your full lipid profile and overall heart risk with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "Absolute Basophils Count",
+      "category": "white_abs",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of basophils, a rare kind of white blood cell involved in immune reactions. The “absolute” count means the estimated number of these cells, rather than their share of all white cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can occur with allergies, inflammation, and occasionally blood disorders. White cell counts can change temporarily when your body reacts to illness or medicines."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count is common and usually not important. A single count cannot tell you exactly what infection or condition you have."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with the full white blood cell count and symptoms. Check the full blood count and any symptoms; seek medical advice if a change is large or persists."
+        }
+      ]
+    },
+    {
+      "biomarker": "Absolute Eosinophils Count",
+      "category": "white_abs",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of eosinophils, white blood cells involved in allergies and some infections. Eosinophils can rise when the immune system reacts to allergies, certain parasites, or other causes."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can happen with allergies, asthma, parasites, or reactions to medicines. White cell counts can change temporarily when your body reacts to illness or medicines."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count is usually not a concern. A single count cannot tell you exactly what infection or condition you have."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at symptoms, medicines, and the rest of your blood count. Check the full blood count and any symptoms; seek medical advice if a change is large or persists."
+        }
+      ]
+    },
+    {
+      "biomarker": "Absolute Lymphocyte Count",
+      "category": "white_abs",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of lymphocytes, white blood cells that help fight infections. Lymphocytes are immune cells that help your body recognise germs and remember them."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can follow some infections and, less often, other blood conditions. White cell counts can change temporarily when your body reacts to illness or medicines."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count may occur with illness, stress, certain medicines, or immune problems. A single count cannot tell you exactly what infection or condition you have."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the overall white count and whether the change persists. Check the full blood count and any symptoms; seek medical advice if a change is large or persists."
+        }
+      ]
+    },
+    {
+      "biomarker": "Absolute Monocyte Count",
+      "category": "white_abs",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of monocytes, white blood cells that help clean up germs and damaged cells. Monocytes help clear away germs and damaged material during the immune response."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can occur during or after infection or with inflammation. White cell counts can change temporarily when your body reacts to illness or medicines."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count usually has little meaning alone but can occur with bone marrow suppression. A single count cannot tell you exactly what infection or condition you have."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read it with the other blood cell counts and symptoms. Check the full blood count and any symptoms; seek medical advice if a change is large or persists."
+        }
+      ]
+    },
+    {
+      "biomarker": "Absolute Neutrophil Count",
+      "category": "white_abs",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of neutrophils, white blood cells that are especially important against bacterial infections. Neutrophils are among the first white blood cells that respond to many infections."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count often occurs with infection, inflammation, stress, or steroid medicines. White cell counts can change temporarily when your body reacts to illness or medicines."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count may make it harder to fight certain infections, especially if very low. A single count cannot tell you exactly what infection or condition you have."
+        },
+        {
+          "label": "What to do next",
+          "text": "A fever with a severely low count needs urgent medical care; compare with WBC and medicines. Check the full blood count and any symptoms; seek medical advice if a change is large or persists."
+        }
+      ]
+    },
+    {
+      "biomarker": "ESR Automated",
+      "category": "inflam",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A test that looks for general inflammation in the body; it does not say where the inflammation is. This test times how quickly red blood cells settle in a tube; it does not directly identify the cause of inflammation."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen with infections, inflammation, anemia, and many other causes. Inflammation is one way your body responds to illness or injury."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not a concern. This test cannot show where the problem is or prove a particular disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Use it with symptoms and other tests; ESR alone cannot tell what illness you have. Compare with symptoms, other tests, and whether the result stays raised."
+        }
+      ]
+    },
+    {
+      "biomarker": "Hemoglobin (Hb)",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The part of red blood cells that carries oxygen around your body. Hemoglobin is the part of your red blood cells that carries oxygen around your body."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen with dehydration or when your body makes more red blood cells. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result means anemia may be present, which can cause tiredness or breathlessness. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check RBC, MCV, ferritin, B12, and symptoms; severe breathlessness or chest pain needs urgent care. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "MCH",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The average amount of oxygen-carrying hemoglobin inside one red blood cell. This tells you roughly how much oxygen-carrying hemoglobin is inside one red blood cell."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result often goes with larger red blood cells. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen with iron deficiency or some inherited blood traits. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read it with MCV, MCHC, hemoglobin, and iron studies. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "MCHC",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "How concentrated hemoglobin is inside your red blood cells. This looks at how concentrated hemoglobin is inside your red blood cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can be due to unusual red-cell changes or a lab-related issue. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen with iron deficiency and some inherited blood traits. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret alongside hemoglobin, MCV, and the blood smear if ordered. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "MCV",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The average size of your red blood cells. This describes the average size of your red blood cells, not how many you have."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high value means larger red blood cells and can occur with low B12, low folate, alcohol use, or other causes. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low value means smaller red blood cells and often occurs with iron deficiency or thalassemia trait. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Use hemoglobin, ferritin, B12, and other CBC results to understand the cause. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "MPV (Mean Platelet Volume)",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The average size of platelets, the tiny blood pieces that help stop bleeding. Platelets are tiny blood parts that help stop bleeding. MPV tells you their average size."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher number means platelets are larger on average; it has many possible causes. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower number means platelets are smaller on average and often means little alone. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read it together with platelet count; MPV alone is not a diagnosis. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "PCV/Hematocrit",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of your blood made up of red blood cells. It is the percentage of your blood that is made up of red blood cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with dehydration or an increased number of red blood cells. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen with anemia or blood loss. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with hemoglobin and RBC count. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Platelet Count",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "How many platelets you have to help blood clot and stop bleeding. Platelets act like tiny repair helpers that come together when you bleed."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count may happen after inflammation, with iron deficiency, or for other reasons. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count can increase bleeding risk, especially when very low. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Unusual bleeding, black stools, or new widespread bruising needs prompt medical attention. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "WBC",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The total number of white blood cells that help protect you from infection. White blood cells are part of the team your body uses to fight infections and respond to inflammation."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can happen with infection, inflammation, stress, medicines, or less common blood conditions. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count may occur with viral illness, medicines, or bone marrow problems. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check which white-cell type changed and whether you have fever or infection symptoms. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "RDW",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A measure of how different your red blood cells are in size. This tells you how much your red blood cells differ in size from one another."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result means red blood cells vary more in size, sometimes from iron, B12, or folate problems. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not meaningful. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with MCV and hemoglobin rather than treating RDW alone. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Neutrophils",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of your white blood cells that are neutrophils, which help fight bacteria. This is usually the percentage of white blood cells that are neutrophils, not their total number."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage may happen with infection or stress, or because other white-cell types are lower. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage may happen with viral illness or because other cells are higher. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "The absolute neutrophil count is more useful for judging infection risk. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Eosinophils",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of white blood cells involved in allergies and some parasite responses. This percentage shows how many of your white blood cells belong to the eosinophil group."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage may be seen with allergies, asthma, parasites, or medicine reactions. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage usually is not a concern. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the absolute eosinophil count for a clearer picture. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Lymphocytes",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of white blood cells involved in your immune defense. This percentage shows the share of white cells that are lymphocytes."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage can occur during some viral infections or when other cell types are lower. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage may appear with stress, steroids, or illness. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "The absolute lymphocyte count helps show whether the number is truly high or low. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Monocytes",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of white blood cells that help clean up infections and damaged tissue. This percentage shows the share of white cells that are monocytes."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage may happen while recovering from infection or with inflammation. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage often means little on its own. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the absolute monocyte count and other CBC values. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Basophils",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of a rare white blood cell involved in allergic and immune reactions. This percentage shows the share of white cells that are basophils."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage may occur with allergies, inflammation, or because other cells are lower. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage is common and usually not concerning. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check the absolute count before drawing conclusions. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "RDW-CV",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A common way labs report how much your red blood cell sizes vary. This is one way of expressing how different your red blood cells are in size."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result means your red blood cells are more uneven in size. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually does not matter. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read with hemoglobin, MCV, ferritin, and B12. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "Mentzer Index (MCV/RCC)",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A calculated number that can help doctors compare two possible causes of small red blood cells: iron deficiency and thalassemia trait. This is a calculation sometimes used to help sort out why red blood cells are unusually small."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher index may lean toward iron deficiency in the right setting, but is not proof. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower index may lean toward thalassemia trait in the right setting, but is not proof. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Do not use it for diagnosis without ferritin and, when needed, hemoglobin testing. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant. These are screening clues only; they cannot confirm iron deficiency or an inherited blood condition."
+        }
+      ]
+    },
+    {
+      "biomarker": "Red Blood Cells (RBC)",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of red blood cells that carry oxygen around your body. These cells carry oxygen from your lungs to the rest of your body."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high count can occur with dehydration or conditions that increase red blood cells. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low count may happen with anemia or blood loss. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with hemoglobin, hematocrit, and MCV. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant."
+        }
+      ]
+    },
+    {
+      "biomarker": "GK Index",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "This is a calculated screening index, not a direct measurement of an illness. A calculated red-blood-cell index some labs use to help screen possible causes of small red blood cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "An above-cutoff value may point toward one cause, depending on the lab formula. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A below-cutoff value may point toward another cause, depending on the lab formula. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Ask which formula and cutoff your lab uses; this index cannot diagnose iron deficiency or thalassemia by itself. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant. These are screening clues only; they cannot confirm iron deficiency or an inherited blood condition."
+        }
+      ]
+    },
+    {
+      "biomarker": "RDWI",
+      "category": "cbc",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A calculation using red-cell measurements to help separate common causes of small red blood cells. This number combines several red-cell measurements to help a clinician investigate certain types of anemia."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher value may lean toward iron deficiency in some methods. Blood count results make more sense when looked at as a group."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower value may lean toward thalassemia trait in some methods. A small change alone may be harmless, while several changes together can tell a more useful story."
+        },
+        {
+          "label": "What to do next",
+          "text": "Confirm using ferritin and appropriate hemoglobin tests; cutoffs depend on method. Compare this number with hemoglobin, red-cell measurements, platelets, and the rest of the CBC as relevant. These are screening clues only; they cannot confirm iron deficiency or an inherited blood condition."
+        }
+      ]
+    },
+    {
+      "biomarker": "T3",
+      "category": "thyroid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A thyroid hormone that helps control how quickly your body uses energy. T3 is one of the hormones that helps set how quickly your body uses energy."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may occur when your thyroid is overactive. Thyroid hormones affect energy, body temperature, and many everyday body functions."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result may occur with illness or an underactive thyroid, depending on the test. The lab may measure total or free hormone, which can change how the number is understood."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check TSH and T4; whether T3 is free or total matters. Compare TSH with the relevant T3 or T4 result and discuss symptoms or medicines with your doctor."
+        }
+      ]
+    },
+    {
+      "biomarker": "T4",
+      "category": "thyroid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A thyroid hormone that helps control energy, temperature, and many body functions. T4 is a hormone made by your thyroid gland; your body can turn some of it into T3."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with an overactive thyroid or changes in binding proteins. Thyroid hormones affect energy, body temperature, and many everyday body functions."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can occur with an underactive thyroid or certain illnesses. The lab may measure total or free hormone, which can change how the number is understood."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with TSH and whether the lab measured free or total T4. Compare TSH with the relevant T3 or T4 result and discuss symptoms or medicines with your doctor."
+        }
+      ]
+    },
+    {
+      "biomarker": "TSH",
+      "category": "thyroid",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A signal from your brain telling your thyroid how hard to work. TSH is a message from your brain telling your thyroid how hard to work."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result often means the thyroid needs more stimulation and may be underactive. Thyroid hormones affect energy, body temperature, and many everyday body functions."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result often means the thyroid is overactive or receiving too much thyroid medicine. The lab may measure total or free hormone, which can change how the number is understood."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check free T4, symptoms, medicines, and pregnancy status where relevant. Compare TSH with the relevant T3 or T4 result and discuss symptoms or medicines with your doctor."
+        }
+      ]
+    },
+    {
+      "biomarker": "BUN Urea Nitrogen",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A measure of waste from breaking down protein that your kidneys help remove. When your body breaks down protein, it makes waste that your kidneys help remove."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level may happen with dehydration, kidney problems, or other conditions. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level may occur with low protein intake or liver problems. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read it with creatinine, eGFR, hydration, and diet. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Calcium Total",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The amount of calcium in your blood, important for bones, nerves, and muscles. Calcium supports bones, nerves, and muscles. Total calcium also depends partly on the protein level in your blood."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen with hormone-related conditions, medicines, or other causes. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen with low vitamin D, low albumin, or other problems. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check albumin or ionized calcium; symptoms such as severe confusion or spasms need prompt care. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Chlorides",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A blood salt that helps control fluid and acid balance. Chloride is a salt that helps your body balance fluids and its acid level."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level may occur with dehydration or changes in the body's acid balance. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level may occur with vomiting, fluid changes, or certain medicines. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read it with sodium, potassium, bicarbonate, and symptoms. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Creatinine",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A waste substance from muscles that your kidneys remove from the blood. Your muscles make creatinine as everyday waste, and your kidneys remove most of it."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may mean your kidneys are filtering less well, but muscle size and dehydration also matter. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result often reflects lower muscle mass and usually is not harmful. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check eGFR, urine tests, and changes from previous results. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Sodium",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A blood salt that helps control fluid balance and nerve function. Sodium is a salt that helps control body water and lets nerves and muscles work properly."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level often means the body has too little water compared with salt. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can occur with excess water, medicines, or other health problems. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Large changes can be dangerous; confusion, seizures, or severe weakness need emergency care. Check it with kidney function, other salts, and your symptoms rather than judging it alone. Very abnormal levels, confusion, fainting, palpitations, or severe weakness need urgent assessment."
+        }
+      ]
+    },
+    {
+      "biomarker": "Urea",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A waste substance made when your body breaks down protein and cleared mainly by the kidneys. Urea is waste made when your body uses protein; it normally leaves through your kidneys."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can occur with dehydration, kidney problems, or increased protein breakdown. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can occur with low protein intake or some liver conditions. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with creatinine, eGFR, diet, and hydration. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Uric Acid",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A waste substance made when your body breaks down certain natural chemicals. Your body makes uric acid as it breaks down certain natural substances in food and cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may raise the chance of gout or kidney stones in some people. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually is not concerning. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Consider symptoms such as sudden painful joints or stones; a high number alone is not gout. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "BUN/Creatinine Ratio",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of two waste-related blood tests often used when checking kidneys and hydration. This compares two waste-related blood results, so a change may come from either number."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high ratio can occur with dehydration, bleeding in the digestive tract, or other causes. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low ratio may reflect changes in protein intake, liver function, or creatinine. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at both actual values, eGFR, and the clinical situation. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Urea/Creatinine Ratio",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A comparison of urea with creatinine used for context when assessing kidney-related results. This comparison uses urea and creatinine, and its number depends on the units and formula used by the lab."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high ratio may occur with dehydration or changes in protein breakdown. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low ratio can occur with low urea production or other factors. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Do not confuse it with BUN/creatinine; the units and cutoffs differ. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "eGFR",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An estimate of how well your kidneys filter waste from your blood. This is an estimate of how well your kidneys filter blood, calculated partly from creatinine."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher result is generally reassuring, though an unusually high estimate is not automatically better. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A persistently low result may mean your kidneys are filtering less well. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare over time and check urine albumin; one result alone usually cannot diagnose chronic kidney disease. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Phosphorus Inorganic",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A mineral important for bones, energy, and cell function. Phosphorus helps support bones, energy use, and normal cell function."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with kidney problems or shifts in minerals and hormones. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can occur with poor intake, some medicines, or other conditions. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read with kidney function, calcium, and vitamin D. Check it with kidney function, other salts, and your symptoms rather than judging it alone."
+        }
+      ]
+    },
+    {
+      "biomarker": "Potassium",
+      "category": "kidney",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A blood salt that helps muscles, nerves, and your heartbeat work properly. Potassium is a salt your nerves and muscles need, especially your heart muscle."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can affect heart rhythm and may relate to kidneys or medicines. Kidneys help balance water, salts, and waste in your body, but these values can change for other reasons too."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can cause weakness or heart-rhythm problems and can follow fluid loss. Hydration, medicines, diet, and other results can affect what the number means."
+        },
+        {
+          "label": "What to do next",
+          "text": "Markedly abnormal results or palpitations, weakness, or fainting need urgent assessment. Check it with kidney function, other salts, and your symptoms rather than judging it alone. Very abnormal levels, confusion, fainting, palpitations, or severe weakness need urgent assessment."
+        }
+      ]
+    },
+    {
+      "biomarker": "Fasting Sugar",
+      "category": "sugar",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The sugar level in your blood after not eating for the required fasting period. This checks the amount of sugar in your blood after you have gone without food for the required time."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level may suggest prediabetes or diabetes, depending on the value and confirmation. Blood sugar changes with food, activity, stress, illness, and medicine."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can cause shakiness, sweating, or confusion. One result may not describe your usual sugar levels, so the test type and timing matter."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with HbA1c and symptoms; very low sugar with confusion needs immediate treatment. Look at fasting glucose and HbA1c together when available; a clinician can advise whether follow-up testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "HbA1c",
+      "category": "sugar",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An estimate of your average blood sugar over about the past two to three months. This gives a picture of your average blood sugar over roughly the last two to three months."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can suggest prediabetes or diabetes depending on the result. Blood sugar changes with food, activity, stress, illness, and medicine."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result may reflect low blood sugar or changes in red-blood-cell lifespan. One result may not describe your usual sugar levels, so the test type and timing matter."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with glucose tests; anemia and some blood conditions can change HbA1c accuracy. Look at fasting glucose and HbA1c together when available; a clinician can advise whether follow-up testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Average Blood Glucose",
+      "category": "sugar",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An estimated average sugar level, often calculated from HbA1c. This is usually an estimated average sugar level worked out from HbA1c, not another blood sample."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high estimate suggests blood sugar has been running high overall. Blood sugar changes with food, activity, stress, illness, and medicine."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low estimate may suggest lower average sugar, but cannot show when lows occurred. One result may not describe your usual sugar levels, so the test type and timing matter."
+        },
+        {
+          "label": "What to do next",
+          "text": "This is usually a calculation, not a separate measurement; look at HbA1c and glucose readings. Look at fasting glucose and HbA1c together when available; a clinician can advise whether follow-up testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Fasting Insulin",
+      "category": "sugar",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The amount of insulin, a hormone that helps sugar enter cells, in your blood after fasting. Insulin is the hormone that helps move sugar from your blood into your cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can occur when your body needs more insulin to keep sugar controlled. Blood sugar changes with food, activity, stress, illness, and medicine."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level may occur when insulin production is reduced, but context matters. One result may not describe your usual sugar levels, so the test type and timing matter."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret alongside fasting glucose and any diabetes medicines; it cannot diagnose insulin resistance alone. Look at fasting glucose and HbA1c together when available; a clinician can advise whether follow-up testing is needed."
+        }
+      ]
+    },
+    {
+      "biomarker": "Iron Serum",
+      "category": "iron",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The amount of iron circulating in your blood at the time of the test. Iron helps your body make hemoglobin, which carries oxygen in red blood cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with supplements, timing of the test, or excess iron. Iron tests help explain whether your body has enough iron to make healthy red blood cells."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can happen with iron deficiency or inflammation. Illness, inflammation, supplements, and recent intake can affect the results."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check ferritin, TIBC, transferrin saturation, and hemoglobin; one iron reading varies during the day. Compare ferritin, iron, transferrin saturation, and hemoglobin before deciding what a change means."
+        }
+      ]
+    },
+    {
+      "biomarker": "TIBC",
+      "category": "iron",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A measure of how much iron your blood could carry. This estimates how much iron your blood could carry if its main iron-carrying protein were filled."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result often happens when your body is low in iron. Iron tests help explain whether your body has enough iron to make healthy red blood cells."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can occur with inflammation, liver illness, or other causes. Illness, inflammation, supplements, and recent intake can affect the results."
+        },
+        {
+          "label": "What to do next",
+          "text": "Use it with serum iron, ferritin, and transferrin saturation. Compare ferritin, iron, transferrin saturation, and hemoglobin before deciding what a change means."
+        }
+      ]
+    },
+    {
+      "biomarker": "UIBC",
+      "category": "iron",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The unused part of your blood's capacity to carry iron. This estimates how much room is still available on the blood protein that carries iron."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may mean there are many empty spots to carry iron, often seen with iron deficiency. Iron tests help explain whether your body has enough iron to make healthy red blood cells."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can mean more spots are already filled with iron or carrying capacity is reduced. Illness, inflammation, supplements, and recent intake can affect the results."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with iron, TIBC, and ferritin. Compare ferritin, iron, transferrin saturation, and hemoglobin before deciding what a change means."
+        }
+      ]
+    },
+    {
+      "biomarker": "Transferrin Saturation",
+      "category": "iron",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The percentage of iron-carrying capacity that is actually filled with iron. This tells you roughly what percentage of your iron-carrying capacity is already being used."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high percentage can suggest excess circulating iron in some settings. Iron tests help explain whether your body has enough iron to make healthy red blood cells."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low percentage can mean too little iron is available. Illness, inflammation, supplements, and recent intake can affect the results."
+        },
+        {
+          "label": "What to do next",
+          "text": "Compare with ferritin and repeat testing when advised; timing and inflammation matter. Compare ferritin, iron, transferrin saturation, and hemoglobin before deciding what a change means."
+        }
+      ]
+    },
+    {
+      "biomarker": "Ferritin",
+      "category": "iron",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A blood test that gives a clue about how much iron your body has stored. Ferritin gives an idea of how much iron your body has stored away for future use."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can happen with inflammation, liver issues, or excess stored iron. Iron tests help explain whether your body has enough iron to make healthy red blood cells."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result usually means your iron stores are running low. Illness, inflammation, supplements, and recent intake can affect the results."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check hemoglobin and other iron tests; ferritin can rise during illness even when iron is low. Compare ferritin, iron, transferrin saturation, and hemoglobin before deciding what a change means."
+        }
+      ]
+    },
+    {
+      "biomarker": "Vitamin B12",
+      "category": "vitamin",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A vitamin needed for healthy nerves and red blood cells. Your body needs B12 to make healthy blood cells and keep nerves working properly."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result is often related to supplements, though other causes are possible. Vitamins are important, but more is not always better."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can cause anemia, tingling, or problems with memory and balance. The result should be read with symptoms, diet, supplements, and any medical conditions."
+        },
+        {
+          "label": "What to do next",
+          "text": "Discuss symptoms and diet; nerve symptoms deserve prompt assessment. Ask a clinician whether a dietary change or supplement is appropriate instead of guessing a dose."
+        }
+      ]
+    },
+    {
+      "biomarker": "Vitamin D Total – 25 Hydroxy",
+      "category": "vitamin",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The main blood test used to see whether your body has enough vitamin D for bone health. This is the main blood test used to estimate your vitamin D supply, which supports bone health."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A very high result can occur from too much supplementation and may cause harm. Vitamins are important, but more is not always better."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can affect bone strength and sometimes muscle health. The result should be read with symptoms, diet, supplements, and any medical conditions."
+        },
+        {
+          "label": "What to do next",
+          "text": "Discuss safe supplementation and avoid taking high doses without medical advice. Ask a clinician whether a dietary change or supplement is appropriate instead of guessing a dose."
+        }
+      ]
+    },
+    {
+      "biomarker": "pH Urine",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "How acidic or alkaline your urine is. This tells you whether your urine is more acidic or more alkaline."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher pH means more alkaline urine; diet, medicines, or some infections can affect it. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A lower pH means more acidic urine; diet and body chemistry can affect it. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Urine pH alone does not diagnose infection or kidney disease. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Urobilinogen",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A substance in urine formed as your body processes bilirubin. A small amount can appear in urine when your body processes bilirubin from old red blood cells."
+        },
+        {
+          "label": "If high or positive",
+          "text": "An increased amount can appear with liver problems or faster red-blood-cell breakdown. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low or absent amount often is normal; in some settings it may relate to reduced bile reaching the gut. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with bilirubin, liver tests, and symptoms. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Colour",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The appearance or shade of your urine. Urine colour can change with how much you drink, certain foods, or medicines."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Dark, red, brown, or unusual urine can be linked to dehydration, food, medicines, blood, or other causes. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "Very pale urine often means it is dilute, usually because you drank fluids. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Persistent red or brown urine should be checked, even if you feel fine. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Transparency",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether your urine looks clear or cloudy. This simply describes whether urine looks clear or cloudy."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Cloudy urine may come from cells, crystals, mucus, or infection, but is not proof of infection. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "Clear urine is usually normal. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Review urine cells, bacteria, nitrite, leukocyte esterase, and symptoms. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Sugar",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether glucose (sugar) is found in your urine. Sugar is usually absent or very low in urine because the kidneys normally keep it in your blood."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Sugar in urine can happen when blood sugar is high or with certain medicines or kidney conditions. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No sugar detected is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check blood glucose and HbA1c; this urine test does not diagnose diabetes alone. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Blood(Urine)",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether the urine test detects blood or blood-like pigments. This test checks for signs of blood or blood pigment in urine; it does not always mean you can see red urine."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A positive result may reflect red blood cells, infection, stones, exercise, menstruation, or other causes. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A negative result is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Confirm with urine microscopy; visible blood or ongoing positive tests deserve medical review. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "RBC (Urine)",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "The number of red blood cells seen in your urine. These are red blood cells seen in a urine sample, which is different from the RBC count in a blood test."
+        },
+        {
+          "label": "If high or positive",
+          "text": "More than expected can come from infection, stones, bleeding, or a sample contaminated by menstruation. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "Few or none is usually normal. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Consider repeat clean-catch testing and discuss persistent blood in urine. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Pus Cells",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "White blood cells seen in urine that may signal irritation or infection. This usually means white blood cells seen in urine, which may appear when the urinary tract is irritated."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Many cells can occur with a urinary infection or inflammation. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "Few or none is often expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check symptoms, leukocyte esterase, nitrite, and whether a urine culture is needed. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Epithelial Cells",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Cells shed from the lining of the urinary tract or skin that can appear in a urine sample. These are cells shed from the surfaces of your urinary tract or nearby skin."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Many may mean the sample was contaminated or that there is irritation; cell type matters. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "Few cells are common and usually not concerning. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "A repeat clean-catch sample may help if contamination is suspected. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Crystals",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Tiny solid particles that can form in urine. Crystals are tiny solid particles formed from substances dissolved in urine."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Some crystals are harmless; certain types or large amounts may be linked with kidney stones. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No crystals seen is common and normal. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with crystal type, urine pH, symptoms, and stone history. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Cast",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Tiny tube-shaped particles formed in the kidneys and sometimes seen in urine. Casts are tiny tube-shaped particles formed inside the kidney’s filtering tubes."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Some types can suggest kidney irritation or injury, while a few hyaline casts can be normal. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No casts seen is usually normal. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "The cast type matters greatly; discuss abnormal casts with a clinician. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Bacteria",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether bacteria are seen in your urine sample. This looks for bacteria in the urine sample, though bacteria can sometimes come from sample contamination."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Bacteria can suggest infection, but can also mean the sample was contaminated. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No bacteria seen is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "If you have burning, fever, or frequent urination, ask if a culture is needed; bacteria without symptoms often do not need antibiotics. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Yeast Cells",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether yeast, a type of fungus, is seen in urine. Yeast cells are a type of fungus that may appear in urine or enter the sample during collection."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Yeast may reflect contamination or a fungal infection, especially in some higher-risk situations. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No yeast seen is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Discuss symptoms and risk factors; a positive result alone does not prove infection. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Nitrate",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Urine dipsticks usually test nitrite, not nitrate; the lab name should be checked before interpretation. Often listed as nitrite on urine tests; it can become positive when some bacteria are present."
+        },
+        {
+          "label": "If high or positive",
+          "text": "If the lab really means urine nitrite, a positive result can suggest certain bacteria in the urine. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A negative nitrite test does not rule out a urinary infection. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Confirm whether the report means nitrite or nitrate. If nitrite is positive, check symptoms, white cells and any urine culture with a clinician. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Urine Ketone",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether your body is using a lot of fat for energy, leaving ketones in your urine. Ketones are substances your body makes when it uses fat for energy."
+        },
+        {
+          "label": "If high or positive",
+          "text": "Ketones can appear with fasting, low carbohydrate intake, vomiting, or poorly controlled diabetes. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No ketones detected is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "If you have diabetes and ketones with high sugar, vomiting, or rapid breathing, seek urgent care. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do. If you have diabetes with vomiting, stomach pain, or fast breathing, seek urgent care."
+        }
+      ]
+    },
+    {
+      "biomarker": "Urine Protein",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether protein is leaking into your urine. Healthy kidneys usually keep most protein in your blood, so urine normally has very little."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A positive result can occur briefly with fever or exercise, or with kidney problems. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No protein detected is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Repeat if advised and ask about urine albumin-to-creatinine ratio and eGFR. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Leucocyte Estrase",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme from white blood cells that can help spot inflammation in urine. This test looks for a substance made by white blood cells, which can suggest irritation or infection."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A positive test may suggest a urinary infection or irritation. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A negative test makes white cells less likely but does not fully rule out infection. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Combine it with symptoms, nitrite, microscopy, and culture if needed. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Bile Pigments",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "Whether bilirubin-related pigments are present in your urine. These are bile-related coloured substances, including bilirubin, that are not normally expected in urine."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A positive result may be a sign that processed bilirubin is entering the urine, sometimes due to liver or bile-flow problems. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "No bile pigments detected is usually expected. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check blood bilirubin and liver tests; yellow eyes or dark urine need medical review. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Specific Gravity",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "How concentrated or watery your urine is. This tells you how concentrated or watery your urine is."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result means concentrated urine, often from not drinking enough fluids, but other causes exist. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result means dilute urine and can happen after drinking a lot of water. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with fluid intake, kidney function, and any repeated unusual results. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Volume-Urine",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "How much urine was collected or passed over the stated period. This is the amount of urine collected, and its meaning depends on whether it was a spot or timed sample."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high volume can occur with high fluid intake or certain medical conditions. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low volume can occur with dehydration, blockage, or kidney problems. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check whether this is a random sample or a timed collection; sudden inability to urinate needs urgent care. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Others-Urine",
+      "category": "urine",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "This is often a place for the lab to write additional urine findings rather than one specific biomarker. A catch-all lab field for additional urine findings not listed elsewhere."
+        },
+        {
+          "label": "If high or positive",
+          "text": "There is no standard “high” result: the meaning depends on the exact finding written by the lab. A urine result can change depending on how the sample was collected and how concentrated it is."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A blank or “none seen” note may simply mean there were no extra findings. One unusual finding does not always mean there is an infection or kidney disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read the exact lab comment; this field has no single medical meaning. Look at the rest of the urine report and any burning, fever, pain, or other symptoms before deciding what to do."
+        }
+      ]
+    },
+    {
+      "biomarker": "Magnesium",
+      "category": "minerals",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A mineral that helps nerves, muscles, and your heart work properly. Magnesium helps muscles, nerves, and many body processes work normally."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level may occur when kidneys cannot clear magnesium or from some supplements. Small amounts of nutrients and other substances can affect many body processes."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can contribute to cramps, weakness, or heart-rhythm problems. An unusual number may reflect diet, medicines, or another condition and needs context."
+        },
+        {
+          "label": "What to do next",
+          "text": "Review medicines, kidney function, and symptoms; severe weakness or palpitations need prompt care. Review the result alongside related tests and symptoms before considering supplements or treatment."
+        }
+      ]
+    },
+    {
+      "biomarker": "Zinc",
+      "category": "minerals",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A mineral that helps immunity, healing, and normal growth. Zinc helps with healing, growth, taste, and normal immune function."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can occur with excess supplements and may lower copper over time. Small amounts of nutrients and other substances can affect many body processes."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level may affect taste, wound healing, and immunity. An unusual number may reflect diet, medicines, or another condition and needs context."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with diet, inflammation, and supplement use; avoid high-dose zinc without advice. Review the result alongside related tests and symptoms before considering supplements or treatment."
+        }
+      ]
+    },
+    {
+      "biomarker": "Homocysteine",
+      "category": "minerals",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A substance made when your body processes proteins and certain vitamins. Homocysteine is a substance made as your body processes proteins."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can occur with low B12, folate, B6, kidney changes, or inherited factors. Small amounts of nutrients and other substances can affect many body processes."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level usually is not a concern. An unusual number may reflect diet, medicines, or another condition and needs context."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at B12, folate, and kidney results; lowering the number alone is not proven to prevent heart disease. Review the result alongside related tests and symptoms before considering supplements or treatment."
+        }
+      ]
+    },
+    {
+      "biomarker": "hs-CRP",
+      "category": "inflam",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A sensitive test for inflammation that can also help assess heart risk in the right setting. This is a sensitive blood test for a protein that increases when your body has inflammation."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A higher result can mean inflammation from an infection, injury, or other cause. Inflammation is one way your body responds to illness or injury."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result generally means less inflammation at the time of testing. This test cannot show where the problem is or prove a particular disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Do not assess heart risk from hs-CRP during an infection; interpret with overall risk factors. Compare with symptoms, other tests, and whether the result stays raised."
+        }
+      ]
+    },
+    {
+      "biomarker": "ESR",
+      "category": "inflam",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A broad sign of inflammation in the body, but it cannot tell exactly where or why. This test checks how quickly red blood cells settle in a tube, which can change with inflammation."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with infection, inflammation, anemia, or many other causes. Inflammation is one way your body responds to illness or injury."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not worrying. This test cannot show where the problem is or prove a particular disease."
+        },
+        {
+          "label": "What to do next",
+          "text": "Read with symptoms and other results; ESR does not diagnose a particular illness. Compare with symptoms, other tests, and whether the result stays raised."
+        }
+      ]
+    },
+    {
+      "biomarker": "Total Testosterone",
+      "category": "hormone",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A hormone important for sexual function, muscle, and other body processes; normal ranges differ greatly by sex and age. Testosterone is a hormone involved in sexual development, muscle, and other body functions."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high level can have different causes, including supplements or hormone conditions, depending on sex. Hormone levels may change through the day, with age, and at different stages of life."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low level can relate to symptoms or health conditions, but one result is not a diagnosis. The sampling time and personal situation can matter as much as the number."
+        },
+        {
+          "label": "What to do next",
+          "text": "Morning timing, age, sex, medicines, and repeat testing matter. Check the test timing, medicines, symptoms, and any relevant reproductive or endocrine history with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "Cortisol",
+      "category": "hormone",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A hormone that helps your body respond to stress and manage energy. Cortisol is a hormone that helps your body respond to stress and manage blood sugar and energy."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with stress, medicines, or certain hormone conditions. Hormone levels may change through the day, with age, and at different stages of life."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result can occur with adrenal problems or steroid medicine effects. The sampling time and personal situation can matter as much as the number."
+        },
+        {
+          "label": "What to do next",
+          "text": "The time of day and type of test are essential; do not interpret one cortisol result alone. Check the test timing, medicines, symptoms, and any relevant reproductive or endocrine history with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "LH",
+      "category": "hormone",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A hormone from the brain that helps control ovaries or testes. LH is a hormone that sends signals to the ovaries or testes."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result may reflect menopause, low function of ovaries or testes, or normal cycle timing. Hormone levels may change through the day, with age, and at different stages of life."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result may occur when the brain sends less hormone signal. The sampling time and personal situation can matter as much as the number."
+        },
+        {
+          "label": "What to do next",
+          "text": "Interpret with sex, age, menstrual cycle stage, FSH, and related hormones. Check the test timing, medicines, symptoms, and any relevant reproductive or endocrine history with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "FSH",
+      "category": "hormone",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A hormone from the brain that helps regulate egg development or sperm production. FSH is a hormone that helps control egg development or sperm production."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur in menopause or when ovaries or testes are making fewer hormones. Hormone levels may change through the day, with age, and at different stages of life."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result may happen when the brain sends less hormone signal. The sampling time and personal situation can matter as much as the number."
+        },
+        {
+          "label": "What to do next",
+          "text": "Timing in the menstrual cycle and other hormone results matter. Check the test timing, medicines, symptoms, and any relevant reproductive or endocrine history with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "Prolactin",
+      "category": "hormone",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "A hormone best known for supporting milk production after childbirth. Prolactin is a hormone best known for helping the body make breast milk."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur with pregnancy, some medicines, stress, or pituitary conditions. Hormone levels may change through the day, with age, and at different stages of life."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not important unless assessing certain pituitary problems. The sampling time and personal situation can matter as much as the number."
+        },
+        {
+          "label": "What to do next",
+          "text": "Check medicines, pregnancy where relevant, and whether a repeat morning sample is advised. Check the test timing, medicines, symptoms, and any relevant reproductive or endocrine history with a clinician."
+        }
+      ]
+    },
+    {
+      "biomarker": "CK/CPK",
+      "category": "muscle",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme that leaks into the blood when muscles are strained or injured. CK is an enzyme that can leak into the blood when muscles are strained or injured."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur after hard exercise, muscle injury, or certain medicines; very high levels can harm kidneys. These substances can rise when cells are stressed or damaged."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not a concern. Exercise, medicines, and sample-related issues may also affect the result."
+        },
+        {
+          "label": "What to do next",
+          "text": "If you have severe muscle pain, weakness, or cola-colored urine, seek urgent care. Review symptoms, recent exercise, and any related blood tests with a clinician. Severe muscle pain, weakness, or dark urine needs urgent assessment."
+        }
+      ]
+    },
+    {
+      "biomarker": "Lactate Dehydrogenase (LDH)",
+      "category": "muscle",
+      "bullets": [
+        {
+          "label": "What it is",
+          "text": "An enzyme found throughout the body that can rise when cells are damaged. LDH is found in many body cells, so a high result does not point to just one organ."
+        },
+        {
+          "label": "If high or positive",
+          "text": "A high result can occur for many reasons, including tissue injury or even sample handling. These substances can rise when cells are stressed or damaged."
+        },
+        {
+          "label": "If low or negative",
+          "text": "A low result is usually not important. Exercise, medicines, and sample-related issues may also affect the result."
+        },
+        {
+          "label": "What to do next",
+          "text": "Look at symptoms and other tests; LDH alone cannot show which organ is affected. Review symptoms, recent exercise, and any related blood tests with a clinician."
+        }
+      ]
+    }
+  ]
+}

@@ -7,3 +7,4 @@ export type CategoryCard = Schemas["CategoryCard"];
 export type CategoryDetail = Schemas["CategoryDetail"];
 export type Finding = Schemas["Finding"];
 export type Priority = Schemas["Priority"];
+export type EducationNote = Schemas["EducationNote"];

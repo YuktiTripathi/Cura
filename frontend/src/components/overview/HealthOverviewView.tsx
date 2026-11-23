@@ -1,6 +1,6 @@
 import { useState } from "react";
 import type { ContextRef } from "../../types/chat";
-import type { CategoryCard, CategoryDetail, Finding } from "../../types/unifiedHealth";
+import type { CategoryCard, CategoryDetail, EducationNote, Finding } from "../../types/unifiedHealth";
 import { useHealthCategory, useHealthOverview } from "../../hooks/useHealthOverview";
 import { HealthIcon } from "./HealthIcon";
 import { t } from "../../i18n";
@@ -19,6 +19,35 @@ function rangeText(f: Finding) {
   if (hi != null) return `up to ${hi}`;
   if (lo != null) return `${lo} or more`;
   return "";
+}
+
+/** Reviewed, general explanation of a test. Which direction applies comes from the report's own range. */
+function AboutTest({ note, status }: { note: EducationNote; status: Finding["status"] }) {
+  const [open, setOpen] = useState(false);
+  const high = status === "above_range" || status === "critical";
+  const low = status === "below_range";
+  const rows: Array<[string, string]> = [["What it is", note.what_it_is]];
+  if (high && note.if_high) rows.push(["If higher than the range", note.if_high]);
+  else if (low && note.if_low) rows.push(["If lower than the range", note.if_low]);
+  else {
+    if (note.if_high) rows.push(["If higher than the range", note.if_high]);
+    if (note.if_low) rows.push(["If lower than the range", note.if_low]);
+  }
+  if (note.next_step) rows.push(["What to do next", note.next_step]);
+  return (
+    <div className="about-test">
+      <button type="button" className="expand-button" aria-expanded={open} onClick={() => setOpen(!open)}>
+        {open ? t("ui.unified.hide_about", "Hide details") : t("ui.unified.about_test", "About this test")}
+      </button>
+      {open ? (
+        <ul>
+          {rows.map(([label, text]) => (
+            <li key={label}><strong>{label}</strong><p>{text}</p></li>
+          ))}
+        </ul>
+      ) : null}
+    </div>
+  );
 }
 
 /** One row for either kind of finding. A subtle label says which kind, so they sit in one list. */
@@ -43,6 +72,7 @@ export function FindingRow({ f }: { f: Finding }) {
         ) : null}
         {f.source_type === "predicted_risk" && f.score != null ? <span className="muted finding-value">{`Score ${f.score}`}</span> : null}
       </div>
+      {f.education ? <AboutTest note={f.education} status={f.status} /> : null}
     </li>
   );
 }

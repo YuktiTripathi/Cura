@@ -26,6 +26,7 @@ from app.contracts.unified_health import (
     Scenario,
     UnifiedOverview,
 )
+from app.biomarkers.education import education_for, first_sentence
 from app.pipeline.gap_words import how_far
 
 STATUS_LABELS: dict[str, str] = {
@@ -55,9 +56,12 @@ def _measured_finding(item: BiomarkerResult) -> Finding:
     label = _MEASURED_LABEL[status]
     if far == "slightly" and status != "critical":
         label = "Slightly " + ("high" if status == "above_range" else "low")
+    note = education_for(item.canonical_id, item.original_name, item.display_name)
     return Finding(
         id=item.result_id,
         source_type="measured",
+        explain=first_sentence(note.what_it_is) if note else "",
+        education=note,
         name=item.display_name,
         medical_name=item.original_name if item.original_name != item.display_name else "",
         status=status,
@@ -242,7 +246,7 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
     m = _counts(p.measured)
     r = RiskCounts(assessed=sum(1 for f in p.risks if f.status != "risk_unknown"), raised=sum(1 for f in p.risks if f.status == "risk_raised"))
     status = p.status
-    important = sorted([f for f in p.measured + p.risks if f.important], key=_rank)[:3]
+    important = [f.model_copy(update={"education": None}) for f in sorted([f for f in p.measured + p.risks if f.important], key=_rank)[:3]]
     summary = (wording or {}).get("summary", "")
     return CategoryCard(
         id=p.cid,

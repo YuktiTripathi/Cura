@@ -31,6 +31,16 @@ FindingStatus = Literal[
 ]
 
 
+class EducationNote(BaseModel):
+    """Reviewed plain-language text about a test. General education, never a reading of this result."""
+
+    name: str
+    what_it_is: str
+    if_high: str = ""
+    if_low: str = ""
+    next_step: str = ""
+
+
 class Finding(BaseModel):
     id: str
     source_type: SourceType
@@ -51,6 +61,7 @@ class Finding(BaseModel):
     measured_on: str | None = None
     report_id: str | None = None
     important: bool = False
+    education: EducationNote | None = None
 
 
 class MeasuredCounts(BaseModel):

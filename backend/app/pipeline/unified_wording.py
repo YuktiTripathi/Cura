@@ -18,7 +18,7 @@ from app.biomarkers.health_categories import REGISTRY_VERSION, category_for
 from app.contracts.unified_health import CategoryCard, Priority, Provenance
 
 logger = logging.getLogger("cura.unified")
-PROMPT_VERSION = "u2"
+PROMPT_VERSION = "u3"
 _TTL = 7 * 24 * 3600
 _DASH = re.compile(r"\s*[—–]\s*")
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -192,7 +192,7 @@ You get verified findings per health category. Blood findings are measured resul
 
 Scenarios: both_reassuring (encouraging, never say risk free), blood_out_risk_ok (the results still deserve attention, a healthy risk does not cancel them), blood_ok_risk_up (results are encouraging, the risk deserves attention, name personal reasons only if given), both_out (explain both, never say one caused the other), blood_only, risk_only (no claims about the other source), incomplete (say what is missing). Never mention report dates or that the reports were made at different times.
 
-Rules: never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. The summary, interpretation and actions must each add something new: never say the same thing twice. Do not repeat the same advice in every category: make actions fit that category's actual findings and the member's context. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
+Rules: the app already shows a reviewed explanation of every individual blood test, so never define or explain what a single test measures; explain how the findings fit together and what they mean for the member. Never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. The summary, interpretation and actions must each add something new: never say the same thing twice. Do not repeat the same advice in every category: make actions fit that category's actual findings and the member's context. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
 
 Return only JSON:
 {"opening": "1 or 2 sentences about the whole picture",
