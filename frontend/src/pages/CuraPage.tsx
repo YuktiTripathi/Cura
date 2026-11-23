@@ -56,6 +56,15 @@ export function CuraPage() {
     return send(text, ids, contextRef);
   }
 
+  const [returning] = useState(() => {
+    try {
+      const seen = window.localStorage.getItem("cura_seen") === "1";
+      window.localStorage.setItem("cura_seen", "1");
+      return seen;
+    } catch {
+      return false;
+    }
+  });
   const [overviewKind, setOverviewKind] = useState<"blood" | "bio_ai" | "unified" | null>(null);
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   // Remember which overview a chat came from, so Back returns there before going home.
@@ -159,6 +168,7 @@ export function CuraPage() {
         {!started && overviewKind === "bio_ai" && <RiskOverviewView onAsk={askFromOverview} openId={openGroupId} onOpenChange={setOpenGroupId} />}
         {!started && !overviewKind && (
           <WelcomeExperience
+            returning={returning}
             me={me}
             meLoading={meLoading}
             suggestions={suggestions}

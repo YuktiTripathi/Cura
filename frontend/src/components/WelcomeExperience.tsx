@@ -11,6 +11,7 @@ export function WelcomeExperience({
   onSend,
   onOpenOverview,
   inputRef,
+  returning = false,
 }: {
   me: MeResponse | null;
   meLoading: boolean;
@@ -19,6 +20,8 @@ export function WelcomeExperience({
   /** Opens the visual overview. Without it the buttons start a chat, as before. */
   onOpenOverview?: (kind: "blood" | "bio_ai" | "unified") => void;
   inputRef: RefObject<HTMLInputElement>;
+  /** True when this person has used Cura before on this device. */
+  returning?: boolean;
 }) {
   const greeting = meLoading ? "Hi 👋" : me?.greeting || "Hi there 👋";
   const personal = me?.starters?.personal || [];
@@ -29,10 +32,12 @@ export function WelcomeExperience({
   return (
     <section className="welcome">
       <p className="greeting">{greeting}</p>
-      <p className="welcome-lead">{t("ui.WelcomeExperience.how_can_i_help_you_understand_your_healt", "How can I help you understand your health better?")}</p>
-      <p className="muted">
-        I can explain your blood report, Bio-AI report, and nutrition, and answer general health questions.
+      <p className="welcome-lead">
+        {returning
+          ? t("ui.WelcomeExperience.welcome_back", "Welcome back. Pick up where you left off, or ask something new.")
+          : t("ui.WelcomeExperience.how_can_i_help_you_understand_your_healt", "How can I help you understand your health better?")}
       </p>
+      <p className="muted">{introLine(capabilities)}</p>
       <div className="capability-grid">
         {(capabilities?.has_blood_report || capabilities?.has_bio_ai_report) && (
           <button
@@ -108,4 +113,15 @@ export function WelcomeExperience({
       )}
     </section>
   );
+}
+
+/** Mentions only what this person actually has, so nothing is promised that is not there. */
+export function introLine(c?: { has_blood_report?: boolean; has_bio_ai_report?: boolean; has_nutrition?: boolean } | null): string {
+  const parts: string[] = [];
+  if (c?.has_blood_report) parts.push("your blood report");
+  if (c?.has_bio_ai_report) parts.push("your Bio-AI report");
+  if (c?.has_nutrition) parts.push("your nutrition");
+  if (parts.length === 0) return "Ask me any health question and I will explain it in simple words.";
+  const list = parts.length === 1 ? parts[0] : `${parts.slice(0, -1).join(", ")} and ${parts[parts.length - 1]}`;
+  return `I can help you understand ${list} in plain language. You can also ask any general health question.`;
 }
