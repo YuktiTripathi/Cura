@@ -1319,3 +1319,4 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .follow-list { display: grid; gap: 8px; }
 .follow-list button { display: flex; justify-content: space-between; text-align: left; border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 12px; background: var(--surface); cursor: pointer; }
 @media (max-width: 520px) { .unified-numbers { grid-template-columns: 1fr; } .finding-row { flex-direction: column; } .finding-side { text-align: left; } }
+.category-lead { margin: 0; font-size: 1.05rem; line-height: 1.5; }

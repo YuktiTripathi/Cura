@@ -195,12 +195,9 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
         </div>
       </header>
       {d.caveat ? <p className="overview-note" role="note">{d.caveat}</p> : null}
-      <section aria-labelledby="cat-about">
-        <h3 id="cat-about">{t("ui.unified.about_body", "What does this part of my body do?")}</h3>
-        <p>{d.about}</p>
-      </section>
+      {d.summary ? <p className="category-lead">{d.summary}</p> : null}
       <section aria-labelledby="cat-results">
-        <h3 id="cat-results">{t("ui.unified.results_say", "What do my health results say?")}</h3>
+        <h3 id="cat-results">{t("ui.unified.results_say", "What your results show")}</h3>
         <ul className="finding-list">{shown.map((f) => <FindingRow key={f.id} f={f} />)}</ul>
         {rest.length > 0 ? (
           <>
@@ -213,13 +210,13 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
         ) : null}
       </section>
       <section aria-labelledby="cat-mean">
-        <h3 id="cat-mean">{t("ui.unified.means_for_me", "What does this mean for me?")}</h3>
+        <h3 id="cat-mean">{`${t("ui.unified.understanding", "Understanding your")} ${d.name}`}</h3>
+        {d.about ? <p>{d.about}</p> : null}
         {(d.interpretation ?? []).map((line) => <p key={line}>{line}</p>)}
-        {d.insight ? <aside className="insight-card"><strong>{t("ui.unified.insight", "CURA's insight")}</strong><p>{d.insight}</p></aside> : null}
       </section>
       {actions.length > 0 ? (
         <section aria-labelledby="cat-next">
-          <h3 id="cat-next">{t("ui.unified.next", "What can I do next?")}</h3>
+          <h3 id="cat-next">{t("ui.unified.next", "What you can do next")}</h3>
           <ul className="action-list">
             {actions.map((a) => (
               <li key={a.title}><span className="priority-icon"><HealthIcon name={a.icon} size={20} /></span><div><strong>{a.title}</strong>{a.detail ? <p>{a.detail}</p> : null}</div></li>

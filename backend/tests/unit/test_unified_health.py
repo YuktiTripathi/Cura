@@ -104,7 +104,7 @@ def test_different_report_dates_are_kept_and_never_assumed_linked():
     assert (p.blood_report_date, p.bio_ai_report_date) == ("2026-08-21", "2026-08-25")
     assert p.dates_differ and not p.reports_linked
     detail = build_category_detail("liver_health", blood(LIVER_OK), bio([("nafld", "mild", 12)]))
-    assert any("different" in x or "may not describe the same time" in x for x in detail.interpretation)
+    assert not any("different" in x or "same time" in x or "2026" in x for x in detail.interpretation + [detail.summary])
 
 
 def test_a_marker_is_counted_in_exactly_one_category():

@@ -18,7 +18,7 @@ from app.biomarkers.health_categories import REGISTRY_VERSION, category_for
 from app.contracts.unified_health import CategoryCard, Priority, Provenance
 
 logger = logging.getLogger("cura.unified")
-PROMPT_VERSION = "u1"
+PROMPT_VERSION = "u2"
 _TTL = 7 * 24 * 3600
 _DASH = re.compile(r"\s*[—–]\s*")
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -80,8 +80,6 @@ def _interpretation(card: CategoryCard, p, prov: Provenance) -> list[str]:
         "blood_only": ["This is based on your measured results only. No Bio-AI risk was assessed for this area."],
         "risk_only": ["This is based on your predicted risk only. No blood results were available for this area."],
     }.get(s, ["Some information is missing, so this area cannot be fully assessed yet."])
-    if prov.dates_differ and card.measured.total and card.risks.assessed:
-        lines.append(f"Your blood report is from {prov.blood_report_date} and your Bio-AI assessment is from {prov.bio_ai_report_date}, so they may not describe the same time.")
     return lines
 
 
@@ -192,14 +190,14 @@ SYSTEM = """You write the wording for a member's health overview. A person with 
 
 You get verified findings per health category. Blood findings are measured results. Predicted risks come from a Bio-AI estimate. They are different kinds of evidence: never treat them as the same, never call a risk a diagnosis or a percent chance, and never say a normal result rules out a condition or an abnormal result confirms one.
 
-Scenarios: both_reassuring (encouraging, never say risk free), blood_out_risk_ok (the results still deserve attention, a healthy risk does not cancel them), blood_ok_risk_up (results are encouraging, the risk deserves attention, name personal reasons only if given), both_out (explain both, never say one caused the other), blood_only, risk_only (no claims about the other source), incomplete (say what is missing). If dates_differ, say the two reports are from different dates and do not assume they are linked.
+Scenarios: both_reassuring (encouraging, never say risk free), blood_out_risk_ok (the results still deserve attention, a healthy risk does not cancel them), blood_ok_risk_up (results are encouraging, the risk deserves attention, name personal reasons only if given), both_out (explain both, never say one caused the other), blood_only, risk_only (no claims about the other source), incomplete (say what is missing). Never mention report dates or that the reports were made at different times.
 
-Rules: never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. Do not repeat the same advice in every category: make actions fit that category's actual findings and the member's context. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
+Rules: never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. The summary, interpretation and actions must each add something new: never say the same thing twice. Do not repeat the same advice in every category: make actions fit that category's actual findings and the member's context. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
 
 Return only JSON:
 {"opening": "1 or 2 sentences about the whole picture",
  "priorities": [{"category_id": "...", "title": "short", "detail": "one sentence", "tone": "attention" or "good"}],  // at most 4, attention first, one good only if true
- "categories": {"<id>": {"about": "what this part of the body does, one sentence", "summary": "1 to 2 sentences combining measured and predicted findings", "interpretation": ["2 to 3 short sentences combining them"], "insight": "one short sentence or empty", "actions": [{"title": "2 to 4 words", "detail": "one sentence", "icon": "clipboard|heart|calendar|check|food|walk|moon"}], // 3 or 4
+ "categories": {"<id>": {"about": "what this part of the body does, one plain sentence", "summary": "1 to 2 sentences that say what this area means for the member, combining measured and predicted findings", "interpretation": ["2 to 3 short sentences that EXPLAIN: what the findings are measuring, why they matter, how they relate. Do not repeat the summary or list the values"], "insight": "", "actions": [{"title": "2 to 4 words", "detail": "one sentence", "icon": "clipboard|heart|calendar|check|food|walk|moon"}], // 3 or 4
  "follow_ups": ["max 4 questions the member may ask next"]}}}"""
 
 
