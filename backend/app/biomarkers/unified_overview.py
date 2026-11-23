@@ -77,19 +77,30 @@ def _measured_finding(item: BiomarkerResult) -> Finding:
         status=status,
         status_label=label,
         value=item.value,
+        status_source=item.status_source,
         unit=item.unit,
         reference_low=item.reference_low,
         reference_high=item.reference_high,
         how_far=far,
         measured_on=item.measured_on,
         report_id=item.report_id,
+        previous_value=item.previous_value,
+        previous_on=item.previous_on,
         important=status in _OUT,
     )
 
 
 def _risk_finding(risk: RiskResult) -> Finding:
-    status = {"raised": "risk_raised", "not_raised": "risk_healthy"}.get(risk.level, "risk_unknown")
-    label = {"risk_raised": f"{risk.status or 'Raised'} predicted risk", "risk_healthy": "Healthy predicted risk"}.get(status, "Risk not classified")
+    if risk.level == "raised":
+        status = "risk_raised"
+    elif risk_status_key(risk.status) in {"healthy", "low", "normal", "mild"}:
+        status = "risk_healthy"
+    else:
+        status = "risk_unknown"
+    label = {
+        "risk_raised": f"{risk.status or 'Raised'} · predicted risk",
+        "risk_healthy": f"{risk.status or 'Healthy'} predicted risk" if risk_status_key(risk.status) == "healthy" else f"{risk.status} · predicted risk",
+    }.get(status, "Risk band unavailable")
     name = risk.display_name or risk.name
     return Finding(
         id=f"risk:{risk.code}",
@@ -103,6 +114,8 @@ def _risk_finding(risk: RiskResult) -> Finding:
         classification=risk.status,
         measured_on=risk.measured_on,
         report_id=risk.report_id,
+        previous_score=risk.previous_score,
+        previous_on=risk.previous_on,
         important=status == "risk_raised",
     )
 

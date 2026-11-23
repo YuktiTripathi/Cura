@@ -12,7 +12,7 @@ from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.unified_health import CategoryDetail, Finding, UnifiedOverview
 from app.db.session import get_db
-from app.pipeline.unified_service import unified_category, unified_overview
+from app.pipeline.unified_service import unified_category, unified_finding, unified_overview
 from app.providers.registry import ProviderRegistry, get_registry
 
 router = APIRouter(prefix="/health-explanation", tags=["health-explanation"])
@@ -37,11 +37,8 @@ def category(category_id: str, principal: AuthenticatedPrincipal = Depends(get_p
 
 
 @router.get("/findings/{finding_id}", response_model=Finding)
-def finding(finding_id: str, principal: AuthenticatedPrincipal = Depends(get_principal), registry: ProviderRegistry = Depends(get_registry), db: Session = Depends(get_db)):
-    ov = unified_overview(principal, registry, db)
-    for card in ov.categories:
-        detail = unified_category(principal, registry, card.id, db)
-        for f in (detail.findings if detail else []):
-            if f.id == finding_id:
-                return f
-    raise HTTPException(status_code=404, detail="That finding was not found.")
+def finding(finding_id: str, principal: AuthenticatedPrincipal = Depends(get_principal), registry: ProviderRegistry = Depends(get_registry)):
+    result = unified_finding(principal, registry, finding_id)
+    if result is None:
+        raise HTTPException(status_code=404, detail="That finding was not found.")
+    return result

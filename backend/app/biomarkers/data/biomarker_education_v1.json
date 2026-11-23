@@ -23,7 +23,8 @@
       "Nitrate": "commonly means urine nitrite; verify lab label",
       "GK Index": "lab-specific formula/cutoff must be verified"
     },
-    "description": "Plain-language explanations formatted entirely as bullets. Each marker has four bullets: meaning, high/positive, low/negative, next step. General educational content, not a patient-specific interpretation."
+    "description": "Each marker has four education bullets: meaning, high/positive, low/negative, next step. Core lipid tests also describe common influences. General educational content, not a patient-specific interpretation.",
+    "lipid_influences_source": "https://www.who.int/news-room/fact-sheets/detail/dyslipidaemia"
   },
   "biomarkers": [
     {
@@ -293,6 +294,7 @@
     {
       "biomarker": "Cholesterol Total",
       "category": "lipid",
+      "common_factors": "Food choices, alcohol, family history, and some health conditions can affect cholesterol.",
       "bullets": [
         {
           "label": "What it is",
@@ -315,6 +317,7 @@
     {
       "biomarker": "HDL Cholesterol Direct",
       "category": "lipid",
+      "common_factors": "Physical activity, tobacco use, and genetics can affect HDL.",
       "bullets": [
         {
           "label": "What it is",
@@ -337,6 +340,7 @@
     {
       "biomarker": "Triglycerides",
       "category": "lipid",
+      "common_factors": "Alcohol, food choices, and some health conditions can affect triglycerides.",
       "bullets": [
         {
           "label": "What it is",
@@ -403,6 +407,7 @@
     {
       "biomarker": "LDL Cholesterol Calculated",
       "category": "lipid",
+      "common_factors": "Saturated fat, family history, and some medicines and health conditions can affect LDL.",
       "bullets": [
         {
           "label": "What it is",

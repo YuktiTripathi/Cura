@@ -41,6 +41,9 @@ function ScoreDetails({ f }: { f: Finding }) {
         <ul>
           <li><strong>{t("ui.unified.score", "Score")}</strong><p>{`${f.score} out of 100`}</p></li>
           {f.classification ? <li><strong>{t("ui.unified.report_category", "Category in your report")}</strong><p>{f.classification}</p></li> : null}
+          {f.previous_score != null ? (
+            <li><strong>Earlier Bio-AI score</strong><p>{f.previous_score}{f.previous_on ? ` · ${formatDay(f.previous_on)}` : ""}</p></li>
+          ) : null}
           <li><strong>{t("ui.unified.scale", "Scale")}</strong><p>{`${scale}. If your report uses different labels, your report's labels apply.`}</p></li>
           <li><strong>{t("ui.unified.limits", "What to keep in mind")}</strong>
             <p>{t("ui.unified.limits_text", "This is a model estimate, not a diagnosis. It is not a percentage chance of having the condition, and a low score does not rule the condition out. Scores for different conditions should not be compared with each other as if the gap meant the same thing.")}</p>
@@ -60,18 +63,19 @@ function rangeText(f: Finding) {
 }
 
 /** Reviewed, general explanation of a test. Which direction applies comes from the report's own range. */
-function AboutTest({ note, status }: { note: EducationNote; status: Finding["status"] }) {
+function AboutTest({ note, status, bothDirections }: { note: EducationNote; status: Finding["status"]; bothDirections?: boolean }) {
   const [open, setOpen] = useState(false);
   const high = status === "above_range" || status === "critical";
   const low = status === "below_range";
   const rows: Array<[string, string]> = [["What it is", note.what_it_is]];
-  if (high && note.if_high) rows.push(["If higher than the range", note.if_high]);
-  else if (low && note.if_low) rows.push(["If lower than the range", note.if_low]);
+  if (!bothDirections && high && note.if_high) rows.push(["If higher than the range", note.if_high]);
+  else if (!bothDirections && low && note.if_low) rows.push(["If lower than the range", note.if_low]);
   else {
     if (note.if_high) rows.push(["If higher than the range", note.if_high]);
     if (note.if_low) rows.push(["If lower than the range", note.if_low]);
   }
-  if (note.next_step) rows.push(["What to do next", note.next_step]);
+  if (note.common_factors) rows.push(["What can affect this result", note.common_factors]);
+  if (!bothDirections && note.next_step) rows.push(["What to do next", note.next_step]);
   return (
     <div className="about-test">
       <button type="button" className="expand-button" aria-expanded={open} onClick={() => setOpen(!open)}>
@@ -89,7 +93,7 @@ function AboutTest({ note, status }: { note: EducationNote; status: Finding["sta
 }
 
 /** One row for either kind of finding. A subtle label says which kind, so they sit in one list. */
-export function FindingRow({ f }: { f: Finding }) {
+export function FindingRow({ f, explanation }: { f: Finding; explanation?: string }) {
   const tone = f.status === "within_range" || f.status === "risk_healthy" ? "good" : f.status === "no_range" || f.status === "no_value" || f.status === "risk_unknown" ? "neutral" : "attention";
   const day = formatDay(f.measured_on);
   const kind = f.source_type === "predicted_risk"
@@ -100,7 +104,7 @@ export function FindingRow({ f }: { f: Finding }) {
       <div className="finding-main">
         <strong>{f.name}</strong>
         {f.medical_name ? <span className="muted finding-medical">{f.medical_name}</span> : null}
-        {f.explain ? <span className="muted">{f.explain}</span> : null}
+        {f.explain && !(explanation && f.education) ? <span className="muted">{f.explain}</span> : null}
         <span className="finding-kind">{kind}</span>
       </div>
       <div className="finding-side">
@@ -112,8 +116,14 @@ export function FindingRow({ f }: { f: Finding }) {
           </span>
         ) : null}
       </div>
+      {explanation ? <p className="finding-explanation">{explanation}</p> : null}
+      {f.previous_value != null && explanation ? (
+        <p className="muted finding-explanation">
+          {["Earlier result", formatDay(f.previous_on)].filter(Boolean).join(" · ")} · {f.previous_value}{f.unit ? ` ${f.unit}` : ""}
+        </p>
+      ) : null}
       {f.source_type === "predicted_risk" ? <ScoreDetails f={f} /> : null}
-      {f.education ? <AboutTest note={f.education} status={f.status} /> : null}
+      {f.education ? <AboutTest note={f.education} status={f.status} bothDirections={Boolean(explanation)} /> : null}
     </li>
   );
 }
@@ -271,6 +281,7 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
         </div>
       </header>
       {d.caveat ? <p className="overview-note" role="note">{d.caveat}</p> : null}
+      {d.story ? <CategoryStoryView detail={d} story={d.story} onAsk={onAsk} /> : <>
       {d.summary ? <p className="category-lead">{d.summary}</p> : null}
       <section aria-labelledby="cat-results">
         <h3 id="cat-results">{t("ui.unified.results_say", "What your results show")}</h3>
@@ -309,6 +320,79 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
           </div>
         </section>
       ) : null}
+      </>}
     </article>
+  );
+}
+
+function CategoryStoryView({ detail, story, onAsk }: { detail: CategoryDetail; story: NonNullable<CategoryDetail["story"]>; onAsk: Ask }) {
+  const [all, setAll] = useState(false);
+  const findings = detail.findings ?? [];
+  const blood = findings.filter((f) => f.source_type === "measured");
+  const predicted = findings.filter((f) => f.source_type === "predicted_risk");
+  const shown = all ? blood : blood.slice(0, 4);
+  return (
+    <>
+      <section aria-labelledby="story-body">
+        <h3 id="story-body">Understand your body</h3>
+        <p>{story.understand_body}</p>
+      </section>
+      <section aria-labelledby="story-bio-ai">
+        <h3 id="story-bio-ai">Understand your Bio-AI assessment</h3>
+        <p>{story.bio_ai_limitations}</p>
+        {predicted.length > 0 ? (
+          <ul className="finding-list">
+            {predicted.map((f) => <FindingRow key={f.id} f={f} explanation={story.risk_explanations[f.id]} />)}
+          </ul>
+        ) : null}
+      </section>
+      <section aria-labelledby="story-influences">
+        <h3 id="story-influences">What could influence your health?</h3>
+        {story.influences.map((line) => <p key={line}>{line}</p>)}
+        {story.self_reported.length > 0 ? (
+          <ul className="action-list">
+            {story.self_reported.map((factor) => (
+              <li key={factor.key}>
+                <div>
+                  <span className="finding-kind">Self-reported · {factor.source === "profile" ? "SuperShyft profile" : "Questionnaire"}</span>
+                  <p><strong>{factor.label}</strong> · {factor.value}{factor.unit ? ` ${factor.unit}` : ""}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
+        ) : <p className="muted">No relevant lifestyle information is available for this area.</p>}
+      </section>
+      <section aria-labelledby="story-biomarkers">
+        <h3 id="story-biomarkers">Understand your biomarkers</h3>
+        {blood.length ? (
+          <ul className="finding-list">
+            {shown.map((f) => <FindingRow key={f.id} f={f} explanation={story.biomarker_meanings[f.id]} />)}
+          </ul>
+        ) : <p>No blood results are available for this area.</p>}
+        {blood.length > 4 ? (
+          <button type="button" className="expand-button" aria-expanded={all} onClick={() => setAll(!all)}>
+            {all ? "Show fewer blood tests" : "Show all blood tests"}
+          </button>
+        ) : null}
+      </section>
+      <section aria-labelledby="story-plan">
+        <h3 id="story-plan">Your personal improvement plan</h3>
+        <ul className="action-list">
+          {story.improvement_plan.map((action) => (
+            <li key={action.action_id ?? action.title}>
+              <span className="priority-icon"><HealthIcon name={action.icon ?? "check"} size={20} /></span>
+              <div><strong>{action.title}</strong><p>{action.detail}</p></div>
+            </li>
+          ))}
+        </ul>
+      </section>
+      <section aria-labelledby="story-next">
+        <h3 id="story-next">Your next steps</h3>
+        {story.monitoring.map((line) => <p key={line}>{line}</p>)}
+        <div className="follow-list">
+          {story.questions.map((q) => <button key={q} type="button" onClick={() => onAsk(q, AREA_REF)}>{q}<span aria-hidden="true">↗</span></button>)}
+        </div>
+      </section>
+    </>
   );
 }

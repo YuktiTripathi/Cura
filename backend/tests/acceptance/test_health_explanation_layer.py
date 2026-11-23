@@ -135,6 +135,9 @@ def test_refresh_returns_the_same_shape_and_category_and_finding_endpoints_work(
         return
     cid = ov["categories"][0]["id"]
     detail = _client.get(f"/api/v1/health-explanation/categories/{cid}", headers=_A).json()
+    assert detail["story"]["understand_body"]
+    ui_detail = _client.get(f"/api/v1/me/health-overview/{cid}", headers=_A).json()
+    assert ui_detail["story"] == detail["story"]
     fid = detail["findings"][0]["id"]
     f = _client.get(f"/api/v1/health-explanation/findings/{fid}", headers=_A).json()
     assert f["id"] == fid and f["data_quality"] in {"verified", "reference_unavailable", "unavailable"}
@@ -167,3 +170,122 @@ def test_data_quality_follows_what_the_report_supplied():
     assert Finding(status="no_range", **base).data_quality == "reference_unavailable"
     assert Finding(status="no_value", **base).data_quality == "unavailable"
     assert Finding(status="above_range", **base).data_quality == "verified"
+
+
+@pytest.mark.parametrize("markers, risks, expected", [
+    (MEENA, RISKS, "risk_raised"),
+    (MEENA, [("cardiac_health", "Healthy", 12)], "risk_healthy"),
+    (MEENA, [("cardiac_health", "Unexpected label", 12)], "risk_unknown"),
+    (MEENA, [], None),
+    ([], RISKS, "risk_raised"),
+    ([m("LDL Cholesterol", 85, 0, 100, "mg/dL")], RISKS, "risk_raised"),
+])
+def test_heart_story_preserves_measured_and_predicted_evidence(markers, risks, expected):
+    from app.health_explanation.category_story import CategoryProfile, build_story
+
+    detail = build_category_detail("heart_circulation", blood(markers) if markers else None, bio(risks) if risks else None)
+    assert detail is not None
+    story = build_story(detail, CategoryProfile(None, None, []), "member")
+    assert "pumps blood" in story.understand_body
+    assert set(story.biomarker_meanings) == {f.id for f in detail.findings if f.source_type == "measured"}
+    prediction = next((f for f in detail.findings if f.source_type == "predicted_risk"), None)
+    if expected:
+        assert prediction is not None and prediction.status == expected
+        assert prediction.id in story.risk_explanations
+        assert "cannot diagnose" in story.bio_ai_limitations
+    else:
+        assert not story.risk_explanations
+        assert "no Bio-AI assessment" in story.bio_ai_limitations
+    assert story.monitoring and story.questions
+
+
+def test_story_validates_model_blocks_and_only_sends_category_context(monkeypatch):
+    import json
+    from types import SimpleNamespace
+
+    from app.contracts.unified_health import SelfReportedFactor
+    from app.health_explanation.category_story import CategoryProfile, build_story
+    from app.core import request_controls as controls
+
+    monkeypatch.setattr(controls.request_controls, "_get", lambda key: None)
+    monkeypatch.setattr(controls.request_controls, "_set", lambda *args: None)
+    calls = []
+
+    def complete(messages, **kwargs):
+        payload = json.loads(messages[1]["content"])
+        calls.append(payload)
+        assert "member-secret" not in json.dumps(payload)
+        assert payload["category"] == "heart_circulation"
+        assert "HbA1c" not in json.dumps(payload)
+        assert payload["age_band"] == "40s"
+        assert payload["self_reported"][0]["source_type"] == "self_reported"
+        return json.dumps({"block_ids": ["Invented diagnosis"], "actions": ["Unsafe advice"]})
+
+    detail = build_category_detail("heart_circulation", blood(MEENA), bio(RISKS))
+    profile = CategoryProfile("40s", "female", [
+        SelfReportedFactor(key="diet_preference", label="diet pattern", value="Vegetarian"),
+        SelfReportedFactor(key="physical_activity_frequency", label="physical activity", value="Rarely"),
+    ])
+    story = build_story(detail, profile, "member-secret", allow_model=True, client=SimpleNamespace(complete=complete))
+    assert len(calls) == 1
+    assert story == build_story(detail, profile, "member-secret")
+    assert {"diet_preference", "physical_activity_frequency"} <= {step.action_id for step in story.improvement_plan}
+    assert "Invented diagnosis" not in story.model_dump_json()
+    assert "Physical activity can affect HDL cholesterol." in story.influences
+
+    def complete_valid(messages, **kwargs):
+        payload = json.loads(messages[1]["content"])
+        return json.dumps({"block_ids": list(reversed(payload["approved_blocks"]))})
+
+    reordered = build_story(detail, profile, "member-secret", allow_model=True, client=SimpleNamespace(complete=complete_valid))
+    assert set(reordered.influences) == set(story.influences)
+    assert reordered.influences != story.influences
+    assert reordered.biomarker_meanings == story.biomarker_meanings
+    assert reordered.risk_explanations == story.risk_explanations
+
+
+def test_story_uses_only_current_relevant_answers_for_the_principal():
+    from types import SimpleNamespace
+
+    from app.auth.models import AuthenticatedPrincipal
+    from app.contracts.questionnaire import QuestionnaireAnswer, QuestionnaireInstance
+    from app.contracts.user import UserProfile
+    from app.health_explanation.category_story import load_profile
+
+    def answer(key, value, date, subject="member"):
+        return QuestionnaireAnswer(
+            subject_id=subject, response_id=date, assessment_instance_id="assessment",
+            question_id=key, question_key=key, question=key, value=value,
+            response_type="choice", recorded_at=date,
+        )
+
+    instance = QuestionnaireInstance(assessment_instance_id="assessment", subject_id="member", answers=[
+        answer("diet_preference", "Vegetarian", "2026-03-01"),
+        answer("diet_preference", "Mixed", "2026-02-01"),
+        answer("diet_preference", "Unrelated member", "2026-04-01", "other"),
+        answer("unrelated_key", "private", "2026-04-01"),
+    ])
+    registry = SimpleNamespace(
+        users=SimpleNamespace(get_profile=lambda principal: UserProfile(subject_id=principal.subject_id, display_name="Private")),
+        questionnaires=SimpleNamespace(query=lambda principal, plan: [instance]),
+    )
+    profile = load_profile(AuthenticatedPrincipal(subject_id="member"), registry, ["ldl"])
+    assert [(factor.key, factor.value) for factor in profile.factors] == [("diet_preference", "Vegetarian")]
+
+
+def test_category_consent_keeps_existing_report_view_without_enriching(monkeypatch):
+    from app.auth.models import AuthenticatedPrincipal
+    from app.pipeline import unified_service
+
+    def unexpected_profile(*args):
+        pytest.fail("A member without current consent must not enter story enrichment")
+
+    monkeypatch.setattr(unified_service.settings, "enable_llm", True)
+    monkeypatch.setattr(type(unified_service.settings), "consent_enforced", lambda self: True)
+    monkeypatch.setattr(unified_service, "_load", lambda *args: (blood(MEENA), bio(RISKS)))
+    monkeypatch.setattr(unified_service, "load_profile", unexpected_profile)
+    monkeypatch.setattr(unified_service, "has_current_consent", lambda db, subject: False)
+    detail = unified_service.unified_category(AuthenticatedPrincipal(subject_id="member"), object(), "heart_circulation", object())
+    assert detail.story is not None
+    assert detail.story.self_reported == []
+    assert detail.story.biomarker_meanings
