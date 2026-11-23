@@ -264,7 +264,7 @@ def drop_routine_doctor(text: str) -> str:
         joined = " ".join(kept).strip()
         marker = re.match(r"^(\s*[-*]\s+)", line)
         if joined and (not marker or len(joined.split()) > 2) and joined not in ("-", "*"):
-            out.append(joined if joined.startswith(marker.group(1).strip()) or not marker else marker.group(1) + joined)
+            out.append(joined if not marker or joined.startswith(marker.group(1).strip()) else marker.group(1) + joined)
     return "\n".join(out)
 
 
