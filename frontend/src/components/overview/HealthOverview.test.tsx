@@ -50,6 +50,12 @@ describe("My Health Overview", () => {
     expect(screen.queryByText("What does this mean?")).toBeNull();
   });
 
+  it("says what the overview could not cover", async () => {
+    vi.spyOn(api, "getHealthOverview").mockResolvedValue({ ...overview, limitations: ["5 blood results have no reference range, so they were not judged as in or out of range."] } as unknown as UnifiedOverview);
+    wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
+    expect(await screen.findByText(/have no reference range/)).toBeTruthy();
+  });
+
   it("opens a category and keeps individual reports reachable", async () => {
     vi.spyOn(api, "getHealthOverview").mockResolvedValue(overview);
     const onOpenChange = vi.fn();

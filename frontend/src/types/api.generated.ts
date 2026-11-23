@@ -272,6 +272,74 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/health-explanation/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Category */
+        get: operations["category_api_v1_health_explanation_categories__category_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health-explanation/findings/{finding_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Finding */
+        get: operations["finding_api_v1_health_explanation_findings__finding_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health-explanation/overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Overview */
+        get: operations["overview_api_v1_health_explanation_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/health-explanation/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /** Refresh */
+        post: operations["refresh_api_v1_health_explanation_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health-snapshot": {
         parameters: {
             query?: never;
@@ -563,11 +631,18 @@ export interface components {
     schemas: {
         /** ActionItem */
         ActionItem: {
+            /** Action Id */
+            action_id?: string | null;
             /**
              * Detail
              * @default
              */
             detail: string;
+            /**
+             * Evidence Status
+             * @default rule_based_unreviewed
+             */
+            evidence_status: string;
             /**
              * Icon
              * @default check
@@ -960,6 +1035,8 @@ export interface components {
             name: string;
             primary_action: components["schemas"]["PrimaryAction"];
             provenance?: components["schemas"]["Provenance"];
+            /** Relationships */
+            relationships?: components["schemas"]["Relationship"][];
             risks?: components["schemas"]["RiskCounts"];
             /**
              * Scenario
@@ -1544,6 +1621,12 @@ export interface components {
         Finding: {
             /** Classification */
             classification?: string | null;
+            /**
+             * Data Quality
+             * @default verified
+             * @enum {string}
+             */
+            data_quality: "verified" | "reference_unavailable" | "unavailable";
             education?: components["schemas"]["EducationNote"] | null;
             /**
              * Explain
@@ -2461,6 +2544,48 @@ export interface components {
              */
             why: string;
         };
+        /**
+         * Relationship
+         * @description An approved association or contrast between findings. It never states a cause.
+         */
+        Relationship: {
+            /** Category */
+            category: string;
+            /**
+             * Causal Claim
+             * @default false
+             * @constant
+             */
+            causal_claim: false;
+            /**
+             * Evidence Status
+             * @default rule_based_unreviewed
+             */
+            evidence_status: string;
+            /** Finding Ids */
+            finding_ids?: string[];
+            /** Interpretation */
+            interpretation: string;
+            /**
+             * Rationale
+             * @default
+             */
+            rationale: string;
+            /** Relationship Id */
+            relationship_id: string;
+            /**
+             * Relationship Type
+             * @enum {string}
+             */
+            relationship_type: "supports" | "consistent_with" | "contextualizes" | "potentially_related" | "discordant" | "independent" | "temporal_change";
+            /** Rule Id */
+            rule_id: string;
+            /**
+             * Rules Version
+             * @default
+             */
+            rules_version: string;
+        };
         /** ReportOverview */
         ReportOverview: {
             /** Date */
@@ -3281,6 +3406,8 @@ export interface components {
              * @enum {string}
              */
             insights_source: "model" | "rules";
+            /** Limitations */
+            limitations?: string[];
             /**
              * Opening
              * @default
@@ -3306,6 +3433,10 @@ export interface components {
              */
             state: "ready" | "no_reports";
             totals?: components["schemas"]["OverviewTotals"];
+            /** Versions */
+            versions?: {
+                [key: string]: string;
+            };
         };
         /** UserProvenance */
         UserProvenance: {
@@ -3916,6 +4047,108 @@ export interface operations {
                 };
                 content: {
                     "application/json": unknown;
+                };
+            };
+        };
+    };
+    category_api_v1_health_explanation_categories__category_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    finding_api_v1_health_explanation_findings__finding_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                finding_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Finding"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    overview_api_v1_health_explanation_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnifiedOverview"];
+                };
+            };
+        };
+    };
+    refresh_api_v1_health_explanation_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnifiedOverview"];
                 };
             };
         };

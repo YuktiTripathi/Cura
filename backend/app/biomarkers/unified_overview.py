@@ -293,6 +293,32 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
     )
 
 
+def _limitations(totals: OverviewTotals, bio: RiskOverview | None) -> list[str]:
+    """Plain statements of what is missing. Each comes from a count, none from a guess."""
+    out: list[str] = []
+    if totals.blood_no_range:
+        out.append(f"{totals.blood_no_range} blood result{'s have' if totals.blood_no_range != 1 else ' has'} no reference range, so {'they were' if totals.blood_no_range != 1 else 'it was'} not judged as in or out of range.")
+    if totals.blood_unavailable:
+        out.append(f"{totals.blood_unavailable} blood result{'s were' if totals.blood_unavailable != 1 else ' was'} not available.")
+    if totals.risks_assessed == 0:
+        out.append("No Bio-AI risk assessment is available, so nothing here is based on predicted risk.")
+    if not (totals.blood_within or totals.blood_outside):
+        out.append("No blood results with a reference range are available, so nothing here is based on measured results.")
+    return out
+
+
+def _versions() -> dict[str, str]:
+    from app.health_explanation.relationship_engine import action_library, rules
+    from app.pipeline.unified_wording import PROMPT_VERSION
+
+    return {
+        "categories": REGISTRY_VERSION,
+        "relationships": rules()["rules_version"],
+        "actions": action_library()["actions_version"],
+        "wording": PROMPT_VERSION,
+    }
+
+
 def build_unified_overview(blood: BodySystemOverview | None, bio: RiskOverview | None, wording: "Wording | None" = None) -> UnifiedOverview:
     from app.pipeline.unified_wording import Wording, rules_wording
 
@@ -324,6 +350,8 @@ def build_unified_overview(blood: BodySystemOverview | None, bio: RiskOverview |
         provenance=prov,
         registry_version=REGISTRY_VERSION,
         insights_source=w.source,
+        limitations=_limitations(totals, bio),
+        versions=_versions(),
     )
 
 

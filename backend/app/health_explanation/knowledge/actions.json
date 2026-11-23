@@ -1,0 +1,12 @@
+{
+ "actions_version": "act-1",
+ "review_status": "unreviewed",
+ "note": "Engineering draft. Every action is a conversation or tracking step. None names a medicine, supplement, dose or diet plan. Each needs clinical review before release.",
+ "actions": [
+  {"action_id": "act_review_results", "when": "measured_out", "title": "Review your results", "detail": "Talk to your doctor about {out}.", "icon": "clipboard", "priority": 1},
+  {"action_id": "act_understand_risk", "when": "risk_raised", "title": "Understand your risk", "detail": "Ask your doctor what your predicted {raised} risk means for you.", "icon": "heart", "priority": 2},
+  {"action_id": "act_ask_about_difference", "when": "scenario:blood_out_risk_ok", "title": "Ask about the difference", "detail": "Ask your doctor why your blood results and your predicted risk point in different directions.", "icon": "clipboard", "priority": 3},
+  {"action_id": "act_track_changes", "when": "measured_out_or_risk_raised", "title": "Keep track of changes", "detail": "Repeat the relevant tests if your doctor advises.", "icon": "calendar", "priority": 4},
+  {"action_id": "act_keep_going", "when": "nothing_raised", "title": "Keep it this way", "detail": "Keep up the habits that are working for you.", "icon": "check", "priority": 5}
+ ]
+}

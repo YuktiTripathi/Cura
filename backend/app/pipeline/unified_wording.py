@@ -19,7 +19,7 @@ from app.contracts.unified_health import CategoryCard, Priority, Provenance
 from app.health_explanation.safety_validator import safety_problems
 
 logger = logging.getLogger("cura.unified")
-PROMPT_VERSION = "u4"
+PROMPT_VERSION = "u5"
 _TTL = 7 * 24 * 3600
 _DASH = re.compile(r"\s*[—–]\s*")
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -83,17 +83,25 @@ def _interpretation(card: CategoryCard, p, prov: Provenance) -> list[str]:
 
 
 def _actions(card: CategoryCard, p) -> list[dict]:
+    """Next steps come only from the approved action library. The model never writes or adds one."""
+    from app.health_explanation.relationship_engine import action_library
+
     out = _names(p.measured, {"above_range", "below_range", "critical"})
     raised = _names(p.risks, {"risk_raised"})
+    conditions = {
+        "measured_out": bool(out),
+        "risk_raised": bool(raised),
+        "measured_out_or_risk_raised": bool(out or raised),
+        "nothing_raised": not (out or raised),
+        f"scenario:{card.scenario}": True,
+    }
+    lib = action_library()
     items: list[dict] = []
-    if out:
-        items.append({"title": "Review your results", "detail": f"Talk to your doctor about {_join(out[:3])}.", "icon": "clipboard"})
-    if raised:
-        items.append({"title": "Understand your risk", "detail": f"Ask your doctor what your predicted {_join(raised[:2])} risk means for you.", "icon": "heart"})
-    if out or raised:
-        items.append({"title": "Keep track of changes", "detail": "Repeat the relevant tests if your doctor advises.", "icon": "calendar"})
-    else:
-        items.append({"title": "Keep it this way", "detail": "Keep up the habits that are working for you.", "icon": "check"})
+    for a in sorted(lib["actions"], key=lambda x: x["priority"]):
+        if not conditions.get(a["when"]):
+            continue
+        detail = a["detail"].format(out=_join(out[:3]), raised=_join(raised[:2]))
+        items.append({"title": a["title"], "detail": detail, "icon": a["icon"], "action_id": a["action_id"]})
     return items[:4]
 
 
@@ -196,12 +204,12 @@ You get verified findings per health category. Blood findings are measured resul
 
 Scenarios: both_reassuring (encouraging, never say risk free), blood_out_risk_ok (the results still deserve attention, a healthy risk does not cancel them), blood_ok_risk_up (results are encouraging, the risk deserves attention, name personal reasons only if given), both_out (explain both, never say one caused the other), blood_only, risk_only (no claims about the other source), incomplete (say what is missing). Never mention report dates or that the reports were made at different times.
 
-Rules: the app already shows a reviewed explanation of every individual blood test, so never define or explain what a single test measures; explain how the findings fit together and what they mean for the member. Never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. The summary, interpretation and actions must each add something new: never say the same thing twice. Do not repeat the same advice in every category: make actions fit that category's actual findings and the member's context. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
+Rules: the app already shows a reviewed explanation of every individual blood test, so never define or explain what a single test measures; explain how the findings fit together and what they mean for the member. Never write a number, value, score or date (the app shows them). Never invent a result, habit or condition; use member_context only if it helps. Do not recommend supplements or medicines. Use everyday names, with no jargon. The summary and interpretation must each add something new: never say the same thing twice. Do not repeat the same advice in every category: do not write next steps, the app adds them. Mention a doctor when a result is outside range or a risk is raised. Never use dashes.
 
 Return only JSON:
 {"opening": "1 or 2 sentences about the whole picture",
  "priorities": [{"category_id": "...", "title": "short", "detail": "one sentence", "tone": "attention" or "good"}],  // at most 4, attention first, one good only if true
- "categories": {"<id>": {"about": "what this part of the body does, one plain sentence", "summary": "1 to 2 sentences that say what this area means for the member, combining measured and predicted findings", "interpretation": ["2 to 3 short sentences that EXPLAIN: what the findings are measuring, why they matter, how they relate. Do not repeat the summary or list the values"], "insight": "", "actions": [{"title": "2 to 4 words", "detail": "one sentence", "icon": "clipboard|heart|calendar|check|food|walk|moon"}], // 3 or 4
+ "categories": {"<id>": {"about": "what this part of the body does, one plain sentence", "summary": "1 to 2 sentences that say what this area means for the member, combining measured and predicted findings", "interpretation": ["2 to 3 short sentences that EXPLAIN: what the findings are measuring, why they matter, how they relate. Do not repeat the summary or list the values"], "insight": "",
  "follow_ups": ["max 4 questions the member may ask next"]}}}"""
 
 
@@ -239,12 +247,6 @@ def _fit(raw: dict, cards: list[CategoryCard], parts: dict, prov: Provenance, al
         lines = [ok(x) for x in (mine.get("interpretation") or []) if ok(x)][:3]
         if lines:
             entry["interpretation"] = lines
-        acts = []
-        for a in (mine.get("actions") or [])[:4]:
-            if isinstance(a, dict) and ok(a.get("title")) and ok(a.get("detail")):
-                acts.append({"title": ok(a["title"]), "detail": ok(a["detail"]), "icon": str(a.get("icon") or "check")[:12]})
-        if len(acts) >= 2:
-            entry["actions"] = acts
         qs = [ok(q) for q in (mine.get("follow_ups") or []) if ok(q)][:4]
         if qs:
             entry["follow_ups"] = qs

@@ -3,9 +3,25 @@
     "schemas": {
       "ActionItem": {
         "properties": {
+          "action_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Action Id"
+          },
           "detail": {
             "default": "",
             "title": "Detail",
+            "type": "string"
+          },
+          "evidence_status": {
+            "default": "rule_based_unreviewed",
+            "title": "Evidence Status",
             "type": "string"
           },
           "icon": {
@@ -1149,6 +1165,13 @@
           },
           "provenance": {
             "$ref": "#/components/schemas/Provenance"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/Relationship"
+            },
+            "title": "Relationships",
+            "type": "array"
           },
           "risks": {
             "$ref": "#/components/schemas/RiskCounts"
@@ -3164,6 +3187,16 @@
               }
             ],
             "title": "Classification"
+          },
+          "data_quality": {
+            "default": "verified",
+            "enum": [
+              "verified",
+              "reference_unavailable",
+              "unavailable"
+            ],
+            "title": "Data Quality",
+            "type": "string"
           },
           "education": {
             "anyOf": [
@@ -5911,6 +5944,77 @@
         "title": "RelatedTest",
         "type": "object"
       },
+      "Relationship": {
+        "description": "An approved association or contrast between findings. It never states a cause.",
+        "properties": {
+          "category": {
+            "title": "Category",
+            "type": "string"
+          },
+          "causal_claim": {
+            "const": false,
+            "default": false,
+            "title": "Causal Claim",
+            "type": "boolean"
+          },
+          "evidence_status": {
+            "default": "rule_based_unreviewed",
+            "title": "Evidence Status",
+            "type": "string"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "interpretation": {
+            "title": "Interpretation",
+            "type": "string"
+          },
+          "rationale": {
+            "default": "",
+            "title": "Rationale",
+            "type": "string"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "relationship_type": {
+            "enum": [
+              "supports",
+              "consistent_with",
+              "contextualizes",
+              "potentially_related",
+              "discordant",
+              "independent",
+              "temporal_change"
+            ],
+            "title": "Relationship Type",
+            "type": "string"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "rules_version": {
+            "default": "",
+            "title": "Rules Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "category",
+          "relationship_type",
+          "interpretation",
+          "rule_id"
+        ],
+        "title": "Relationship",
+        "type": "object"
+      },
       "ReportOverview": {
         "properties": {
           "date": {
@@ -8051,6 +8155,13 @@
             "title": "Insights Source",
             "type": "string"
           },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
           "opening": {
             "default": "",
             "title": "Opening",
@@ -8087,6 +8198,13 @@
           },
           "totals": {
             "$ref": "#/components/schemas/OverviewTotals"
+          },
+          "versions": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Versions",
+            "type": "object"
           }
         },
         "title": "UnifiedOverview",
@@ -8887,6 +9005,132 @@
           }
         },
         "summary": "Api Health"
+      }
+    },
+    "/api/v1/health-explanation/categories/{category_id}": {
+      "get": {
+        "operationId": "category_api_v1_health_explanation_categories__category_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "required": true,
+            "schema": {
+              "title": "Category Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Category",
+        "tags": [
+          "health-explanation"
+        ]
+      }
+    },
+    "/api/v1/health-explanation/findings/{finding_id}": {
+      "get": {
+        "operationId": "finding_api_v1_health_explanation_findings__finding_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "finding_id",
+            "required": true,
+            "schema": {
+              "title": "Finding Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Finding"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Finding",
+        "tags": [
+          "health-explanation"
+        ]
+      }
+    },
+    "/api/v1/health-explanation/overview": {
+      "get": {
+        "operationId": "overview_api_v1_health_explanation_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnifiedOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Overview",
+        "tags": [
+          "health-explanation"
+        ]
+      }
+    },
+    "/api/v1/health-explanation/refresh": {
+      "post": {
+        "operationId": "refresh_api_v1_health_explanation_refresh_post",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnifiedOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Refresh",
+        "tags": [
+          "health-explanation"
+        ]
       }
     },
     "/api/v1/health-snapshot": {
