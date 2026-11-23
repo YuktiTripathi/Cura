@@ -6,6 +6,8 @@ export const queryKeys = {
   documents: ["documents"] as const,
   overview: ["overview"] as const,
   bodySystems: (reportId: string | null) => ["body-systems", reportId] as const,
+  healthOverview: ["health-overview"] as const,
+  healthCategory: (id: string) => ["health-overview", id] as const,
   riskOverview: (reportId: string | null) => ["bio-ai-risks", reportId] as const,
 };
 

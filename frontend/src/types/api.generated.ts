@@ -364,6 +364,43 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/me/health-overview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Unified Health Overview
+         * @description Blood results and Bio-AI risks in one set of health categories. Values are the reports' own.
+         */
+        get: operations["unified_health_overview_api_v1_me_health_overview_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/me/health-overview/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Unified Health Category */
+        get: operations["unified_health_category_api_v1_me_health_overview__category_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/me/overview": {
         parameters: {
             query?: never;
@@ -524,6 +561,21 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
+        /** ActionItem */
+        ActionItem: {
+            /**
+             * Detail
+             * @default
+             */
+            detail: string;
+            /**
+             * Icon
+             * @default check
+             */
+            icon: string;
+            /** Title */
+            title: string;
+        };
         /** AllergySubsection */
         AllergySubsection: {
             /** Abnormal Count */
@@ -804,6 +856,115 @@ export interface components {
             kind: components["schemas"]["CatalogItemKind"];
             /** Name */
             name: string;
+        };
+        /** CategoryCard */
+        CategoryCard: {
+            /**
+             * Completeness
+             * @enum {string}
+             */
+            completeness: "complete" | "partial" | "none";
+            /**
+             * Count Line
+             * @default
+             */
+            count_line: string;
+            /**
+             * Detail Line
+             * @default
+             */
+            detail_line: string;
+            /** Icon */
+            icon: string;
+            /** Id */
+            id: string;
+            /** Important Findings */
+            important_findings?: components["schemas"]["Finding"][];
+            measured?: components["schemas"]["MeasuredCounts"];
+            /** Name */
+            name: string;
+            primary_action: components["schemas"]["PrimaryAction"];
+            risks?: components["schemas"]["RiskCounts"];
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "both_reassuring" | "blood_out_risk_ok" | "blood_ok_risk_up" | "both_out" | "blood_only" | "risk_only" | "incomplete" | "none";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "looking_good" | "worth_attention" | "needs_closer_attention" | "not_assessed";
+            /** Status Label */
+            status_label: string;
+            /** Summary */
+            summary: string;
+        };
+        /** CategoryDetail */
+        CategoryDetail: {
+            /**
+             * About
+             * @default
+             */
+            about: string;
+            /** Actions */
+            actions?: components["schemas"]["ActionItem"][];
+            /** Caveat */
+            caveat?: string | null;
+            /**
+             * Completeness
+             * @enum {string}
+             */
+            completeness: "complete" | "partial" | "none";
+            /** Context */
+            context?: string[];
+            /**
+             * Count Line
+             * @default
+             */
+            count_line: string;
+            /**
+             * Detail Line
+             * @default
+             */
+            detail_line: string;
+            /** Findings */
+            findings?: components["schemas"]["Finding"][];
+            /** Follow Ups */
+            follow_ups?: string[];
+            /** Icon */
+            icon: string;
+            /** Id */
+            id: string;
+            /** Important Findings */
+            important_findings?: components["schemas"]["Finding"][];
+            /**
+             * Insight
+             * @default
+             */
+            insight: string;
+            /** Interpretation */
+            interpretation?: string[];
+            measured?: components["schemas"]["MeasuredCounts"];
+            /** Name */
+            name: string;
+            primary_action: components["schemas"]["PrimaryAction"];
+            provenance?: components["schemas"]["Provenance"];
+            risks?: components["schemas"]["RiskCounts"];
+            /**
+             * Scenario
+             * @enum {string}
+             */
+            scenario: "both_reassuring" | "blood_out_risk_ok" | "blood_ok_risk_up" | "both_out" | "blood_only" | "risk_only" | "incomplete" | "none";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "looking_good" | "worth_attention" | "needs_closer_attention" | "not_assessed";
+            /** Status Label */
+            status_label: string;
+            /** Summary */
+            summary: string;
         };
         /** ChatMeta */
         ChatMeta: {
@@ -1344,6 +1505,58 @@ export interface components {
             /** Rating */
             rating: string;
         };
+        /** Finding */
+        Finding: {
+            /** Classification */
+            classification?: string | null;
+            /**
+             * Explain
+             * @default
+             */
+            explain: string;
+            /** How Far */
+            how_far?: ("slightly" | "moderately" | "clearly") | null;
+            /** Id */
+            id: string;
+            /**
+             * Important
+             * @default false
+             */
+            important: boolean;
+            /** Measured On */
+            measured_on?: string | null;
+            /**
+             * Medical Name
+             * @default
+             */
+            medical_name: string;
+            /** Name */
+            name: string;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
+            /** Report Id */
+            report_id?: string | null;
+            /** Score */
+            score?: number | null;
+            /**
+             * Source Type
+             * @enum {string}
+             */
+            source_type: "measured" | "predicted_risk";
+            /**
+             * Status
+             * @enum {string}
+             */
+            status: "within_range" | "above_range" | "below_range" | "critical" | "no_range" | "no_value" | "risk_healthy" | "risk_raised" | "risk_unknown";
+            /** Status Label */
+            status_label: string;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value?: number | null;
+        };
         /** FollowUpSuggestion */
         FollowUpSuggestion: {
             /** Category */
@@ -1748,6 +1961,34 @@ export interface components {
             /** User Id */
             user_id: string | number;
         };
+        /** MeasuredCounts */
+        MeasuredCounts: {
+            /**
+             * No Range
+             * @default 0
+             */
+            no_range: number;
+            /**
+             * Outside Range
+             * @default 0
+             */
+            outside_range: number;
+            /**
+             * Total
+             * @default 0
+             */
+            total: number;
+            /**
+             * Unavailable
+             * @default 0
+             */
+            unavailable: number;
+            /**
+             * Within Range
+             * @default 0
+             */
+            within_range: number;
+        };
         /** MessageOut */
         MessageOut: {
             /** Content */
@@ -1795,6 +2036,41 @@ export interface components {
              * @default
              */
             why: string;
+        };
+        /** OverviewTotals */
+        OverviewTotals: {
+            /**
+             * Blood No Range
+             * @default 0
+             */
+            blood_no_range: number;
+            /**
+             * Blood Outside
+             * @default 0
+             */
+            blood_outside: number;
+            /**
+             * Blood Unavailable
+             * @default 0
+             */
+            blood_unavailable: number;
+            /**
+             * Blood Within
+             * @default 0
+             */
+            blood_within: number;
+            /** Metabolic Age */
+            metabolic_age?: number | null;
+            /**
+             * Risks Assessed
+             * @default 0
+             */
+            risks_assessed: number;
+            /**
+             * Risks Raised
+             * @default 0
+             */
+            risks_raised: number;
         };
         /** PackageAction */
         PackageAction: {
@@ -2013,6 +2289,50 @@ export interface components {
             unit?: string | null;
             /** Value */
             value?: string | null;
+        };
+        /** PrimaryAction */
+        PrimaryAction: {
+            /** Label */
+            label: string;
+            /** Question */
+            question: string;
+        };
+        /** Priority */
+        Priority: {
+            /** Category Id */
+            category_id: string;
+            /** Detail */
+            detail: string;
+            /** Icon */
+            icon: string;
+            /** Title */
+            title: string;
+            /**
+             * Tone
+             * @enum {string}
+             */
+            tone: "attention" | "good";
+        };
+        /** Provenance */
+        Provenance: {
+            /** Bio Ai Report Date */
+            bio_ai_report_date?: string | null;
+            /** Bio Ai Report Id */
+            bio_ai_report_id?: string | null;
+            /** Blood Report Date */
+            blood_report_date?: string | null;
+            /** Blood Report Id */
+            blood_report_id?: string | null;
+            /**
+             * Dates Differ
+             * @default false
+             */
+            dates_differ: boolean;
+            /**
+             * Reports Linked
+             * @default false
+             */
+            reports_linked: boolean;
         };
         /** ProvenanceSource */
         ProvenanceSource: {
@@ -2236,6 +2556,19 @@ export interface components {
         RewindRequest: {
             /** Keep */
             keep: number;
+        };
+        /** RiskCounts */
+        RiskCounts: {
+            /**
+             * Assessed
+             * @default 0
+             */
+            assessed: number;
+            /**
+             * Raised
+             * @default 0
+             */
+            raised: number;
         };
         /**
          * RiskExplanation
@@ -2891,6 +3224,52 @@ export interface components {
             stream_policy: components["schemas"]["StreamPolicy"];
             /** Uncertainties */
             uncertainties?: string[];
+        };
+        /** UnifiedOverview */
+        UnifiedOverview: {
+            /**
+             * Available
+             * @default false
+             */
+            available: boolean;
+            /** Categories */
+            categories?: components["schemas"]["CategoryCard"][];
+            /**
+             * Disclaimer
+             * @default Blood tests measure your current health. Bio-AI estimates future health risks. Neither alone gives a complete picture of your health.
+             */
+            disclaimer: string;
+            /**
+             * Insights Source
+             * @default rules
+             * @enum {string}
+             */
+            insights_source: "model" | "rules";
+            /**
+             * Opening
+             * @default
+             */
+            opening: string;
+            /**
+             * Overall Question
+             * @default Help me understand my overall health
+             */
+            overall_question: string;
+            /** Priorities */
+            priorities?: components["schemas"]["Priority"][];
+            provenance?: components["schemas"]["Provenance"];
+            /**
+             * Registry Version
+             * @default 1
+             */
+            registry_version: string;
+            /**
+             * State
+             * @default no_reports
+             * @enum {string}
+             */
+            state: "ready" | "no_reports";
+            totals?: components["schemas"]["OverviewTotals"];
         };
         /** UserProvenance */
         UserProvenance: {
@@ -3658,6 +4037,57 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["GoalListResponse"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    unified_health_overview_api_v1_me_health_overview_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["UnifiedOverview"];
+                };
+            };
+        };
+    };
+    unified_health_category_api_v1_me_health_overview__category_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CategoryDetail"];
                 };
             };
             /** @description Validation Error */

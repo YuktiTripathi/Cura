@@ -8,6 +8,8 @@ from app.biomarkers.risk_overview import build_risk_overview
 from app.contracts.body_systems import BodySystemOverview, RiskOverview
 from app.contracts.goals import GoalListRequest, GoalListResponse
 from app.core.errors import ProviderUnavailableError
+from app.pipeline.unified_service import unified_category, unified_overview
+from app.contracts.unified_health import CategoryDetail, UnifiedOverview
 from app.contracts.me import MeResponse
 from app.contracts.capabilities import CapabilitiesResponse
 from app.contracts.overview import HealthOverview
@@ -106,6 +108,29 @@ def bio_ai_risks(
         return build_risk_overview(reports, report_id)
     except ReportNotFound as exc:
         raise HTTPException(status_code=404, detail="That report was not found.") from exc
+
+
+@router.get("/me/health-overview", response_model=UnifiedOverview)
+def unified_health_overview(
+    principal: AuthenticatedPrincipal = Depends(get_principal),
+    registry: ProviderRegistry = Depends(get_registry),
+    db: Session = Depends(get_db),
+) -> UnifiedOverview:
+    """Blood results and Bio-AI risks in one set of health categories. Values are the reports' own."""
+    return unified_overview(principal, registry, db)
+
+
+@router.get("/me/health-overview/{category_id}", response_model=CategoryDetail)
+def unified_health_category(
+    category_id: str,
+    principal: AuthenticatedPrincipal = Depends(get_principal),
+    registry: ProviderRegistry = Depends(get_registry),
+    db: Session = Depends(get_db),
+) -> CategoryDetail:
+    detail = unified_category(principal, registry, category_id, db)
+    if detail is None:
+        raise HTTPException(status_code=404, detail="That health category has no results.")
+    return detail
 
 
 @router.get("/me/goals", response_model=GoalListResponse)

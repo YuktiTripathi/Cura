@@ -1,6 +1,29 @@
 {
   "components": {
     "schemas": {
+      "ActionItem": {
+        "properties": {
+          "detail": {
+            "default": "",
+            "title": "Detail",
+            "type": "string"
+          },
+          "icon": {
+            "default": "check",
+            "title": "Icon",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "required": [
+          "title"
+        ],
+        "title": "ActionItem",
+        "type": "object"
+      },
       "AllergySubsection": {
         "properties": {
           "abnormal_count": {
@@ -914,6 +937,257 @@
           "name"
         ],
         "title": "CatalogPackageRef",
+        "type": "object"
+      },
+      "CategoryCard": {
+        "properties": {
+          "completeness": {
+            "enum": [
+              "complete",
+              "partial",
+              "none"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "count_line": {
+            "default": "",
+            "title": "Count Line",
+            "type": "string"
+          },
+          "detail_line": {
+            "default": "",
+            "title": "Detail Line",
+            "type": "string"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "important_findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Important Findings",
+            "type": "array"
+          },
+          "measured": {
+            "$ref": "#/components/schemas/MeasuredCounts"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_action": {
+            "$ref": "#/components/schemas/PrimaryAction"
+          },
+          "risks": {
+            "$ref": "#/components/schemas/RiskCounts"
+          },
+          "scenario": {
+            "enum": [
+              "both_reassuring",
+              "blood_out_risk_ok",
+              "blood_ok_risk_up",
+              "both_out",
+              "blood_only",
+              "risk_only",
+              "incomplete",
+              "none"
+            ],
+            "title": "Scenario",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "looking_good",
+              "worth_attention",
+              "needs_closer_attention",
+              "not_assessed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_label": {
+            "title": "Status Label",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "status",
+          "status_label",
+          "completeness",
+          "scenario",
+          "summary",
+          "primary_action"
+        ],
+        "title": "CategoryCard",
+        "type": "object"
+      },
+      "CategoryDetail": {
+        "properties": {
+          "about": {
+            "default": "",
+            "title": "About",
+            "type": "string"
+          },
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ActionItem"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "caveat": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Caveat"
+          },
+          "completeness": {
+            "enum": [
+              "complete",
+              "partial",
+              "none"
+            ],
+            "title": "Completeness",
+            "type": "string"
+          },
+          "context": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Context",
+            "type": "array"
+          },
+          "count_line": {
+            "default": "",
+            "title": "Count Line",
+            "type": "string"
+          },
+          "detail_line": {
+            "default": "",
+            "title": "Detail Line",
+            "type": "string"
+          },
+          "findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "array"
+          },
+          "follow_ups": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Follow Ups",
+            "type": "array"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "important_findings": {
+            "items": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Important Findings",
+            "type": "array"
+          },
+          "insight": {
+            "default": "",
+            "title": "Insight",
+            "type": "string"
+          },
+          "interpretation": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Interpretation",
+            "type": "array"
+          },
+          "measured": {
+            "$ref": "#/components/schemas/MeasuredCounts"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "primary_action": {
+            "$ref": "#/components/schemas/PrimaryAction"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "risks": {
+            "$ref": "#/components/schemas/RiskCounts"
+          },
+          "scenario": {
+            "enum": [
+              "both_reassuring",
+              "blood_out_risk_ok",
+              "blood_ok_risk_up",
+              "both_out",
+              "blood_only",
+              "risk_only",
+              "incomplete",
+              "none"
+            ],
+            "title": "Scenario",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "looking_good",
+              "worth_attention",
+              "needs_closer_attention",
+              "not_assessed"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_label": {
+            "title": "Status Label",
+            "type": "string"
+          },
+          "summary": {
+            "title": "Summary",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "icon",
+          "status",
+          "status_label",
+          "completeness",
+          "scenario",
+          "summary",
+          "primary_action"
+        ],
+        "title": "CategoryDetail",
         "type": "object"
       },
       "ChatMeta": {
@@ -2834,6 +3108,173 @@
         "title": "FeedbackRequest",
         "type": "object"
       },
+      "Finding": {
+        "properties": {
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
+          "explain": {
+            "default": "",
+            "title": "Explain",
+            "type": "string"
+          },
+          "how_far": {
+            "anyOf": [
+              {
+                "enum": [
+                  "slightly",
+                  "moderately",
+                  "clearly"
+                ],
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "How Far"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "important": {
+            "default": false,
+            "title": "Important",
+            "type": "boolean"
+          },
+          "measured_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured On"
+          },
+          "medical_name": {
+            "default": "",
+            "title": "Medical Name",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "reference_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference High"
+          },
+          "reference_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Low"
+          },
+          "report_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Report Id"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "source_type": {
+            "enum": [
+              "measured",
+              "predicted_risk"
+            ],
+            "title": "Source Type",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "within_range",
+              "above_range",
+              "below_range",
+              "critical",
+              "no_range",
+              "no_value",
+              "risk_healthy",
+              "risk_raised",
+              "risk_unknown"
+            ],
+            "title": "Status",
+            "type": "string"
+          },
+          "status_label": {
+            "title": "Status Label",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "id",
+          "source_type",
+          "name",
+          "status",
+          "status_label"
+        ],
+        "title": "Finding",
+        "type": "object"
+      },
       "FollowUpSuggestion": {
         "properties": {
           "category": {
@@ -3990,6 +4431,37 @@
         "title": "MeResponse",
         "type": "object"
       },
+      "MeasuredCounts": {
+        "properties": {
+          "no_range": {
+            "default": 0,
+            "title": "No Range",
+            "type": "integer"
+          },
+          "outside_range": {
+            "default": 0,
+            "title": "Outside Range",
+            "type": "integer"
+          },
+          "total": {
+            "default": 0,
+            "title": "Total",
+            "type": "integer"
+          },
+          "unavailable": {
+            "default": 0,
+            "title": "Unavailable",
+            "type": "integer"
+          },
+          "within_range": {
+            "default": 0,
+            "title": "Within Range",
+            "type": "integer"
+          }
+        },
+        "title": "MeasuredCounts",
+        "type": "object"
+      },
       "MessageOut": {
         "properties": {
           "content": {
@@ -4085,6 +4557,53 @@
           "title"
         ],
         "title": "NutritionPriority",
+        "type": "object"
+      },
+      "OverviewTotals": {
+        "properties": {
+          "blood_no_range": {
+            "default": 0,
+            "title": "Blood No Range",
+            "type": "integer"
+          },
+          "blood_outside": {
+            "default": 0,
+            "title": "Blood Outside",
+            "type": "integer"
+          },
+          "blood_unavailable": {
+            "default": 0,
+            "title": "Blood Unavailable",
+            "type": "integer"
+          },
+          "blood_within": {
+            "default": 0,
+            "title": "Blood Within",
+            "type": "integer"
+          },
+          "metabolic_age": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metabolic Age"
+          },
+          "risks_assessed": {
+            "default": 0,
+            "title": "Risks Assessed",
+            "type": "integer"
+          },
+          "risks_raised": {
+            "default": 0,
+            "title": "Risks Raised",
+            "type": "integer"
+          }
+        },
+        "title": "OverviewTotals",
         "type": "object"
       },
       "PackageAction": {
@@ -4867,6 +5386,121 @@
         "title": "PresentedFinding",
         "type": "object"
       },
+      "PrimaryAction": {
+        "properties": {
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "question": {
+            "title": "Question",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "question"
+        ],
+        "title": "PrimaryAction",
+        "type": "object"
+      },
+      "Priority": {
+        "properties": {
+          "category_id": {
+            "title": "Category Id",
+            "type": "string"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "icon": {
+            "title": "Icon",
+            "type": "string"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "tone": {
+            "enum": [
+              "attention",
+              "good"
+            ],
+            "title": "Tone",
+            "type": "string"
+          }
+        },
+        "required": [
+          "category_id",
+          "title",
+          "detail",
+          "icon",
+          "tone"
+        ],
+        "title": "Priority",
+        "type": "object"
+      },
+      "Provenance": {
+        "properties": {
+          "bio_ai_report_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio Ai Report Date"
+          },
+          "bio_ai_report_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Bio Ai Report Id"
+          },
+          "blood_report_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Report Date"
+          },
+          "blood_report_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Blood Report Id"
+          },
+          "dates_differ": {
+            "default": false,
+            "title": "Dates Differ",
+            "type": "boolean"
+          },
+          "reports_linked": {
+            "default": false,
+            "title": "Reports Linked",
+            "type": "boolean"
+          }
+        },
+        "title": "Provenance",
+        "type": "object"
+      },
       "ProvenanceSource": {
         "properties": {
           "name": {
@@ -5605,6 +6239,22 @@
           "keep"
         ],
         "title": "RewindRequest",
+        "type": "object"
+      },
+      "RiskCounts": {
+        "properties": {
+          "assessed": {
+            "default": 0,
+            "title": "Assessed",
+            "type": "integer"
+          },
+          "raised": {
+            "default": 0,
+            "title": "Raised",
+            "type": "integer"
+          }
+        },
+        "title": "RiskCounts",
         "type": "object"
       },
       "RiskExplanation": {
@@ -7319,6 +7969,75 @@
         "title": "TurnExperience",
         "type": "object"
       },
+      "UnifiedOverview": {
+        "properties": {
+          "available": {
+            "default": false,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "categories": {
+            "items": {
+              "$ref": "#/components/schemas/CategoryCard"
+            },
+            "title": "Categories",
+            "type": "array"
+          },
+          "disclaimer": {
+            "default": "Blood tests measure your current health. Bio-AI estimates future health risks. Neither alone gives a complete picture of your health.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "insights_source": {
+            "default": "rules",
+            "enum": [
+              "model",
+              "rules"
+            ],
+            "title": "Insights Source",
+            "type": "string"
+          },
+          "opening": {
+            "default": "",
+            "title": "Opening",
+            "type": "string"
+          },
+          "overall_question": {
+            "default": "Help me understand my overall health",
+            "title": "Overall Question",
+            "type": "string"
+          },
+          "priorities": {
+            "items": {
+              "$ref": "#/components/schemas/Priority"
+            },
+            "title": "Priorities",
+            "type": "array"
+          },
+          "provenance": {
+            "$ref": "#/components/schemas/Provenance"
+          },
+          "registry_version": {
+            "default": "1",
+            "title": "Registry Version",
+            "type": "string"
+          },
+          "state": {
+            "default": "no_reports",
+            "enum": [
+              "ready",
+              "no_reports"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "totals": {
+            "$ref": "#/components/schemas/OverviewTotals"
+          }
+        },
+        "title": "UnifiedOverview",
+        "type": "object"
+      },
       "UserProvenance": {
         "properties": {
           "sources": {
@@ -8328,6 +9047,64 @@
           }
         },
         "summary": "Put Goals"
+      }
+    },
+    "/api/v1/me/health-overview": {
+      "get": {
+        "description": "Blood results and Bio-AI risks in one set of health categories. Values are the reports' own.",
+        "operationId": "unified_health_overview_api_v1_me_health_overview_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnifiedOverview"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Unified Health Overview"
+      }
+    },
+    "/api/v1/me/health-overview/{category_id}": {
+      "get": {
+        "operationId": "unified_health_category_api_v1_me_health_overview__category_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "required": true,
+            "schema": {
+              "title": "Category Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CategoryDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Unified Health Category"
       }
     },
     "/api/v1/me/overview": {

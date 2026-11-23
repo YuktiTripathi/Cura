@@ -17,7 +17,7 @@ export function WelcomeExperience({
   suggestions?: Array<{ id: string; text: string }>;
   onSend: (text: string, documentIds?: string[], contextRef?: ContextRef) => void;
   /** Opens the visual overview. Without it the buttons start a chat, as before. */
-  onOpenOverview?: (kind: "blood" | "bio_ai") => void;
+  onOpenOverview?: (kind: "blood" | "bio_ai" | "unified") => void;
   inputRef: RefObject<HTMLInputElement>;
 }) {
   const greeting = meLoading ? "Hi 👋" : me?.greeting || "Hi there 👋";
@@ -34,37 +34,21 @@ export function WelcomeExperience({
         I can explain your blood report, Bio-AI report, and nutrition, and answer general health questions.
       </p>
       <div className="capability-grid">
-        {capabilities?.has_blood_report && (
+        {(capabilities?.has_blood_report || capabilities?.has_bio_ai_report) && (
           <button
             type="button"
             onClick={() =>
               onOpenOverview
-                ? onOpenOverview("blood")
-                : onSend("What does my lab report say about my health?", [], {
-                    type: "blood_report",
-                    source: "supershyft",
-                    entry_point: "blood_report_overview",
-                  })
-            }
-          >
-            🩸 <strong>{t("ui.WelcomeExperience.my_blood_report", "My Blood Report")}</strong>
-            <span>{t("ui.WelcomeExperience.understand_markers_and_trends", "Understand markers and trends")}</span>
-          </button>
-        )}
-        {capabilities?.has_bio_ai_report && (
-          <button
-            type="button"
-            onClick={() =>
-              onOpenOverview
-                ? onOpenOverview("bio_ai")
-                : onSend("Help me understand my latest Bio-AI report and its findings.", [], {
+                ? onOpenOverview("unified")
+                : onSend("Help me understand my overall health.", [], {
                     type: "bio_ai_report",
                     source: "supershyft",
+                    entry_point: "health_area",
                   })
             }
           >
-            🧬 <strong>{t("ui.WelcomeExperience.my_bio_ai_report", "My Bio-AI Report")}</strong>
-            <span>{t("ui.WelcomeExperience.explore_risk_assessments", "Explore risk assessments")}</span>
+            🩺 <strong>{t("ui.WelcomeExperience.my_health_overview", "My Health Overview")}</strong>
+            <span>{t("ui.WelcomeExperience.blood_results_and_risks_together", "Your blood results and future risks together")}</span>
           </button>
         )}
         {capabilities?.has_nutrition && (

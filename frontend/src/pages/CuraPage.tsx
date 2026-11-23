@@ -12,6 +12,7 @@ import { ConversationSidebar } from "../components/ConversationSidebar";
 import { WelcomeExperience } from "../components/WelcomeExperience";
 import { BodySystemOverviewView } from "../components/overview/BodySystemOverviewView";
 import { RiskOverviewView } from "../components/overview/RiskOverviewView";
+import { HealthOverviewView } from "../components/overview/HealthOverviewView";
 import type { ContextRef } from "../types/chat";
 import { useOverview } from "../hooks/useOverview";
 import { MarkerPanel } from "../components/marker/MarkerPanel";
@@ -53,10 +54,10 @@ export function CuraPage() {
     return send(text, ids, contextRef);
   }
 
-  const [overviewKind, setOverviewKind] = useState<"blood" | "bio_ai" | null>(null);
+  const [overviewKind, setOverviewKind] = useState<"blood" | "bio_ai" | "unified" | null>(null);
   const [openGroupId, setOpenGroupId] = useState<string | null>(null);
   // Remember which overview a chat came from, so Back returns there before going home.
-  const [returnTo, setReturnTo] = useState<"blood" | "bio_ai" | null>(null);
+  const [returnTo, setReturnTo] = useState<"blood" | "bio_ai" | "unified" | null>(null);
   function askFromOverview(text: string, contextRef: ContextRef) {
     setReturnTo(overviewKind);
     setOverviewKind(null);
@@ -144,6 +145,14 @@ export function CuraPage() {
     >
       <CuraHeader onOpenSidebar={() => setDrawerOpen(true)} onBack={goBack} />
       <div className="main-scroll" ref={scrollRef}>
+        {!started && overviewKind === "unified" && (
+          <HealthOverviewView
+            onAsk={askFromOverview}
+            openId={openGroupId}
+            onOpenChange={setOpenGroupId}
+            onOpenReport={(kind) => { setOpenGroupId(null); setOverviewKind(kind); }}
+          />
+        )}
         {!started && overviewKind === "blood" && <BodySystemOverviewView onAsk={askFromOverview} openId={openGroupId} onOpenChange={setOpenGroupId} />}
         {!started && overviewKind === "bio_ai" && <RiskOverviewView onAsk={askFromOverview} openId={openGroupId} onOpenChange={setOpenGroupId} />}
         {!started && !overviewKind && (

@@ -120,8 +120,8 @@ describe("CuraPage shell", () => {
       expect(screen.getByText("Hi Yukti 👋")).toBeTruthy();
     });
     expect(screen.getByText("How can I help you understand your health better?")).toBeTruthy();
-    expect(screen.getByText("My Blood Report")).toBeTruthy();
-    expect(screen.getByText("My Bio-AI Report")).toBeTruthy();
+    expect(screen.getByText("My Health Overview")).toBeTruthy();
+    expect(screen.queryByText("My Blood Report")).toBeNull();
     expect(screen.queryByText("My Health Scenario")).toBeNull();
     expect(screen.getByRole("button", { name: /Nutrition/ })).toBeTruthy();
     const welcome = screen.getByText("How can I help you understand your health better?").closest("section");

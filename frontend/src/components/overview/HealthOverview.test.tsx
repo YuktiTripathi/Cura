@@ -1,0 +1,85 @@
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { FindingRow, HealthOverviewView } from "./HealthOverviewView";
+import type { CategoryDetail, UnifiedOverview } from "../../types/unifiedHealth";
+import * as api from "../../lib/api";
+
+afterEach(() => { cleanup(); vi.restoreAllMocks(); });
+
+const counts = { total: 2, within_range: 1, outside_range: 1, no_range: 0, unavailable: 0 };
+const card = (over: Record<string, unknown> = {}) => ({
+  id: "liver_health", name: "Liver Health", icon: "liver", status: "worth_attention", status_label: "Worth paying attention to", completeness: "complete",
+  scenario: "blood_out_risk_ok", summary: "Two liver results are above range, even though your fatty liver risk is healthy.",
+  important_findings: [], measured: counts, risks: { assessed: 1, raised: 0 }, count_line: "8 blood tests · 1 risk assessed", detail_line: "2 blood results outside range",
+  primary_action: { label: "Explore my liver health", question: "What do my liver results mean for me?" }, ...over,
+});
+const overview = {
+  available: true, state: "ready", opening: "Here is your whole picture.", totals: { blood_within: 42, blood_outside: 11, blood_no_range: 5, blood_unavailable: 5, risks_assessed: 8, risks_raised: 2, metabolic_age: 43 },
+  priorities: [{ category_id: "liver_health", title: "Look after your liver", detail: "Two results are high.", icon: "liver", tone: "attention" }],
+  categories: [card(), card({ id: "thyroid_health", name: "Thyroid Health", status: "looking_good", status_label: "Looking good", summary: "All good.", primary_action: { label: "Explore my thyroid health", question: "q" } })],
+  provenance: { blood_report_date: "2026-08-21", bio_ai_report_date: "2026-08-25", reports_linked: false, dates_differ: true }, overall_question: "Help me understand my overall health", disclaimer: "Blood tests measure your current health.",
+} as unknown as UnifiedOverview;
+const detail = {
+  ...card(), about: "Your liver cleans your blood.", interpretation: ["A healthy risk does not cancel abnormal results."], insight: "Different tests tell different things.",
+  findings: [
+    { id: "a", source_type: "measured", name: "Direct Bilirubin", status: "above_range", status_label: "Above range", value: 0.5, unit: "mg/dL", reference_low: 0, reference_high: 0.3, important: true },
+    { id: "risk:nafld", source_type: "predicted_risk", name: "Fatty Liver", status: "risk_healthy", status_label: "Healthy predicted risk", score: 12, classification: "mild", important: false },
+    { id: "b", source_type: "measured", name: "Albumin", status: "within_range", status_label: "Within range", value: 4, unit: "g/dL", important: false },
+  ],
+  actions: [{ title: "Review your results", detail: "Talk to your doctor.", icon: "clipboard" }], follow_ups: ["Why is my bilirubin high?"],
+} as unknown as CategoryDetail;
+
+function wrap(ui: React.ReactElement) {
+  return render(<QueryClientProvider client={new QueryClient({ defaultOptions: { queries: { retry: false } } })}>{ui}</QueryClientProvider>);
+}
+
+describe("My Health Overview", () => {
+  it("shows the combined summary, priorities and one card per category with one action each", async () => {
+    vi.spyOn(api, "getHealthOverview").mockResolvedValue(overview);
+    wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
+    expect(await screen.findByText("Here is your whole picture.")).toBeTruthy();
+    expect(screen.getByText("42")).toBeTruthy();
+    expect(screen.getByText("Look after your liver")).toBeTruthy();
+    expect(screen.getAllByRole("article")).toHaveLength(2);
+    expect(screen.getAllByRole("button", { name: /Explore my/ })).toHaveLength(2);
+    expect(screen.queryByText("What does this mean?")).toBeNull();
+  });
+
+  it("opens a category and keeps individual reports reachable", async () => {
+    vi.spyOn(api, "getHealthOverview").mockResolvedValue(overview);
+    const onOpenChange = vi.fn();
+    const onOpenReport = vi.fn();
+    wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={onOpenChange} onOpenReport={onOpenReport} />);
+    fireEvent.click(await screen.findByRole("button", { name: /Explore my liver health/ }));
+    expect(onOpenChange).toHaveBeenCalledWith("liver_health");
+    fireEvent.click(screen.getByText("View blood report"));
+    expect(onOpenReport).toHaveBeenCalledWith("blood");
+  });
+
+  it("shows measured and predicted findings in one list, expands the rest, and asks with the area context", async () => {
+    vi.spyOn(api, "getHealthCategory").mockResolvedValue(detail);
+    const onAsk = vi.fn();
+    wrap(<HealthOverviewView onAsk={onAsk} openId="liver_health" onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
+    expect(await screen.findByText("Direct Bilirubin")).toBeTruthy();
+    expect(screen.getAllByText("Measured").length).toBeGreaterThan(0);
+    expect(screen.queryByText("Albumin")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "View complete assessment" }));
+    expect(screen.getByText("Albumin")).toBeTruthy();
+    expect(screen.getByText("Fatty Liver")).toBeTruthy();
+    expect(screen.getByText("Predicted risk")).toBeTruthy();
+    fireEvent.click(screen.getByRole("button", { name: /Why is my bilirubin high\?/ }));
+    expect(onAsk).toHaveBeenCalledWith("Why is my bilirubin high?", expect.objectContaining({ entry_point: "health_area" }));
+  });
+
+  it("prints verified values and ranges exactly as given", () => {
+    render(<ul><FindingRow f={detail.findings![0]} /></ul>);
+    expect(screen.getByText(/0\.5 mg\/dL \(0 to 0\.3\)/)).toBeTruthy();
+  });
+
+  it("says plainly when nothing is available", async () => {
+    vi.spyOn(api, "getHealthOverview").mockResolvedValue({ ...overview, available: false, categories: [] } as unknown as UnifiedOverview);
+    wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
+    expect(await screen.findByText(/No blood results or Bio-AI report/)).toBeTruthy();
+  });
+});

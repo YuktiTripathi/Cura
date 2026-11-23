@@ -299,17 +299,18 @@ describe("Welcome buttons", () => {
     const onSend = vi.fn();
     const onOpenOverview = vi.fn();
     render(<WelcomeExperience me={me} meLoading={false} onSend={onSend} onOpenOverview={onOpenOverview} inputRef={createRef()} />);
-    fireEvent.click(screen.getByText("My Blood Report"));
-    fireEvent.click(screen.getByText("My Bio-AI Report"));
-    expect(onOpenOverview.mock.calls).toEqual([["blood"], ["bio_ai"]]);
+    expect(screen.queryByText("My Blood Report")).toBeNull();
+    expect(screen.queryByText("My Bio-AI Report")).toBeNull();
+    fireEvent.click(screen.getByText("My Health Overview"));
+    expect(onOpenOverview.mock.calls).toEqual([["unified"]]);
     expect(onSend).not.toHaveBeenCalled();
   });
 
   it("still start the chat when no overview handler is given", () => {
     const onSend = vi.fn();
     render(<WelcomeExperience me={me} meLoading={false} onSend={onSend} inputRef={createRef()} />);
-    fireEvent.click(screen.getByText("My Blood Report"));
-    expect(onSend).toHaveBeenCalledWith(expect.any(String), [], expect.objectContaining({ entry_point: "blood_report_overview" }));
+    fireEvent.click(screen.getByText("My Health Overview"));
+    expect(onSend).toHaveBeenCalledWith(expect.any(String), [], expect.objectContaining({ entry_point: "health_area" }));
   });
 });
 

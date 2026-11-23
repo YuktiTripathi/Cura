@@ -63,7 +63,7 @@
    "topic": "cell health"
   }
  ],
- "raised_statuses": [
+ "raised_statuses": ["increased", 
   "critical",
   "very high",
   "high",
@@ -71,7 +71,7 @@
   "moderate",
   "medium"
  ],
- "status_order": [
+ "status_order": ["increased", 
   "critical",
   "very high",
   "high",

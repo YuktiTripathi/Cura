@@ -1261,3 +1261,61 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .related-values li { display: inline-flex; gap: 6px; padding: 4px 10px; border-radius: 999px; background: var(--surface-2, #f1f3f5); font-size: 0.88rem; }
 .action-icon { color: var(--ov-in, #17818a); }
 .action-card strong { font-size: 1.05rem; }
+
+/* ---- My Health Overview: one picture from blood results and Bio-AI risks ---- */
+.unified { display: grid; gap: 14px; }
+.unified h2, .unified h3 { margin: 0; }
+.unified-opening { font-size: 1.05rem; line-height: 1.5; margin: 0; }
+.unified-summary { border: 1px solid var(--border-card); border-radius: 14px; background: var(--surface); padding: 16px; display: grid; gap: 10px; }
+.unified-numbers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin: 0; }
+.unified-numbers dt { font-size: 0.85rem; color: var(--text-muted); order: 2; }
+.unified-numbers dd { margin: 0; font-size: 1.9rem; font-weight: 700; order: 1; }
+.unified-numbers div { display: flex; flex-direction: column; }
+.unified [data-tone="good"] { color: #2e6b3a; }
+.unified [data-tone="attention"] { color: #8a4a1f; }
+.unified-bar { display: flex; height: 8px; border-radius: 6px; overflow: hidden; background: var(--range-track); }
+.unified-bar span { display: block; }
+.unified-bar [data-tone="good"] { background: #2f7f86; }
+.unified-bar [data-tone="attention"] { background: #b0395f; }
+.unified-bar [data-tone="neutral"] { background: #8892a6; }
+.unified-bar [data-tone="faint"] { background: #c6d0e0; }
+.unified-metabolic { display: grid; gap: 2px; border-top: 1px solid var(--border-divider); padding-top: 10px; }
+.unified-metabolic strong { font-size: 1.5rem; }
+.priority-list, .action-list, .finding-list { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 12px; }
+.priority-list li, .action-list li { display: grid; grid-template-columns: 28px 1fr; gap: 10px; align-items: start; }
+.priority-list p, .action-list p { margin: 2px 0 0; color: var(--text-muted); }
+.priority-icon { display: inline-flex; padding-top: 2px; }
+.priority-list [data-tone="attention"] .priority-icon { color: #9a4f1d; }
+.priority-list [data-tone="good"] .priority-icon { color: #2e6b3a; }
+.unified-overall { width: 100%; margin-top: 12px; border-radius: 999px; padding: 12px; background: var(--surface); border: 1px solid var(--border); cursor: pointer; }
+.health-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; margin-top: 10px; }
+.health-card { border: 1px solid var(--border-card); border-radius: 14px; background: var(--surface); padding: 14px; display: flex; flex-direction: column; gap: 6px; }
+.health-card h4 { margin: 0; font-size: 1.05rem; }
+.health-card-icon { color: #b0395f; display: inline-flex; }
+.health-card[data-status="looking_good"] .health-card-icon { color: #2f7f86; }
+.health-card-status { margin: 0; font-weight: 600; font-size: 0.9rem; }
+.health-card-status[data-status="looking_good"] { color: #2e6b3a; }
+.health-card-status[data-status="worth_attention"], .health-card-status[data-status="needs_closer_attention"] { color: #8a4a1f; }
+.health-card-status[data-status="not_assessed"] { color: var(--text-muted); }
+.health-card-summary { margin: 0; line-height: 1.45; }
+.health-card-counts { margin-top: auto; border-top: 1px solid var(--border-divider); padding-top: 8px; }
+.health-card-counts p { margin: 2px 0; font-size: 0.9rem; }
+.health-card button { border: 1px solid var(--border); border-radius: 999px; padding: 8px 12px; background: var(--surface); cursor: pointer; }
+.unified-disclaimer { margin: 6px 0 0; }
+.link-button { background: none; border: 0; padding: 0; color: var(--link); text-decoration: underline; cursor: pointer; font: inherit; }
+.category-screen header { display: flex; gap: 12px; align-items: center; }
+.category-screen section { border-top: 1px solid var(--border-divider); padding-top: 12px; display: grid; gap: 8px; }
+.finding-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-divider); }
+.finding-main { display: grid; gap: 2px; }
+.finding-kind { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint); }
+.finding-side { display: grid; gap: 2px; text-align: right; align-content: start; }
+.finding-status { font-weight: 600; font-size: 0.9rem; }
+.finding-status[data-tone="good"] { color: #2e6b3a; }
+.finding-status[data-tone="attention"] { color: #8a4a1f; }
+.finding-status[data-tone="neutral"] { color: var(--text-muted); }
+.expand-button { justify-self: start; background: none; border: 0; color: var(--link); cursor: pointer; padding: 4px 0; font: inherit; font-weight: 600; }
+.insight-card { border: 1px solid var(--border-card); border-radius: 10px; padding: 10px 12px; background: var(--surface-subtle); }
+.insight-card p { margin: 4px 0 0; }
+.follow-list { display: grid; gap: 8px; }
+.follow-list button { display: flex; justify-content: space-between; text-align: left; border: 1px solid var(--border-card); border-radius: 12px; padding: 10px 12px; background: var(--surface); cursor: pointer; }
+@media (max-width: 520px) { .unified-numbers { grid-template-columns: 1fr; } .finding-row { flex-direction: column; } .finding-side { text-align: left; } }
