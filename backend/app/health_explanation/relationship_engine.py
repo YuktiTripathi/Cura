@@ -59,3 +59,8 @@ def build_relationships(
             ids = [f.id for f in measured if f.status in _OUT or f.status == "within_range"] + [f.id for f in risks if f.status != "risk_unknown"]
             out.append(make(rule, ids))
     return out
+
+
+@lru_cache(maxsize=1)
+def action_library() -> dict:
+    return json.loads((Path(__file__).parent / "knowledge" / "actions.json").read_text(encoding="utf-8"))
