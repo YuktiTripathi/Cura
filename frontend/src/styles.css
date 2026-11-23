@@ -1334,3 +1334,50 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
 .health-card-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-divider); padding-top: 8px; font-size: 0.9rem; }
 .health-card-arrow { color: var(--text-faint); font-size: 1.1rem; }
 .health-card-status { font-weight: 600; font-size: 0.9rem; }
+
+/* CURA 2.0 stage 1: accessibility foundation */
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 8px 0;
+  padding: 10px 14px;
+  border: 1px solid var(--border, #d8dde6);
+  border-left: 4px solid var(--danger);
+  border-radius: 8px;
+  background: var(--surface, #fff);
+}
+.error-banner p { margin: 0; color: var(--text, inherit); }
+.error-banner .text-button { min-height: 44px; min-width: 44px; padding: 8px 14px; font-weight: 600; }
+
+/* Clinical text never goes below 14px. */
+.value-card-date,
+.value-card-status,
+.range-meta,
+.answer-note,
+.findings-table th,
+.finding-kind {
+  font-size: max(0.875rem, 14px);
+}
+
+/* Comfortable touch targets on touch screens. */
+@media (pointer: coarse) {
+  .chips button,
+  .composer button,
+  .menu-button,
+  .text-button {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Respect reduced motion everywhere. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

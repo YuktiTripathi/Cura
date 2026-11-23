@@ -28,6 +28,8 @@ export function CuraPage() {
     loading,
     processingSteps,
     error,
+    failed,
+    retryFailed,
     send,
     editAndResend,
     conversationId,
@@ -184,12 +186,22 @@ export function CuraPage() {
           editingDisabled={loading}
         />
         {loading && <ProgressStepper events={processingSteps} />}
-        {error && <p className="error">{error}</p>}
+        {error && (
+          <div className="error-banner" role="alert">
+            <p>{error}</p>
+            {failed && (
+              <button type="button" className="text-button" onClick={retryFailed} disabled={loading}>
+                Try again
+              </button>
+            )}
+          </div>
+        )}
       </div>
       <div className="composer-dock">
         <Composer
           disabled={loading}
           onSend={sendWithContext}
+          restoreText={failed?.text}
           inputRef={inputRef}
           conversationId={conversationId}
           onUploaded={refreshDocuments}

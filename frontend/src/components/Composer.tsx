@@ -7,6 +7,8 @@ import { t } from "../i18n";
 type Props = {
   disabled: boolean;
   onSend: (value: string, documentIds?: string[]) => void;
+  /** Text of a message that failed to send; put back in the box if the person has typed nothing new. */
+  restoreText?: string;
   inputRef?: RefObject<HTMLInputElement>;
   conversationId?: string | null;
   onUploaded?: () => void;
@@ -21,6 +23,7 @@ type Props = {
 export function Composer({
   disabled,
   onSend,
+  restoreText,
   inputRef,
   conversationId = null,
   onUploaded,
@@ -32,6 +35,9 @@ export function Composer({
   const uploader = sharedUploader ?? ownUploader;
   const chip = uploader.chip;
   const [value, setValue] = useState("");
+  useEffect(() => {
+    if (restoreText) setValue((current) => (current.trim() ? current : restoreText));
+  }, [restoreText]);
   const [recording, setRecording] = useState(false);
   const [transcribing, setTranscribing] = useState(false);
   const [elapsed, setElapsed] = useState(0);

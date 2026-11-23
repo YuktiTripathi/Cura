@@ -32,6 +32,7 @@ export function useCuraChat() {
   );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [failed, setFailed] = useState<FailedSend | null>(null);
   const [processing, setProcessing] = useState<ProcessingEvent | null>(null);
   // Every status shown during the current turn, in order, for the progress stepper.
   const [processingSteps, setProcessingSteps] = useState<ProcessingEvent[]>([]);
@@ -69,6 +70,7 @@ export function useCuraChat() {
   async function send(text: string, documentIds: string[] = [], contextRef?: ContextRef) {
     setLoading(true);
     setError(null);
+    setFailed(null);
     const initial: ProcessingEvent = { stage: "PLANNING", message_key: "planning", family: "personal" };
     setProcessing(initial);
     setProcessingSteps([initial]);
@@ -197,7 +199,8 @@ export function useCuraChat() {
         }
         return current;
       });
-      setError(err instanceof Error ? err.message : "Something went wrong");
+      setError(friendlySendError(err));
+      setFailed({ text, documentIds, contextRef });
     } finally {
       finished = true;
       if (timer) window.clearTimeout(timer);
@@ -241,6 +244,17 @@ export function useCuraChat() {
     await send(next, target.documentIds || [], target.contextRef);
   }
 
+  function retryFailed() {
+    if (!failed || loading) return;
+    const { text, documentIds, contextRef } = failed;
+    // Drop the user bubble from the failed attempt so a retry does not show the question twice.
+    setMessages((m) => {
+      const last = m[m.length - 1];
+      return last?.role === "user" && last.content === text ? m.slice(0, -1) : m;
+    });
+    void send(text, documentIds, contextRef);
+  }
+
   function resumeConversation(detail: ConversationDetail) {
     applyDetail(detail);
     setConversationEpoch((n) => n + 1);
@@ -252,6 +266,8 @@ export function useCuraChat() {
     processing,
     processingSteps,
     error,
+    failed,
+    retryFailed,
     send,
     editAndResend,
     conversationId,
@@ -260,4 +276,18 @@ export function useCuraChat() {
     newConversation,
     resumeConversation,
   };
+}
+
+export interface FailedSend {
+  text: string;
+  documentIds: string[];
+  contextRef?: ContextRef;
+}
+
+/** A calm, plain message. Raw server or network text is never shown to the person. */
+export function friendlySendError(err: unknown): string {
+  const offline = typeof navigator !== "undefined" && navigator.onLine === false;
+  if (offline) return "You seem to be offline. Your question is saved. Try again when you are back online.";
+  void err;
+  return "I could not get an answer just now. Your question is saved, so you can try again.";
 }
