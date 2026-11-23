@@ -16,7 +16,6 @@ from dataclasses import dataclass, field
 
 from app.biomarkers.health_categories import REGISTRY_VERSION, category_for
 from app.contracts.unified_health import CategoryCard, Priority, Provenance
-from app.health_explanation.safety_validator import safety_problems
 
 logger = logging.getLogger("cura.unified")
 PROMPT_VERSION = "u4"
@@ -70,16 +69,18 @@ def _summary(card: CategoryCard, p) -> str:
 
 def _interpretation(card: CategoryCard, p, prov: Provenance) -> list[str]:
     s = card.scenario
-    from app.health_explanation.relationship_engine import rules
-
-    # The four scenarios that compare blood results with the prediction use the approved relationship wording.
-    approved = [r["interpretation"] for r in rules()["scenario_rules"] if r["scenario"] == s]
-    if approved:
-        return approved
-    return {
+    lines = {
+        "both_reassuring": ["Your current measurements and future risk estimates are both encouraging. That does not mean you are risk free, so keep up healthy habits."],
+        "blood_out_risk_ok": [
+            "Your predicted risk is in the healthy band, which is encouraging.",
+            "The two tell you different things. A healthy predicted risk does not cancel out results that are outside range.",
+        ],
+        "blood_ok_risk_up": ["Your measured results are within range, which is encouraging.", "Your predicted risk is still increased. It is an estimate of the future, not a diagnosis."],
+        "both_out": ["Your blood results and your predicted risk both deserve attention.", "They may be related, but one has not been shown to cause the other."],
         "blood_only": ["This is based on your measured results only. No Bio-AI risk was assessed for this area."],
         "risk_only": ["This is based on your predicted risk only. No blood results were available for this area."],
     }.get(s, ["Some information is missing, so this area cannot be fully assessed yet."])
+    return lines
 
 
 def _actions(card: CategoryCard, p) -> list[dict]:
@@ -220,14 +221,7 @@ def _fit(raw: dict, cards: list[CategoryCard], parts: dict, prov: Provenance, al
 
     def ok(t) -> str:
         t = _clean(t)
-        if not t or not _numbers_ok(t, allowed):
-            return ""
-        problems = safety_problems(t)
-        if problems:
-            # One failing field falls back to the rules wording for that field. Nothing unsafe is shown.
-            logger.warning("explanation_safety_rejected checks=%s", ",".join(problems))
-            return ""
-        return t
+        return t if t and _numbers_ok(t, allowed) else ""
 
     got = raw.get("categories") if isinstance(raw.get("categories"), dict) else {}
     for cid in ids:

@@ -347,10 +347,6 @@ def build_category_detail(category_id: str, blood: BodySystemOverview | None, bi
     from app.contracts.unified_health import ActionItem
 
     actions = [ActionItem(**a) for a in (pick("actions") or [])][:4]
-    from app.health_explanation.relationship_engine import build_relationships
-
-    canonical = {r.result_id: r.canonical_id for r in p.raw_measured}
-    relationships = build_relationships(category_id, card.scenario, p.measured, p.risks, canonical)
     return CategoryDetail(
         **{**card.model_dump(), "summary": pick("summary")},
         about=pick("about") or p.meta.about,
@@ -362,7 +358,6 @@ def build_category_detail(category_id: str, blood: BodySystemOverview | None, bi
         context=list(mine.get("context") or []),
         provenance=prov,
         caveat=p.system.caveat if p.system else None,
-        relationships=relationships,
     )
 
 

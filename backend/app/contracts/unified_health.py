@@ -116,21 +116,6 @@ class CategoryCard(BaseModel):
     primary_action: PrimaryAction
 
 
-class Relationship(BaseModel):
-    """An approved association or contrast between findings. It never states a cause."""
-
-    relationship_id: str
-    category: str
-    finding_ids: list[str] = Field(default_factory=list)
-    relationship_type: Literal["supports", "consistent_with", "contextualizes", "potentially_related", "discordant", "independent", "temporal_change"]
-    interpretation: str
-    causal_claim: Literal[False] = False
-    evidence_status: str = "rule_based_unreviewed"
-    rule_id: str
-    rationale: str = ""
-    rules_version: str = ""
-
-
 class CategoryDetail(CategoryCard):
     about: str = ""
     findings: list[Finding] = Field(default_factory=list)
@@ -141,7 +126,6 @@ class CategoryDetail(CategoryCard):
     context: list[str] = Field(default_factory=list)
     provenance: Provenance = Field(default_factory=Provenance)
     caveat: str | None = None
-    relationships: list[Relationship] = Field(default_factory=list)
 
 
 class Priority(BaseModel):
