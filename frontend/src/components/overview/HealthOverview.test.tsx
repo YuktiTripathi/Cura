@@ -17,7 +17,7 @@ const card = (over: Record<string, unknown> = {}) => ({
 const overview = {
   available: true, state: "ready", opening: "Here is your whole picture.", totals: { blood_within: 42, blood_outside: 11, blood_no_range: 5, blood_unavailable: 5, risks_assessed: 8, risks_raised: 2, metabolic_age: 43 },
   priorities: [{ category_id: "liver_health", title: "Look after your liver", detail: "Two results are high.", icon: "liver", tone: "attention" }],
-  categories: [card(), card({ id: "thyroid_health", name: "Thyroid Health", status: "looking_good", status_label: "Looking good", summary: "All good.", primary_action: { label: "Explore my thyroid health", question: "q" } })],
+  categories: [card(), card({ id: "thyroid_health", name: "Thyroid Health", description: "How your thyroid helps control your energy and metabolism.", status: "looking_good", status_label: "Looking good", summary: "All good.", primary_action: { label: "Explore my thyroid health", question: "q" } })],
   provenance: { blood_report_date: "2026-08-21", bio_ai_report_date: "2026-08-25", reports_linked: false, dates_differ: true }, overall_question: "Help me understand my overall health", disclaimer: "Blood tests measure your current health.",
 } as unknown as UnifiedOverview;
 const detail = {
@@ -46,7 +46,7 @@ describe("My Health Overview", () => {
     expect(screen.getAllByText("How your body processes food, breaks down medicines and removes waste.")).toHaveLength(1);
     expect(screen.getAllByText("8 blood tests · 1 risk assessed").length).toBeGreaterThan(0);
     expect(screen.queryByText(/Explore my/)).toBeNull();
-    expect(screen.queryByText(/outside range|Two liver results are above range/)).toBeNull();
+    cards.forEach((c) => expect(c.textContent).not.toMatch(/outside range|above range|unavailable/));
     expect(screen.queryByText("What does this mean?")).toBeNull();
   });
 
