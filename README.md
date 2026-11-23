@@ -50,6 +50,33 @@ npm run dev
 
 The UI calls `http://127.0.0.1:8000` by default (`VITE_CURA_API_URL`).
 
+## Run the health explanation with a live model
+
+Start from a checkout of `main`. From the repository root, activate the backend virtual environment.
+Set `OPENROUTER_API_KEY` in the terminal environment using your local secret manager or a hidden prompt.
+
+```bash
+source backend/.venv/bin/activate
+export APP_ENV=development AUTH_PROVIDER=mock HEALTH_PROVIDER=mock
+export MOCK_USER_ID=demo-user-001 DEV_AUTH_HEADER=true
+export ENABLE_LLM=true LLM_PROVIDER=openrouter MEDICAL_LLM_MODEL=openai/gpt-5-mini
+python run_backend.py
+```
+
+In a second terminal at the repository root:
+
+```bash
+cd frontend
+npm ci
+VITE_CURA_USER_ID=demo-user-001 VITE_CURA_API_URL= npm run dev
+```
+
+Open http://localhost:5173 and choose **My Health Overview → Heart & Circulation**.
+The demo sends eligible fictional category evidence through the existing personal-health model policy.
+The model orders approved explanation blocks when there is more than one eligible block.
+The verified report data and approved wording come from CURA. The category falls back to its built-in
+ordering if the privacy policy rejects the request, the provider is unavailable, or the model response is invalid.
+
 ## Tests
 
 See [docs/testing.md](docs/testing.md) and [docs/safety.md](docs/safety.md).
