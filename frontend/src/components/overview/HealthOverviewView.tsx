@@ -226,11 +226,6 @@ export function HealthOverviewView({
           {categories.map((c) => <CategoryCardView key={c.id} card={c} onOpen={() => onOpenChange(c.id)} />)}
         </div>
       </section>
-      {(data.limitations ?? []).length > 0 ? (
-        <section className="overview-note" aria-label={t("ui.unified.limits", "What this overview could not cover")}>
-          <ul>{(data.limitations ?? []).map((line) => <li key={line}>{line}</li>)}</ul>
-        </section>
-      ) : null}
       <p className="muted unified-disclaimer">{data.disclaimer}</p>
       <p className="unified-reports muted">
         {t("ui.unified.reports", "Looking for a single report?")}{" "}
@@ -289,7 +284,6 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
         <h3 id="cat-mean">{`${t("ui.unified.understanding", "Understanding your")} ${d.name}`}</h3>
         {d.about ? <p>{d.about}</p> : null}
         {(d.interpretation ?? []).map((line) => <p key={line}>{line}</p>)}
-        {(d.relationships ?? []).filter((r) => r.rule_id.startsWith("grp_")).map((r) => <p key={r.relationship_id} data-relationship={r.relationship_type}>{r.interpretation}</p>)}
       </section>
       {actions.length > 0 ? (
         <section aria-labelledby="cat-next">

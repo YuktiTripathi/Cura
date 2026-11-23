@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import model_validator, BaseModel, Field
+from pydantic import BaseModel, Field
 
 CategoryStatus = Literal["looking_good", "worth_attention", "needs_closer_attention", "not_assessed"]
 Completeness = Literal["complete", "partial", "none"]
@@ -62,16 +62,6 @@ class Finding(BaseModel):
     report_id: str | None = None
     important: bool = False
     education: EducationNote | None = None
-    # How far this finding can be relied on. It follows from what the report supplied, never from a guess.
-    data_quality: Literal["verified", "reference_unavailable", "unavailable"] = "verified"
-
-    @model_validator(mode="after")
-    def _derive_quality(self):
-        if self.status in {"no_range"}:
-            self.data_quality = "reference_unavailable"
-        elif self.status in {"no_value", "risk_unknown"}:
-            self.data_quality = "unavailable"
-        return self
 
 
 class MeasuredCounts(BaseModel):
@@ -106,9 +96,6 @@ class ActionItem(BaseModel):
     title: str
     detail: str = ""
     icon: str = "check"
-    action_id: str | None = None
-    # Every action comes from the approved library. Until clinical review it says so.
-    evidence_status: str = "rule_based_unreviewed"
 
 
 class CategoryCard(BaseModel):
@@ -187,6 +174,3 @@ class UnifiedOverview(BaseModel):
     disclaimer: str = "Blood tests measure your current health. Bio-AI estimates future health risks. Neither alone gives a complete picture of your health."
     registry_version: str = "1"
     insights_source: Literal["model", "rules"] = "rules"
-    # What this overview could not say, and which rule sets produced it.
-    limitations: list[str] = Field(default_factory=list)
-    versions: dict[str, str] = Field(default_factory=dict)
