@@ -45,6 +45,30 @@ def _explicit_dates(message: str) -> bool:
     return len(re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")) >= 1
 
 
+def _asked_dates(message: str) -> list[str]:
+    import re
+
+    return sorted(set(re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")))
+
+
+def _day(value) -> str:
+    return (value.isoformat() if hasattr(value, "isoformat") else str(value or ""))[:10]
+
+
+def _date_gap_note(message: str, context) -> str:
+    """When none of the stored results is from a date the person asked about, say so before showing anything."""
+    asked = _asked_dates(message)
+    if not asked:
+        return ""
+    held = {_day(m.measured_at) for m in context.markers} | {
+        _day(getattr(r, "measured_at", None)) for r in context.bio_ai_risks
+    }
+    held.discard("")
+    if any(day in held for day in asked):
+        return ""
+    return f"I don't have a result from {', '.join(asked)}. The most recent results on record are:\n\n"
+
+
 def _stored_flag(marker) -> str:
     flag = getattr(getattr(marker, "flag", None), "value", getattr(marker, "flag", None))
     if flag in {"high", "low", "critical", "normal"}:
@@ -342,7 +366,9 @@ class DeterministicRenderer:
                 lines.append(f"• **{answer.question or answer.question_key}:** {answer.value}.{dated}")
                 shown_q = True
             note = "\n\nThe questionnaire answer is separate from the laboratory result." if shown_q else ""
-            return "Stored results for the requested dates:\n\n" + "\n".join(lines) + _range_absence(context, message) + note
+            gap = _date_gap_note(message, context)
+            heading = gap or "Stored results for the requested dates:\n\n"
+            return heading + "\n".join(lines) + _range_absence(context, message) + note
         if context.intent.value == "latest_result" and context.markers:
             extra = _derived_and_stated(context, message)
             if len(context.markers) > 1:

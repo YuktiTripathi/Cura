@@ -18,7 +18,7 @@ from app.biomarkers.health_categories import REGISTRY_VERSION, category_for
 from app.contracts.unified_health import CategoryCard, Priority, Provenance
 
 logger = logging.getLogger("cura.unified")
-PROMPT_VERSION = "u3"
+PROMPT_VERSION = "u4"
 _TTL = 7 * 24 * 3600
 _DASH = re.compile(r"\s*[—–]\s*")
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -132,7 +132,12 @@ def rules_wording(cards: list[CategoryCard], parts: dict, prov: Provenance, deta
         if detail:
             entry.update(about=p.meta.about, interpretation=_interpretation(card, p, prov), actions=_actions(card, p), follow_ups=_follow_ups(card, p))
         w.categories[card.id] = entry
-    attention = [c for c in cards if c.status in {"needs_closer_attention", "worth_attention"}]
+    # Membership and order are fixed by rule: the closer attention tier first, then the registry order.
+    # Neither the model nor how far a value sits from its range decides which areas come first.
+    attention = sorted(
+        (c for c in cards if c.status in {"needs_closer_attention", "worth_attention"}),
+        key=lambda c: (c.status != "needs_closer_attention", category_for(c.id).order),
+    )
     if len(cards) > 1:
         w.opening = (
             "I have put your blood results and future health risks together. "
@@ -239,15 +244,16 @@ def _fit(raw: dict, cards: list[CategoryCard], parts: dict, prov: Provenance, al
             entry["follow_ups"] = qs
         w.categories[cid] = entry
     w.opening = ok(raw.get("opening")) or base.opening
+    # The rules decide which areas are priorities and in what order. The model may only reword their text.
+    reworded = {i.get("category_id"): i for i in (raw.get("priorities") or []) if isinstance(i, dict)}
     pri = []
-    for item in (raw.get("priorities") or [])[:4]:
-        if isinstance(item, dict) and item.get("category_id") in ids and ok(item.get("title")) and ok(item.get("detail")):
-            card = next(c for c in cards if c.id == item["category_id"])
-            tone = "good" if item.get("tone") == "good" and card.status == "looking_good" else "attention"
-            if tone == "attention" and card.status == "looking_good":
-                continue
-            pri.append(Priority(category_id=card.id, title=ok(item["title"]), detail=ok(item["detail"]), icon=card.icon if tone == "attention" else "check", tone=tone))
-    w.priorities = pri or base.priorities
+    for fixed in base.priorities:
+        item = reworded.get(fixed.category_id)
+        if fixed.tone == "attention" and item and ok(item.get("title")) and ok(item.get("detail")):
+            pri.append(fixed.model_copy(update={"title": ok(item["title"]), "detail": ok(item["detail"])}))
+        else:
+            pri.append(fixed)
+    w.priorities = pri
     return w
 
 

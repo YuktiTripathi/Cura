@@ -50,10 +50,12 @@ def test_general_and_broad_questions_get_no_preview(message):
     assert names[-1] in {"answer", "complete"}
 
 
-def test_presented_findings_carry_numeric_reference_bounds():
+def test_trusted_facts_carry_numeric_reference_bounds():
+    # The trusted value, unit, range, date and source travel in experience.key_facts, not in the legacy findings list.
     chat = client.post("/api/v1/chat", headers=USER, json={"message": "What is my LDL?"}).json()
-    findings = (chat.get("presentation") or {}).get("findings") or []
+    findings = (chat.get("experience") or {}).get("key_facts") or []
     ldl = next(item for item in findings if item.get("canonical_key") == "ldl")
+    assert ldl["unit"] and ldl["source_date"] and ldl["source_id"]
     assert isinstance(ldl["numeric_value"], float)
     assert ldl["reference_low"] is not None or ldl["reference_high"] is not None
 

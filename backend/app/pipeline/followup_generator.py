@@ -477,6 +477,13 @@ FALLBACK = {
 }
 
 
+_NOT_A_TOPIC = re.compile(
+    r"^(?:is|are|was|were|am|do|does|did|can|could|should|would|will|why|when|where|who|which|how|"
+    r"it|its|this|that|these|those|they|i|my|me|we|you|your|explain|more|less|again|so|and|but)\b",
+    re.I,
+)
+
+
 def general_continuations(message: str) -> list[str]:
     """Two or three next questions that stay on a general topic. None if the topic is unclear."""
     subject = re.sub(
@@ -488,7 +495,13 @@ def general_continuations(message: str) -> list[str]:
     subject = re.sub(r"^(?:a|an|the)\s+", "", subject, flags=re.I).strip()
     if not subject or len(subject.split()) > 8:
         return []
-    phrase = subject[0].lower() + subject[1:]
+    # Only a noun phrase can be wrapped in a template. "is it serious" or "why is it low" is a question about
+    # something already discussed, and wrapping it gives nonsense like "What does is it serious mean?".
+    if _NOT_A_TOPIC.match(subject):
+        return []
+    first = subject.split()[0]
+    # Keep names like HbA1c, LDL and TSH as written; only lowercase an ordinary capitalised word.
+    phrase = subject if any(ch.isupper() for ch in first[1:]) or first.isupper() else subject[0].lower() + subject[1:]
     return [
         f"What does {phrase} mean in everyday terms?",
         f"What can affect {phrase}?",

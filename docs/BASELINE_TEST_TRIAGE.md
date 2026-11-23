@@ -1,12 +1,29 @@
-# Baseline backend test failures (31): triage
+# Baseline backend test failures: triage
 
-Method: I ran the 31 failing tests alone and read each failure message and the code path it exercises. I traced the root cause in depth only for the items marked "traced". The rest are classified from the assertion, so treat those as likely, not proven. No test was edited to make it pass.
+Last full run: 2052 passed, 27 failed, 4 skipped, 1 expected failure. The run began with 31 failures. No new failure appeared. No test was changed just to make it pass. Four tests were changed because they checked the wrong thing, and each change is explained below.
 
-Environment note: the sandbox has no model or safety classifier access (`safety_classifier status=degraded error=ProxyError`), so any test that needs a live model result depends on fallbacks.
+Tags: [Verified] I traced the cause. [Likely] classified from the failure message and code, not traced. [Open] not investigated.
 
-## A. Stale tests: they check old prompt wording (12)
-The active prompt is the "house" prompt in `app/pipeline/prompt_builder.py`. Tests still look for phrases from the legacy prompt. The house prompt carries the same safety rules in its own words (traced: not a diagnosis, never invent values, report range decides, questionnaire answers are not lab results). Needs a decision: replace these with one test of the active prompt's safety contract.
-- test_conversational_personal: active_defaults, conflicts_resolved, safety_rules_are_kept
+Environment: the sandbox has no model or safety classifier access, so tests that depend on a live model result are covered only by fallbacks.
+
+## Fixed or replaced since the first triage (4)
+
+| Test | What was wrong | Action |
+|---|---|---|
+| test_requested_date_that_has_no_report_is_said_plainly | [Verified] Real defect. Asking for 2020-01-01 returned the 2026 result and never said there was no 2020 result. | Fixed the code. Test unchanged. |
+| test_iron_deficiency_question_reads_the_whole_pattern | [Verified] The answer reads haemoglobin, MCV, ferritin and TIBC together with correct uncertainty. The test wanted the exact word "iron-deficiency". | Test replaced with a check that all four values appear, the answer says "taken together", says it cannot diagnose and leaves confirmation to a doctor. |
+| test_presented_findings_carry_numeric_reference_bounds | [Verified] The trusted value, unit, range, date and source are in `experience.key_facts`. The old `presentation.findings` list is empty by design. | Test now reads `experience.key_facts`. |
+| test_internal_ids_hidden_from_answers_but_kept_in_evidence | [Verified] Same cause. | Test now reads `experience.key_facts` and checks value, unit, range, date and source id. |
+
+Correction to my earlier triage: I had said an empty `presentation.findings` might block the range visual. It does not. The data is complete in `experience.key_facts` and `semantic`.
+
+Also fixed, not in the original list: a crash in `drop_routine_doctor`, and a follow up that turned "Is it serious?" into "What does is it serious mean in everyday terms?". Both have new tests.
+
+## Remaining 27
+
+### A. Check old prompt wording (about 11) [Likely]
+The active prompt is the house prompt in `app/pipeline/prompt_builder.py`. These tests look for phrases from the legacy prompt. I checked that the house prompt contains the same safety rules in other words (not a diagnosis, never invent values, the report range decides, questionnaire answers are not lab results). I did not check every phrase. They should be replaced by one test of the active prompt's safety contract. This is a proposal, not done.
+- test_conversational_personal: active_defaults, conflicts_resolved, safety_rules_are_kept, whole_report_score_note
 - test_simple_explanations: more_simply, concept_first_simple_bullets
 - test_blood_report_overview: overview_prompt_is_added_without_replacing_safety
 - test_diagnostics_packages: prompt_forbids_hallucinated_package_metadata
@@ -14,24 +31,30 @@ The active prompt is the "house" prompt in `app/pipeline/prompt_builder.py`. Tes
 - test_eval_dose_and_answer_shape: report_range_instruction
 - test_presentation_policy: same_plain_language_policy
 - test_response_quality_regressions: food_question_is_told_to_name_foods_first
-- test_narrative_summary: wants the phrase "not a diagnosis", answer says "not diagnoses" (wording only)
+- test_narrative_summary: expects "not a diagnosis"; the answer says "not diagnoses"
 
-## B. Stale against the new spec (2)
-Follow-ups are capped at four now; tests expect five. The CURA 2.0 brief says at most four. Update the tests to four.
+### B. Follow up cap (2) [Verified]
+Code caps follow ups at four. Tests expect five. The CURA 2.0 brief says four. Update the tests to four.
 - test_relationship_map: follow_up_cap_is_five
 - test_semantic_answer_preservation: follow_ups_are_capped_once
 
-## C. Real findings that affect the redesign (must decide or fix before release)
-1. Fixed in this change (traced): `drop_routine_doctor` crashed on any non-bullet line containing a routine "see your doctor" sentence, which failed the whole chat turn (for example "What is my latest Vitamin D?" in the fallback path). Regression test added.
-2. test_requested_date_that_has_no_report_is_said_plainly (traced): asking for a HbA1c on 2020-01-01 returns "Stored results for the requested dates: HbA1c 5.5 on 2026-08-18" and never says there is no 2020 result. Misleading. Fix before release.
-3. test_presentation findings (internal_ids_hidden, presented_findings_carry_numeric_reference_bounds) (traced): a single value answer has `presentation.findings == []`, so the numeric range is not available to a biomarker card from that field. The card must be built from another trusted field, or findings must be filled. Blocks the range visual.
-4. test_pr10_completeness follow_up_keeps_the_retrieved_value and test_explanation_path omitted_bio_ai_score_is_added: when the model leaves out a number, the backstop does not add it back for follow-ups, and the Bio-AI score is no longer added. Whether to show the raw Bio-AI score at all is a product decision (see spec section 5). Decide, then fix or retire the test.
-5. test_dynamic_format follow_ups_are_the_models_own_and_specific: follow-ups came back generic. Affects follow-up relevance.
-6. test_blood_report_overview (KeyError entry_point; whole report not kept): the old blood overview path. Probably superseded by the unified overview; confirm before deleting.
-7. test_answer_tier_routing, test_audit_jev_confidence (PCOD risk now plans Bio-AI), test_conversation_state (ALT then supplement), test_conversation_quality iron pattern, test_diagnostics_packages iron studies name, test_brevity report table, test_followup_and_pageindex (110 vs 130): behaviour changed or data differs. Not traced. Investigate individually; none is known to be release blocking.
+### C. Behaviour that may matter for the redesign (open, not stale until proven)
+- test_explanation_path omitted_bio_ai_score_is_added_from_the_record [Open]. If the model leaves out a Bio-AI score, the score is no longer added back. The product decision is to keep score transparency, so this test may describe wanted behaviour. Investigate first.
+- test_pr10_completeness follow_up_keeps_the_retrieved_value [Likely]. The function is called without conversation context, so "it" resolves to nothing. End to end, a follow up keeps the value (acceptance test). The unit test should be rewritten with a resolved topic.
+- test_dynamic_format follow_ups_are_the_models_own_and_specific [Open]. Follow ups were generic. Related to the open defect that personal follow ups run out after several turns.
+- test_blood_report_overview (3 tests) [Likely]. They exercise the older blood overview path, probably replaced by the unified overview. Confirm and retire or update.
+- test_audit_jev_confidence pcod_risk [Likely]. "Tell me my risk score for PCOD" now plans Bio-AI. The test expects blood only. The new behaviour looks right. Confirm.
+- test_answer_tier_routing, test_conversation_state, test_diagnostics_packages iron studies name, test_brevity report table, test_followup_and_pageindex [Open]. Behaviour or data changed. Not traced.
 
-## D. Prompt size
-test_personal_system_prompt_budget: the personal prompt is 3409 characters against a 3200 budget. A genuine budget overrun, not a wording issue. Cost and latency only.
+### D. Prompt size [Verified]
+test_personal_system_prompt_budget: 3409 characters against a budget of 3200. A real overrun that costs money and latency. Not a safety issue.
+
+## Clinical content problems found while testing (release blocking, not covered by any baseline test)
+- Slightly high LDL: "Results a little outside the range are common and often settle on their own." Unsupported. Now recorded as an expected failure in `tests/acceptance/test_product_acceptance.py`.
+- ALT in range: "Everything here is within your lab's normal range, so there is nothing that needs action." Too absolute.
+- Low vitamin D fallback ends with a generic "worth discussing with your doctor at your next visit".
 
 ## Summary
-Unrelated baseline noise: groups A, B, and D. Could affect the redesign: items 3, 4, 5. Fix before release: items 1 (done), 2, 3. Everything in item 7 is open.
+- Release blocking: the three clinical content problems above; the unreviewed prioritization rules (see the UX spec section 6).
+- Could affect the redesign: C items on Bio-AI score, follow up relevance, and the older blood overview path.
+- Unrelated baseline noise, to be cleaned up: A, B, D.

@@ -47,9 +47,12 @@ def test_internal_ids_hidden_from_answers_but_kept_in_evidence():
     assert any("Aug 2026" in name or "18 Aug" in name for name in names)
     pres = body["presentation"]
     assert pres["mode"] == "SINGLE_VALUE"
-    assert pres["findings"]
-    assert all("blood-002" not in (pres.get("summary") or "") for _ in [0])
-    assert pres["findings"][0]["source_id"] == "blood-002"
+    assert "blood-002" not in (pres.get("summary") or "")
+    # The trusted value, its unit, range, date and source travel in experience.key_facts.
+    fact = body["experience"]["key_facts"][0]
+    assert fact["source_id"] == "blood-002"
+    assert (fact["value"], fact["unit"], fact["reference_low"], fact["reference_high"]) == ("12.6", "ng/mL", 30.0, 100.0)
+    assert fact["source_date"] == "2026-08-18"
 
 
 def test_domain_query_displays_primary_entities_not_reasoning_context():

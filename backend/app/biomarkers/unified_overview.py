@@ -27,6 +27,8 @@ from app.contracts.unified_health import (
     UnifiedOverview,
 )
 from app.biomarkers.education import education_for, first_sentence
+from app.contracts.blood import BloodMarker
+from app.pipeline.clinical_thresholds import clinical_note
 from app.pipeline.gap_words import how_far
 
 STATUS_LABELS: dict[str, str] = {
@@ -105,23 +107,39 @@ def _risk_finding(risk: RiskResult) -> Finding:
 
 
 def _rank(f: Finding) -> tuple:
+    """Order for display only: a critical result, then a raised risk, then results outside range.
+    How far a number sits from its range is never used. Within a tier the order is by name, which is not a ranking."""
     order = {"critical": 0, "risk_raised": 1, "above_range": 2, "below_range": 2}
-    far = {"clearly": 0, "moderately": 1, "slightly": 2, None: 3}[f.how_far]
-    return (order.get(f.status, 9), far, f.name.lower())
+    return (order.get(f.status, 9), f.name.lower())
 
 
-def decide_status(measured: list[Finding], risks: list[Finding]) -> CategoryStatus:
-    """Fixed rules. Clinical significance counts, not how many results are abnormal."""
+def urgent_threshold_hit(item: BiomarkerResult) -> bool:
+    """True when a guideline cut-off marks the result as one to raise with a doctor soon (see clinical_thresholds).
+    These cut-offs are guideline thresholds, not laboratory reference ranges, and they have not had clinical sign off here."""
+    if item.value is None:
+        return False
+    marker = BloodMarker(
+        id=item.result_id, key=item.cura_key or item.canonical_id or item.display_name,
+        name=item.display_name, value=item.value, unit=item.unit,
+    )
+    note = clinical_note(marker)
+    return bool(note and note.urgent)
+
+
+def decide_status(measured: list[Finding], risks: list[Finding], urgent: bool = False) -> CategoryStatus:
+    """Fixed rules. Distance from a reference range never raises a status.
+    Closer attention needs one of: a critical flag, a guideline urgent threshold, a Bio-AI class the report
+    calls high or worse, or a blood result outside range together with a raised predicted risk."""
     out = [f for f in measured if f.status in _OUT]
     raised = [f for f in risks if f.status == "risk_raised"]
     assessed = [f for f in measured if f.status in {"within_range", *_OUT}] + [f for f in risks if f.status != "risk_unknown"]
     if not assessed:
         return "not_assessed"
-    if any(f.status == "critical" for f in out):
+    if urgent or any(f.status == "critical" for f in out):
         return "needs_closer_attention"
     if any((f.classification or "").strip().lower() in _STRONG_RISK for f in raised):
         return "needs_closer_attention"
-    if any(f.how_far == "clearly" for f in out) or (out and raised):
+    if out and raised:
         return "needs_closer_attention"
     if out or raised:
         return "worth_attention"
@@ -221,7 +239,7 @@ class _Parts:
 
     @property
     def status(self) -> CategoryStatus:
-        return decide_status(self.measured, self.risks)
+        return decide_status(self.measured, self.risks, urgent=any(urgent_threshold_hit(r) for r in self.raw_measured))
 
     @property
     def scenario(self) -> Scenario:

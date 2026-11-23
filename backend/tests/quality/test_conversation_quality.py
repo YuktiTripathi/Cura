@@ -29,8 +29,15 @@ def test_report_choice_reply_answers_the_original_question():
 
 def test_iron_deficiency_question_reads_the_whole_pattern():
     text = answer(IRON, "Am I iron deficient?")
-    assert "Haemoglobin" in text and "MCV" in text
-    assert "iron-deficiency" in text
+    # Connected evidence: haemoglobin, red cell size, ferritin and iron capacity are read as one pattern.
+    for part in ("Haemoglobin", "MCV", "Ferritin", "TIBC", "10.5", "72", "8 ng/mL"):
+        assert part in text
+    lowered = text.lower()
+    assert "taken together" in lowered
+    # Uncertainty: it names the pattern without diagnosing, and leaves confirmation to a doctor.
+    assert "can't diagnose" in lowered
+    assert "a doctor can confirm" in lowered
+    assert "you are iron deficient" not in lowered
     assert "settle on their own" not in text
 
 

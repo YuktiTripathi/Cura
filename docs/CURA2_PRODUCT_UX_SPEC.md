@@ -1,408 +1,466 @@
 # CURA 2.0 Product and UX Specification
 
-Purpose: make health information understandable and useful to an ordinary person, not to build a prettier chatbot.
+Purpose: help a person with no medical background understand their health information correctly, without being overwhelmed or misled. The aim is not a prettier chatbot.
 
-Status: draft for review. All people, values and answers below are synthetic. The example answers are the target wording. They are not captured model output, and none has had clinical review. Clinical sign off is a precondition for release (see section 9).
+## How to read this document
 
-Guiding rules
-1. Say what matters first, in words a 12 year old could follow.
-2. One health story per health area. Blood results and Bio-AI predictions are told together, but never blurred.
-3. Use a picture or a badge only when it says something faster than a sentence.
-4. Never invent a conclusion. Keep uncertainty. No causes, no probabilities from model scores.
-5. Every personal answer ends at something the person can reasonably do, or says plainly that nothing is needed.
+Every section and example carries one of these tags. If nothing is tagged, treat it as Proposed.
 
-Synthetic person used throughout: Meena, 55, no medical background, phone user.
+- [Implemented and tested] Exists in the code and has an automated test. It has not been clinically reviewed or tested with real users unless a tag says so.
+- [Proposed] Designed here, not built.
+- [Unreviewed] Wording or rules that contain clinical content. None of it has had clinical review. All of it needs sign off before release.
+- [Open decision] A product or clinical choice nobody has made yet.
+- [Release blocking] Must be fixed or decided before this can be released.
 
-Her synthetic results
-- HbA1c 5.9 % (report range up to 5.7). Fasting glucose 104 mg/dL (70 to 99). LDL 142 mg/dL (under 100). HDL 38 mg/dL (50 or more). Triglycerides 168 mg/dL (under 150). Vitamin D 12.6 ng/mL (30 to 100). Haemoglobin 12.8 g/dL (12 to 15, in range). TSH 2.1 (in range). Creatinine 0.8 (in range). No liver panel in the report.
-- Bio-AI: Type 2 diabetes risk in the "high" band. Heart disease risk in the "moderate" band. Fatty liver risk in the "low" band.
-- Conflicts and gaps built in: Bio-AI diabetes is high while her blood sugar is only slightly above range. Fatty liver risk is low but there is no liver blood test to compare with.
+Evidence status: there is no clinical validation and no usability testing behind any of this. The synthetic people and answers are written by the authors. The example answers are target wording, not captured model output. Automated tests run with the chat model switched off, so they cover the deterministic behaviour only.
+
+## The synthetic person used in all examples
+
+Meena, 55, no medical background, uses a phone.
+
+Blood report of 21 Aug 2026, nine markers. Six are outside the report's reference range. Three are inside.
+
+| Marker | Result | Report range | Status |
+|---|---|---|---|
+| HbA1c | 5.9 % | up to 5.7 | A little above |
+| Fasting glucose | 104 mg/dL | 70 to 99 | A little above |
+| LDL cholesterol | 142 mg/dL | under 100 | Above |
+| HDL cholesterol | 38 mg/dL | 50 or more | Below |
+| Triglycerides | 168 mg/dL | under 150 | A little above |
+| Vitamin D | 12.6 ng/mL | 30 to 100 | Well below |
+| Haemoglobin | 12.8 g/dL | 12 to 15 | In range |
+| TSH | 2.1 mIU/L | 0.4 to 4.0 | In range |
+| Creatinine | 0.8 mg/dL | 0.6 to 1.1 | In range |
+
+Bio-AI report of 25 Aug 2026: type 2 diabetes risk in the "high" category, heart (cardiac) risk "moderate", fatty liver risk "low". The Bio-AI scores used in examples are made up: 72, 48, 12.
+
+Counts that must always be stated correctly
+- Markers: 9 measured, 6 outside range, 3 inside range.
+- Health areas holding the six outside markers: 3 (blood sugar has 2, heart and circulation has 3, vitamins has 1).
+- Bio-AI estimates: 3 assessed, 2 raised (high and moderate), 1 low.
+- Never present a count of markers as a count of areas, or the reverse.
+
+Built in on purpose: the Bio-AI diabetes category is high while the blood sugar tests are only a little above range; the fatty liver estimate is low but there is no liver blood test to compare it with; two reports are four days apart.
+
+[Implemented and tested] The count rules above are checked in `tests/acceptance/test_product_acceptance.py` against this same report.
 
 ---
 
 ## 1. Complete user journey
 
-### 1.1 Opening the app (first visit, report available)
-Meena sees one screen, no menu to learn:
+### 1.1 Opening the app (first visit, reports available) [Implemented and tested in part]
+Welcome copy that names only what exists, and a "Welcome back" line on a returning device, are built and tested. The single big button and question chips below are the target layout [Proposed].
 
 ```
 Hello Meena
 
-Your latest blood report and Bio-AI report are ready.
+I can help you understand your blood report and your Bio-AI report in plain language.
+You can also ask any general health question.
 
-[ See my health at a glance ]        <- the one big button
+[ See my health at a glance ]        <- one big button
 
 Or ask me anything about your health
 [ Type your question...        ] [mic]
 
 Questions people often ask
   Why is my vitamin D low?
-  What should I look at first?
+  What do my cholesterol results mean?
   What can I eat for better blood sugar?
 ```
 
-Rules: one primary action. Report specific suggestions appear only because the reports exist. No capability grid of three equal cards. Nutrition appears as a chip, not a card, unless nutrition data exists. The greeting uses the first name only.
+Rules: one primary action. Suggestions appear only because the data exists. First name only.
 
-### 1.2 Returning visit
-```
-Welcome back, Meena
+### 1.2 Returning visit [Proposed beyond the greeting]
+"Welcome back" is built. A "Continue where you left off" link is not.
 
-Last time we talked about your vitamin D.
-[ Continue ]   [ Start something new ]
-```
-Shown only when a recent conversation exists. If not, the first visit screen is shown with "Welcome back" as the first line. (Stage 2 already shows the "Welcome back" line from a device flag. The "Continue" link is not built.)
+### 1.3 Health at a glance [Implemented and tested in part, wording Unreviewed]
+The overview screen exists. What it must say for Meena:
 
-### 1.3 Health at a glance (one screen, no reading required)
 ```
 Your health at a glance
 
-Most of your results are in range.        <- one sentence, counts only
-A few things deserve attention.
+Blood tests (21 Aug 2026): 6 of your 9 are outside the report's range.
+They sit in 3 areas: blood sugar, heart and circulation, and vitamins.
+Bio-AI estimates (25 Aug 2026): 2 of 3 are raised.
 
-Start here
- 1. Vitamin D is low            [ Read more ]
- 2. Cholesterol is higher       [ Read more ]
- 3. Blood sugar is edging up    [ Read more ]
+Areas to look at                      (shown in a fixed order, not ranked)
+  Heart and circulation     Needs closer attention   >
+  Blood sugar               Needs closer attention   >
+  Vitamins and minerals     Worth attention          >
 
-Explore by area
-  Heart and circulation    Worth attention     >
-  Blood sugar              Worth attention     >
-  Vitamins and minerals    Needs a closer look >
-  Liver                    Not checked yet     >
-  ...
+Everything else
+  Thyroid                   Looking good             >
+  Kidney                    Looking good             >
+  Blood                     Looking good             >
+  Liver                     Looking good (risk estimate only, no liver blood test)   >
 ```
-Rules: at most three "Start here" items. Whole row is tappable. Each area shows one plain status. No score, no pie, no traffic light array. This is the existing unified overview, with "Start here" kept to three and wording per section 4.
 
-### 1.4 An area (for example Blood sugar)
-Order, top to bottom, nothing repeated:
-1. One sentence answer ("Your blood sugar is a little above the usual range, and the risk estimate agrees that it deserves attention.")
-2. "What we measured" (blood tests) with each value and its plain label.
-3. "What the Bio-AI estimate adds" (prediction, labelled as such).
-4. "What you can do" (one to three items).
-5. Up to four follow-up questions, all different from what is already on the page.
+Rules
+- The heading says "Areas to look at", never "Most important". See section 6 on prioritization.
+- Both report dates are shown and labelled. They are separate reports, not one moment in time.
+- "Needs closer attention" appears only for the reasons listed in section 6, and the area screen says which reason applied.
+- No overall score.
 
-### 1.5 Asking a question
-Typed, spoken, or tapped from a suggestion. While waiting she sees "Looking at your results..." and nothing about internal steps. The answer starts at once; long answers show the first part and a "Show more" link.
+### 1.4 An area (for example Blood sugar) [Implemented and tested in part]
+Order, nothing repeated:
+1. One sentence on what this area shows, written from the data.
+2. What was measured, with value, unit, report range, plain label and date.
+3. What the Bio-AI estimate adds, labelled as a prediction, with its date.
+4. How the two relate (section 7), only when both exist.
+5. What the person can reasonably do, with items needing professional review flagged (section 5).
+6. Up to four follow up questions that are relevant and different from what is on the page.
 
-### 1.6 Knowing what to do next
-Every personal answer ends with a "What you can do" line, or says "Nothing is needed right now". It never ends with a generic "consult your doctor". A doctor is mentioned only with a reason and a time frame (section 4).
+### 1.5 Asking a question [Implemented and tested in part]
+"Looking at your results..." appears while waiting, with no internal steps. The error and retry behaviour (calm message, Try again, draft kept) is built and tested.
 
-Clicks and reading budget
-- Open the app to a useful answer about her own results: 2 taps (glance, area).
-- A typical answer is read in under 20 seconds: about 60 to 90 words before "Show more".
-- No screen asks her to read the same finding twice.
+### 1.6 Knowing what to do next [Proposed]
+Every personal answer ends with something the person can reasonably do, or says plainly that no action is needed for what was asked. A doctor is mentioned only with a reason. Today's fallback answers still contain generic lines (see section 10, release blocking).
+
+### Reading and click budget
+Aims, not measurements: an answer about a person's own results in at most two taps from opening the app; no finding stated twice on one screen. Answer length follows the question (section 3).
 
 ---
 
-## 2. Response patterns with realistic examples
+## 2. Plain status labels for a measured value [Implemented and tested for the health overview, answer cards not yet]
 
-Conventions: **Short answer** is always the first line. "Details" are collapsed after the first screenful. Labels are plain words, never colour alone, and each has a small text label.
+Labels describe distance from the report's own range. They do not say how serious a result is.
 
-Plain status labels for a measured value (used everywhere)
-- In range
-- A little above range / A little below range (just outside the report's own range)
-- Above range / Below range
-- Well above range / Well below range
-- Needs medical attention soon (only for values the clinical thresholds file marks critical; unchanged from the existing deterministic rules)
+- Within range
+- A little above range / A little below range (within 10 percent of the limit)
+- Above range / Below range (10 to 50 percent past the limit)
+- Well above range / Well below range (more than 50 percent past the limit)
+- Critical (unchanged; "Needs medical attention soon" is proposed wording that needs clinical review [Unreviewed])
 
-"A little" versus "well" is decided by the existing deterministic rules, never by the model. How far past the limit a number is does not say how serious it is, so the label describes distance only, and the next step line carries any urgency.
+Never red for a minor deviation. Status is never colour alone.
 
-Colour: neutral for "In range", amber for outside range, and a stronger tone only for "Needs medical attention soon". Never red for a minor deviation.
+The 10 and 50 percent cut offs are an existing engineering choice, not a clinical standard [Unreviewed].
 
-### 2.1 General health question (no personal data needed)
+---
+
+## 3. Response patterns with realistic examples
+
+All examples are target wording for the synthetic Meena [Proposed, Unreviewed]. Anything under "What you can do" that is a clinical recommendation is marked with (review) and must be approved by a clinician before release.
+
+Length rule [Proposed]: length follows the question. A short question gets a short answer. A complex question gets enough explanation to be understood. There is no word limit. Progressive disclosure is allowed for background and detail. It is never used to hide something medically important: any result outside range, any urgent flag, any missing test that matters, and the next step are always visible without opening anything.
+
+### 3.1 General health question
 Question: "What is HbA1c?"
 ```
 HbA1c shows your average blood sugar over the last 2 to 3 months.
 
-A higher number means your blood sugar has been running higher than usual.
-It is one of the main tests doctors use to check for diabetes.
+Doctors use it, along with other tests, to check for diabetes and to see how
+blood sugar is being controlled.
 
-Want to see yours?   [ Show my HbA1c ]
+[ Show my HbA1c ]
 ```
-Structure: short answer, one extra idea, one optional personal link. No disclaimer. The "Show my HbA1c" chip appears only if a result exists.
 
-### 2.2 Single biomarker, personal
+### 3.2 Single biomarker, personal: vitamin D
 Question: "Why is my vitamin D low?"
 ```
-Your vitamin D is 12.6 ng/mL. That is well below the usual 30 to 100.     [ Well below range ]
+Your vitamin D is 12.6 ng/mL. Your report's range is 30 to 100.     [ Well below range ]
+From your blood report of 21 Aug 2026.
 
-Why it matters
 Vitamin D helps your body use calcium, so low levels can affect bones and muscles over time.
 
-What may be behind it
-Common reasons are little sun exposure or low intake. Your report cannot tell which applies to you.
+Common reasons include little sun exposure or low intake. Your report cannot tell
+which applies to you.
 
 What you can do
- - Ask your doctor about a supplement, because 12.6 is low enough that food and sun alone are unlikely to fix it.
- - Retest in about 3 months to see if it has moved.
-
-[ What foods have vitamin D? ]  [ Is this why I feel tired? ]
+ - Talk to your doctor about whether you need treatment. (review)
+ - Your doctor may suggest repeating the test after some time. (review)
 ```
-Structure: value and label in the first sentence (found, and what it means), why it matters, a hedged "may be" cause line, what to do. Source line in small text: "From your blood report of 18 Aug 2026".
+The shape is adaptive. A simpler question, "What is my vitamin D?", gets two sentences with the value, range, label and date.
 
-The range picture is a single horizontal bar with her value marked, shown only when a numeric range exists (see section 3, S3). Text already states the range, so the bar is optional and collapses on small screens to the label.
-
-### 2.3 Single biomarker, mildly outside range
+### 3.3 Fasting glucose read together with HbA1c
 Question: "Is my fasting sugar ok?"
+A fasting glucose is never explained alone when HbA1c exists. [Implemented and tested in the deterministic path: the answer lists both.]
 ```
-Your fasting blood sugar is 104 mg/dL, a little above the usual limit of 99.   [ A little above range ]
+Your fasting blood sugar is 104 mg/dL. Your report's range is 70 to 99.   [ A little above range ]
+Your HbA1c is 5.9 %. Your report's range is up to 5.7.                    [ A little above range ]
+Both from your blood report of 21 Aug 2026.
 
-This is a small difference. One reading does not mean you have diabetes.
+What this means
+Both results are above the lab's range, and both point the same way. Guidelines
+use separate cut offs from the lab range: fasting glucose of 100 to 125 mg/dL and
+HbA1c of 5.7 to 6.4 % are both called the prediabetes range. (review)
+This is not a diagnosis. A doctor decides what these results mean for you,
+and usually looks at repeat tests.
 
 What you can do
- - Nothing urgent. Your next regular check will show if it stays above range.
+ - Ask your doctor whether to repeat these tests. (review)
 ```
-Note the absence of a doctor referral. The reason is stated ("one reading, small difference"). If the same marker is above range on two reports, the pattern changes (section 6).
+This example replaces the earlier draft, which read fasting glucose on its own and said "nothing urgent".
 
-### 2.4 Complete blood report summary
+Distinguish two kinds of cut off in every answer [Proposed]: the lab reference range printed on the person's report, and guideline thresholds used by doctors (for example prediabetes or diabetes ranges). The first says "outside this lab's range". The second says "in a range doctors use for a condition", never "you have it".
+
+### 3.4 Complete blood report summary (correct counts)
 Question: "Explain my blood report"
 ```
-Most of your results are fine. 3 of 9 are outside the report's range.   <- counts from the data
+6 of your 9 blood tests are outside the report's range. 3 are inside.
+(Blood report of 21 Aug 2026)
 
-What stands out
- - Vitamin D is well below range (12.6).
- - LDL cholesterol is above range (142), and HDL "good" cholesterol is below (38).
- - Blood sugar is a little above range (HbA1c 5.9, fasting 104).
+Results outside range, by area
+ Blood sugar:   HbA1c 5.9 % (a little above), fasting glucose 104 mg/dL (a little above)
+ Heart:         LDL 142 mg/dL (above), HDL 38 mg/dL (below), triglycerides 168 mg/dL (a little above)
+ Vitamins:      Vitamin D 12.6 ng/mL (well below)
 
-In range
+Inside range
  Haemoglobin, thyroid (TSH) and kidney (creatinine).
 
 Not in this report
  No liver tests were included.
 
+How these fit together
+ Your blood sugar results are read together, and your cholesterol results are read together.
+ Ask about an area to see what it means.
+
 What you can do
- - Start with vitamin D, as it is furthest from range.
- - Heart and blood sugar numbers are worth tracking at your next test.
-
-[ Why is my cholesterol high? ] [ What should I eat? ] [ Compare with my Bio-AI report ]
+ - Go through the three areas with your doctor. (review)
 ```
-Rules: three "stands out" items at most; everything in range collapses into one line; the tests that were not done are named once.
+Rules: nothing here is ranked, because the findings are grouped by area (section 6). The six outside markers sit in three areas, and the summary says so without mixing the two counts.
 
-### 2.5 Bio-AI risk prediction
+### 3.5 Bio-AI risk prediction [score transparency retained]
 Question: "What does my diabetes risk mean?"
 ```
-Your Bio-AI report puts your type 2 diabetes risk in the high band.   [ Risk estimate: High ]
+Your Bio-AI report places your type 2 diabetes risk in the High category.   [ Risk category: High ]
+Bio-AI report of 25 Aug 2026. This is a prediction, not a diagnosis.
 
-This is a prediction from your health data. It is not a diagnosis and it is not a percentage chance.
-
-What fed into it
-Your blood sugar, weight and family history were among the inputs.  <- only inputs the report itself lists
-
-What you can do
- - Your blood sugar tests are the real check. Yours are a little above range, so keep tracking them.
- - Walking after meals and cutting sugary drinks help blood sugar for most people.
-
-[ What is the difference between this and my HbA1c? ] [ How can I lower it? ]
-```
-Rules: the prediction label is a "band" word only. The raw score number is not shown (decision needed, section 9). Never "you have a 68% chance". Never "this is caused by".
-
-### 2.6 Unified Blood plus Bio-AI, one health area
-Question tapped from the Blood sugar area: "What is going on with my blood sugar?"
-```
-Your blood sugar is a little above range, and the Bio-AI estimate also flags diabetes risk as high.
-
-What your blood test shows (measured)
- HbA1c        5.9 %    A little above range
- Fasting      104      A little above range
-
-What the Bio-AI estimate shows (predicted)
- Type 2 diabetes risk    High band
-
-Putting it together
-Both point the same way, but they are different kinds of information. The blood tests are measurements. The estimate is a prediction that also uses other details. The measurements are only slightly above range, so a high band does not mean you have diabetes.
+[ View the score and how to read it ]    <- expands:
+    Score: 72
+    Scale: (taken from the Bio-AI documentation, shown only once documented)
+    What it can and cannot tell you: (taken from the Bio-AI documentation)
+    The score is not a percentage chance of having the condition.
 
 What you can do
- - Ask your doctor whether to repeat HbA1c and fasting sugar. Two readings together are more reliable than one.
- - Keep walking after meals if you can.
+ - Your blood sugar tests are the measured part. Yours are a little above range;
+   see the blood sugar area. (review)
 ```
-Rules: "(measured)" and "(predicted)" headings are always shown. "Putting it together" is one short paragraph, written only when both exist. It states agreement or disagreement, never a cause.
+Rules
+- The official category is the headline. The raw score is always inspectable, never hidden by default policy.
+- The scale and limitations come from the Bio-AI documentation. If they are not documented, the screen says so and shows no scale. [Open decision, Release blocking for this screen]
+- A score is never turned into a probability or a percent unless the model explicitly supports that reading.
+- The inputs that fed a prediction are named only if the report itself lists them. They are never guessed.
 
-When they conflict (Bio-AI heart risk moderate, but cholesterol is above range and HDL low): "Your cholesterol numbers are above range. The Bio-AI heart estimate is moderate, not high. These do not contradict each other, because the estimate uses more than cholesterol."
-
-### 2.7 Nutrition and lifestyle
-Question: "What can I eat for better blood sugar?"
+### 3.6 Unified Blood plus Bio-AI, one area
+Question tapped from Blood sugar: "What is going on with my blood sugar?"
 ```
-Foods that help most are the ones that digest slowly.
+Blood sugar: needs closer attention
+Reason: a blood result is outside range and the Bio-AI estimate is raised for the same area.
 
-Eat more
- - Dal, chana, rajma and other pulses
- - Vegetables, especially leafy ones
- - Whole grains like jowar and bajra instead of white rice
+Measured (blood report, 21 Aug 2026)
+ HbA1c            5.9 %      Report range up to 5.7      A little above range
+ Fasting glucose  104 mg/dL  Report range 70 to 99       A little above range
 
-Eat less
- - Sugary drinks and sweets
- - White bread and maida snacks
+Predicted (Bio-AI report, 25 Aug 2026)
+ Type 2 diabetes risk       Category: High       [ View score ]
 
-A walk of 10 to 15 minutes after meals also helps.
+How they relate
+ Both point toward higher blood sugar, but they are different kinds of information.
+ The blood tests are measurements from one day. The Bio-AI result is a prediction made
+ separately, four days later. Neither shows that the other caused it, and a High
+ category does not mean you have diabetes.
 
-[ Give me a one day meal idea ] [ What about fruit? ]
+What you can do
+ - Ask your doctor whether to repeat HbA1c and fasting glucose. (review)
 ```
-Rules: name foods first, in everyday words and local foods when region is known. Link to her data only in one clause ("Your sugar is a little above range, so this is worth doing"). No list of lab values.
+Rules
+- "Measured" and "Predicted" headings, each with its own source and date, are always shown.
+- Two reports from different dates are never described as the same moment.
+- "How they relate" says whether the two agree or differ and never states a cause.
 
-### 2.8 Multi turn follow ups
-```
-Meena:  Why is my vitamin D low?
-CURA:   (answer 2.2)
-Meena:  Will sunlight be enough?
-CURA:   Probably not on its own at 12.6. Sun helps, but at this level a supplement is usually advised.
-        Ask your doctor about the dose.
-Meena:  explain simply
-CURA:   Your body is very short of vitamin D. Sun and food may not be enough to fill the gap, so a doctor
-        will probably suggest a supplement.
-```
-Rules: a follow up answers the new question in two to four sentences, uses the value only if it changes the answer, does not repeat the earlier explanation, and "explain simply" rewrites the previous answer, shorter, no new facts.
+Conflict example: cholesterol is outside range while the Bio-AI heart estimate is moderate. "Your cholesterol tests are outside range. Your Bio-AI heart estimate is in the Moderate category. These are different kinds of information and do not cancel each other."
+
+### 3.7 Nutrition and lifestyle [Proposed, Unreviewed]
+Question: "What can I eat for better blood sugar?" Foods first, in everyday words, then one clause linking to her data. No list of lab values. All dietary advice here needs review.
+
+### 3.8 Multi turn follow ups [Implemented and tested in part]
+Tested: a follow up such as "Why is it low?" keeps the vitamin D value, unit, date and source. A question about the previous answer is never wrapped in a template ("What does is it serious mean?" is fixed and tested). Not yet fixed: after several turns the personal suggestions run out and generic ones appear (section 10).
 
 ---
 
-## 3. Screen by screen UI specification
+## 4. Connected evidence principle [Proposed except where tagged]
 
-S1 Welcome (section 1.1). One primary button, one input, three question chips.
-S2 Health at a glance (1.3). Sentence, at most three "Start here" rows, area list with one status each.
-S3 Area screen (1.4). Sections in order: Answer sentence, Measured, Predicted, Putting it together, What you can do, Follow ups.
-- Biomarker row: name, value with unit, plain label. Tap to open "About this test" (existing reviewed education text, not model generated). A range bar (already built as `RangeBar`) appears only when the report range has numeric bounds and the screen is wider than 360 px; it is not the only carrier of meaning.
-S4 Chat. Messages as bubbles; the answer's first line is bold. Follow ups below the answer, at most four. "Show more" after about 90 words.
-S5 Uploaded document. Plain summary, values with the same labels, a clear line for what could not be read, and "Compare with my results" only if both exist.
-S6 Errors and empty states. One calm sentence, what happened, what to do, Try again button, draft kept (Stage 1 done). "No report yet" screens say what to do ("Your report will appear here once SuperShyft uploads it") and still allow general questions.
-S7 Processing. "Looking at your results..." then the answer streams. No stage names.
+No single result is interpreted alone when related results exist. Each group lists what is read together. None of the group rules below has been clinically reviewed.
 
-Visual limits: no charts except the optional range bar; no more than one badge per row; no badge for "in range" items inside lists (they collapse to one line).
+| Group | Read together | Status |
+|---|---|---|
+| Metabolic | HbA1c, fasting glucose, triglycerides, HDL, Bio-AI diabetes category | Glucose with HbA1c in the same answer: [Implemented and tested]. The rest: [Proposed] |
+| Heart | LDL, HDL, triglycerides (and total or non HDL cholesterol when present), Bio-AI heart category | [Proposed] |
+| Liver | ALT, AST, GGT, ALP, bilirubin, albumin. A normal enzyme does not prove a healthy liver | [Proposed] |
+| Kidney | Creatinine with eGFR, urea, urine protein. One creatinine is not a kidney verdict | [Proposed] |
+| Iron | Haemoglobin, MCV, MCH, ferritin, TIBC, serum iron read as one pattern, no diagnosis | [Implemented and tested in the deterministic path] |
+
+Rules for all groups
+- State the pattern with uncertainty ("often seen when", "a doctor can confirm"), never "you have".
+- Say what is missing when the group is incomplete.
+- Distinguish lab reference ranges from guideline or diagnostic thresholds in the wording.
+- Anything that suggests treatment or testing is marked for professional review.
 
 ---
 
-## 4. Health literacy and tone standard
+## 5. Recommendations needing professional review [Proposed]
 
-The four part pattern (use where it applies, never forced)
-1. What CURA found: the fact, with number and unit.
-2. What it means: one plain sentence.
-3. Why it matters: only when it changes what the person does or feels.
-4. What she can do: realistic, optional, specific.
-A simple "What is HbA1c?" has only part 2. A single mildly high marker has parts 1, 2 and 4.
+Every clinical recommendation shown to a person must be one of: (a) in a reviewed content file, or (b) generated by the model within rules and marked as needing review in the content register. The register of items needing sign off starts here and must be completed by a clinician before release.
+
+(review) items in this document: referral and repeat testing wording in 3.2, 3.3, 3.4, 3.5, 3.6; the prediabetes ranges in 3.3; any supplement, diet or exercise advice; the status rules in section 6; the 10 and 50 percent label cut offs in section 2; the Critical label wording.
+
+---
+
+## 6. Clinical prioritization [Implemented and tested, Unreviewed, Release blocking until reviewed]
+
+Principle: findings are never ranked by how far they sit outside the laboratory range. Distance is shown in the label for information only.
+
+What the code now does (`app/biomarkers/unified_overview.py`, `app/pipeline/unified_wording.py`)
+1. An area is "Needs closer attention" only if one of these is true:
+   - a result carries a critical flag from the report;
+   - a guideline urgent threshold applies (`app/pipeline/clinical_thresholds.py`, for example HbA1c 6.5 % or higher, fasting glucose 126 mg/dL or higher, triglycerides 500 or higher, LDL 190 or higher);
+   - a Bio-AI category the report calls high or worse;
+   - a blood result outside range together with a raised Bio-AI estimate in the same area.
+2. Otherwise an area with any outside range result or raised estimate is "Worth attention". Otherwise "Looking good" or "Not yet assessed".
+3. Areas listed under "Areas to look at" are ordered by status tier first, then by a fixed registry order. That order is stable and not a ranking, and the screen says so.
+4. The model cannot add, remove or reorder priorities. It may only reword their text.
+5. If no reviewed justification exists to order two findings, they are shown together in a fixed order with no ranking language.
+
+Open issues
+- The rule list above is engineering's draft. A clinician must review and own it. [Release blocking]
+- "Moderate" predicted risk plus any blood result outside range currently counts as the closer attention tier. Whether Moderate should do that is an [Open decision].
+- Guideline thresholds cover only five markers today.
+- The "Areas to look at" heading and "not ranked" note are [Proposed]; the screen still says "priorities" in places.
+
+---
+
+## 7. Blood plus Bio-AI combined experience
+
+Principles [Proposed, partly Implemented]
+1. One area, one story. The Bio-AI estimate and blood tests for the same area appear together. [Implemented for the overview and area screens.]
+2. Always label the type: "Measured" for blood tests, "Predicted" for Bio-AI. [Implemented in the data model; UI wording as above.]
+3. Show the official category prominently. The raw score is inspectable with its documented scale and limits (section 3.5). No percent, no probability.
+4. Never state a cause between a measured result and a prediction.
+5. Show the source and date of every measured and predicted item. Do not imply two reports describe the same moment.
+6. [Open issue] The registry text for fatty liver risk reads "Your chances of developing excess fat in your liver". "Chances" can read as a probability. It needs clinical and wording review.
+
+Scenario wording [Unreviewed]
+- Both reassuring: "Your results and your risk estimate both look good for this area."
+- Blood outside range, estimate not raised: "Your blood test is outside range. The estimate is not raised, which does not cancel the test."
+- Blood in range, estimate raised: "Your blood tests are in range. The estimate still flags this area."
+- Both raised: "Both your blood test and the estimate flag this area."
+- Only one source: say which one exists.
+- Incomplete: name the missing test once.
+
+---
+
+## 8. Follow up conversation behaviour
+
+- At most four follow ups. [Implemented: the cap is four.] They must be relevant, different from each other and from what was already asked or shown. [Partly implemented. Defect: after several turns the personal ones run out and generic ones appear. Release blocking.]
+- Never a template that wraps the person's own words. [Implemented and tested.]
+- The last topic stays in focus so "Is it serious?" resolves to it. [Tested for the vitamin D case.]
+- "Explain more simply" rewrites the last answer shorter with no new facts. [Needs the live model; not verifiable offline.]
+- A vague question gets one short clarifying question.
+- Repeating results across reports: say a result was also outside range earlier, and say worse or better only if the numbers show direction. [Proposed]
+
+---
+
+## 9. Health literacy and tone standard [Proposed]
+
+The four part pattern, used where it applies and never forced on simple questions
+1. What CURA found, with value, unit, report range and date.
+2. What it means in one plain sentence.
+3. Why it matters, only if it changes what the person does or feels.
+4. What the person can reasonably do, with (review) items flagged.
 
 Language
-- Target reading level: about grade 6. Sentences under 20 words. One idea per sentence.
-- Define a medical word in the same sentence or replace it: "blood sugar", "good cholesterol (HDL)".
+- Plain words. Define a medical word in the same sentence or replace it.
+- No "elevated", "suboptimal", "dyslipidemia" without a plain gloss.
 - Numbers always carry the unit and the person's own report range.
-- No "elevated", "suboptimal", "dyslipidemia", "glycaemic" in answers. Allowed once with a plain gloss if the report uses it.
-- Hindi and Hinglish: same rules; sentences even shorter; native reviewer required before release.
+- Hindi and Hinglish: same rules, shorter sentences, native reviewer required. [Open decision]
 
 Disclaimers and referrals
-- One short qualifier maximum per answer, and only where the content could be misread: "a risk estimate, not a diagnosis" (Bio-AI) or "a reading of your results, not a diagnosis" (blood).
-- No stock "consult your doctor" closer. Mention a doctor only with a reason and a time frame: "Ask your doctor about a supplement, because 12.6 is low enough that food and sun alone are unlikely to fix it."
+- One short qualifier at most, only where content could be misread: "a risk estimate, not a diagnosis" for Bio-AI, "a reading of your results, not a diagnosis" for blood.
+- No stock closing "consult your doctor". Mention a doctor only with a reason. Today's fallback answers still contain generic lines (section 10).
 - Emergency symptoms: the safety action is the first line.
 
 Uncertainty
-- Say what the report cannot tell her ("Your report cannot tell which applies to you").
-- Use "may be linked to", "one common reason is". Never "because of", "caused by".
-- Say plainly when data is missing, once ("No liver tests were included").
+- Say what the report cannot tell, say when data is missing, once. Use "may be linked to". Never "caused by".
 
-Empathy without drama
-- Neutral, calm first line. No praise openers, no "Don't worry", no "Unfortunately".
-- Good news is said plainly ("Most of your results are fine").
-
-Repetition
-- Never state the same value twice in an answer. Never repeat a follow up suggestion that was already asked in the conversation.
+Repetition: no value stated twice in one answer; no follow up repeated.
 
 ---
 
-## 5. Blood plus Bio-AI combined experience
+## 10. Known problems found in the current system
 
-Principles
-1. One area, one story. The user never has to open "Blood" and "Bio-AI" separately.
-2. Always label the type: "measured" (a blood test) or "predicted" (a Bio-AI estimate). Same two words everywhere.
-3. A prediction is shown as a band (low, moderate, high). No percentages and no conversion of the score into a chance. The raw score is hidden by default; if product wants it, show it under "Details" with "This is a model score, not a probability".
-4. Never infer cause either way ("high cholesterol is why your heart risk is moderate" is not allowed). Say what each shows, then say whether they agree.
-5. Reports from different dates are separate facts. Do not comment on the date difference in the main story.
+Release blocking [Release blocking]
+1. Unsupported reassurance: the deterministic answer for a slightly high LDL says results a little outside range "are common and often settle on their own". This is not supported for LDL. The acceptance test for it is written and currently fails by design (expected failure).
+2. Absolute reassurance: "Everything here is within your lab's normal range, so there is nothing that needs action." A normal single enzyme does not prove the organ is healthy.
+3. The fallback answer for a low vitamin D ends with "It is worth discussing with your doctor at your next visit" (a generic referral line, and its urgency is not justified).
+4. Follow up suggestions become generic and off topic after a few turns.
+5. The prioritization rules in section 6 and every (review) item have no clinical sign off.
+6. The Bio-AI score scale and limitations are not in the product, so the score screen cannot be completed.
 
-Scenario text (existing deterministic scenarios, new wording)
-- Both reassuring: "Your results and your risk estimate both look good for this area."
-- Blood outside, risk fine: "Your blood test is outside range. The risk estimate is not raised, which is reassuring but does not replace the test."
-- Blood fine, risk raised: "Your blood tests are in range. The Bio-AI estimate still flags this area, so it is worth keeping an eye on."
-- Both raised: "Both your blood test and the risk estimate flag this area, so it deserves attention."
-- Blood only / risk only: say which one exists. "This area has no Bio-AI estimate."
-- Incomplete: name the missing test once.
+Other open problems
+- Answer cards and the range bar do not show the "A little above" distance labels yet. The range bar itself exists.
+- "Explain more simply" returns a service unavailable message when the model is off; with the model on it is untested.
+- The personal prompt is over its own size budget (3409 against 3200 characters).
+- Hindi and Hinglish copy has no reviewer.
 
-Where wording comes from: status and scenario are deterministic (unchanged). The model only words the single "Putting it together" paragraph and the answer sentence, and may not add numbers or statuses. Education text is reviewed copy.
-
----
-
-## 6. Follow up conversation behavior
-
-- At most four follow ups. They must be: relevant to this answer, different from each other, not already asked, and answerable from available data. Generic follow ups ("Tell me more") are never shown.
-- Pattern: one "go deeper" (why), one "what can I do", one "connect" (another area or the Bio-AI side), one optional "compare" if two reports exist.
-- If the answer already contains the action, do not offer "what can I do".
-- A follow up question replaces, not extends, the earlier explanation. It must not restate the earlier value unless it changes the answer.
-- Memory in the session: the last biomarker or area stays "in focus" so "Is it serious?" and "Will sunlight help?" resolve to it.
-- If the question is vague ("what about the other one?"), ask one short clarifying question with two tappable choices.
-- When a topic repeats across reports (HbA1c above range twice), say so in one sentence: "It was also above range in your June report." Do not call it worsening or improving unless the numbers show direction.
-- "More simply" shortens the last answer and adds no facts.
+Fixed in this round [Implemented and tested]
+- A crash in the answer cleaner on any non bullet line with a routine "see your doctor" sentence.
+- A requested date with no report now says so plainly.
+- A follow up was turned into "What does is it serious mean in everyday terms?"; HbA1c lost its capital letters in suggestions.
+- Category status no longer rises because a number is far from its range.
+- The model can no longer choose or reorder the priority areas.
 
 ---
 
-## 7. Accessibility and mobile
+## 11. Accessibility and mobile [Implemented in part]
 
-- WCAG 2.2 AA. Text contrast 4.5 to 1, large text 3 to 1, UI parts 3 to 1.
-- Status is never colour alone: each has a text label, and the label comes before the badge in reading order.
-- Touch targets at least 44 by 44 CSS px on touch screens (Stage 1 added this for chips and buttons).
-- Clinical text at least 14 px (Stage 1). Body 16 px. Support 200 percent zoom without horizontal scroll.
-- Focus ring visible on every control (exists). Skip link (exists). Answers announced politely; errors use `role="alert"` (Stage 1).
-- Reduced motion respected everywhere (Stage 1). No motion needed to understand anything.
-- Range bar, if shown, has a text alternative: "12.6 ng/mL. Usual range 30 to 100. Well below range."
-- Mobile first: single column; the answer's first line visible without scrolling; follow ups wrap and never overlap the composer; composer stays above the keyboard; draft preserved on error (Stage 1).
-- Screen reader order: short answer, label, details, what you can do, follow ups.
-- Voice input stays optional and its errors are plain sentences.
+Implemented: visible focus ring, skip link, clinical text at least 14 px, 44 px touch targets on touch screens for chips and buttons, reduced motion everywhere, errors announced as alerts, draft kept after a failed send. Not yet verified on a real phone or with a screen reader.
+
+Proposed: status never by colour alone, range bar with a text alternative, single column, first line visible without scrolling, follow ups never overlapping the composer, 200 percent zoom without horizontal scroll.
 
 ---
 
-## 8. Usability acceptance criteria
+## 12. Acceptance criteria
 
-These are targets to test with a small group of non clinical adults (aim for people aged 45 to 65). None has been measured yet.
+Automated, run with synthetic data and the model off [Implemented and tested, 15 passing, 1 expected failure]
+- Summaries count markers correctly (6 outside, 3 inside, 9 total) and do not confuse markers with areas.
+- Related measurements are read together where implemented (glucose with HbA1c, iron pattern).
+- Findings carry the actual value, unit, report range, date and source.
+- Predicted risks are labelled predictions and never described as diagnoses; the raw score and category are both kept.
+- A status never rises only because a value is far from its range; priority order is by tier, then fixed order; the model cannot change it.
+- A follow up keeps the trusted value and context.
+- A requested date with no report is said plainly.
+- The expected failure records the LDL reassurance problem.
 
-Comprehension
-- After reading an area answer, at least 8 of 10 participants can say in their own words: what was found, whether it is serious, and what they will do.
-- At least 8 of 10 can correctly say which result was a blood measurement and which was a prediction.
-- No participant concludes "I have diabetes" from a high Bio-AI band alone.
+Not yet done [Proposed]
+- Testing with a live model.
+- Testing with real people aged about 45 to 65: can they say what was found, whether it is serious, what to do, and which result was measured and which predicted.
+- Screen reader and keyboard checks on a phone.
+- Clinical review of every (review) item.
 
-Effort
-- From app open to an answer about their own top finding: at most 2 taps.
-- First screenful of any answer is 90 words or fewer.
-- No finding appears twice on one screen.
-
-Language
-- Every answer passes an automated check: no banned terms, sentence length under 20 words on average, no stock "consult your doctor", at most one qualifier.
-- Every answer states units and the report's own range for each value mentioned.
-
-Safety
-- No answer states a cause, a diagnosis, or a probability derived from a Bio-AI score.
-- Any value in an answer exists in the trusted data; numbers are checked after the model writes (existing guards).
-- Red flag symptoms always put the safety action first.
-
-Robustness
-- Every state in section 3 (loading, empty, error, partial, offline) has been viewed on a phone width.
-- Keyboard only and screen reader pass on S1 to S4.
-
-Test matrix: the 15 scenarios from the CURA 2.0 brief, run against synthetic reports for Meena (conflicting, abnormal, incomplete), a person with all results in range, a person with no Bio-AI report, and a person with no reports. Results will be recorded as run, with pass or fail per scenario.
+No usability scores exist. None may be reported until real sessions are run.
 
 ---
 
-## 9. Prioritized implementation roadmap
+## 13. Roadmap
 
-Done: Stage 1 (errors, retry, draft, accessibility base), Stage 2 (welcome and returning), crash fix in `drop_routine_doctor`, baseline test triage (`docs/BASELINE_TEST_TRIAGE.md`).
+Done: errors, retry and draft; accessibility base; welcome copy and returning greeting; distance labels in the overview; date with no report; follow up template guard; deterministic prioritization; acceptance suite; this specification and `docs/BASELINE_TEST_TRIAGE.md`.
 
-Next, in order of value to the person:
-1. Plain status labels everywhere (section 2). Done for the health overview and category screens ("A little above range", "Above range", "Well above range", and the same for below). Not yet done: answer value cards and the range bar, which need distance in the answer data. The "Critical" label is unchanged pending clinical sign off on "Needs medical attention soon". Replace "(low)" style tags with the five labels, derived from the existing deterministic status. Frontend plus a small mapping.
-2. Biomarker answer structure: found, means, may be behind it, what you can do. Prompt and card changes. Blocked on triage item 3 (single value findings are empty), so the card reads the value from the trusted structured data.
-3. Fix the "date with no report" answer (triage item 2). Must be fixed before release.
-4. "Start here" capped at three on the glance screen and "what we measured / what Bio-AI shows / putting it together" in the area screen.
-5. Remove generic doctor referral from deterministic fallback text ("It is worth discussing with your doctor at your next visit" appears today in the fallback answer for low vitamin D).
-6. Follow up rules: four max, distinct, not already asked (also triage items 5 and the cap tests).
-7. Bio-AI wording: band only, remove score numbers from answers; update or retire the score tests after the decision below.
-8. Nutrition pattern (foods first, local foods).
-9. Uploaded document pattern.
-10. Hindi and Hinglish pass with a native reviewer. Test matrix run and report.
+Next
+1. Clinical review of the rules and (review) items (blocks release).
+2. Bio-AI score screen with documented scale and limits (needs documentation).
+3. Remove the unsupported and generic reassurance lines (section 10 items 1 to 3).
+4. Fix follow up relevance after several turns.
+5. Show source and date on every measured and predicted item in the area screens; show "Measured" and "Predicted" headings.
+6. Distance labels on answer cards and the range bar.
+7. Connected evidence for the heart, liver and kidney groups.
+8. Nutrition and uploaded document patterns.
+9. Hindi and Hinglish review, usability sessions, screen reader pass.
 
-Decisions needed from you or clinical reviewers before release
-- Show the raw Bio-AI score anywhere, or band only? Spec assumes band only.
-- Approve the five status labels and the "A little" versus "Well" distinction.
-- Clinical review of the example wording in sections 2 and 5, and of the "what you can do" statements (for example vitamin D and supplement advice, which is a clinician decision).
-- Who reviews Hindi and Hinglish text.
-- Whether the range bar is worth keeping at all after the first usability round.
+## 14. Open decisions
+
+- Who owns clinical review, and the review process.
+- Whether Moderate predicted risk plus any blood result outside range should count as closer attention.
+- The Critical label wording ("Needs medical attention soon").
+- Where the Bio-AI scale and limitations are documented.
+- The wording "chances" in the fatty liver registry text.
+- Who reviews Hindi and Hinglish.
