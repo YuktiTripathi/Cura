@@ -8,6 +8,7 @@ export const queryKeys = {
   bodySystems: (reportId: string | null) => ["body-systems", reportId] as const,
   healthOverview: ["health-overview"] as const,
   healthCategory: (id: string) => ["health-overview", id] as const,
+  healthStory: (id: string, lang: string) => ["health-story", id, lang] as const,
   riskOverview: (reportId: string | null) => ["bio-ai-risks", reportId] as const,
 };
 

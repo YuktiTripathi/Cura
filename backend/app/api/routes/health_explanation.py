@@ -5,13 +5,15 @@ Wording is cached by a key that includes the member and a hash of their reports,
 from an old cache. Refresh therefore recomputes from the live reports.
 """
 
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 
 from app.auth.deps import get_principal
 from app.auth.models import AuthenticatedPrincipal
 from app.contracts.unified_health import CategoryDetail, Finding, UnifiedOverview
 from app.db.session import get_db
+from app.health_explanation.story_schema import HealthStory
+from app.health_explanation.story_service import category_story
 from app.pipeline.unified_service import unified_category, unified_overview
 from app.providers.registry import ProviderRegistry, get_registry
 
@@ -34,6 +36,21 @@ def category(category_id: str, principal: AuthenticatedPrincipal = Depends(get_p
     if detail is None:
         raise HTTPException(status_code=404, detail="That health category has no results.")
     return detail
+
+
+@router.get("/categories/{category_id}/story", response_model=HealthStory)
+def story(
+    category_id: str,
+    lang: str = Query("en", pattern="^(en|hi)$"),
+    principal: AuthenticatedPrincipal = Depends(get_principal),
+    registry: ProviderRegistry = Depends(get_registry),
+    db: Session = Depends(get_db),
+):
+    """The guided health story for one category, from the signed in member's own data."""
+    result = category_story(principal, registry, category_id, db, lang)
+    if result is None:
+        raise HTTPException(status_code=404, detail="That health category has no results.")
+    return result
 
 
 @router.get("/findings/{finding_id}", response_model=Finding)

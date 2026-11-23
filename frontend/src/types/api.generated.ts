@@ -289,6 +289,26 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/health-explanation/categories/{category_id}/story": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Story
+         * @description The guided health story for one category, from the signed in member's own data.
+         */
+        get: operations["story_api_v1_health_explanation_categories__category_id__story_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health-explanation/findings/{finding_id}": {
         parameters: {
             query?: never;
@@ -722,6 +742,80 @@ export interface components {
             source: string;
             /** Status */
             status?: string | null;
+        };
+        /** BiomarkerCard */
+        BiomarkerCard: {
+            /**
+             * Age Sex Note
+             * @default
+             */
+            age_sex_note: string;
+            /**
+             * Body Function
+             * @default
+             */
+            body_function: string;
+            /** Causes When High */
+            causes_when_high?: string[];
+            /** Causes When Low */
+            causes_when_low?: string[];
+            /**
+             * Detail Level
+             * @default full
+             * @enum {string}
+             */
+            detail_level: "full" | "basic";
+            /**
+             * Effects When High
+             * @default
+             */
+            effects_when_high: string;
+            /**
+             * Effects When Low
+             * @default
+             */
+            effects_when_low: string;
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /** Finding Id */
+            finding_id: string;
+            /** Influences */
+            influences?: string[];
+            /** Marker Id */
+            marker_id?: string | null;
+            /**
+             * Measures
+             * @default
+             */
+            measures: string;
+            /** Name */
+            name: string;
+            /**
+             * Needs Attention
+             * @default false
+             */
+            needs_attention: boolean;
+            /** Practical Steps */
+            practical_steps?: string[];
+            /** Related Markers */
+            related_markers?: string[];
+            /**
+             * Review Status
+             * @default unreviewed
+             * @enum {string}
+             */
+            review_status: "unreviewed" | "reviewed";
+            /**
+             * Unit Note
+             * @default
+             */
+            unit_note: string;
+            /**
+             * Why It Matters
+             * @default
+             */
+            why_it_matters: string;
+            your_result: components["schemas"]["YourResult"];
         };
         /** BiomarkerResult */
         BiomarkerResult: {
@@ -1845,6 +1939,45 @@ export interface components {
             /** Scores */
             scores?: components["schemas"]["ScoreOverview"][];
         };
+        /** HealthStory */
+        HealthStory: {
+            /** Biomarker Education */
+            biomarker_education?: components["schemas"]["BiomarkerCard"][];
+            /** Category Id */
+            category_id: string;
+            /** Category Name */
+            category_name: string;
+            /**
+             * Disclaimer
+             * @default This is general education about your results. It is not a diagnosis and does not replace advice from your doctor.
+             */
+            disclaimer: string;
+            /** Headline */
+            headline: string;
+            /**
+             * Icon
+             * @default marker
+             */
+            icon: string;
+            improvement_plan: components["schemas"]["ImprovementPlan"];
+            /** Limitations */
+            limitations?: string[];
+            metadata: components["schemas"]["StoryMetadata"];
+            next_steps: components["schemas"]["NextSteps"];
+            personal_factors: components["schemas"]["PersonalFactors"];
+            /**
+             * Status
+             * @default not_assessed
+             */
+            status: string;
+            /**
+             * Status Label
+             * @default
+             */
+            status_label: string;
+            understand_body: components["schemas"]["UnderstandBody"];
+            your_assessment: components["schemas"]["YourAssessment"];
+        };
         /** HealthTheme */
         HealthTheme: {
             /** Interpretation */
@@ -1875,6 +2008,21 @@ export interface components {
             status: string;
             /** Value */
             value: number;
+        };
+        /** ImprovementPlan */
+        ImprovementPlan: {
+            /** Actions */
+            actions?: components["schemas"]["PlanAction"][];
+            /**
+             * Lead
+             * @default
+             */
+            lead: string;
+            /**
+             * Note
+             * @default These steps support heart health in general. They are not promised to change a Bio-AI score or any single result, and they do not replace advice from your doctor.
+             */
+            note: string;
         };
         /**
          * InsightCandidate
@@ -1962,6 +2110,31 @@ export interface components {
          * @enum {string}
          */
         LanguageRegister: "SIMPLE_LANGUAGE" | "TECHNICAL";
+        /** LifestyleFactor */
+        LifestyleFactor: {
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /** Key */
+            key: string;
+            /** Label */
+            label: string;
+            /** Level */
+            level?: string | null;
+            /** Recorded At */
+            recorded_at?: string | null;
+            /**
+             * Source
+             * @default Your questionnaire
+             */
+            source: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "reported" | "not_reported";
+            /** Value */
+            value?: string | null;
+        };
         /** LifestyleSummary */
         LifestyleSummary: {
             activity_level?: components["schemas"]["ProvenancedFact"] | null;
@@ -2108,6 +2281,24 @@ export interface components {
              */
             within_range: number;
         };
+        /** MeasuredFinding */
+        MeasuredFinding: {
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            finding: components["schemas"]["Finding"];
+            /** Marker Id */
+            marker_id?: string | null;
+            /**
+             * Source
+             * @default Laboratory report
+             */
+            source: string;
+            /**
+             * Why Relevant
+             * @default
+             */
+            why_relevant: string;
+        };
         /** MessageOut */
         MessageOut: {
             /** Content */
@@ -2118,6 +2309,17 @@ export interface components {
             id: string;
             /** Role */
             role: string;
+        };
+        /** NextSteps */
+        NextSteps: {
+            /** Follow Ups */
+            follow_ups?: string[];
+            /** Monitoring */
+            monitoring?: string[];
+            /** Related Categories */
+            related_categories?: components["schemas"]["RelatedCategory"][];
+            /** Suggested Questions */
+            suggested_questions?: string[];
         };
         /** NutritionFood */
         NutritionFood: {
@@ -2271,6 +2473,27 @@ export interface components {
             /** Unit */
             unit?: string | null;
         };
+        /** PersonalFactors */
+        PersonalFactors: {
+            /**
+             * Lead
+             * @default
+             */
+            lead: string;
+            /** Lifestyle */
+            lifestyle?: components["schemas"]["LifestyleFactor"][];
+            /** Measured */
+            measured?: components["schemas"]["MeasuredFinding"][];
+            /** Missing */
+            missing?: string[];
+            /** Relationships */
+            relationships?: components["schemas"]["StoryRelationship"][];
+            /**
+             * Within Range Count
+             * @default 0
+             */
+            within_range_count: number;
+        };
         /** PersonalHealthProfile */
         PersonalHealthProfile: {
             /** Allergies */
@@ -2381,6 +2604,29 @@ export interface components {
             session_only: boolean;
             /** Stable Domains */
             stable_domains?: string[];
+        };
+        /** PlanAction */
+        PlanAction: {
+            /** Action Id */
+            action_id: string;
+            /**
+             * Evidence Status
+             * @default rule_based_unreviewed
+             */
+            evidence_status: string;
+            /**
+             * Safety Note
+             * @default
+             */
+            safety_note: string;
+            /** Supported By */
+            supported_by?: string[];
+            /** Title */
+            title: string;
+            /** What */
+            what: string;
+            /** Why */
+            why: string;
         };
         /** PresentedFinding */
         PresentedFinding: {
@@ -2534,6 +2780,20 @@ export interface components {
             symptoms?: string[];
             /** Travel */
             travel?: string[];
+        };
+        /** RelatedCategory */
+        RelatedCategory: {
+            /**
+             * Icon
+             * @default marker
+             */
+            icon: string;
+            /** Id */
+            id: string;
+            /** Name */
+            name: string;
+            /** Status Label */
+            status_label: string;
         };
         /** RelatedTest */
         RelatedTest: {
@@ -2730,45 +2990,6 @@ export interface components {
              * @default 0
              */
             raised: number;
-        };
-        /**
-         * RiskExplanation
-         * @description A Bio-AI risk explained in four steps. Values come from the report, the wording from the model.
-         */
-        RiskExplanation: {
-            /** Actions */
-            actions?: components["schemas"]["ExplainerAction"][];
-            /** Condition */
-            condition?: string[];
-            /** Condition Title */
-            condition_title: string;
-            /** Meaning */
-            meaning?: string[];
-            /**
-             * Meaning Title
-             * @default What does this mean for you?
-             */
-            meaning_title: string;
-            /** More */
-            more?: components["schemas"]["ExplainerSection"][];
-            /**
-             * Related Button
-             * @default
-             */
-            related_button: string;
-            /** Related Tests */
-            related_tests?: components["schemas"]["RelatedTest"][];
-            /**
-             * Related Text
-             * @default
-             */
-            related_text: string;
-            /**
-             * Related Title
-             * @default
-             */
-            related_title: string;
-            score_card?: components["schemas"]["RiskScoreCard"] | null;
         };
         /** RiskGroupSummary */
         RiskGroupSummary: {
@@ -2994,6 +3215,13 @@ export interface components {
             /** Status */
             status?: string | null;
         };
+        /** Section */
+        Section: {
+            /** Heading */
+            heading: string;
+            /** Text */
+            text: string;
+        };
         /** SemanticResponse */
         SemanticResponse: {
             /** Blocks */
@@ -3089,6 +3317,63 @@ export interface components {
              */
             normal: number;
         };
+        /** StoryMetadata */
+        StoryMetadata: {
+            /** Actions Version */
+            actions_version: string;
+            /**
+             * Data State
+             * @default partial
+             * @enum {string}
+             */
+            data_state: "complete" | "partial" | "empty";
+            /** Evidence Version */
+            evidence_version: string;
+            /** Generated At */
+            generated_at: string;
+            /**
+             * Generation
+             * @default rules
+             * @enum {string}
+             */
+            generation: "rules" | "model";
+            /** Generation Model */
+            generation_model?: string | null;
+            /** Knowledge Version */
+            knowledge_version: string;
+            /** Prompt Version */
+            prompt_version: string;
+            /** Rules Version */
+            rules_version: string;
+        };
+        /** StoryRelationship */
+        StoryRelationship: {
+            /**
+             * Causal Claim
+             * @default false
+             * @constant
+             */
+            causal_claim: false;
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /**
+             * Evidence Status
+             * @default rule_based_unreviewed
+             */
+            evidence_status: string;
+            /** Finding Ids */
+            finding_ids?: string[];
+            /** Lifestyle Keys */
+            lifestyle_keys?: string[];
+            /** Relationship Id */
+            relationship_id: string;
+            /** Relationship Type */
+            relationship_type: string;
+            /** Rule Id */
+            rule_id: string;
+            /** Text */
+            text: string;
+        };
         /**
          * StreamPolicy
          * @enum {string}
@@ -3148,7 +3433,7 @@ export interface components {
             related_findings?: components["schemas"]["PresentedFinding"][];
             /** Response Depth */
             response_depth?: string | null;
-            risk_explanation?: components["schemas"]["RiskExplanation"] | null;
+            risk_explanation?: components["schemas"]["app__contracts__presentation__RiskExplanation"] | null;
             /** Structured Next Steps */
             structured_next_steps?: {
                 [key: string]: unknown;
@@ -3386,6 +3671,39 @@ export interface components {
             /** Uncertainties */
             uncertainties?: string[];
         };
+        /** UnderstandBody */
+        UnderstandBody: {
+            /**
+             * Available
+             * @default false
+             */
+            available: boolean;
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /**
+             * Report Scope
+             * @default
+             */
+            report_scope: string;
+            /**
+             * Review Status
+             * @default unreviewed
+             * @enum {string}
+             */
+            review_status: "unreviewed" | "reviewed";
+            /** Sections */
+            sections?: components["schemas"]["Section"][];
+            /**
+             * Source
+             * @default medical_knowledge_base
+             */
+            source: string;
+            /**
+             * Title
+             * @default
+             */
+            title: string;
+        };
         /** UnifiedOverview */
         UnifiedOverview: {
             /**
@@ -3460,6 +3778,119 @@ export interface components {
             msg: string;
             /** Error Type */
             type: string;
+        };
+        /** YourAssessment */
+        YourAssessment: {
+            /**
+             * Available
+             * @default false
+             */
+            available: boolean;
+            /**
+             * Lead
+             * @default
+             */
+            lead: string;
+            /**
+             * Note
+             * @default
+             */
+            note: string;
+            /** Risks */
+            risks?: components["schemas"]["app__health_explanation__story_schema__RiskExplanation"][];
+        };
+        /** YourResult */
+        YourResult: {
+            /** Measured On */
+            measured_on?: string | null;
+            /** Reference High */
+            reference_high?: number | null;
+            /** Reference Low */
+            reference_low?: number | null;
+            /**
+             * Source
+             * @default Laboratory report
+             */
+            source: string;
+            /** Status */
+            status: string;
+            /** Status Label */
+            status_label: string;
+            /** Unit */
+            unit?: string | null;
+            /** Value */
+            value?: number | null;
+        };
+        /**
+         * RiskExplanation
+         * @description A Bio-AI risk explained in four steps. Values come from the report, the wording from the model.
+         */
+        app__contracts__presentation__RiskExplanation: {
+            /** Actions */
+            actions?: components["schemas"]["ExplainerAction"][];
+            /** Condition */
+            condition?: string[];
+            /** Condition Title */
+            condition_title: string;
+            /** Meaning */
+            meaning?: string[];
+            /**
+             * Meaning Title
+             * @default What does this mean for you?
+             */
+            meaning_title: string;
+            /** More */
+            more?: components["schemas"]["ExplainerSection"][];
+            /**
+             * Related Button
+             * @default
+             */
+            related_button: string;
+            /** Related Tests */
+            related_tests?: components["schemas"]["RelatedTest"][];
+            /**
+             * Related Text
+             * @default
+             */
+            related_text: string;
+            /**
+             * Related Title
+             * @default
+             */
+            related_title: string;
+            score_card?: components["schemas"]["RiskScoreCard"] | null;
+        };
+        /** RiskExplanation */
+        app__health_explanation__story_schema__RiskExplanation: {
+            /** Assessed On */
+            assessed_on?: string | null;
+            /** Classification */
+            classification?: string | null;
+            /** Contributing Factors */
+            contributing_factors?: string[] | null;
+            /**
+             * Contributing Note
+             * @default
+             */
+            contributing_note: string;
+            /** Evidence Ids */
+            evidence_ids?: string[];
+            /** Finding Id */
+            finding_id: string;
+            /** Limitations */
+            limitations: string[];
+            /** Model Name */
+            model_name?: string | null;
+            /** Model Version */
+            model_version?: string | null;
+            /** Name */
+            name: string;
+            /** Score */
+            score?: number | null;
+            /** What It Does Not Mean */
+            what_it_does_not_mean: string[];
+            /** What It Means */
+            what_it_means: string;
         };
     };
     responses: never;
@@ -4069,6 +4500,39 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["CategoryDetail"];
+                };
+            };
+            /** @description Validation Error */
+            422: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HTTPValidationError"];
+                };
+            };
+        };
+    };
+    story_api_v1_health_explanation_categories__category_id__story_get: {
+        parameters: {
+            query?: {
+                lang?: string;
+            };
+            header?: never;
+            path: {
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthStory"];
                 };
             };
             /** @description Validation Error */

@@ -1,7 +1,9 @@
 import { useState } from "react";
 import type { ContextRef } from "../../types/chat";
 import type { CategoryCard, CategoryDetail, EducationNote, Finding } from "../../types/unifiedHealth";
-import { useHealthCategory, useHealthOverview } from "../../hooks/useHealthOverview";
+import { useHealthCategory, useHealthOverview, useHealthStory } from "../../hooks/useHealthOverview";
+import { HealthStoryView } from "./story/HealthStoryView";
+import { getLocale } from "../../i18n";
 import { HealthIcon } from "./HealthIcon";
 import { t } from "../../i18n";
 
@@ -182,7 +184,7 @@ export function HealthOverviewView({
 }) {
   const query = useHealthOverview();
   const data = query.data;
-  if (openId) return <CategoryScreen id={openId} onAsk={onAsk} />;
+  if (openId) return <CategoryScreen id={openId} onAsk={onAsk} onOpen={onOpenChange} />;
   if (query.isLoading) return <section className="overview" aria-busy="true"><p className="muted">{t("ui.unified.loading", "Putting your health picture together…")}</p></section>;
   if (query.isError || !data) {
     return (
@@ -241,7 +243,15 @@ export function HealthOverviewView({
   );
 }
 
-function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
+function CategoryScreen({ id, onAsk, onOpen }: { id: string; onAsk: Ask; onOpen?: (id: string) => void }) {
+  const story = useHealthStory(id, getLocale() === "hi" ? "hi" : "en");
+  const [summary, setSummary] = useState(false);
+  if (story.data && !summary) return <HealthStoryView story={story.data} onAsk={onAsk} onOpenCategory={onOpen} onShowSummary={() => setSummary(true)} />;
+  if (story.isLoading) return <section className="overview" aria-busy="true"><p className="muted">{t("ui.unified.loading_area", "Opening this part of your health…")}</p></section>;
+  return <SummaryScreen id={id} onAsk={onAsk} />;
+}
+
+function SummaryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
   const query = useHealthCategory(id);
   const [all, setAll] = useState(false);
   const d: CategoryDetail | undefined = query.data;

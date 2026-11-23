@@ -3,10 +3,245 @@
  "review_status": "unreviewed",
  "note": "Engineering draft. Every action is a conversation or tracking step. None names a medicine, supplement, dose or diet plan. Each needs clinical review before release.",
  "actions": [
-  {"action_id": "act_review_results", "when": "measured_out", "title": "Review your results", "detail": "Talk to your doctor about {out}.", "icon": "clipboard", "priority": 1},
-  {"action_id": "act_understand_risk", "when": "risk_raised", "title": "Understand your risk", "detail": "Ask your doctor what your predicted {raised} risk means for you.", "icon": "heart", "priority": 2},
-  {"action_id": "act_ask_about_difference", "when": "scenario:blood_out_risk_ok", "title": "Ask about the difference", "detail": "Ask your doctor why your blood results and your predicted risk point in different directions.", "icon": "clipboard", "priority": 3},
-  {"action_id": "act_track_changes", "when": "measured_out_or_risk_raised", "title": "Keep track of changes", "detail": "Repeat the relevant tests if your doctor advises.", "icon": "calendar", "priority": 4},
-  {"action_id": "act_keep_going", "when": "nothing_raised", "title": "Keep it this way", "detail": "Keep up the habits that are working for you.", "icon": "check", "priority": 5}
+  {
+   "action_id": "act_review_results",
+   "when": "measured_out",
+   "title": "Review your results",
+   "detail": "Talk to your doctor about {out}.",
+   "icon": "clipboard",
+   "priority": 1
+  },
+  {
+   "action_id": "act_understand_risk",
+   "when": "risk_raised",
+   "title": "Understand your risk",
+   "detail": "Ask your doctor what your predicted {raised} risk means for you.",
+   "icon": "heart",
+   "priority": 2
+  },
+  {
+   "action_id": "act_ask_about_difference",
+   "when": "scenario:blood_out_risk_ok",
+   "title": "Ask about the difference",
+   "detail": "Ask your doctor why your blood results and your predicted risk point in different directions.",
+   "icon": "clipboard",
+   "priority": 3
+  },
+  {
+   "action_id": "act_track_changes",
+   "when": "measured_out_or_risk_raised",
+   "title": "Keep track of changes",
+   "detail": "Repeat the relevant tests if your doctor advises.",
+   "icon": "calendar",
+   "priority": 4
+  },
+  {
+   "action_id": "act_keep_going",
+   "when": "nothing_raised",
+   "title": "Keep it this way",
+   "detail": "Keep up the habits that are working for you.",
+   "icon": "check",
+   "priority": 5
+  }
+ ],
+ "story_actions": [
+  {
+   "action_id": "heart_move_gradually",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b",
+     "hdl_cholesterol_direct",
+     "triglycerides",
+     "vldl_cholesterol",
+     "chol_hdl_ratio"
+    ],
+    "or_risk_raised": true,
+    "activity": [
+     "low"
+    ]
+   },
+   "title": "Add gentle movement to your day",
+   "what": "Build up daily movement slowly, for example a short brisk walk, and add a little more each week.",
+   "why": "You have reported low physical activity, and regular activity supports healthier cholesterol patterns and heart health.",
+   "safety_note": "If you have chest pain, breathlessness or a medical condition, check with your doctor before increasing activity."
+  },
+  {
+   "action_id": "heart_keep_active",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b",
+     "hdl_cholesterol_direct",
+     "triglycerides",
+     "vldl_cholesterol",
+     "chol_hdl_ratio"
+    ],
+    "or_risk_raised": true,
+    "activity": [
+     "active"
+    ]
+   },
+   "title": "Keep up your activity",
+   "what": "Keep up the regular activity you have reported. Whether your routine needs to change is a good question for your doctor.",
+   "why": "You have reported being active, so basic advice to start moving does not apply. Other things can influence these results.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_tell_doctor_activity",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b",
+     "hdl_cholesterol_direct",
+     "triglycerides",
+     "vldl_cholesterol",
+     "chol_hdl_ratio"
+    ],
+    "or_risk_raised": true,
+    "activity": [
+     "not_reported",
+     "unclassified"
+    ]
+   },
+   "title": "Tell your doctor how active you are",
+   "what": "Describe how active you are in a usual week when you speak to your doctor.",
+   "why": "Your activity level is not clearly recorded, and it can influence cholesterol and heart health.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_fibre_foods",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b"
+    ],
+    "diet": [
+     "vegetarian",
+     "vegan",
+     "eggetarian",
+     "not_reported",
+     "unclassified"
+    ]
+   },
+   "title": "Add fibre rich foods",
+   "what": "Include more of foods such as oats, beans, lentils, chickpeas, fruit, vegetables, nuts and seeds, in ways that suit your own diet.",
+   "why": "Your LDL related cholesterol is outside the laboratory range, and fibre rich plant foods are generally linked with healthier cholesterol.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_fibre_foods_nonveg",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b"
+    ],
+    "diet": [
+     "non_vegetarian"
+    ]
+   },
+   "title": "Add fibre rich foods and healthier protein",
+   "what": "Include more oats, beans, lentils, fruit, vegetables, nuts and seeds. When you eat non vegetarian food, fish can replace some fried or processed meat.",
+   "why": "Your LDL related cholesterol is outside the laboratory range, and fibre rich foods and healthier protein choices are generally linked with healthier cholesterol.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_healthier_fats",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "hdl_cholesterol_direct",
+     "ldl_cholesterol_calculated",
+     "chol_hdl_ratio",
+     "cholesterol_total"
+    ]
+   },
+   "title": "Choose healthier fats",
+   "what": "Choose nuts, seeds and plant oils more often than fried and packaged foods.",
+   "why": "The type of fat in your diet can influence your cholesterol results.",
+   "safety_note": "If you have a nut allergy, choose seeds or other foods that are safe for you."
+  },
+  {
+   "action_id": "heart_less_sugar_alcohol",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "triglycerides",
+     "vldl_cholesterol"
+    ]
+   },
+   "title": "Cut back on sugar and alcohol",
+   "what": "Have fewer sugary drinks and sweets, and limit alcohol if you drink.",
+   "why": "Your triglycerides are outside the laboratory range, and sugar and alcohol are known to influence triglycerides.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_check_bp",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b",
+     "hdl_cholesterol_direct",
+     "triglycerides",
+     "vldl_cholesterol",
+     "chol_hdl_ratio"
+    ],
+    "or_risk_raised": true
+   },
+   "title": "Have your blood pressure checked",
+   "what": "Ask for a blood pressure reading if you have not had one recently.",
+   "why": "Your blood report does not measure blood pressure, and it is an important part of heart health.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_discuss",
+   "category": "heart_circulation",
+   "requires": {
+    "any_marker_out": [
+     "ldl_cholesterol_calculated",
+     "non_hdl_cholesterol",
+     "cholesterol_total",
+     "apo_b_apolipoprotein_b",
+     "hdl_cholesterol_direct",
+     "triglycerides",
+     "vldl_cholesterol",
+     "chol_hdl_ratio"
+    ],
+    "or_risk_raised": true
+   },
+   "title": "Discuss your results with your doctor",
+   "what": "Share these results and your Bio-AI assessment with your doctor and ask what they mean for you.",
+   "why": "Your doctor can look at your results together with your history, which this app cannot do.",
+   "safety_note": ""
+  },
+  {
+   "action_id": "heart_keep_going",
+   "category": "heart_circulation",
+   "requires": {
+    "nothing_raised": true
+   },
+   "title": "Keep up what is working",
+   "what": "Keep up the habits that support your heart, such as regular movement and a balanced diet.",
+   "why": "Your heart related results and assessment are not raised. That does not mean you are risk free, so regular checkups still matter.",
+   "safety_note": ""
+  }
  ]
 }

@@ -1,0 +1,594 @@
+{
+ "kb_version": "bk-1",
+ "review_status": "unreviewed",
+ "note": "Engineering draft of general medical education for Heart & Circulation. It is not a reading of any person's result. Every entry needs clinical review before release. Reference ranges are never stored here; they come from the person's own report.",
+ "biomarkers": [
+  {
+   "marker_id": "hdl_cholesterol_direct",
+   "display_name": "HDL cholesterol",
+   "aliases": [
+    "HDL",
+    "good cholesterol",
+    "HDL-C"
+   ],
+   "measures": "The cholesterol carried by HDL particles in your blood.",
+   "body_function": "HDL helps carry extra cholesterol away from your tissues and back to the liver.",
+   "why_it_matters": "It is one part of your overall cholesterol picture, which doctors use alongside other results to understand heart health.",
+   "causes_when_low": [
+    "Little physical activity",
+    "Smoking",
+    "Being overweight",
+    "Some inherited patterns",
+    "Some medical conditions"
+   ],
+   "causes_when_high": [
+    "Some inherited patterns",
+    "Some medicines",
+    "Heavy alcohol use",
+    "Some liver or thyroid conditions"
+   ],
+   "effects_when_low": "A lower HDL can be associated with less efficient cholesterol removal and with a higher chance of heart and blood vessel problems over time.",
+   "effects_when_high": "A higher HDL is often seen with a healthier cholesterol profile, but higher is not always better. Very high values can have other causes, so your doctor looks at the whole picture.",
+   "influences": [
+    "Physical activity",
+    "The types of fat in your diet",
+    "Smoking",
+    "Body weight",
+    "Genetics",
+    "Other health conditions"
+   ],
+   "practical_steps": [
+    "Regular movement, built up gradually",
+    "Choosing healthier fats such as nuts, seeds and plant oils over fried and packaged foods",
+    "Not smoking, if you smoke"
+   ],
+   "related_markers": [
+    "ldl_cholesterol_calculated",
+    "triglycerides",
+    "cholesterol_total",
+    "chol_hdl_ratio"
+   ],
+   "lifestyle_factors": [
+    "activity",
+    "diet",
+    "smoking",
+    "weight",
+    "alcohol"
+   ],
+   "age_sex_note": "Typical reference ranges differ between men and women. Your report's range is the one that applies to you.",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:hdl_cholesterol_direct"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "ldl_cholesterol_calculated",
+   "display_name": "LDL cholesterol",
+   "aliases": [
+    "LDL",
+    "bad cholesterol",
+    "LDL-C"
+   ],
+   "measures": "The cholesterol carried by LDL particles. Many labs calculate it from other cholesterol results.",
+   "body_function": "LDL carries cholesterol from the liver to the rest of the body, where cells use it.",
+   "why_it_matters": "When LDL stays high over years, cholesterol can build up in the walls of blood vessels, which is why doctors pay attention to it.",
+   "causes_when_low": [
+    "Very low fat intake",
+    "Some inherited patterns",
+    "Some thyroid or liver conditions",
+    "Malnutrition"
+   ],
+   "causes_when_high": [
+    "A diet high in saturated and trans fats",
+    "Little physical activity",
+    "Being overweight",
+    "Some inherited patterns",
+    "Some medical conditions such as an underactive thyroid"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "A higher LDL is associated with more cholesterol build up in blood vessels over time, and with a higher chance of heart and blood vessel problems.",
+   "influences": [
+    "Diet, especially saturated and trans fat",
+    "Physical activity",
+    "Body weight",
+    "Genetics",
+    "Thyroid, liver and kidney health"
+   ],
+   "practical_steps": [
+    "Eating more fibre rich foods such as oats, beans, lentils, fruit and vegetables",
+    "Choosing nuts, seeds and plant oils over fried and packaged foods",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "hdl_cholesterol_direct",
+    "non_hdl_cholesterol",
+    "apo_b_apolipoprotein_b",
+    "cholesterol_total"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "activity",
+    "weight",
+    "smoking"
+   ],
+   "age_sex_note": "",
+   "unit_note": "Calculated LDL can be less reliable when triglycerides are very high.",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:ldl_cholesterol_calculated"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "cholesterol_total",
+   "display_name": "Total cholesterol",
+   "aliases": [
+    "Cholesterol",
+    "TC"
+   ],
+   "measures": "All the cholesterol in your blood, from HDL, LDL and other particles added together.",
+   "body_function": "Your body uses cholesterol to build cells and hormones. It travels through the blood in particles.",
+   "why_it_matters": "It is a starting point. Doctors look at the parts (HDL, LDL, triglycerides) because the same total can hide very different patterns.",
+   "causes_when_low": [
+    "Malnutrition",
+    "Some liver or thyroid conditions",
+    "Some inherited patterns"
+   ],
+   "causes_when_high": [
+    "A diet high in saturated and trans fats",
+    "Little physical activity",
+    "Being overweight",
+    "Some medical conditions",
+    "Some inherited patterns"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "A higher total can reflect higher LDL, so your doctor will look at the parts to understand it.",
+   "influences": [
+    "Diet",
+    "Physical activity",
+    "Body weight",
+    "Genetics",
+    "Thyroid, liver and kidney health"
+   ],
+   "practical_steps": [
+    "Eating more fibre rich foods such as oats, beans, lentils, fruit and vegetables",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "ldl_cholesterol_calculated",
+    "hdl_cholesterol_direct",
+    "triglycerides"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "activity",
+    "weight"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:cholesterol_total"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "triglycerides",
+   "display_name": "Triglycerides",
+   "aliases": [
+    "TG",
+    "Triglyceride"
+   ],
+   "measures": "The amount of a type of fat (triglycerides) in your blood.",
+   "body_function": "Triglycerides store and carry energy from the food you eat. Your body uses them between meals.",
+   "why_it_matters": "High levels over time are linked with heart and blood vessel problems, and very high levels can affect the pancreas.",
+   "causes_when_low": [
+    "Very low fat intake",
+    "Malnutrition",
+    "Some thyroid conditions"
+   ],
+   "causes_when_high": [
+    "Sugary foods and drinks",
+    "Refined carbohydrates",
+    "Alcohol",
+    "Being overweight",
+    "Little physical activity",
+    "Poorly controlled blood sugar",
+    "Eating shortly before the test",
+    "Some medicines and inherited patterns"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "Higher triglycerides are associated with a higher chance of heart and blood vessel problems, and often travel with low HDL and higher blood sugar.",
+   "influences": [
+    "Sugar and refined carbohydrates",
+    "Alcohol",
+    "Body weight",
+    "Physical activity",
+    "Whether you fasted",
+    "Blood sugar control",
+    "Genetics"
+   ],
+   "practical_steps": [
+    "Cutting back on sugary drinks and sweets",
+    "Choosing whole grains over refined ones",
+    "Regular movement, built up gradually",
+    "Limiting alcohol"
+   ],
+   "related_markers": [
+    "hdl_cholesterol_direct",
+    "vldl_cholesterol",
+    "non_hdl_cholesterol"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "alcohol",
+    "activity",
+    "weight"
+   ],
+   "age_sex_note": "",
+   "unit_note": "Results are usually most reliable when you fast before the test, if your lab asked you to.",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:triglycerides"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "non_hdl_cholesterol",
+   "display_name": "Non-HDL cholesterol",
+   "aliases": [
+    "Non HDL",
+    "Non-HDL-C"
+   ],
+   "measures": "All the cholesterol except the HDL part, which means LDL and other particles that can build up in blood vessels.",
+   "body_function": "It adds up the cholesterol in particles that can deposit in blood vessel walls.",
+   "why_it_matters": "It gives a wider picture than LDL alone, especially when triglycerides are raised.",
+   "causes_when_low": [
+    "The same patterns that lower LDL"
+   ],
+   "causes_when_high": [
+    "The same patterns that raise LDL and triglycerides"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "A higher value is associated with more cholesterol that can build up in blood vessels over time.",
+   "influences": [
+    "Diet",
+    "Physical activity",
+    "Body weight",
+    "Genetics"
+   ],
+   "practical_steps": [
+    "Eating more fibre rich foods such as oats, beans, lentils, fruit and vegetables",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "ldl_cholesterol_calculated",
+    "triglycerides",
+    "apo_b_apolipoprotein_b"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "activity",
+    "weight"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:non_hdl_cholesterol"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "vldl_cholesterol",
+   "display_name": "VLDL cholesterol",
+   "aliases": [
+    "VLDL"
+   ],
+   "measures": "The cholesterol in VLDL particles, which mainly carry triglycerides. Many labs estimate it from triglycerides.",
+   "body_function": "VLDL particles carry fat made by the liver out into the blood.",
+   "why_it_matters": "Because it is usually estimated from triglycerides, it tends to rise and fall with them.",
+   "causes_when_low": [
+    "Low triglycerides"
+   ],
+   "causes_when_high": [
+    "The same patterns that raise triglycerides"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "A higher value usually goes with higher triglycerides.",
+   "influences": [
+    "Triglyceride level",
+    "Sugar, refined carbohydrates and alcohol",
+    "Body weight"
+   ],
+   "practical_steps": [
+    "Cutting back on sugary drinks and sweets",
+    "Limiting alcohol",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "triglycerides"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "alcohol",
+    "activity",
+    "weight"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:vldl_cholesterol"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "chol_hdl_ratio",
+   "display_name": "Cholesterol to HDL ratio",
+   "aliases": [
+    "CHOL/HDL ratio",
+    "TC/HDL"
+   ],
+   "measures": "Your total cholesterol divided by your HDL cholesterol.",
+   "body_function": "It is a calculated number, not a substance in your blood.",
+   "why_it_matters": "It combines two results into one number that some doctors use as a quick summary. It does not replace looking at each result.",
+   "causes_when_low": [
+    "Higher HDL or lower total cholesterol"
+   ],
+   "causes_when_high": [
+    "Higher total cholesterol, lower HDL, or both"
+   ],
+   "effects_when_low": "A lower ratio is usually seen with a healthier cholesterol pattern.",
+   "effects_when_high": "A higher ratio is associated with a less favourable cholesterol pattern.",
+   "influences": [
+    "Everything that influences total cholesterol and HDL"
+   ],
+   "practical_steps": [
+    "Look at the HDL and total cholesterol results that make up the ratio"
+   ],
+   "related_markers": [
+    "hdl_cholesterol_direct",
+    "cholesterol_total"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "activity",
+    "smoking"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:chol_hdl_ratio"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "lipo_a_lipoprotein_a",
+   "display_name": "Lipoprotein(a)",
+   "aliases": [
+    "Lp(a)",
+    "Lipo A"
+   ],
+   "measures": "The amount of a particular cholesterol carrying particle, Lp(a), in your blood.",
+   "body_function": "Lp(a) is a cholesterol carrying particle. How much you have is mostly decided by your genes.",
+   "why_it_matters": "A higher level is linked with a higher chance of heart and blood vessel problems, and it often does not change much with diet or exercise.",
+   "causes_when_low": [
+    "Genetics"
+   ],
+   "causes_when_high": [
+    "Genetics",
+    "Some kidney and thyroid conditions"
+   ],
+   "effects_when_low": "A low level is not usually a concern.",
+   "effects_when_high": "A higher level is associated with a higher chance of heart and blood vessel problems over time.",
+   "influences": [
+    "Genetics, mostly"
+   ],
+   "practical_steps": [
+    "Share the result with your doctor, since it is often measured once"
+   ],
+   "related_markers": [
+    "ldl_cholesterol_calculated",
+    "apo_b_apolipoprotein_b"
+   ],
+   "lifestyle_factors": [],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:lipo_a_lipoprotein_a"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "apo_b_apolipoprotein_b",
+   "display_name": "Apolipoprotein B",
+   "aliases": [
+    "Apo B",
+    "ApoB"
+   ],
+   "measures": "A protein found on each of the cholesterol particles that can build up in blood vessels. It reflects how many such particles you have.",
+   "body_function": "Apo B helps carry fats and cholesterol around in the blood.",
+   "why_it_matters": "It counts the particles rather than the amount of cholesterol they hold, which gives doctors another view of the same risk.",
+   "causes_when_low": [
+    "The same patterns that lower LDL"
+   ],
+   "causes_when_high": [
+    "The same patterns that raise LDL and triglycerides",
+    "Some medical conditions"
+   ],
+   "effects_when_low": "A low value is usually not a concern on its own, and your doctor will consider the reason.",
+   "effects_when_high": "A higher value is associated with more particles that can build up in blood vessels.",
+   "influences": [
+    "Diet",
+    "Physical activity",
+    "Body weight",
+    "Genetics"
+   ],
+   "practical_steps": [
+    "Eating more fibre rich foods such as oats, beans, lentils, fruit and vegetables",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "ldl_cholesterol_calculated",
+    "non_hdl_cholesterol"
+   ],
+   "lifestyle_factors": [
+    "diet",
+    "activity",
+    "weight"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:apo_b_apolipoprotein_b"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "hs_crp",
+   "display_name": "hs-CRP",
+   "aliases": [
+    "High sensitivity CRP",
+    "hsCRP",
+    "C-reactive protein"
+   ],
+   "measures": "A protein your liver makes when there is inflammation in the body, measured at very low levels.",
+   "body_function": "CRP rises when the body is dealing with inflammation, for example from an infection or injury.",
+   "why_it_matters": "A mildly raised level over time is sometimes used by doctors as one more piece of information about heart and blood vessel health.",
+   "causes_when_low": [
+    "Not usually a concern"
+   ],
+   "causes_when_high": [
+    "Recent infection or injury",
+    "Being overweight",
+    "Smoking",
+    "Little physical activity",
+    "Some long term conditions"
+   ],
+   "effects_when_low": "A low level is usually good news.",
+   "effects_when_high": "A higher level means there is inflammation somewhere. It does not say where, and a recent cold or injury can raise it.",
+   "influences": [
+    "Recent illness",
+    "Body weight",
+    "Smoking",
+    "Physical activity",
+    "Sleep"
+   ],
+   "practical_steps": [
+    "If it is raised, ask your doctor whether to repeat it when you are well",
+    "Regular movement, built up gradually"
+   ],
+   "related_markers": [
+    "hdl_cholesterol_direct"
+   ],
+   "lifestyle_factors": [
+    "activity",
+    "smoking",
+    "weight",
+    "sleep"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:hs_crp"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  },
+  {
+   "marker_id": "homocysteine",
+   "display_name": "Homocysteine",
+   "aliases": [
+    "Hcy"
+   ],
+   "measures": "The amount of homocysteine, an amino acid made when your body processes protein, in your blood.",
+   "body_function": "Your body normally converts homocysteine into other useful substances, which needs certain B vitamins.",
+   "why_it_matters": "Higher levels have been linked with blood vessel problems, and they can reflect low B vitamin levels or other conditions.",
+   "causes_when_low": [
+    "Not usually a concern"
+   ],
+   "causes_when_high": [
+    "Low folate, vitamin B12 or vitamin B6",
+    "Kidney problems",
+    "An underactive thyroid",
+    "Some medicines",
+    "Smoking",
+    "Genetics"
+   ],
+   "effects_when_low": "A low level is usually not a concern.",
+   "effects_when_high": "A higher level is associated with a higher chance of blood vessel problems and can point to low B vitamins or kidney issues.",
+   "influences": [
+    "B vitamin intake",
+    "Kidney health",
+    "Thyroid health",
+    "Smoking",
+    "Genetics"
+   ],
+   "practical_steps": [
+    "Ask your doctor what could explain a raised level before changing what you take"
+   ],
+   "related_markers": [],
+   "lifestyle_factors": [
+    "diet",
+    "smoking"
+   ],
+   "age_sex_note": "",
+   "unit_note": "",
+   "categories": [
+    "heart_circulation"
+   ],
+   "evidence_level": "general_medical_education",
+   "evidence_ids": [
+    "kb:bk-1:homocysteine"
+   ],
+   "review_status": "unreviewed",
+   "kb_version": "bk-1"
+  }
+ ]
+}

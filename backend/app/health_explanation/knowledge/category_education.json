@@ -1,0 +1,36 @@
+{
+ "kb_version": "bk-1",
+ "review_status": "unreviewed",
+ "note": "Engineering draft of general education. Needs clinical review before release.",
+ "categories": {
+  "heart_circulation": {
+   "title": "Let's get to know your heart",
+   "evidence_ids": [
+    "kb:bk-1:cat:heart_circulation"
+   ],
+   "sections": [
+    {
+     "heading": "What your heart does",
+     "text": "Your heart is a muscle that pumps blood around your body all day. Blood carries oxygen and nutrients to every organ and brings waste products back to be cleared."
+    },
+    {
+     "heading": "How blood circulates",
+     "text": "Blood leaves the heart through large blood vessels called arteries and returns through veins. The arteries need to stay open and flexible so blood can flow easily."
+    },
+    {
+     "heading": "Where cholesterol fits in",
+     "text": "Cholesterol is a fat like substance your body needs to build cells and hormones. It travels in your blood in particles. When too much of certain particles circulates for years, cholesterol can slowly build up in artery walls and make them narrower."
+    },
+    {
+     "heading": "Why blood pressure and blood vessels matter",
+     "text": "Blood pressure is the force of blood against artery walls. Pressure that stays high puts extra strain on the heart and the vessels. Your blood report does not measure blood pressure, so it is something to check separately."
+    },
+    {
+     "heading": "Why looking after it matters",
+     "text": "Heart and blood vessel problems usually develop slowly and quietly. Understanding your numbers early gives you time to act on them with your doctor."
+    }
+   ],
+   "report_scope": "A blood report shows cholesterol and related fats. It does not show blood pressure, how well your heart pumps, or whether your arteries are narrowed."
+  }
+ }
+}

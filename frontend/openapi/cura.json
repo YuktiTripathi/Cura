@@ -277,6 +277,139 @@
         "title": "BioAIRisk",
         "type": "object"
       },
+      "BiomarkerCard": {
+        "properties": {
+          "age_sex_note": {
+            "default": "",
+            "title": "Age Sex Note",
+            "type": "string"
+          },
+          "body_function": {
+            "default": "",
+            "title": "Body Function",
+            "type": "string"
+          },
+          "causes_when_high": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Causes When High",
+            "type": "array"
+          },
+          "causes_when_low": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Causes When Low",
+            "type": "array"
+          },
+          "detail_level": {
+            "default": "full",
+            "enum": [
+              "full",
+              "basic"
+            ],
+            "title": "Detail Level",
+            "type": "string"
+          },
+          "effects_when_high": {
+            "default": "",
+            "title": "Effects When High",
+            "type": "string"
+          },
+          "effects_when_low": {
+            "default": "",
+            "title": "Effects When Low",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "influences": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Influences",
+            "type": "array"
+          },
+          "marker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Id"
+          },
+          "measures": {
+            "default": "",
+            "title": "Measures",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "needs_attention": {
+            "default": false,
+            "title": "Needs Attention",
+            "type": "boolean"
+          },
+          "practical_steps": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Practical Steps",
+            "type": "array"
+          },
+          "related_markers": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Related Markers",
+            "type": "array"
+          },
+          "review_status": {
+            "default": "unreviewed",
+            "enum": [
+              "unreviewed",
+              "reviewed"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "unit_note": {
+            "default": "",
+            "title": "Unit Note",
+            "type": "string"
+          },
+          "why_it_matters": {
+            "default": "",
+            "title": "Why It Matters",
+            "type": "string"
+          },
+          "your_result": {
+            "$ref": "#/components/schemas/YourResult"
+          }
+        },
+        "required": [
+          "name",
+          "finding_id",
+          "your_result"
+        ],
+        "title": "BiomarkerCard",
+        "type": "object"
+      },
       "BiomarkerResult": {
         "properties": {
           "canonical_id": {
@@ -3828,6 +3961,87 @@
         "title": "HealthOverview",
         "type": "object"
       },
+      "HealthStory": {
+        "properties": {
+          "biomarker_education": {
+            "items": {
+              "$ref": "#/components/schemas/BiomarkerCard"
+            },
+            "title": "Biomarker Education",
+            "type": "array"
+          },
+          "category_id": {
+            "title": "Category Id",
+            "type": "string"
+          },
+          "category_name": {
+            "title": "Category Name",
+            "type": "string"
+          },
+          "disclaimer": {
+            "default": "This is general education about your results. It is not a diagnosis and does not replace advice from your doctor.",
+            "title": "Disclaimer",
+            "type": "string"
+          },
+          "headline": {
+            "title": "Headline",
+            "type": "string"
+          },
+          "icon": {
+            "default": "marker",
+            "title": "Icon",
+            "type": "string"
+          },
+          "improvement_plan": {
+            "$ref": "#/components/schemas/ImprovementPlan"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "metadata": {
+            "$ref": "#/components/schemas/StoryMetadata"
+          },
+          "next_steps": {
+            "$ref": "#/components/schemas/NextSteps"
+          },
+          "personal_factors": {
+            "$ref": "#/components/schemas/PersonalFactors"
+          },
+          "status": {
+            "default": "not_assessed",
+            "title": "Status",
+            "type": "string"
+          },
+          "status_label": {
+            "default": "",
+            "title": "Status Label",
+            "type": "string"
+          },
+          "understand_body": {
+            "$ref": "#/components/schemas/UnderstandBody"
+          },
+          "your_assessment": {
+            "$ref": "#/components/schemas/YourAssessment"
+          }
+        },
+        "required": [
+          "category_id",
+          "category_name",
+          "headline",
+          "understand_body",
+          "your_assessment",
+          "personal_factors",
+          "improvement_plan",
+          "next_steps",
+          "metadata"
+        ],
+        "title": "HealthStory",
+        "type": "object"
+      },
       "HealthTheme": {
         "properties": {
           "interpretation": {
@@ -3913,6 +4127,29 @@
           "value"
         ],
         "title": "HistoryPoint",
+        "type": "object"
+      },
+      "ImprovementPlan": {
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/PlanAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "lead": {
+            "default": "",
+            "title": "Lead",
+            "type": "string"
+          },
+          "note": {
+            "default": "These steps support heart health in general. They are not promised to change a Bio-AI score or any single result, and they do not replace advice from your doctor.",
+            "title": "Note",
+            "type": "string"
+          }
+        },
+        "title": "ImprovementPlan",
         "type": "object"
       },
       "InsightCandidate": {
@@ -4189,6 +4426,78 @@
         ],
         "title": "LanguageRegister",
         "type": "string"
+      },
+      "LifestyleFactor": {
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "key": {
+            "title": "Key",
+            "type": "string"
+          },
+          "label": {
+            "title": "Label",
+            "type": "string"
+          },
+          "level": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Level"
+          },
+          "recorded_at": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Recorded At"
+          },
+          "source": {
+            "default": "Your questionnaire",
+            "title": "Source",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "reported",
+              "not_reported"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "key",
+          "label",
+          "state"
+        ],
+        "title": "LifestyleFactor",
+        "type": "object"
       },
       "LifestyleSummary": {
         "properties": {
@@ -4549,6 +4858,46 @@
         "title": "MeasuredCounts",
         "type": "object"
       },
+      "MeasuredFinding": {
+        "properties": {
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "finding": {
+            "$ref": "#/components/schemas/Finding"
+          },
+          "marker_id": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Marker Id"
+          },
+          "source": {
+            "default": "Laboratory report",
+            "title": "Source",
+            "type": "string"
+          },
+          "why_relevant": {
+            "default": "",
+            "title": "Why Relevant",
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding"
+        ],
+        "title": "MeasuredFinding",
+        "type": "object"
+      },
       "MessageOut": {
         "properties": {
           "content": {
@@ -4575,6 +4924,40 @@
           "created_at"
         ],
         "title": "MessageOut",
+        "type": "object"
+      },
+      "NextSteps": {
+        "properties": {
+          "follow_ups": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Follow Ups",
+            "type": "array"
+          },
+          "monitoring": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Monitoring",
+            "type": "array"
+          },
+          "related_categories": {
+            "items": {
+              "$ref": "#/components/schemas/RelatedCategory"
+            },
+            "title": "Related Categories",
+            "type": "array"
+          },
+          "suggested_questions": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Suggested Questions",
+            "type": "array"
+          }
+        },
+        "title": "NextSteps",
         "type": "object"
       },
       "NutritionFood": {
@@ -4957,6 +5340,50 @@
         "title": "PersonalBaseline",
         "type": "object"
       },
+      "PersonalFactors": {
+        "properties": {
+          "lead": {
+            "default": "",
+            "title": "Lead",
+            "type": "string"
+          },
+          "lifestyle": {
+            "items": {
+              "$ref": "#/components/schemas/LifestyleFactor"
+            },
+            "title": "Lifestyle",
+            "type": "array"
+          },
+          "measured": {
+            "items": {
+              "$ref": "#/components/schemas/MeasuredFinding"
+            },
+            "title": "Measured",
+            "type": "array"
+          },
+          "missing": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Missing",
+            "type": "array"
+          },
+          "relationships": {
+            "items": {
+              "$ref": "#/components/schemas/StoryRelationship"
+            },
+            "title": "Relationships",
+            "type": "array"
+          },
+          "within_range_count": {
+            "default": 0,
+            "title": "Within Range Count",
+            "type": "integer"
+          }
+        },
+        "title": "PersonalFactors",
+        "type": "object"
+      },
       "PersonalHealthProfile": {
         "properties": {
           "allergies": {
@@ -5337,6 +5764,51 @@
           }
         },
         "title": "PersonalizationContext",
+        "type": "object"
+      },
+      "PlanAction": {
+        "properties": {
+          "action_id": {
+            "title": "Action Id",
+            "type": "string"
+          },
+          "evidence_status": {
+            "default": "rule_based_unreviewed",
+            "title": "Evidence Status",
+            "type": "string"
+          },
+          "safety_note": {
+            "default": "",
+            "title": "Safety Note",
+            "type": "string"
+          },
+          "supported_by": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Supported By",
+            "type": "array"
+          },
+          "title": {
+            "title": "Title",
+            "type": "string"
+          },
+          "what": {
+            "title": "What",
+            "type": "string"
+          },
+          "why": {
+            "title": "Why",
+            "type": "string"
+          }
+        },
+        "required": [
+          "action_id",
+          "title",
+          "what",
+          "why"
+        ],
+        "title": "PlanAction",
         "type": "object"
       },
       "PresentedFinding": {
@@ -5927,6 +6399,34 @@
         "title": "RecentContext",
         "type": "object"
       },
+      "RelatedCategory": {
+        "properties": {
+          "icon": {
+            "default": "marker",
+            "title": "Icon",
+            "type": "string"
+          },
+          "id": {
+            "title": "Id",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status_label": {
+            "title": "Status Label",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "status_label"
+        ],
+        "title": "RelatedCategory",
+        "type": "object"
+      },
       "RelatedTest": {
         "properties": {
           "finding": {
@@ -6413,85 +6913,6 @@
           }
         },
         "title": "RiskCounts",
-        "type": "object"
-      },
-      "RiskExplanation": {
-        "description": "A Bio-AI risk explained in four steps. Values come from the report, the wording from the model.",
-        "properties": {
-          "actions": {
-            "items": {
-              "$ref": "#/components/schemas/ExplainerAction"
-            },
-            "title": "Actions",
-            "type": "array"
-          },
-          "condition": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Condition",
-            "type": "array"
-          },
-          "condition_title": {
-            "title": "Condition Title",
-            "type": "string"
-          },
-          "meaning": {
-            "items": {
-              "type": "string"
-            },
-            "title": "Meaning",
-            "type": "array"
-          },
-          "meaning_title": {
-            "default": "What does this mean for you?",
-            "title": "Meaning Title",
-            "type": "string"
-          },
-          "more": {
-            "items": {
-              "$ref": "#/components/schemas/ExplainerSection"
-            },
-            "title": "More",
-            "type": "array"
-          },
-          "related_button": {
-            "default": "",
-            "title": "Related Button",
-            "type": "string"
-          },
-          "related_tests": {
-            "items": {
-              "$ref": "#/components/schemas/RelatedTest"
-            },
-            "title": "Related Tests",
-            "type": "array"
-          },
-          "related_text": {
-            "default": "",
-            "title": "Related Text",
-            "type": "string"
-          },
-          "related_title": {
-            "default": "",
-            "title": "Related Title",
-            "type": "string"
-          },
-          "score_card": {
-            "anyOf": [
-              {
-                "$ref": "#/components/schemas/RiskScoreCard"
-              },
-              {
-                "type": "null"
-              }
-            ]
-          }
-        },
-        "required": [
-          "condition_title"
-        ],
-        "title": "RiskExplanation",
         "type": "object"
       },
       "RiskGroupSummary": {
@@ -7102,6 +7523,24 @@
         "title": "ScoreOverview",
         "type": "object"
       },
+      "Section": {
+        "properties": {
+          "heading": {
+            "title": "Heading",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "heading",
+          "text"
+        ],
+        "title": "Section",
+        "type": "object"
+      },
       "SemanticResponse": {
         "properties": {
           "blocks": {
@@ -7296,6 +7735,134 @@
           }
         },
         "title": "StatusBreakdown",
+        "type": "object"
+      },
+      "StoryMetadata": {
+        "properties": {
+          "actions_version": {
+            "title": "Actions Version",
+            "type": "string"
+          },
+          "data_state": {
+            "default": "partial",
+            "enum": [
+              "complete",
+              "partial",
+              "empty"
+            ],
+            "title": "Data State",
+            "type": "string"
+          },
+          "evidence_version": {
+            "title": "Evidence Version",
+            "type": "string"
+          },
+          "generated_at": {
+            "title": "Generated At",
+            "type": "string"
+          },
+          "generation": {
+            "default": "rules",
+            "enum": [
+              "rules",
+              "model"
+            ],
+            "title": "Generation",
+            "type": "string"
+          },
+          "generation_model": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Generation Model"
+          },
+          "knowledge_version": {
+            "title": "Knowledge Version",
+            "type": "string"
+          },
+          "prompt_version": {
+            "title": "Prompt Version",
+            "type": "string"
+          },
+          "rules_version": {
+            "title": "Rules Version",
+            "type": "string"
+          }
+        },
+        "required": [
+          "knowledge_version",
+          "rules_version",
+          "actions_version",
+          "prompt_version",
+          "evidence_version",
+          "generated_at"
+        ],
+        "title": "StoryMetadata",
+        "type": "object"
+      },
+      "StoryRelationship": {
+        "properties": {
+          "causal_claim": {
+            "const": false,
+            "default": false,
+            "title": "Causal Claim",
+            "type": "boolean"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "evidence_status": {
+            "default": "rule_based_unreviewed",
+            "title": "Evidence Status",
+            "type": "string"
+          },
+          "finding_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Finding Ids",
+            "type": "array"
+          },
+          "lifestyle_keys": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Lifestyle Keys",
+            "type": "array"
+          },
+          "relationship_id": {
+            "title": "Relationship Id",
+            "type": "string"
+          },
+          "relationship_type": {
+            "title": "Relationship Type",
+            "type": "string"
+          },
+          "rule_id": {
+            "title": "Rule Id",
+            "type": "string"
+          },
+          "text": {
+            "title": "Text",
+            "type": "string"
+          }
+        },
+        "required": [
+          "relationship_id",
+          "text",
+          "relationship_type",
+          "rule_id"
+        ],
+        "title": "StoryRelationship",
         "type": "object"
       },
       "StreamPolicy": {
@@ -7500,7 +8067,7 @@
           "risk_explanation": {
             "anyOf": [
               {
-                "$ref": "#/components/schemas/RiskExplanation"
+                "$ref": "#/components/schemas/app__contracts__presentation__RiskExplanation"
               },
               {
                 "type": "null"
@@ -8127,6 +8694,55 @@
         "title": "TurnExperience",
         "type": "object"
       },
+      "UnderstandBody": {
+        "properties": {
+          "available": {
+            "default": false,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "report_scope": {
+            "default": "",
+            "title": "Report Scope",
+            "type": "string"
+          },
+          "review_status": {
+            "default": "unreviewed",
+            "enum": [
+              "unreviewed",
+              "reviewed"
+            ],
+            "title": "Review Status",
+            "type": "string"
+          },
+          "sections": {
+            "items": {
+              "$ref": "#/components/schemas/Section"
+            },
+            "title": "Sections",
+            "type": "array"
+          },
+          "source": {
+            "default": "medical_knowledge_base",
+            "title": "Source",
+            "type": "string"
+          },
+          "title": {
+            "default": "",
+            "title": "Title",
+            "type": "string"
+          }
+        },
+        "title": "UnderstandBody",
+        "type": "object"
+      },
       "UnifiedOverview": {
         "properties": {
           "available": {
@@ -8266,6 +8882,311 @@
           "type"
         ],
         "title": "ValidationError",
+        "type": "object"
+      },
+      "YourAssessment": {
+        "properties": {
+          "available": {
+            "default": false,
+            "title": "Available",
+            "type": "boolean"
+          },
+          "lead": {
+            "default": "",
+            "title": "Lead",
+            "type": "string"
+          },
+          "note": {
+            "default": "",
+            "title": "Note",
+            "type": "string"
+          },
+          "risks": {
+            "items": {
+              "$ref": "#/components/schemas/app__health_explanation__story_schema__RiskExplanation"
+            },
+            "title": "Risks",
+            "type": "array"
+          }
+        },
+        "title": "YourAssessment",
+        "type": "object"
+      },
+      "YourResult": {
+        "properties": {
+          "measured_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Measured On"
+          },
+          "reference_high": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference High"
+          },
+          "reference_low": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Low"
+          },
+          "source": {
+            "default": "Laboratory report",
+            "title": "Source",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "status_label": {
+            "title": "Status Label",
+            "type": "string"
+          },
+          "unit": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Unit"
+          },
+          "value": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Value"
+          }
+        },
+        "required": [
+          "status",
+          "status_label"
+        ],
+        "title": "YourResult",
+        "type": "object"
+      },
+      "app__contracts__presentation__RiskExplanation": {
+        "description": "A Bio-AI risk explained in four steps. Values come from the report, the wording from the model.",
+        "properties": {
+          "actions": {
+            "items": {
+              "$ref": "#/components/schemas/ExplainerAction"
+            },
+            "title": "Actions",
+            "type": "array"
+          },
+          "condition": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Condition",
+            "type": "array"
+          },
+          "condition_title": {
+            "title": "Condition Title",
+            "type": "string"
+          },
+          "meaning": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Meaning",
+            "type": "array"
+          },
+          "meaning_title": {
+            "default": "What does this mean for you?",
+            "title": "Meaning Title",
+            "type": "string"
+          },
+          "more": {
+            "items": {
+              "$ref": "#/components/schemas/ExplainerSection"
+            },
+            "title": "More",
+            "type": "array"
+          },
+          "related_button": {
+            "default": "",
+            "title": "Related Button",
+            "type": "string"
+          },
+          "related_tests": {
+            "items": {
+              "$ref": "#/components/schemas/RelatedTest"
+            },
+            "title": "Related Tests",
+            "type": "array"
+          },
+          "related_text": {
+            "default": "",
+            "title": "Related Text",
+            "type": "string"
+          },
+          "related_title": {
+            "default": "",
+            "title": "Related Title",
+            "type": "string"
+          },
+          "score_card": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/RiskScoreCard"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": [
+          "condition_title"
+        ],
+        "title": "RiskExplanation",
+        "type": "object"
+      },
+      "app__health_explanation__story_schema__RiskExplanation": {
+        "properties": {
+          "assessed_on": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Assessed On"
+          },
+          "classification": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Classification"
+          },
+          "contributing_factors": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contributing Factors"
+          },
+          "contributing_note": {
+            "default": "",
+            "title": "Contributing Note",
+            "type": "string"
+          },
+          "evidence_ids": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Evidence Ids",
+            "type": "array"
+          },
+          "finding_id": {
+            "title": "Finding Id",
+            "type": "string"
+          },
+          "limitations": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Limitations",
+            "type": "array"
+          },
+          "model_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Name"
+          },
+          "model_version": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Model Version"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "what_it_does_not_mean": {
+            "items": {
+              "type": "string"
+            },
+            "title": "What It Does Not Mean",
+            "type": "array"
+          },
+          "what_it_means": {
+            "title": "What It Means",
+            "type": "string"
+          }
+        },
+        "required": [
+          "finding_id",
+          "name",
+          "what_it_means",
+          "what_it_does_not_mean",
+          "limitations"
+        ],
+        "title": "RiskExplanation",
         "type": "object"
       }
     }
@@ -9044,6 +9965,60 @@
           }
         },
         "summary": "Category",
+        "tags": [
+          "health-explanation"
+        ]
+      }
+    },
+    "/api/v1/health-explanation/categories/{category_id}/story": {
+      "get": {
+        "description": "The guided health story for one category, from the signed in member's own data.",
+        "operationId": "story_api_v1_health_explanation_categories__category_id__story_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "category_id",
+            "required": true,
+            "schema": {
+              "title": "Category Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "lang",
+            "required": false,
+            "schema": {
+              "default": "en",
+              "pattern": "^(en|hi)$",
+              "title": "Lang",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStory"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Story",
         "tags": [
           "health-explanation"
         ]

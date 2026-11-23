@@ -23,6 +23,7 @@ _CHECKS: dict[str, re.Pattern[str]] = {
         r"\bis\s+the\s+reason\s+(?:for|why)\s+your\b|\bleading\s+to\s+your\b|\bresulting\s+from\s+your\b",
         re.I,
     ),
+    "causal_verb": re.compile(r"\bcaus(?:ed|es|ing)\s+(?:this|it|that|your|the|these)\b|\bis\s+(?:why|the\s+reason)\b", re.I),
     "rules_out": re.compile(r"\b(?:rules?\s+out|ruled\s+out|proves?\s+you\s+(?:are|have)|means\s+you\s+are\s+(?:healthy|fine|safe))\b", re.I),
     "dose_or_medicine": re.compile(
         r"\b\d+(?:\.\d+)?\s?(?:mg|mcg|µg|iu|ml|units?)\b(?!\s*/\s*d?l)|"
@@ -38,11 +39,11 @@ def safety_problems(text: str | None) -> list[str]:
     value = text or ""
     found = []
     for name, pattern in _CHECKS.items():
-        if name == "rules_out":
+        if name in {"rules_out", "causal_verb"}:
             for m in pattern.finditer(value):
-                before = value[max(0, m.start() - 25) : m.start()].lower()
+                before = value[max(0, m.start() - 60) : m.start()].lower()
                 if not re.search(_NEGATION, before):
-                    found.append(name)
+                    found.append("causal_claim" if name == "causal_verb" else name)
                     break
         elif pattern.search(value):
             found.append(name)

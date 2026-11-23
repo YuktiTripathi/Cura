@@ -35,7 +35,11 @@
  "marker_group_rules": [
   {
    "rule_id": "grp_blood_sugar_pair",
-   "markers": ["hba1c", "fasting_sugar", "average_blood_glucose"],
+   "markers": [
+    "hba1c",
+    "fasting_sugar",
+    "average_blood_glucose"
+   ],
    "min_outside": 2,
    "relationship_type": "consistent_with",
    "interpretation": "More than one of your blood sugar results is outside range. They are read together: HbA1c reflects your average over a few months, and fasting sugar is one morning.",
@@ -43,11 +47,92 @@
   },
   {
    "rule_id": "grp_cholesterol_set",
-   "markers": ["ldl_cholesterol_calculated", "hdl_cholesterol_direct", "triglycerides", "total_cholesterol", "non_hdl_cholesterol", "vldl_cholesterol"],
+   "markers": [
+    "ldl_cholesterol_calculated",
+    "hdl_cholesterol_direct",
+    "triglycerides",
+    "total_cholesterol",
+    "cholesterol_total",
+    "non_hdl_cholesterol",
+    "vldl_cholesterol"
+   ],
    "min_outside": 2,
    "relationship_type": "consistent_with",
    "interpretation": "More than one of your cholesterol and blood fat results is outside range. They are read together, as one picture of your blood fats.",
    "rationale": "Lipid measures are interpreted as a set. The wording does not name a condition."
+  }
+ ],
+ "lifestyle_rules": [
+  {
+   "rule_id": "life_activity_low_hdl_low",
+   "category": "heart_circulation",
+   "markers": [
+    "hdl_cholesterol_direct"
+   ],
+   "marker_status": [
+    "below_range"
+   ],
+   "lifestyle": "activity",
+   "levels": [
+    "low"
+   ],
+   "relationship_type": "potentially_related",
+   "interpretation": "Your HDL cholesterol is below your laboratory's reference range, and you have reported low physical activity. Regular physical activity can support cardiovascular health and healthier cholesterol patterns. This does not mean that low activity caused your HDL result.",
+   "rationale": "Physical activity is a recognised influence on HDL. The wording states an association and no cause."
+  },
+  {
+   "rule_id": "life_activity_active_hdl_low",
+   "category": "heart_circulation",
+   "markers": [
+    "hdl_cholesterol_direct"
+   ],
+   "marker_status": [
+    "below_range"
+   ],
+   "lifestyle": "activity",
+   "levels": [
+    "active"
+   ],
+   "relationship_type": "contextualizes",
+   "interpretation": "Your HDL cholesterol is below your laboratory's reference range even though you have reported being physically active. Activity is only one thing that can influence HDL. Genetics, smoking, body weight and the fats in your diet can also play a part, so it is worth discussing the whole picture with your doctor.",
+   "rationale": "Activity alone does not explain HDL. The wording avoids repeating beginner advice and names other influences."
+  },
+  {
+   "rule_id": "life_activity_low_trig_high",
+   "category": "heart_circulation",
+   "markers": [
+    "triglycerides",
+    "vldl_cholesterol"
+   ],
+   "marker_status": [
+    "above_range"
+   ],
+   "lifestyle": "activity",
+   "levels": [
+    "low"
+   ],
+   "relationship_type": "potentially_related",
+   "interpretation": "Your triglycerides are above your laboratory's reference range, and you have reported low physical activity. Regular activity can support healthier triglyceride levels. This does not mean that low activity caused this result.",
+   "rationale": "Physical activity is a recognised influence on triglycerides. The wording states an association and no cause."
+  },
+  {
+   "rule_id": "life_activity_low_ldl_high",
+   "category": "heart_circulation",
+   "markers": [
+    "ldl_cholesterol_calculated",
+    "non_hdl_cholesterol",
+    "cholesterol_total"
+   ],
+   "marker_status": [
+    "above_range"
+   ],
+   "lifestyle": "activity",
+   "levels": [
+    "low"
+   ],
+   "relationship_type": "potentially_related",
+   "interpretation": "Your LDL related cholesterol is above your laboratory's reference range, and you have reported low physical activity. Activity is one of several things that can influence cholesterol, along with diet and genetics. This does not mean that low activity caused this result.",
+   "rationale": "Physical activity is one of several recognised influences. The wording states an association and no cause."
   }
  ]
 }

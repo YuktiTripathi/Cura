@@ -8,3 +8,7 @@ export type CategoryDetail = Schemas["CategoryDetail"];
 export type Finding = Schemas["Finding"];
 export type Priority = Schemas["Priority"];
 export type EducationNote = Schemas["EducationNote"];
+export type HealthStory = Schemas["HealthStory"];
+export type BiomarkerCard = Schemas["BiomarkerCard"];
+export type PlanAction = Schemas["PlanAction"];
+export type StoryRelationship = Schemas["StoryRelationship"];

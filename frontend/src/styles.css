@@ -1381,3 +1381,34 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
     scroll-behavior: auto !important;
   }
 }
+
+/* Guided health story */
+.story { display: grid; gap: 1.5rem; max-width: 46rem; margin-inline: auto; }
+.story-nav { display: flex; gap: 0.5rem; overflow-x: auto; padding-bottom: 0.25rem; position: sticky; top: 0; background: var(--bg, #fff); z-index: 2; }
+.story-nav a { white-space: nowrap; padding: 0.35rem 0.8rem; border-radius: 999px; border: 1px solid currentColor; font-size: 0.85rem; text-decoration: none; opacity: 0.8; }
+.story-chapter { display: grid; gap: 0.75rem; scroll-margin-top: 3.5rem; padding-top: 0.5rem; border-top: 1px solid rgba(128, 128, 128, 0.25); }
+.story-chapter h3 { margin: 0; font-size: 1.3rem; line-height: 1.25; }
+.story-chapter h4 { margin: 0.75rem 0 0; font-size: 1rem; }
+.story-lead { font-size: 1.05rem; line-height: 1.5; margin: 0; }
+.story-figure { margin: 0; color: inherit; }
+.story-figure svg { width: 100%; max-width: 22rem; height: auto; display: block; }
+.story-section { padding: 0.5rem 0; border-bottom: 1px solid rgba(128, 128, 128, 0.2); }
+.story-section summary { cursor: pointer; font-weight: 600; }
+.bio-list, .lifestyle-list, .relationship-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.6rem; }
+.bio-card { border: 1px solid rgba(128, 128, 128, 0.35); border-radius: 12px; overflow: hidden; }
+.bio-card[data-tone="attention"] { border-color: #b45309; }
+.bio-card-head { display: flex; justify-content: space-between; gap: 0.75rem; align-items: center; width: 100%; padding: 0.8rem 1rem; background: none; border: 0; text-align: left; cursor: pointer; font: inherit; color: inherit; }
+.bio-card-body { display: grid; gap: 0.75rem; padding: 0 1rem 1rem; }
+.bio-block h5 { margin: 0 0 0.2rem; font-size: 0.95rem; }
+.bio-block p, .bio-block ul { margin: 0; }
+.bio-block ul { padding-left: 1.1rem; }
+.lifestyle-list li { display: grid; gap: 0.1rem; padding: 0.6rem 0.8rem; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.3); }
+.lifestyle-list li[data-state="not_reported"] { border-style: dashed; opacity: 0.8; }
+.relationship-list li { padding: 0.75rem 1rem; border-left: 3px solid #0e7490; background: rgba(14, 116, 144, 0.06); border-radius: 0 10px 10px 0; }
+.relationship-list p { margin: 0 0 0.25rem; }
+.story-ask div { display: flex; gap: 0.5rem; }
+.story-ask input { flex: 1; min-width: 0; padding: 0.6rem 0.8rem; border-radius: 10px; border: 1px solid rgba(128, 128, 128, 0.5); font: inherit; }
+.related-list { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.related-list button { padding: 0.5rem 0.9rem; border-radius: 999px; border: 1px solid rgba(128, 128, 128, 0.5); background: none; font: inherit; color: inherit; cursor: pointer; }
+.story-foot p { margin: 0 0 0.4rem; }
+@media (max-width: 520px) { .bio-card-head { flex-direction: column; align-items: flex-start; } .story-ask div { flex-direction: column; } }

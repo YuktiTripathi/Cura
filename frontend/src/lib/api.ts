@@ -3,7 +3,7 @@ import type { AnswerPreview, ChatResponse, ContextRef, ExperienceBlock } from ".
 import type { MeResponse } from "../types/me";
 import type { HealthOverview } from "../types/overview";
 import type { BodySystemOverview, RiskOverview } from "../types/bodySystems";
-import type { CategoryDetail, UnifiedOverview } from "../types/unifiedHealth";
+import type { CategoryDetail, HealthStory, UnifiedOverview } from "../types/unifiedHealth";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
 const USER = import.meta.env.VITE_CURA_USER_ID || "";
@@ -143,6 +143,12 @@ export async function getHealthCategory(categoryId: string): Promise<CategoryDet
   const res = await fetch(`${API}/api/v1/me/health-overview/${encodeURIComponent(categoryId)}`, { headers: authHeaders() });
   if (!res.ok) throw new Error("This part of your health overview isn't available right now.");
   return (await res.json()) as CategoryDetail;
+}
+
+export async function getHealthStory(categoryId: string, lang = "en"): Promise<HealthStory> {
+  const res = await fetch(`${API}/api/v1/health-explanation/categories/${encodeURIComponent(categoryId)}/story?lang=${lang}`, { headers: authHeaders() });
+  if (!res.ok) throw new Error("This guided explanation isn't available right now.");
+  return (await res.json()) as HealthStory;
 }
 
 export async function transcribeVoice(
