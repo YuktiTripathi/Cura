@@ -183,12 +183,35 @@ def test_a_glucose_question_is_read_together_with_hba1c():
 
 def test_a_single_marker_answer_has_a_next_step_or_says_none_is_needed():
     answer = _ask("Is my ALT high?")["answer"].lower()
-    assert "nothing that needs action" in answer or "doctor" in answer or "retest" in answer
+    assert "no action is needed because of" in answer or "doctor" in answer or "retest" in answer
 
 
-# 6. Known gaps: written down as failing tests so they stay visible -----------------------------------------
+# 6. Safety wording ------------------------------------------------------------------------------------
 
-@pytest.mark.xfail(strict=True, reason="Generic reassurance: a slightly high LDL is told it will 'often settle on its own'. Needs clinical review (release blocking).")
 def test_no_unsupported_reassurance_for_a_high_ldl():
     answer = _ask("Is my LDL a problem?")["answer"].lower()
-    assert "settle on their own" not in answer
+    assert "settle on" not in answer and "nothing that needs action" not in answer
+
+
+def test_an_in_range_answer_does_not_claim_everything_is_fine():
+    answer = _ask("Is my ALT high?")["answer"].lower()
+    assert "nothing that needs action" not in answer and "everything is fine" not in answer
+
+
+def test_low_vitamin_d_has_a_reasoned_next_step_not_a_generic_referral():
+    answer = _ask("What is my latest Vitamin D?")["answer"].lower()
+    assert "at your next visit" not in answer
+    assert "whether you need treatment" in answer
+
+
+def test_follow_ups_never_fall_back_to_stock_questions_for_a_person_with_results():
+    from app.pipeline.followup_generator import FALLBACK
+
+    stock = set(FALLBACK["none"])
+    first = _ask("What is my vitamin D?")
+    cid = first["conversation_id"]
+    for question in ("Why is it low?", "Is it serious?", "Will sunlight help?"):
+        turn = _ask(question, cid)
+        shown = [item["text"] for item in turn["follow_ups"]]
+        assert not stock.intersection(shown), (question, shown)
+        assert len(shown) == len(set(shown)) and len(shown) <= 4

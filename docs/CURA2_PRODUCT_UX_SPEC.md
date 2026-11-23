@@ -334,9 +334,9 @@ Open issues
 Principles [Proposed, partly Implemented]
 1. One area, one story. The Bio-AI estimate and blood tests for the same area appear together. [Implemented for the overview and area screens.]
 2. Always label the type: "Measured" for blood tests, "Predicted" for Bio-AI. [Implemented in the data model; UI wording as above.]
-3. Show the official category prominently. The raw score is inspectable with its documented scale and limits (section 3.5). No percent, no probability.
+3. Show the official category prominently. The raw score is inspectable with its documented scale and limits (section 3.5). No percent, no probability. [Implemented and tested: the category is the row's label, "View the score" shows the score, the report's category, a plain note that the scale is not documented yet, and that the score is not a percentage chance.]
 4. Never state a cause between a measured result and a prediction.
-5. Show the source and date of every measured and predicted item. Do not imply two reports describe the same moment.
+5. Show the source and date of every measured and predicted item. Do not imply two reports describe the same moment. [Implemented and tested on each finding row in the area screen: "Measured, blood report 21 Aug 2026" and "Predicted, Bio-AI report 25 Aug 2026". Separate Measured and Predicted headings are not built.]
 6. [Open issue] The registry text for fatty liver risk reads "Your chances of developing excess fat in your liver". "Chances" can read as a probability. It needs clinical and wording review.
 
 Scenario wording [Unreviewed]
@@ -389,12 +389,15 @@ Repetition: no value stated twice in one answer; no follow up repeated.
 ## 10. Known problems found in the current system
 
 Release blocking [Release blocking]
-1. Unsupported reassurance: the deterministic answer for a slightly high LDL says results a little outside range "are common and often settle on their own". This is not supported for LDL. The acceptance test for it is written and currently fails by design (expected failure).
-2. Absolute reassurance: "Everything here is within your lab's normal range, so there is nothing that needs action." A normal single enzyme does not prove the organ is healthy.
-3. The fallback answer for a low vitamin D ends with "It is worth discussing with your doctor at your next visit" (a generic referral line, and its urgency is not justified).
-4. Follow up suggestions become generic and off topic after a few turns.
-5. The prioritization rules in section 6 and every (review) item have no clinical sign off.
-6. The Bio-AI score scale and limitations are not in the product, so the score screen cannot be completed.
+1. The prioritization rules in section 6 and every (review) item have no clinical sign off.
+2. The Bio-AI score scale and limitations are not documented in the product. The score screen says so and shows no scale.
+3. The replacement wording for the removed lines below is engineering's draft and needs clinical review.
+
+Fixed in this round, wording still Unreviewed [Implemented and tested]
+- "Results a little outside the range are common and often settle on their own" is removed. It is replaced by "One result outside the range does not show what is behind it. A doctor can read it alongside your other results."
+- "Everything here is within your lab's normal range, so there is nothing that needs action" is removed. It is replaced by "These results are within your report's range, so no action is needed because of them alone. One reading does not rule out a problem."
+- The generic "worth discussing with your doctor at your next visit" is replaced by a specific line per result: repeat the test (HbA1c, fasting glucose), ask what the result means and whether action is needed (triglycerides), ask whether treatment is needed (vitamin D). Each of these is a clinical recommendation and is marked for review.
+- Follow up suggestions no longer fall back to stock questions such as "How much exercise do I need each week?" for a person with results on record. When grounded questions run out, fewer are shown, possibly none.
 
 Other open problems
 - Answer cards and the range bar do not show the "A little above" distance labels yet. The range bar itself exists.
@@ -421,15 +424,15 @@ Proposed: status never by colour alone, range bar with a text alternative, singl
 
 ## 12. Acceptance criteria
 
-Automated, run with synthetic data and the model off [Implemented and tested, 15 passing, 1 expected failure]
+Automated, run with synthetic data and the model off [Implemented and tested, 19 passing]
 - Summaries count markers correctly (6 outside, 3 inside, 9 total) and do not confuse markers with areas.
 - Related measurements are read together where implemented (glucose with HbA1c, iron pattern).
 - Findings carry the actual value, unit, report range, date and source.
 - Predicted risks are labelled predictions and never described as diagnoses; the raw score and category are both kept.
 - A status never rises only because a value is far from its range; priority order is by tier, then fixed order; the model cannot change it.
-- A follow up keeps the trusted value and context.
+- A follow up keeps the trusted value and context, and never falls back to stock questions.
+- A high LDL, an in range ALT and a low vitamin D answer contain no unsupported reassurance or generic referral.
 - A requested date with no report is said plainly.
-- The expected failure records the LDL reassurance problem.
 
 Not yet done [Proposed]
 - Testing with a live model.
@@ -448,9 +451,9 @@ Done: errors, retry and draft; accessibility base; welcome copy and returning gr
 Next
 1. Clinical review of the rules and (review) items (blocks release).
 2. Bio-AI score screen with documented scale and limits (needs documentation).
-3. Remove the unsupported and generic reassurance lines (section 10 items 1 to 3).
-4. Fix follow up relevance after several turns.
-5. Show source and date on every measured and predicted item in the area screens; show "Measured" and "Predicted" headings.
+3. Clinical review of the replacement wording (section 10).
+4. Separate Measured and Predicted headings in the area screen.
+5. Source and date on answer cards, not only the area screen.
 6. Distance labels on answer cards and the range bar.
 7. Connected evidence for the heart, liver and kidney groups.
 8. Nutrition and uploaded document patterns.

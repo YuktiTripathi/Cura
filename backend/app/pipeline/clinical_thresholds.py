@@ -66,7 +66,9 @@ def clinical_note(marker: BloodMarker) -> ClinicalNote | None:
         return None
     kind = _kind(marker)
     soon = "Please discuss this result with your doctor soon."
-    next_visit = "It is worth discussing with your doctor at your next visit."
+    repeat = "Ask your doctor whether these results should be repeated."
+    review = "Ask your doctor what these results mean for you and whether any action is needed."
+    treat = "Ask your doctor whether you need treatment."
     if kind == "hba1c" and _unit_ok(marker, "", "%"):
         if value >= 6.5:
             return ClinicalNote(marker, (
@@ -75,7 +77,7 @@ def clinical_note(marker: BloodMarker) -> ClinicalNote | None:
             ), True)
         if value >= 5.7:
             return ClinicalNote(marker, (
-                f"An HbA1c of {_fmt(value)}% is in the prediabetes range (5.7% to 6.4%). {next_visit}"
+                f"An HbA1c of {_fmt(value)}% is in the prediabetes range (5.7% to 6.4%). {repeat}"
             ), False)
     if kind == "fasting_glucose" and _unit_ok(marker, "mgdl"):
         if value >= 126:
@@ -86,7 +88,7 @@ def clinical_note(marker: BloodMarker) -> ClinicalNote | None:
         if value >= 100:
             return ClinicalNote(marker, (
                 f"A fasting glucose of {_fmt(value)} mg/dL is in the prediabetes range "
-                f"(100 to 125 mg/dL). {next_visit}"
+                f"(100 to 125 mg/dL). {repeat}"
             ), False)
     if kind == "triglycerides" and _unit_ok(marker, "mgdl"):
         if value >= 500:
@@ -95,7 +97,7 @@ def clinical_note(marker: BloodMarker) -> ClinicalNote | None:
             ), True)
         if value >= 200:
             return ClinicalNote(marker, (
-                f"Triglycerides of {_fmt(value)} mg/dL are in the high range (200 to 499 mg/dL). {next_visit}"
+                f"Triglycerides of {_fmt(value)} mg/dL are in the high range (200 to 499 mg/dL). {review}"
             ), False)
     if kind == "ldl" and _unit_ok(marker, "mgdl") and value >= 190:
         return ClinicalNote(marker, (
@@ -103,7 +105,7 @@ def clinical_note(marker: BloodMarker) -> ClinicalNote | None:
         ), True)
     if kind == "vitamin_d" and _unit_ok(marker, "ngml") and value < 20:
         return ClinicalNote(marker, (
-            f"A vitamin D level of {_fmt(value)} ng/mL is in the deficient range (below 20 ng/mL). {next_visit}"
+            f"A vitamin D level of {_fmt(value)} ng/mL is in the deficient range (below 20 ng/mL). {treat}"
         ), False)
     return None
 

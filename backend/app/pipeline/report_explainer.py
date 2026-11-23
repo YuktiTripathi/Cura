@@ -397,9 +397,9 @@ def explain_markers(markers: list[BloodMarker]) -> str:
     patterns = [p for p in (_pattern(code, [m for m in flagged if _theme(m).code == code]) for code in themes) if p]
     parts.extend(patterns)
     if not flagged:
-        parts.append("Everything here is within your lab's normal range, so there is nothing that needs action.")
+        parts.append("These results are within your report's range, so no action is needed because of them alone. One reading does not rule out a problem.")
     elif not clinical_notes(flagged) and not patterns:
-        parts.append("Results a little outside the range are common and often settle on their own.")
+        parts.append("One result outside the range does not show what is behind it. A doctor can read it alongside your other results.")
     if one_test and len(parts) <= 2:
         return "\n\n".join(parts)  # a simple question stays a short paragraph
     return _bullets(parts)

@@ -13,6 +13,33 @@ function formatValue(f: Finding) {
   return `${f.value}${f.unit ? ` ${f.unit}` : ""}`;
 }
 
+function formatDay(iso?: string | null) {
+  if (!iso) return "";
+  const d = new Date(`${String(iso).slice(0, 10)}T00:00:00`);
+  return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+}
+
+/** The raw Bio-AI score, kept inspectable. The scale is shown only once it is documented, so none is invented here. */
+function ScoreDetails({ f }: { f: Finding }) {
+  const [open, setOpen] = useState(false);
+  if (f.score == null) return null;
+  return (
+    <div className="about-test">
+      <button type="button" className="expand-button" aria-expanded={open} onClick={() => setOpen(!open)}>
+        {open ? t("ui.unified.hide_score", "Hide the score") : t("ui.unified.view_score", "View the score")}
+      </button>
+      {open ? (
+        <ul>
+          <li><strong>{t("ui.unified.score", "Score")}</strong><p>{f.score}</p></li>
+          {f.classification ? <li><strong>{t("ui.unified.report_category", "Category in the report")}</strong><p>{f.classification}</p></li> : null}
+          <li><strong>{t("ui.unified.scale", "Scale")}</strong><p>{t("ui.unified.scale_missing", "The scale for this score is not documented in this app yet.")}</p></li>
+          <li><strong>{t("ui.unified.limits", "What to keep in mind")}</strong><p>{t("ui.unified.limits_text", "This is a model estimate, not a diagnosis. Do not read the score as a percentage chance of having the condition.")}</p></li>
+        </ul>
+      ) : null}
+    </div>
+  );
+}
+
 function rangeText(f: Finding) {
   const { reference_low: lo, reference_high: hi } = f;
   if (lo != null && hi != null) return `${lo} to ${hi}`;
@@ -53,7 +80,10 @@ function AboutTest({ note, status }: { note: EducationNote; status: Finding["sta
 /** One row for either kind of finding. A subtle label says which kind, so they sit in one list. */
 export function FindingRow({ f }: { f: Finding }) {
   const tone = f.status === "within_range" || f.status === "risk_healthy" ? "good" : f.status === "no_range" || f.status === "no_value" || f.status === "risk_unknown" ? "neutral" : "attention";
-  const kind = f.source_type === "predicted_risk" ? t("ui.unified.predicted", "Predicted risk") : t("ui.unified.measured", "Measured");
+  const day = formatDay(f.measured_on);
+  const kind = f.source_type === "predicted_risk"
+    ? `${t("ui.unified.predicted", "Predicted")}${day ? `, ${t("ui.unified.bio_report", "Bio-AI report")} ${day}` : ""}`
+    : `${t("ui.unified.measured", "Measured")}${day ? `, ${t("ui.unified.blood_report", "blood report")} ${day}` : ""}`;
   return (
     <li className="finding-row" data-tone={tone} data-kind={f.source_type}>
       <div className="finding-main">
@@ -70,8 +100,8 @@ export function FindingRow({ f }: { f: Finding }) {
             {rangeText(f) ? ` (${rangeText(f)})` : ""}
           </span>
         ) : null}
-        {f.source_type === "predicted_risk" && f.score != null ? <span className="muted finding-value">{`Score ${f.score}`}</span> : null}
       </div>
+      {f.source_type === "predicted_risk" ? <ScoreDetails f={f} /> : null}
       {f.education ? <AboutTest note={f.education} status={f.status} /> : null}
     </li>
   );

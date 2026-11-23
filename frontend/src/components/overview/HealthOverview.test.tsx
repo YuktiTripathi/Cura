@@ -71,7 +71,7 @@ describe("My Health Overview", () => {
     fireEvent.click(screen.getByRole("button", { name: "View complete assessment" }));
     expect(screen.getByText("Albumin")).toBeTruthy();
     expect(screen.getByText("Fatty Liver")).toBeTruthy();
-    expect(screen.getByText("Predicted risk")).toBeTruthy();
+    expect(screen.getByText(/^Predicted/)).toBeTruthy();
     fireEvent.click(screen.getByRole("button", { name: /Why is my bilirubin high\?/ }));
     expect(onAsk).toHaveBeenCalledWith("Why is my bilirubin high?", expect.objectContaining({ entry_point: "health_area" }));
   });
@@ -79,6 +79,25 @@ describe("My Health Overview", () => {
   it("prints verified values and ranges exactly as given", () => {
     render(<ul><FindingRow f={detail.findings![0]} /></ul>);
     expect(screen.getByText(/0\.5 mg\/dL \(0 to 0\.3\)/)).toBeTruthy();
+  });
+
+  it("shows the source and date of each result and never implies one moment in time", () => {
+    const measured = { ...detail.findings![0], measured_on: "2026-08-21" };
+    const predicted = { ...detail.findings![1], measured_on: "2026-08-25" };
+    render(<ul><FindingRow f={measured} /><FindingRow f={predicted} /></ul>);
+    expect(screen.getByText("Measured, blood report 21 Aug 2026")).toBeTruthy();
+    expect(screen.getByText("Predicted, Bio-AI report 25 Aug 2026")).toBeTruthy();
+  });
+
+  it("keeps the Bio-AI category prominent and the raw score inspectable without a probability", () => {
+    render(<ul><FindingRow f={detail.findings![1]} /></ul>);
+    expect(screen.getByText("Healthy predicted risk")).toBeTruthy();
+    expect(screen.queryByText("12")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: "View the score" }));
+    expect(screen.getByText("12")).toBeTruthy();
+    expect(screen.getByText(/not documented in this app yet/)).toBeTruthy();
+    expect(screen.getByText(/not a diagnosis/)).toBeTruthy();
+    expect(screen.queryByText(/%/)).toBeNull();
   });
 
   it("says plainly when nothing is available", async () => {

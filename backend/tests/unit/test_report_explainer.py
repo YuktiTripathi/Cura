@@ -82,7 +82,10 @@ def test_explain_markers_gives_meaning_and_guideline_note():
 def test_explain_markers_all_normal_says_no_action():
     from app.pipeline.report_explainer import explain_markers
 
-    assert "nothing that needs action" in explain_markers([_m("HDL", 51, "mg/dL", F.normal)])
+    text = explain_markers([_m("HDL", 51, "mg/dL", F.normal)])
+    assert "within your report's range" in text
+    assert "does not rule out a problem" in text
+    assert "nothing that needs action" not in text  # one in range reading does not prove all is well
 
 
 def test_bio_risk_not_raised_corrects_the_premise():

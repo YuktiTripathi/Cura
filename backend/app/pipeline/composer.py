@@ -145,8 +145,7 @@ def _journey_follow_ups(
         model_questions=list(llm_follow_ups or []),
         count=4 - len(kept),
     )
-    if len(kept) + len(questions) < 2:
-        return None
+    # When the grounded questions run out, offer fewer rather than stock questions that do not fit the topic.
     # The member's own next questions first; Cura's clinical-context question last.
     return [*to_suggestions(questions), *kept]
 
@@ -491,11 +490,15 @@ class ResponseComposer:
             # Never an empty row: a few general, clinically safe questions.
             from app.pipeline.followup_generator import FollowUpBrief, fallback_questions, to_suggestions
 
+            # A person with results on record gets questions about those results, not stock health questions.
+            has_blood, has_risks = bool(context.markers), bool(context.bio_ai_risks)
+            on_record = plan.knowledge_scope == KnowledgeScope.personal and (has_blood or has_risks)
+            kind = ("both" if has_blood and has_risks else "blood" if has_blood else "bio") if on_record else None
             general = fallback_questions(
                 FollowUpBrief(asked=list(history or []), shown=list(shown_follow_ups or [])),
-                count=4, current=plan.raw_message,
+                count=4, current=plan.raw_message, kind=kind,
             )
-            combined = to_suggestions(general, personal=False)
+            combined = to_suggestions(general, personal=on_record)
             presentation.suggestion_chips = [item.text for item in combined]
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:

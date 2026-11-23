@@ -49,12 +49,14 @@ Code caps follow ups at four. Tests expect five. The CURA 2.0 brief says four. U
 ### D. Prompt size [Verified]
 test_personal_system_prompt_budget: 3409 characters against a budget of 3200. A real overrun that costs money and latency. Not a safety issue.
 
-## Clinical content problems found while testing (release blocking, not covered by any baseline test)
-- Slightly high LDL: "Results a little outside the range are common and often settle on their own." Unsupported. Now recorded as an expected failure in `tests/acceptance/test_product_acceptance.py`.
-- ALT in range: "Everything here is within your lab's normal range, so there is nothing that needs action." Too absolute.
-- Low vitamin D fallback ends with a generic "worth discussing with your doctor at your next visit".
+## Clinical content problems found while testing
+Fixed, with tests in `tests/acceptance/test_product_acceptance.py`, wording still needs clinical review:
+- Slightly high LDL: "often settle on their own" removed.
+- In range ALT: "nothing that needs action" removed. The old test that required that phrase (`test_report_explainer`) was replaced, because it enforced an unsupported absolute.
+- Low vitamin D: generic "at your next visit" referral replaced with a specific line.
+- Follow ups no longer fall back to stock questions after several turns.
 
 ## Summary
-- Release blocking: the three clinical content problems above; the unreviewed prioritization rules (see the UX spec section 6).
+- Release blocking: the unreviewed prioritization rules and replacement wording (see the UX spec sections 6 and 10).
 - Could affect the redesign: C items on Bio-AI score, follow up relevance, and the older blood overview path.
 - Unrelated baseline noise, to be cleaned up: A, B, D.
