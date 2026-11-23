@@ -323,3 +323,16 @@ def test_every_card_carries_its_fixed_description_from_the_registry():
     liver = card(ov, "liver_health")
     assert liver.description == "How your body processes food, breaks down medicines and removes waste."
     assert "—" not in liver.description
+
+
+def test_plain_measured_labels_describe_distance_only():
+    from app.biomarkers.unified_overview import plain_measured_label
+
+    assert plain_measured_label("above_range", "slightly") == "A little above range"
+    assert plain_measured_label("above_range", "moderately") == "Above range"
+    assert plain_measured_label("above_range", "clearly") == "Well above range"
+    assert plain_measured_label("below_range", "slightly") == "A little below range"
+    assert plain_measured_label("below_range", "clearly") == "Well below range"
+    assert plain_measured_label("below_range", None) == "Below range"
+    assert plain_measured_label("within_range", None) == "Within range"
+    assert plain_measured_label("critical", None) == "Critical"

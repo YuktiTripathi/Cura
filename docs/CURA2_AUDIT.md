@@ -17,7 +17,7 @@ Streaming answers with friendly progress text, document upload and review, voice
 4. Touch targets under 44px on chips and buttons (fixed for touch screens in Stage 1).
 5. Reduced motion only covered the assistant bubble (fixed in Stage 1).
 6. The welcome promised reports the person might not have, and had no returning greeting (fixed in Stage 2).
-7. Biomarker values have no range visual, so "where am I" needs reading text. Open.
+7. Correction: a range bar already exists in answer value cards (`RangeBar`). The real gap is that single value answers arrive with empty `presentation.findings`, so the card may not get its range, and labels did not say how far outside range a value is (distance labels added in Stage 3). Open for the answer cards.
 8. Status relies on colour and wording that can feel alarming for small deviations. Open.
 9. Bio-AI risk wording can read like a diagnosis in some answers. Open.
 10. No trend or multi-report comparison block, and follow-ups are not checked for repetition. Open.

@@ -50,12 +50,19 @@ _OUT = {"above_range", "below_range", "critical"}
 _STRONG_RISK = {"critical", "very high", "high"}
 
 
+def plain_measured_label(status: str, far: str | None) -> str:
+    """Plain wording for a measured value. Distance only: it says how far outside the range, not how serious."""
+    if status == "above_range":
+        return {"slightly": "A little above range", "clearly": "Well above range"}.get(far or "", "Above range")
+    if status == "below_range":
+        return {"slightly": "A little below range", "clearly": "Well below range"}.get(far or "", "Below range")
+    return _MEASURED_LABEL[status]
+
+
 def _measured_finding(item: BiomarkerResult) -> Finding:
     status = _MEASURED_STATUS[item.status]
     far = how_far(item.value, item.reference_low, item.reference_high) if status in _OUT else None
-    label = _MEASURED_LABEL[status]
-    if far == "slightly" and status != "critical":
-        label = "Slightly " + ("high" if status == "above_range" else "low")
+    label = plain_measured_label(status, far)
     note = education_for(item.canonical_id, item.original_name, item.display_name)
     return Finding(
         id=item.result_id,

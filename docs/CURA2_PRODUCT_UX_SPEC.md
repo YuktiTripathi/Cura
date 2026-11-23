@@ -259,7 +259,7 @@ Rules: a follow up answers the new question in two to four sentences, uses the v
 S1 Welcome (section 1.1). One primary button, one input, three question chips.
 S2 Health at a glance (1.3). Sentence, at most three "Start here" rows, area list with one status each.
 S3 Area screen (1.4). Sections in order: Answer sentence, Measured, Predicted, Putting it together, What you can do, Follow ups.
-- Biomarker row: name, value with unit, plain label. Tap to open "About this test" (existing reviewed education text, not model generated). A range bar appears only when the report range has numeric bounds and the screen is wider than 360 px; it is not the only carrier of meaning.
+- Biomarker row: name, value with unit, plain label. Tap to open "About this test" (existing reviewed education text, not model generated). A range bar (already built as `RangeBar`) appears only when the report range has numeric bounds and the screen is wider than 360 px; it is not the only carrier of meaning.
 S4 Chat. Messages as bubbles; the answer's first line is bold. Follow ups below the answer, at most four. "Show more" after about 90 words.
 S5 Uploaded document. Plain summary, values with the same labels, a clear line for what could not be read, and "Compare with my results" only if both exist.
 S6 Errors and empty states. One calm sentence, what happened, what to do, Try again button, draft kept (Stage 1 done). "No report yet" screens say what to do ("Your report will appear here once SuperShyft uploads it") and still allow general questions.
@@ -389,7 +389,7 @@ Test matrix: the 15 scenarios from the CURA 2.0 brief, run against synthetic rep
 Done: Stage 1 (errors, retry, draft, accessibility base), Stage 2 (welcome and returning), crash fix in `drop_routine_doctor`, baseline test triage (`docs/BASELINE_TEST_TRIAGE.md`).
 
 Next, in order of value to the person:
-1. Plain status labels everywhere (section 2). Replace "(low)" style tags with the five labels, derived from the existing deterministic status. Frontend plus a small mapping.
+1. Plain status labels everywhere (section 2). Done for the health overview and category screens ("A little above range", "Above range", "Well above range", and the same for below). Not yet done: answer value cards and the range bar, which need distance in the answer data. The "Critical" label is unchanged pending clinical sign off on "Needs medical attention soon". Replace "(low)" style tags with the five labels, derived from the existing deterministic status. Frontend plus a small mapping.
 2. Biomarker answer structure: found, means, may be behind it, what you can do. Prompt and card changes. Blocked on triage item 3 (single value findings are empty), so the card reads the value from the trusted structured data.
 3. Fix the "date with no report" answer (triage item 2). Must be fixed before release.
 4. "Start here" capped at three on the glance screen and "what we measured / what Bio-AI shows / putting it together" in the area screen.
