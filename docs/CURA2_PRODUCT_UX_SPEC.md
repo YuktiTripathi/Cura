@@ -32,12 +32,12 @@ Blood report of 21 Aug 2026, nine markers. Six are outside the report's referenc
 | TSH | 2.1 mIU/L | 0.4 to 4.0 | In range |
 | Creatinine | 0.8 mg/dL | 0.6 to 1.1 | In range |
 
-Bio-AI report of 25 Aug 2026: type 2 diabetes risk in the "high" category, heart (cardiac) risk "moderate", fatty liver risk "low". The Bio-AI scores used in examples are made up: 72, 48, 12.
+Bio-AI report of 25 Aug 2026, using the report labels from the Bio-AI knowledge base: type 2 diabetes 72 out of 100 (High Risk), cardiac health 48 (Increased Risk), fatty liver 12 (Healthy). The scores are made up.
 
 Counts that must always be stated correctly
 - Markers: 9 measured, 6 outside range, 3 inside range.
 - Health areas holding the six outside markers: 3 (blood sugar has 2, heart and circulation has 3, vitamins has 1).
-- Bio-AI estimates: 3 assessed, 2 raised (high and moderate), 1 low.
+- Bio-AI estimates: 3 assessed, 2 raised (High Risk and Increased Risk), 1 Healthy.
 - Never present a count of markers as a count of areas, or the reverse.
 
 Built in on purpose: the Bio-AI diabetes category is high while the blood sugar tests are only a little above range; the fatty liver estimate is low but there is no liver blood test to compare it with; two reports are four days apart.
@@ -222,14 +222,18 @@ Rules: nothing here is ranked, because the findings are grouped by area (section
 ### 3.5 Bio-AI risk prediction [score transparency retained]
 Question: "What does my diabetes risk mean?"
 ```
-Your Bio-AI report places your type 2 diabetes risk in the High category.   [ Risk category: High ]
+Your Bio-AI report places your type 2 diabetes risk at 72 out of 100, which is High Risk.   [ High Risk ]
 Bio-AI report of 25 Aug 2026. This is a prediction, not a diagnosis.
 
 [ View the score and how to read it ]    <- expands:
     Score: 72
-    Scale: (taken from the Bio-AI documentation, shown only once documented)
-    What it can and cannot tell you: (taken from the Bio-AI documentation)
-    The score is not a percentage chance of having the condition.
+    Score: 72 out of 100
+    Category in your report: High Risk
+    Scale: 0 to 25 Healthy, 26 to 50 Increased Risk, 51 to 75 High Risk, 76 to 100 Very High Risk.
+           If your report uses different labels, your report's labels apply.
+    What to keep in mind: a model estimate, not a diagnosis; not a percentage chance of having
+           the condition; a low score does not rule the condition out; scores for different
+           conditions should not be compared as if the gap meant the same thing.
 
 What you can do
  - Your blood sugar tests are the measured part. Yours are a little above range;
@@ -237,7 +241,7 @@ What you can do
 ```
 Rules
 - The official category is the headline. The raw score is always inspectable, never hidden by default policy.
-- The scale and limitations come from the Bio-AI documentation. If they are not documented, the screen says so and shows no scale. [Open decision, Release blocking for this screen]
+- The scale and limits come from the Bio-AI knowledge base `cura.kb.bio_ai.explainer` version 1.0 (18 Nov 2026), section 3. The bands are those of the sample MetSights report. The knowledge base says the person's own report and the approved production configuration take priority, so production thresholds and labels must be confirmed. [Implemented and tested for the display; production confirmation is an Open decision]
 - A score is never turned into a probability or a percent unless the model explicitly supports that reading.
 - The inputs that fed a prediction are named only if the report itself lists them. They are never guessed.
 
@@ -252,7 +256,7 @@ Measured (blood report, 21 Aug 2026)
  Fasting glucose  104 mg/dL  Report range 70 to 99       A little above range
 
 Predicted (Bio-AI report, 25 Aug 2026)
- Type 2 diabetes risk       Category: High       [ View score ]
+ Type 2 diabetes risk       High Risk (72 out of 100)       [ View score ]
 
 How they relate
  Both point toward higher blood sugar, but they are different kinds of information.
@@ -268,7 +272,7 @@ Rules
 - Two reports from different dates are never described as the same moment.
 - "How they relate" says whether the two agree or differ and never states a cause.
 
-Conflict example: cholesterol is outside range while the Bio-AI heart estimate is moderate. "Your cholesterol tests are outside range. Your Bio-AI heart estimate is in the Moderate category. These are different kinds of information and do not cancel each other."
+Conflict example: cholesterol is outside range while the Bio-AI cardiac health score is 48, Increased Risk. "Your cholesterol tests are outside range. Your Bio-AI cardiac health score is 48 out of 100, Increased Risk. These are different kinds of information and do not cancel each other."
 
 ### 3.7 Nutrition and lifestyle [Proposed, Unreviewed]
 Question: "What can I eat for better blood sugar?" Foods first, in everyday words, then one clause linking to her data. No list of lab values. All dietary advice here needs review.
@@ -323,7 +327,7 @@ What the code now does (`app/biomarkers/unified_overview.py`, `app/pipeline/unif
 
 Open issues
 - The rule list above is engineering's draft. A clinician must review and own it. [Release blocking]
-- "Moderate" predicted risk plus any blood result outside range currently counts as the closer attention tier. Whether Moderate should do that is an [Open decision].
+- "Increased Risk" (the second band) plus any blood result outside range currently counts as the closer attention tier. Whether that band should do that is an [Open decision].
 - Guideline thresholds cover only five markers today.
 - The "Areas to look at" heading and "not ranked" note are [Proposed]; the screen still says "priorities" in places.
 
@@ -334,10 +338,10 @@ Open issues
 Principles [Proposed, partly Implemented]
 1. One area, one story. The Bio-AI estimate and blood tests for the same area appear together. [Implemented for the overview and area screens.]
 2. Always label the type: "Measured" for blood tests, "Predicted" for Bio-AI. [Implemented in the data model; UI wording as above.]
-3. Show the official category prominently. The raw score is inspectable with its documented scale and limits (section 3.5). No percent, no probability. [Implemented and tested: the category is the row's label, "View the score" shows the score, the report's category, a plain note that the scale is not documented yet, and that the score is not a percentage chance.]
+3. Show the official category prominently. The raw score is inspectable with its documented scale and limits (section 3.5). No percent, no probability. [Implemented and tested: the category is the row's label, and "View the score" shows the score, the report's category, the documented scale and the limits.]
 4. Never state a cause between a measured result and a prediction.
 5. Show the source and date of every measured and predicted item. Do not imply two reports describe the same moment. [Implemented and tested on each finding row in the area screen: "Measured, blood report 21 Aug 2026" and "Predicted, Bio-AI report 25 Aug 2026". Separate Measured and Predicted headings are not built.]
-6. [Open issue] The registry text for fatty liver risk reads "Your chances of developing excess fat in your liver". "Chances" can read as a probability. It needs clinical and wording review.
+6. The registry descriptions no longer use "chances", which could read as a probability. The new wording needs review. [Implemented, Unreviewed]
 
 Scenario wording [Unreviewed]
 - Both reassuring: "Your results and your risk estimate both look good for this area."
@@ -390,7 +394,7 @@ Repetition: no value stated twice in one answer; no follow up repeated.
 
 Release blocking [Release blocking]
 1. The prioritization rules in section 6 and every (review) item have no clinical sign off.
-2. The Bio-AI score scale and limitations are not documented in the product. The score screen says so and shows no scale.
+2. The Bio-AI scale comes from the sample report. Production labels, thresholds and the strings the live feed sends are not confirmed (see section 10 below, "Found while applying the knowledge base").
 3. The replacement wording for the removed lines below is engineering's draft and needs clinical review.
 
 Fixed in this round, wording still Unreviewed [Implemented and tested]
@@ -398,6 +402,15 @@ Fixed in this round, wording still Unreviewed [Implemented and tested]
 - "Everything here is within your lab's normal range, so there is nothing that needs action" is removed. It is replaced by "These results are within your report's range, so no action is needed because of them alone. One reading does not rule out a problem."
 - The generic "worth discussing with your doctor at your next visit" is replaced by a specific line per result: repeat the test (HbA1c, fasting glucose), ask what the result means and whether action is needed (triglycerides), ask whether treatment is needed (vitamin D). Each of these is a clinical recommendation and is marked for review.
 - Follow up suggestions no longer fall back to stock questions such as "How much exercise do I need each week?" for a person with results on record. When grounded questions run out, fewer are shown, possibly none.
+
+Found while applying the Bio-AI knowledge base [Implemented and tested]
+- The code compared exact short words ("high", "very high"). The report's labels are "Increased Risk", "High Risk" and "Very High Risk". With those labels a High Risk result would have counted as not raised. All comparisons now use one normaliser (`app/contracts/risk_status.py`). Whether the live feed sends labels or short words is not known, so both are handled.
+- The ordering of raised risks put "increased" first, ahead of Very High Risk. "Increased Risk" is the lowest raised band. Fixed in the registry order.
+- The presentation code ranked "Increased Risk" the same as a healthy result. Fixed.
+
+Not yet shown to the person, though the knowledge base defines them [Proposed]: the health rank or percentile, the lifestyle contribution, the overall metabolic risk score, and metabolic age. The overview shows metabolic age as "an estimate of your body's metabolic health". The knowledge base says to explain it as a model estimate, not biological age, a diagnosis or a lifespan measure, and not to mix it up with the other elements. That wording needs checking.
+
+The registry text said "Your chances of developing excess fat in your liver" and "Your chances of hormone related conditions". The knowledge base says a score is not a probability, so both are reworded ("Whether fat may be building up in your liver", "Whether hormone related conditions may need attention"). The new wording is Unreviewed. [Implemented]
 
 Other open problems
 - Answer cards and the range bar do not show the "A little above" distance labels yet. The range bar itself exists.
@@ -462,8 +475,7 @@ Next
 ## 14. Open decisions
 
 - Who owns clinical review, and the review process.
-- Whether Moderate predicted risk plus any blood result outside range should count as closer attention.
+- Whether Increased Risk (26 to 50) plus any blood result outside range should count as closer attention.
 - The Critical label wording ("Needs medical attention soon").
-- Where the Bio-AI scale and limitations are documented.
-- The wording "chances" in the fatty liver registry text.
+- Confirm that production Bio-AI labels, thresholds and feed strings match the sample report in the knowledge base.
 - Who reviews Hindi and Hinglish.

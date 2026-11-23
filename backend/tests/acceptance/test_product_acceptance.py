@@ -7,7 +7,7 @@ or usability testing.
 Meena has nine blood markers. Six are outside the supplied reference ranges and three are inside them:
   outside: HbA1c 5.9 %, fasting glucose 104 mg/dL, LDL 142, HDL 38, triglycerides 168, vitamin D 12.6
   inside:  haemoglobin 12.8, TSH 2.1, creatinine 0.8
-Bio-AI: type 2 diabetes high, heart (cardiac_health) moderate, fatty liver (nafld) low.
+Bio-AI, with the report's own labels: type 2 diabetes 72 High Risk, cardiac health 48 Increased Risk, fatty liver 12 Healthy.
 """
 
 from __future__ import annotations
@@ -39,7 +39,7 @@ MEENA = [
     m("TSH", 2.1, 0.4, 4.0, "mIU/L"),
     m("Creatinine", 0.8, 0.6, 1.1, "mg/dL"),
 ]
-MEENA_RISKS = [("type_2_diabetes", "high", 72), ("cardiac_health", "moderate", 48), ("nafld", "low", 12)]
+MEENA_RISKS = [("type_2_diabetes", "High Risk", 72), ("cardiac_health", "Increased Risk", 48), ("nafld", "Healthy", 12)]
 
 
 def meena():
@@ -126,7 +126,7 @@ def test_predicted_risks_are_labelled_as_predictions_never_as_diagnoses():
 def test_the_raw_bio_ai_score_is_kept_with_its_classification():
     ov = build_unified_overview(blood(MEENA), bio(MEENA_RISKS))
     risk = next(f for c in ov.categories for f in c.important_findings if f.id == "risk:type_2_diabetes")
-    assert risk.score == 72 and (risk.classification or "").lower() == "high"
+    assert risk.score == 72 and risk.classification == "High Risk"
 
 
 # 4. Values, units and ranges are preserved -------------------------------------------------------------
@@ -215,3 +215,33 @@ def test_follow_ups_never_fall_back_to_stock_questions_for_a_person_with_results
         shown = [item["text"] for item in turn["follow_ups"]]
         assert not stock.intersection(shown), (question, shown)
         assert len(shown) == len(set(shown)) and len(shown) <= 4
+
+
+# 7. The report's own category labels (Bio-AI knowledge base, section 3.1) ----------------------------------
+
+@pytest.mark.parametrize("label,raised", [
+    ("Healthy", False), ("Increased Risk", True), ("High Risk", True), ("Very High Risk", True),
+    ("healthy", False), ("increased", True), ("high", True), ("very high", True),
+])
+def test_report_labels_and_short_words_are_classified_the_same_way(label, raised):
+    from app.biomarkers.risk_overview import _level
+
+    assert (_level(label) == "raised") is raised
+
+
+def test_a_high_risk_label_alone_needs_closer_attention_and_increased_risk_does_not():
+    high = prepare(None, bio([("type_2_diabetes", "High Risk", 72)]))[0][0]
+    increased = prepare(None, bio([("type_2_diabetes", "Increased Risk", 48)]))[0][0]
+    assert high.status == "needs_closer_attention"
+    assert increased.status == "worth_attention"
+
+
+def test_increased_risk_is_the_lowest_raised_band_when_ordering_risks():
+    from app.biomarkers.risk_overview import build_risk_overview  # noqa: F401  (ordering is read from the registry)
+    from app.contracts.risk_status import risk_status_key
+    import json
+    from pathlib import Path
+
+    order = json.loads((Path(__file__).resolve().parents[2] / "app/biomarkers/data/risk_registry_v1.json").read_text())["status_order"]
+    assert order.index("very high") < order.index("high") < order.index("increased")
+    assert risk_status_key("Very High Risk") == "very high"

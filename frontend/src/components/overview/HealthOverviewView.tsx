@@ -19,10 +19,19 @@ function formatDay(iso?: string | null) {
   return Number.isNaN(d.getTime()) ? "" : d.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
 }
 
-/** The raw Bio-AI score, kept inspectable. The scale is shown only once it is documented, so none is invented here. */
+/** The sample report's bands, from the Bio-AI knowledge base (cura.kb.bio_ai.explainer 1.0, section 3.1). Reference only. */
+export const BIO_AI_BANDS: Array<{ from: number; to: number; label: string }> = [
+  { from: 0, to: 25, label: "Healthy" },
+  { from: 26, to: 50, label: "Increased Risk" },
+  { from: 51, to: 75, label: "High Risk" },
+  { from: 76, to: 100, label: "Very High Risk" },
+];
+
+/** The raw Bio-AI score, kept inspectable with its documented scale and limits. The report's own label always comes first. */
 function ScoreDetails({ f }: { f: Finding }) {
   const [open, setOpen] = useState(false);
   if (f.score == null) return null;
+  const scale = BIO_AI_BANDS.map((b) => `${b.from} to ${b.to} ${b.label}`).join(", ");
   return (
     <div className="about-test">
       <button type="button" className="expand-button" aria-expanded={open} onClick={() => setOpen(!open)}>
@@ -30,10 +39,12 @@ function ScoreDetails({ f }: { f: Finding }) {
       </button>
       {open ? (
         <ul>
-          <li><strong>{t("ui.unified.score", "Score")}</strong><p>{f.score}</p></li>
-          {f.classification ? <li><strong>{t("ui.unified.report_category", "Category in the report")}</strong><p>{f.classification}</p></li> : null}
-          <li><strong>{t("ui.unified.scale", "Scale")}</strong><p>{t("ui.unified.scale_missing", "The scale for this score is not documented in this app yet.")}</p></li>
-          <li><strong>{t("ui.unified.limits", "What to keep in mind")}</strong><p>{t("ui.unified.limits_text", "This is a model estimate, not a diagnosis. Do not read the score as a percentage chance of having the condition.")}</p></li>
+          <li><strong>{t("ui.unified.score", "Score")}</strong><p>{`${f.score} out of 100`}</p></li>
+          {f.classification ? <li><strong>{t("ui.unified.report_category", "Category in your report")}</strong><p>{f.classification}</p></li> : null}
+          <li><strong>{t("ui.unified.scale", "Scale")}</strong><p>{`${scale}. If your report uses different labels, your report's labels apply.`}</p></li>
+          <li><strong>{t("ui.unified.limits", "What to keep in mind")}</strong>
+            <p>{t("ui.unified.limits_text", "This is a model estimate, not a diagnosis. It is not a percentage chance of having the condition, and a low score does not rule the condition out. Scores for different conditions should not be compared with each other as if the gap meant the same thing.")}</p>
+          </li>
         </ul>
       ) : null}
     </div>

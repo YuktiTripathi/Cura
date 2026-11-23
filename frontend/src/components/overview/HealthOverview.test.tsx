@@ -94,10 +94,12 @@ describe("My Health Overview", () => {
     expect(screen.getByText("Healthy predicted risk")).toBeTruthy();
     expect(screen.queryByText("12")).toBeNull();
     fireEvent.click(screen.getByRole("button", { name: "View the score" }));
-    expect(screen.getByText("12")).toBeTruthy();
-    expect(screen.getByText(/not documented in this app yet/)).toBeTruthy();
+    expect(screen.getByText("12 out of 100")).toBeTruthy();
+    expect(screen.getByText(/0 to 25 Healthy, 26 to 50 Increased Risk, 51 to 75 High Risk, 76 to 100 Very High Risk/)).toBeTruthy();
+    expect(screen.getByText(/your report's labels apply/)).toBeTruthy();
     expect(screen.getByText(/not a diagnosis/)).toBeTruthy();
-    expect(screen.queryByText(/%/)).toBeNull();
+    expect(screen.getByText(/not a percentage chance/)).toBeTruthy();
+    expect(screen.queryByText(/12%/)).toBeNull();
   });
 
   it("says plainly when nothing is available", async () => {

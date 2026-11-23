@@ -11,6 +11,8 @@ they are: never rounded, converted or merged.
 
 from __future__ import annotations
 
+from app.contracts.risk_status import risk_status_key
+
 import dataclasses
 
 import re
@@ -348,7 +350,7 @@ def build_answer_evidence(context: HealthContext, message: str) -> AnswerEvidenc
     topics = _semantic_topics(semantic)
     if "bio_ai" in topics.markers and context.bio_ai_risks:
         # "my Bio-AI risk" names the whole assessment, not one score: use its elevated risks.
-        elevated = [r.code for r in context.bio_ai_risks if str(r.status or "").lower() in {"high", "very high", "elevated", "moderate"}]
+        elevated = [r.code for r in context.bio_ai_risks if risk_status_key(r.status) in {"high", "very high", "increased", "elevated", "moderate"}]
         topics = dataclasses.replace(
             topics,
             markers=[m for m in topics.markers if m != "bio_ai"],
@@ -961,7 +963,7 @@ def build_focus_brief(context: HealthContext) -> dict:
 
 
 def _risk_raised(risk) -> bool:
-    return (getattr(risk, "status", None) or "").lower() in {"critical", "very high", "high", "elevated", "moderate", "medium"}
+    return risk_status_key(getattr(risk, "status", None)) in {"critical", "very high", "high", "increased", "elevated", "moderate", "medium"}
 
 
 def _blood_counts(context, markers) -> dict:

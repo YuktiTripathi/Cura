@@ -6,6 +6,8 @@ measured blood value and not a diagnosis, and no risk is ever inferred from bloo
 
 from __future__ import annotations
 
+from app.contracts.risk_status import risk_status_key
+
 import json
 import re
 from collections import defaultdict
@@ -73,7 +75,7 @@ def _day(value) -> str | None:
 def _level(status: str | None) -> str:
     if not status:
         return "unknown"
-    return "raised" if status.strip().lower() in _registry()["_raised"] else "not_raised"
+    return "raised" if risk_status_key(status) in _registry()["_raised"] else "not_raised"
 
 
 def _collapse(risks: list[BioAIRisk]) -> tuple[list[tuple[BioAIRisk, int]], int]:
@@ -171,7 +173,7 @@ def build_risk_overview(reports: list[BioAIReport], report_id: str | None = None
         for item in items:
             breakdown[(item.status or "unknown").strip().lower() or "unknown"] += 1
         raised = [item for item in items if item.level == "raised"]
-        raised.sort(key=lambda i: (reg["_rank"].get((i.status or "").lower(), 99), -(i.score or 0), i.name.lower()))
+        raised.sort(key=lambda i: (reg["_rank"].get(risk_status_key(i.status), 99), -(i.score or 0), i.name.lower()))
         groups.append(
             RiskGroupSummary(
                 id=group_id,

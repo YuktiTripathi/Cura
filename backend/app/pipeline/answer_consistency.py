@@ -9,7 +9,9 @@ import re
 
 from app.pipeline.gap_words import how_far
 
-_RAISED = {"critical", "very high", "high", "elevated", "moderate", "medium"}
+from app.contracts.risk_status import risk_status_key
+
+_RAISED = {"critical", "very high", "high", "increased", "elevated", "moderate", "medium"}
 
 # "8 assessment areas and 7 are raised", "covers 8 areas, with 5 raised", "looked at 8 assessment areas and 5 were raised"
 _AREA_COUNT = re.compile(
@@ -26,7 +28,7 @@ def bio_ai_counts(context) -> tuple[int, int] | None:
     risks = list(getattr(context, "bio_ai_risks", None) or [])
     if not risks:
         return None
-    raised = sum(1 for risk in risks if (getattr(risk, "status", None) or "").lower() in _RAISED)
+    raised = sum(1 for risk in risks if risk_status_key(getattr(risk, "status", None)) in _RAISED)
     return len(risks), raised
 
 

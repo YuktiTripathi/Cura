@@ -20,7 +20,7 @@
    "codes": [
     "nafld"
    ],
-   "about": "Your chances of developing excess fat in your liver.",
+   "about": "Whether fat may be building up in your liver.",
    "topic": "liver health"
   },
   {
@@ -50,7 +50,7 @@
    "codes": [
     "pcos"
    ],
-   "about": "Your chances of hormone related conditions.",
+   "about": "Whether hormone related conditions may need attention.",
    "topic": "hormone health"
   },
   {
@@ -71,13 +71,13 @@
   "moderate",
   "medium"
  ],
- "status_order": ["increased", 
-  "critical",
+ "status_order": ["critical",
   "very high",
   "high",
   "elevated",
   "moderate",
   "medium",
+  "increased",
   "mild",
   "low"
  ],

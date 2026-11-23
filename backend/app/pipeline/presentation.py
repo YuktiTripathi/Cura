@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from app.contracts.risk_status import risk_status_key
+
 import re
 from datetime import date, datetime
 
@@ -672,10 +674,10 @@ def build_structured_response(
                 )
             )
     def _attention(status: str | None) -> int:
-        value = (status or "").lower()
+        value = risk_status_key(status)
         if value in {"critical", "very high", "high"}:
             return 0
-        if value in {"moderate", "elevated", "medium"}:
+        if value in {"increased", "moderate", "elevated", "medium"}:
             return 1
         return 2
 

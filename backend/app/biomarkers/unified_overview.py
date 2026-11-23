@@ -28,6 +28,7 @@ from app.contracts.unified_health import (
 )
 from app.biomarkers.education import education_for, first_sentence
 from app.contracts.blood import BloodMarker
+from app.contracts.risk_status import risk_status_key
 from app.pipeline.clinical_thresholds import clinical_note
 from app.pipeline.gap_words import how_far
 
@@ -137,7 +138,7 @@ def decide_status(measured: list[Finding], risks: list[Finding], urgent: bool = 
         return "not_assessed"
     if urgent or any(f.status == "critical" for f in out):
         return "needs_closer_attention"
-    if any((f.classification or "").strip().lower() in _STRONG_RISK for f in raised):
+    if any(risk_status_key(f.classification) in _STRONG_RISK for f in raised):
         return "needs_closer_attention"
     if out and raised:
         return "needs_closer_attention"
