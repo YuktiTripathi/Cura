@@ -26,13 +26,18 @@ def fact(text, value, qid=None):
     return NS(fact=text, value=value, question_id=qid, measured_at="2026-08-20")
 
 
-def life(activity=None, diet=None, smoking=None):
+def life(activity=None, diet=None, smoking=None, allergy=None, condition=None, age=None, sex=None):
     lifestyle = []
+    if age:
+        lifestyle.append(fact("age", age, "age"))
+    if sex:
+        lifestyle.append(fact("sex", sex, "sex"))
     if activity:
         lifestyle.append(fact("physical activity", activity, "physical_activity_frequency"))
     if smoking:
         lifestyle.append(fact("smoking", smoking))
-    profile = NS(lifestyle=lifestyle, questionnaire=[], dietary_preferences=[fact("diet", diet)] if diet else [])
+    profile = NS(lifestyle=lifestyle, questionnaire=[], dietary_preferences=[fact("diet", diet)] if diet else [],
+                 allergies=[fact("allergy", allergy)] if allergy else [], relevant_conditions=[fact("condition", condition)] if condition else [])
     return read_lifestyle(profile, None)
 
 
@@ -125,7 +130,8 @@ def test_9_diet_decides_which_food_advice_is_shown(diet, expect_fish):
 
 def test_10_age_and_sex_are_stated_as_not_used_rather_than_guessed():
     s = story([HDL_LOW], RAISED)
-    assert any("Age, sex and family history are not used" in x for x in s.personal_factors.missing)
+    assert any("Age is not on record" in x for x in s.personal_factors.missing)
+    assert any("Sex is not on record" in x for x in s.personal_factors.missing)
 
 
 # Contract and safety --------------------------------------------------------------------------------
@@ -278,3 +284,25 @@ def test_story_endpoint_has_no_member_id_in_its_path_and_ignores_a_body_supplied
 def test_story_requires_authentication():
     r = client.get(f"/api/v1/health-explanation/categories/{HEART}/story")
     assert r.status_code in (401, 403) or r.status_code in (200, 404)
+
+
+def test_age_and_sex_are_used_only_when_reported_and_never_from_look_alike_words():
+    s = story([HDL_LOW], RAISED, life(age="34", sex="female"))
+    by = {x.key: x for x in s.personal_factors.lifestyle}
+    assert by["age"].value == "34" and by["sex"].value == "female"
+    assert not any("Age is not on record" in x for x in s.personal_factors.missing)
+    profile = NS(lifestyle=[fact("daily usage of oil", "high", "oil_usage")], questionnaire=[], dietary_preferences=[], allergies=[], relevant_conditions=[])
+    assert {x.key: x for x in read_lifestyle(profile, None)}["age"].state == "not_reported"
+
+
+def test_a_nut_allergy_removes_nut_advice_everywhere_in_the_plan():
+    s = story([HDL_LOW, LDL_HIGH], RAISED, life(diet="Vegetarian", allergy="Peanut allergy"))
+    text = json.dumps(s.improvement_plan.model_dump()).lower()
+    assert "nuts" not in text and "seeds" not in text and "peanut" not in text
+    assert any(x.key == "allergies" and x.state == "reported" for x in s.personal_factors.lifestyle)
+
+
+def test_a_reported_condition_makes_the_activity_advice_defer_to_the_doctor():
+    s = story([HDL_LOW], RAISED, life(activity="Low", condition="Knee arthritis"))
+    move = next(a for a in s.improvement_plan.actions if a.action_id == "heart_move_gradually")
+    assert "Check with your doctor before increasing your activity" in move.safety_note

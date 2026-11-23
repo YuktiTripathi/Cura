@@ -67,7 +67,8 @@
    "title": "Add gentle movement to your day",
    "what": "Build up daily movement slowly, for example a short brisk walk, and add a little more each week.",
    "why": "You have reported low physical activity, and regular activity supports healthier cholesterol patterns and heart health.",
-   "safety_note": "If you have chest pain, breathlessness or a medical condition, check with your doctor before increasing activity."
+   "safety_note": "If you have chest pain, breathlessness or a medical condition, check with your doctor before increasing activity.",
+   "condition_note": "You have reported a health condition. Check with your doctor before increasing your activity."
   },
   {
    "action_id": "heart_keep_active",
@@ -139,7 +140,8 @@
    "title": "Add fibre rich foods",
    "what": "Include more of foods such as oats, beans, lentils, chickpeas, fruit, vegetables, nuts and seeds, in ways that suit your own diet.",
    "why": "Your LDL related cholesterol is outside the laboratory range, and fibre rich plant foods are generally linked with healthier cholesterol.",
-   "safety_note": ""
+   "safety_note": "",
+   "what_without_nuts": "Include more of foods such as oats, beans, lentils, chickpeas, fruit and vegetables, in ways that suit your own diet and allergies."
   },
   {
    "action_id": "heart_fibre_foods_nonveg",
@@ -158,7 +160,8 @@
    "title": "Add fibre rich foods and healthier protein",
    "what": "Include more oats, beans, lentils, fruit, vegetables, nuts and seeds. When you eat non vegetarian food, fish can replace some fried or processed meat.",
    "why": "Your LDL related cholesterol is outside the laboratory range, and fibre rich foods and healthier protein choices are generally linked with healthier cholesterol.",
-   "safety_note": ""
+   "safety_note": "",
+   "what_without_nuts": "Include more oats, beans, lentils, fruit and vegetables. When you eat non vegetarian food, fish can replace some fried or processed meat."
   },
   {
    "action_id": "heart_healthier_fats",
@@ -174,7 +177,8 @@
    "title": "Choose healthier fats",
    "what": "Choose nuts, seeds and plant oils more often than fried and packaged foods.",
    "why": "The type of fat in your diet can influence your cholesterol results.",
-   "safety_note": "If you have a nut allergy, choose seeds or other foods that are safe for you."
+   "safety_note": "If you have a nut allergy, choose seeds or other foods that are safe for you.",
+   "what_without_nuts": "Choose plant oils such as olive or mustard oil more often than fried and packaged foods, in ways that suit your allergies."
   },
   {
    "action_id": "heart_less_sugar_alcohol",

@@ -33,10 +33,12 @@ from app.health_explanation.story_schema import (
     YourAssessment,
     YourResult,
 )
-from app.health_explanation.user_context import level_of
+from app.health_explanation.user_context import level_of, value_of
 
 PROMPT_VERSION = "story-1"
 _OUT = {"above_range", "below_range", "critical"}
+_SHOWN = {"age", "sex", "activity", "diet", "smoking", "alcohol", "sleep", "stress", "conditions", "allergies"}
+_NUT = ("nut", "peanut", "almond", "cashew", "walnut", "seed", "sesame")
 _UNSUPPORTED = "This category does not have approved education text yet, so only your own results are shown."
 
 
@@ -177,7 +179,13 @@ def _plan(category_id: str, findings: list[Finding], canonical: dict[str, str | 
             support.append("reported:activity")
         if "diet" in req and diet not in {"not_reported"}:
             support.append("reported:diet")
-        chosen.append(PlanAction(action_id=a["action_id"], title=a["title"], what=a["what"], why=a["why"], supported_by=support, safety_note=a["safety_note"]))
+        what, note = a["what"], a["safety_note"]
+        if any(w in value_of(lifestyle, "allergies") for w in _NUT) and "what_without_nuts" in a:
+            what = a["what_without_nuts"]
+            note = ""
+        if value_of(lifestyle, "conditions") and a.get("condition_note"):
+            note = a["condition_note"]
+        chosen.append(PlanAction(action_id=a["action_id"], title=a["title"], what=what, why=a["why"], supported_by=support, safety_note=note))
     return chosen[:6]
 
 
@@ -253,9 +261,9 @@ def build_story(category_id: str, blood, bio, lifestyle: list[LifestyleFactor], 
     if not any(f.source_type == "predicted_risk" for f in findings):
         missing.append("No Bio-AI risk was assessed for this area.")
     for x in lifestyle:
-        if x.state == "not_reported" and x.key in {"activity", "diet", "smoking", "alcohol", "sleep", "stress"}:
+        if x.state == "not_reported" and x.key in _SHOWN:
             missing.append(f"{x.label} is not on record, so nothing here assumes it either way.")
-    missing.append("Age, sex and family history are not used in this explanation.")
+    missing.append("Family history is not part of this explanation.")
 
     limitations = list(detail.caveat and [detail.caveat] or [])
     if not edu:
@@ -283,7 +291,7 @@ def build_story(category_id: str, blood, bio, lifestyle: list[LifestyleFactor], 
             risks=_risk_explanations(detail, bio),
             note="" if has_risk else "No Bio-AI risk was assessed for this area. This story is based on your blood results only." if has_blood else "",
         ),
-        personal_factors=PersonalFactors(measured=measured, within_range_count=max(0, len(within) - sum(1 for m in measured if m.finding.status == "within_range")), lifestyle=[x for x in lifestyle if x.key in {"activity", "diet", "smoking", "alcohol", "sleep", "stress"}], relationships=relationships, missing=missing),
+        personal_factors=PersonalFactors(measured=measured, within_range_count=max(0, len(within) - sum(1 for m in measured if m.finding.status == "within_range")), lifestyle=[x for x in lifestyle if x.key in _SHOWN], relationships=relationships, missing=missing),
         biomarker_education=_cards(findings, canonical),
         improvement_plan=plan,
         next_steps=NextSteps(monitoring=_monitoring(p.raw_measured, findings), follow_ups=[], suggested_questions=_questions(detail, lifestyle, findings), related_categories=related),

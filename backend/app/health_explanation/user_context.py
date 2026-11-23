@@ -13,8 +13,9 @@ from app.health_explanation.story_schema import LifestyleFactor
 
 logger = logging.getLogger("cura.story")
 
-_LABELS = {"activity": "Physical activity", "diet": "Eating pattern", "sleep": "Sleep", "smoking": "Smoking", "alcohol": "Alcohol", "stress": "Stress"}
-_TRACKED = ("activity", "diet", "sleep", "smoking", "alcohol", "stress")
+_LABELS = {"age": "Age", "sex": "Sex", "activity": "Physical activity", "diet": "Eating pattern", "sleep": "Sleep", "smoking": "Smoking", "alcohol": "Alcohol", "stress": "Stress", "conditions": "Health conditions you reported", "allergies": "Allergies you reported"}
+_TRACKED = ("age", "sex", "activity", "diet", "sleep", "smoking", "alcohol", "stress", "conditions", "allergies")
+_EXACT = {"age": ("age", "age_years"), "sex": ("sex", "gender", "biological_sex")}
 
 
 def classify_activity(text: str | None) -> str | None:
@@ -75,6 +76,16 @@ def read_lifestyle(profile, summary) -> list[LifestyleFactor]:
         f = _first(facts, *needles)
         if f is not None and (f.value not in (None, "") or f.fact):
             found[key] = (str(f.value if f.value not in (None, "") else f.fact), f)
+    # Age and sex only from a question that is exactly that, so words like "usage" never match.
+    for key, ids in _EXACT.items():
+        for f in facts:
+            if (f.question_id or "").lower() in ids and f.value not in (None, ""):
+                found[key] = (str(f.value), f)
+                break
+    for key, group in (("conditions", getattr(profile, "relevant_conditions", []) or []), ("allergies", getattr(profile, "allergies", []) or [])):
+        texts = [str(f.value if f.value not in (None, "") else f.fact) for f in group if (f.value not in (None, "") or f.fact)]
+        if texts:
+            found[key] = ("; ".join(texts[:4]), group[0])
     out: list[LifestyleFactor] = []
     for key in _TRACKED:
         if key in found:
@@ -96,6 +107,13 @@ def load_lifestyle(principal, registry, db) -> list[LifestyleFactor]:
     except Exception as exc:  # noqa: BLE001 - the story still works from measured data
         logger.warning("story_lifestyle_unavailable error=%s", type(exc).__name__)
         return read_lifestyle(None, None)
+
+
+def value_of(factors: list[LifestyleFactor], key: str) -> str:
+    for f in factors:
+        if f.key == key and f.state == "reported":
+            return (f.value or "").lower()
+    return ""
 
 
 def level_of(factors: list[LifestyleFactor], key: str) -> str:
