@@ -870,6 +870,11 @@ export interface components {
              */
             count_line: string;
             /**
+             * Description
+             * @default
+             */
+            description: string;
+            /**
              * Detail Line
              * @default
              */
@@ -923,6 +928,11 @@ export interface components {
              * @default
              */
             count_line: string;
+            /**
+             * Description
+             * @default
+             */
+            description: string;
             /**
              * Detail Line
              * @default

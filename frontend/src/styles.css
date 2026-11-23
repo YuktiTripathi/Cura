@@ -1324,3 +1324,13 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .about-test { flex-basis: 100%; }
 .about-test ul { list-style: none; margin: 4px 0 0; padding: 0; display: grid; gap: 8px; }
 .about-test p { margin: 2px 0 0; color: var(--text-muted); }
+
+/* Overview cards: introduce the area only. Colour carries the status and nothing else. */
+button.health-card { text-align: left; font: inherit; color: inherit; cursor: pointer; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 6px; min-height: 210px; padding: 16px; }
+button.health-card:hover, button.health-card:focus-visible { border-color: var(--accent); box-shadow: 0 2px 10px rgba(16, 35, 61, 0.08); }
+.health-card .health-card-icon { color: var(--text-muted); }
+.health-card-name { font-size: 1.05rem; }
+.health-card-description { color: var(--text-muted); line-height: 1.45; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.health-card-foot { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--border-divider); padding-top: 8px; font-size: 0.9rem; }
+.health-card-arrow { color: var(--text-faint); font-size: 1.1rem; }
+.health-card-status { font-weight: 600; font-size: 0.9rem; }

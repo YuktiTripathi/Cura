@@ -955,6 +955,11 @@
             "title": "Count Line",
             "type": "string"
           },
+          "description": {
+            "default": "",
+            "title": "Description",
+            "type": "string"
+          },
           "detail_line": {
             "default": "",
             "title": "Detail Line",
@@ -1079,6 +1084,11 @@
           "count_line": {
             "default": "",
             "title": "Count Line",
+            "type": "string"
+          },
+          "description": {
+            "default": "",
+            "title": "Description",
             "type": "string"
           },
           "detail_line": {

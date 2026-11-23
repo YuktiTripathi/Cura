@@ -9,7 +9,7 @@ afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
 const counts = { total: 2, within_range: 1, outside_range: 1, no_range: 0, unavailable: 0 };
 const card = (over: Record<string, unknown> = {}) => ({
-  id: "liver_health", name: "Liver Health", icon: "liver", status: "worth_attention", status_label: "Worth paying attention to", completeness: "complete",
+  id: "liver_health", name: "Liver Health", description: "How your body processes food, breaks down medicines and removes waste.", icon: "liver", status: "worth_attention", status_label: "Worth paying attention to", completeness: "complete",
   scenario: "blood_out_risk_ok", summary: "Two liver results are above range, even though your fatty liver risk is healthy.",
   important_findings: [], measured: counts, risks: { assessed: 1, raised: 0 }, count_line: "8 blood tests · 1 risk assessed", detail_line: "2 blood results outside range",
   primary_action: { label: "Explore my liver health", question: "What do my liver results mean for me?" }, ...over,
@@ -41,8 +41,12 @@ describe("My Health Overview", () => {
     expect(await screen.findByText("Here is your whole picture.")).toBeTruthy();
     expect(screen.getByText("42")).toBeTruthy();
     expect(screen.getByText("Look after your liver")).toBeTruthy();
-    expect(screen.getAllByRole("article")).toHaveLength(2);
-    expect(screen.getAllByRole("button", { name: /Explore my/ })).toHaveLength(2);
+    const cards = document.querySelectorAll("button.health-card");
+    expect(cards).toHaveLength(2);
+    expect(screen.getAllByText("How your body processes food, breaks down medicines and removes waste.")).toHaveLength(1);
+    expect(screen.getAllByText("8 blood tests · 1 risk assessed").length).toBeGreaterThan(0);
+    expect(screen.queryByText(/Explore my/)).toBeNull();
+    expect(screen.queryByText(/outside range|Two liver results are above range/)).toBeNull();
     expect(screen.queryByText("What does this mean?")).toBeNull();
   });
 
@@ -51,7 +55,7 @@ describe("My Health Overview", () => {
     const onOpenChange = vi.fn();
     const onOpenReport = vi.fn();
     wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={onOpenChange} onOpenReport={onOpenReport} />);
-    fireEvent.click(await screen.findByRole("button", { name: /Explore my liver health/ }));
+    fireEvent.click(await screen.findByRole("button", { name: /Liver Health\. Worth paying attention to/ }));
     expect(onOpenChange).toHaveBeenCalledWith("liver_health");
     fireEvent.click(screen.getByText("View blood report"));
     expect(onOpenReport).toHaveBeenCalledWith("blood");

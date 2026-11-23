@@ -313,3 +313,13 @@ def test_the_education_text_never_uses_dashes_and_no_test_says_the_member_is_abn
     assert "—" not in text
     for item in json.loads(text)["biomarkers"]:
         assert len(item["bullets"]) == 4
+
+
+def test_every_card_carries_its_fixed_description_from_the_registry():
+    from app.biomarkers.health_categories import CATEGORIES
+
+    assert all(c.description for c in CATEGORIES)
+    ov = build_unified_overview(blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
+    liver = card(ov, "liver_health")
+    assert liver.description == "How your body processes food, breaks down medicines and removes waste."
+    assert "—" not in liver.description

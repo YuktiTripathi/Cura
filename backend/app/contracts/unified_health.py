@@ -102,6 +102,7 @@ class CategoryCard(BaseModel):
     id: str
     name: str
     icon: str
+    description: str = ""
     status: CategoryStatus
     status_label: str
     completeness: Completeness

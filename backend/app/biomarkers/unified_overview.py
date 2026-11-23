@@ -252,6 +252,7 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
         id=p.cid,
         name=p.meta.name,
         icon=p.meta.icon,
+        description=p.meta.description,
         status=status,
         status_label=STATUS_LABELS[status],
         completeness=_completeness(m, r, p.system),

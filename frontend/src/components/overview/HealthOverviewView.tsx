@@ -111,19 +111,19 @@ function Summary({ data }: { data: NonNullable<ReturnType<typeof useHealthOvervi
   );
 }
 
+/** The whole card opens the category. It only introduces the area: icon, name, what it means, status, counts. */
 function CategoryCardView({ card, onOpen }: { card: CategoryCard; onOpen: () => void }) {
   return (
-    <article className="health-card" data-status={card.status}>
+    <button type="button" className="health-card" data-status={card.status} onClick={onOpen} aria-label={`${card.name}. ${card.status_label}.`}>
       <span className="health-card-icon"><HealthIcon name={card.icon} /></span>
-      <h4>{card.name}</h4>
-      <p className="health-card-status" data-status={card.status}>{card.status_label}</p>
-      <p className="health-card-summary">{card.summary}</p>
-      <div className="health-card-counts">
-        <p className="muted">{card.count_line}</p>
-        {card.detail_line ? <p>{card.detail_line}</p> : null}
-      </div>
-      <button type="button" onClick={onOpen}>{`${card.primary_action.label} →`}</button>
-    </article>
+      <strong className="health-card-name">{card.name}</strong>
+      <span className="health-card-description">{card.description}</span>
+      <span className="health-card-status" data-status={card.status}>{card.status_label}</span>
+      <span className="health-card-foot">
+        <span className="muted">{card.count_line}</span>
+        <span className="health-card-arrow" aria-hidden="true">→</span>
+      </span>
+    </button>
   );
 }
 
