@@ -1,0 +1,53 @@
+{
+ "rules_version": "rel-1",
+ "review_status": "unreviewed",
+ "note": "Engineering draft. Every rule needs clinical review before release. A relationship here is an association or a contrast. It is never a cause.",
+ "scenario_rules": [
+  {
+   "rule_id": "scn_both_out",
+   "scenario": "both_out",
+   "relationship_type": "consistent_with",
+   "interpretation": "Your blood results and your predicted risk both point to this area. They measure different things, and one has not been shown to cause the other.",
+   "rationale": "Measured results and a model prediction are separate kinds of evidence that agree in direction. No causal link is established."
+  },
+  {
+   "rule_id": "scn_blood_out_risk_ok",
+   "scenario": "blood_out_risk_ok",
+   "relationship_type": "discordant",
+   "interpretation": "Your blood results are outside range, but your predicted risk is not raised. A lower predicted risk does not cancel results that are outside range.",
+   "rationale": "The two measure different things. A prediction does not correct a measurement."
+  },
+  {
+   "rule_id": "scn_blood_ok_risk_up",
+   "scenario": "blood_ok_risk_up",
+   "relationship_type": "discordant",
+   "interpretation": "Your blood results are within range, but your assessment flags an increased predicted risk. Results in range do not rule out a predicted risk.",
+   "rationale": "A prediction can use more than the blood results, and a result in range is one reading."
+  },
+  {
+   "rule_id": "scn_both_reassuring",
+   "scenario": "both_reassuring",
+   "relationship_type": "consistent_with",
+   "interpretation": "Your blood results and your predicted risk are both encouraging for this area. That does not mean you are risk free.",
+   "rationale": "Both sources agree in direction. Neither rules out future problems."
+  }
+ ],
+ "marker_group_rules": [
+  {
+   "rule_id": "grp_blood_sugar_pair",
+   "markers": ["hba1c", "fasting_sugar", "average_blood_glucose"],
+   "min_outside": 2,
+   "relationship_type": "consistent_with",
+   "interpretation": "More than one of your blood sugar results is outside range. They are read together: HbA1c reflects your average over a few months, and fasting sugar is one morning.",
+   "rationale": "Related glucose measures are interpreted as one pattern. The wording does not name a condition."
+  },
+  {
+   "rule_id": "grp_cholesterol_set",
+   "markers": ["ldl_cholesterol_calculated", "hdl_cholesterol_direct", "triglycerides", "total_cholesterol", "non_hdl_cholesterol", "vldl_cholesterol"],
+   "min_outside": 2,
+   "relationship_type": "consistent_with",
+   "interpretation": "More than one of your cholesterol and blood fat results is outside range. They are read together, as one picture of your blood fats.",
+   "rationale": "Lipid measures are interpreted as a set. The wording does not name a condition."
+  }
+ ]
+}
