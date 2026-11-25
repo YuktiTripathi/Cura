@@ -159,6 +159,13 @@ def _with_pattern_keys(message: str, keys: list[str]) -> list[str]:
 from app.pipeline.turn_kinds import resolve_turn_kind  # noqa: E402
 
 
+_FOOD_RELEVANT_MARKERS = frozenset({
+    "vitamin_d", "vitamin_b12", "folate", "iron", "ferritin", "hemoglobin", "tibc", "transferrin_saturation",
+    "ldl", "hdl", "triglycerides", "total_cholesterol", "non_hdl_cholesterol", "vldl", "hba1c",
+    "fasting_blood_glucose", "calcium", "homocysteine", "uric_acid", "magnesium", "vitamin_b9",
+})
+
+
 class ContextBuilder:
     def __init__(self, registry: ProviderRegistry):
         self.registry = registry
@@ -644,6 +651,9 @@ class ContextBuilder:
             if keys:
                 markers = [item for item in markers if item.key in keys]
             wanted_flags = _selector_marker_flags(selectors)
+            if plan.intent == IntentType.nutrition_guidance and not keys:
+                # Food advice reads the results food can influence, not the whole report.
+                markers = [item for item in markers if item.key in _FOOD_RELEVANT_MARKERS] or markers
             if wanted_flags:
                 markers = [item for item in markers if item.flag in wanted_flags]
             elif not keys and len(markers) > 24:

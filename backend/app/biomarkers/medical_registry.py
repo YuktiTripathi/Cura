@@ -116,6 +116,8 @@ def category_intro(category_id: str | None) -> str:
 
 
 def _intent_of(text: str) -> str:
+    if re.search(r"\b(eat|diet|food|foods|nutrition|meal|meals)\b", text):
+        return "nutrition"
     if re.search(r"\b(why|cause|causes|reason|reasons|explain why|what could|how come)\b", text):
         return "possible_causes"
     if re.search(r"\b(relate|related|relationship|connected|connection|link|linked|together|compare|affect|affects)\b", text):
@@ -146,7 +148,7 @@ def canonical_key(key: str | None) -> str | None:
         return key
 
 
-def chat_passages(message: str, keys: list[str]) -> list[str]:
+def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = None) -> list[str]:
     """Relevant V2.3 fields for this question only. Never the whole library, never a biology lesson
     when the person asked why a result is low."""
 
@@ -172,13 +174,21 @@ def chat_passages(message: str, keys: list[str]) -> list[str]:
         row = entry_for(key) or (risk if eligible(risk) else None)
         if not row:
             continue
-        if position > 0 and mode != "definition":
+        if position > 0 and mode not in {"definition", "nutrition"}:
             continue  # related results contribute through the relationship lines only
         name = row.get("display_name") or row.get("clinical_name") or key
         explanations = row.get("result_explanations") or {}
         limits = _clean_lines(row.get("clinical_limitations"))
         limits = [line for line in limits if "not confirmed" not in line.lower()]
-        if mode == "possible_causes":
+        if mode == "nutrition":
+            # Food advice reads what a result outside its range may reflect and what influences it, per result.
+            own = (sides or {}).get(key) or (sides or {}).get(keys[position] if position < len(keys) else "") or side
+            if own:
+                add(f"{name}, what a {own} result may reflect", _clean_lines(explanations.get(own)))
+            else:
+                add(name, _clean_lines(row.get("short_description")) + _clean_lines(row.get("what_happens_inside_my_body"))[:2])
+            add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
+        elif mode == "possible_causes":
             if side:
                 add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
             add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))

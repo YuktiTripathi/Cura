@@ -1430,18 +1430,30 @@ class ChatService:
             use_knowledge = True
         if use_knowledge:
             with perf.stage("knowledge_lookup"):
-                from app.biomarkers.medical_registry import chat_passages, related_ids
+                from app.biomarkers.medical_registry import canonical_key, chat_passages, related_ids
                 from app.pipeline.evidence_inventory import requested_marker_keys
 
                 keys = list(requested_marker_keys(payload.message))
                 keys += [getattr(r, "code", None) for r in (context.bio_ai_risks or []) if getattr(r, "code", None) and not keys][:2]
                 if not keys:
                     keys = [k for k in [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])] if k][:3]
-                for key in list(keys):
+                if not keys:
+                    # Food advice: the passages for the results outside their range that food can influence.
+                    keys = [
+                        m.key for m in (context.markers or [])
+                        if getattr(m, "flag", None) is not None and str(getattr(m.flag, "value", m.flag)) in {"low", "high"} and m.value is not None
+                    ][:3]
+                food_question = bool(re.search(r"\b(eat|diet|food|foods|nutrition|meal|meals)\b", (payload.message or "").lower()))
+                for key in ([] if food_question else list(keys)):
                     for other in related_ids(key)[:4]:
                         if other not in keys:
                             keys.append(other)
-                context.medical_passages = chat_passages(payload.message, keys[:8])
+                sides = {}
+                for m in context.markers or []:
+                    flag = str(getattr(m.flag, "value", m.flag))
+                    if flag in {"low", "high"} and m.value is not None:
+                        sides[canonical_key(m.key) or m.key] = flag
+                context.medical_passages = chat_passages(payload.message, keys[:8], sides)
             medical_hits = []
             ContextMerger().merge_into(context, plan, principal.subject_id)
         # Recent user statements ("I now work out 5 days a week") supersede older questionnaire answers.
