@@ -361,13 +361,13 @@ def _status_sentence(marker: BloodMarker) -> str:
     name = _display_name(marker.name)
     flag = _flag(marker)
     ref = _range_text(marker)
-    lab = f" (your lab's range is {ref})" if ref else ""
+    lab = f" (the report gives {ref})" if ref else ""
     if "high" in flag:
-        state = "higher than the normal range"
+        state = "above the range on your report"
     elif "low" in flag:
-        state = "lower than the normal range"
+        state = "below the range on your report"
     elif flag == "normal":
-        state = "within the normal range"
+        state = "within the range on your report"
     else:
         state = "reported without a clear range"
     verb = "are" if name.lower().endswith(("ides", "cells", "lipids")) else "is"
@@ -518,6 +518,7 @@ _SECTION = re.compile(
     r"\*\*(?:What to do next|Looking good|Went up|Came down|No change|Your Bio-AI report)\b"
     r"|only have one Bio-AI assessment for you"
     r"|which is (?:higher|lower) than the normal range|which is within the normal range"
+    r"|which is (?:above|below|within) the range on your report"
     r"|most important result to look at|ratio is \d"
 )
 

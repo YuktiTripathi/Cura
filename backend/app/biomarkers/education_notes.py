@@ -1,45 +1,17 @@
-"""Reviewed medical content, version 2.1.
+"""Turns a Medical Knowledge Library V2.3 row into the education note a screen shows.
 
-Screens read these files. They do not ask a model to rewrite them.
-A missing entry stays empty. The older education file is only a fallback
-when this registry has no matching biomarker.
+The only source is backend/app/medical_content/library, read through medical_registry. A missing
+entry stays empty. Nothing here asks a model to rewrite the text.
 """
 
 from __future__ import annotations
 
-import json
-from functools import lru_cache
-from pathlib import Path
-
-from app.biomarkers.registry import normalize_label
 from app.contracts.unified_health import EducationNote
 
-CONTENT_VERSION = "2.1"
-_ROOT = Path(__file__).parent / "content" / "v2" / "content"
 
 
 def _join(lines: list | None) -> str:
     return " ".join(str(line).strip() for line in lines or [] if str(line).strip())
-
-
-@lru_cache(maxsize=1)
-def _biomarkers() -> dict[str, dict]:
-    rows = json.loads((_ROOT / "biomarker_content.json").read_text(encoding="utf-8"))
-    index: dict[str, dict] = {}
-    for row in rows:
-        if row.get("biomarker_id"):
-            index[row["biomarker_id"]] = row
-        for label in (row.get("clinical_name"), row.get("display_name"), *(row.get("original_test_names") or [])):
-            key = normalize_label(label or "")
-            if key and key not in index:
-                index[key] = row
-    return index
-
-
-@lru_cache(maxsize=1)
-def _risks() -> dict[str, dict]:
-    rows = json.loads((_ROOT / "bio_ai_content.json").read_text(encoding="utf-8"))
-    return {row["risk_id"]: row for row in rows if row.get("risk_id")}
 
 
 def _lines(value) -> list[str]:

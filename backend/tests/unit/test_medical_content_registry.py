@@ -1,38 +1,29 @@
-from app.medical_content.attach import note_for, passages_for
-from app.medical_content.mapping import mapping_rows
-from app.medical_content.registry import load_registry
+from app.biomarkers import medical_registry as library
+from app.biomarkers.education_notes import note_for
 
 
 def test_a_row_without_review_status_is_still_usable():
-    from app.biomarkers.medical_registry import eligible
-
-    assert eligible({"display_name": "ALT", "short_description": "An enzyme."})
-    assert not eligible({"review_status": "rejected"})
-    assert not eligible(None)
+    assert library.eligible({"display_name": "ALT", "short_description": "An enzyme."})
+    assert not library.eligible({"review_status": "rejected"})
+    assert not library.eligible(None)
 
 
 def test_library_loads_once_and_keeps_review_status():
-    library = load_registry()
-    assert library["version"] == "2.3"
-    assert len(library["biomarkers"]) == 119
-    assert len(library["relationships"]) == 219
-    assert all(entry["review_status"] == "pending_clinical_review" for entry in library["biomarkers"])
+    assert library.CONTENT_VERSION == "2.3"
+    assert len(library.relationships()) == 219
+    assert len(library.bio_ai_content()) == 11
+    rows = library._load("content/biomarker_content.json")
+    assert len(rows) == 119
+    assert all(row["review_status"] == "pending_clinical_review" for row in rows)
 
 
-def test_exact_matches_only_and_unresolved_stay_unresolved():
-    rows = mapping_rows()
-    confirmed = [row for row in rows if row["mapping_status"] == "exact_canonical_match"]
-    unresolved = [row for row in rows if row["mapping_status"] == "unresolved"]
-    assert confirmed
-    assert all(row["canonical_identifier"] for row in confirmed)
-    glucose = next(row for row in rows if row["content_key"] == "WB-070")
-    assert glucose["canonical_identifier"] == "average_blood_glucose"
-    assert not glucose["provider_identifier"]
+def test_identity_comes_from_the_inventory_not_from_names():
+    identities = library._identity_by_content_key()
+    assert identities.get("WB-070") == "average_blood_glucose"
 
 
 def test_confirmed_marker_attaches_without_an_approval_flag():
     note = note_for("cholesterol_total", "within_range")
-    assert note is not None
-    assert "laboratory" in note.next_step.lower() or note.what_it_is
+    assert note is not None and note.what_it_is
     assert note_for("not_a_real_marker", "within_range") is None
-    assert passages_for(["cholesterol_total"])
+    assert library.chat_passages("What is cholesterol?", ["cholesterol_total"])

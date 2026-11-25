@@ -58,7 +58,7 @@ def _load() -> tuple[dict[str, EducationNote], dict[str, str]]:
 def education_for(canonical_id: str | None, *names: str | None) -> EducationNote | None:
     """V2.3 only. A missing entry stays empty. The older education file is not a fallback."""
 
-    from app.biomarkers.content_registry import note_for
+    from app.biomarkers.education_notes import note_for
 
     return note_for(canonical_id, *names)
 

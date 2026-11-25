@@ -118,7 +118,7 @@ def assemble_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegis
                 if note is not None:
                     finding.education = note
             elif finding.source_type == "predicted_risk":
-                from app.biomarkers.content_registry import risk_note
+                from app.biomarkers.education_notes import risk_note
 
                 note = risk_note(finding.id.split(":", 1)[-1])
                 if note is not None:

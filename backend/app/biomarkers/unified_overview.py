@@ -102,7 +102,7 @@ def _risk_finding(risk: RiskResult) -> Finding:
         "risk_healthy": f"{risk.status or 'Healthy'} predicted risk" if risk_status_key(risk.status) == "healthy" else f"{risk.status} · predicted risk",
     }.get(status, "Risk band unavailable")
     name = risk.display_name or risk.name
-    from app.biomarkers.content_registry import risk_explanation
+    from app.biomarkers.education_notes import risk_explanation
 
     reviewed = risk_explanation(risk.code)
     return Finding(

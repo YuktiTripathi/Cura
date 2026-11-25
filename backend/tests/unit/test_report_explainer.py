@@ -74,7 +74,7 @@ def test_explain_markers_gives_meaning_and_guideline_note():
     from app.pipeline.report_explainer import explain_markers
 
     text = explain_markers([_m("Vitamin D", 12.6, "ng/mL", F.low)])
-    assert "lower than the normal range" in text
+    assert "below the range on your report" in text
     assert "absorb calcium" in text
     assert "deficient range" in text
 
