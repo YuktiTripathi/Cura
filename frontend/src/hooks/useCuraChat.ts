@@ -152,15 +152,12 @@ export function useCuraChat() {
             if (existingBlocks.some((item) => item.sequence === block.sequence && item.kind === block.kind)) {
               return current;
             }
-            const shouldAppendText = Boolean(block.text) && block.kind !== "continuation";
-            const separator = shouldAppendText && next[last].content.trim() ? "\n\n" : "";
+            // Block text is shown by StreamingExperience while nothing else is on screen. It is never
+            // appended to the streamed answer, which would print the same answer twice.
             next[last] = {
               ...next[last],
               preview: undefined,
               experienceBlocks: [...existingBlocks, block],
-              content: shouldAppendText
-                ? `${next[last].content}${separator}${block.text}`
-                : next[last].content,
             };
             return next;
           });
@@ -178,7 +175,8 @@ export function useCuraChat() {
         const streamed = next[last]?.role === "assistant" ? next[last].content : "";
         next[last] = {
           role: "assistant",
-          content: streamed.trim() ? streamed : res.answer,
+          // The final validated answer is authoritative; the streamed text was only provisional.
+          content: res.answer?.trim() ? res.answer : streamed,
           evidence: res.evidence,
           followUps: res.follow_ups,
           recommendations: res.recommendations || [],

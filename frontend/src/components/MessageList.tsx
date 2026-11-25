@@ -103,7 +103,7 @@ export function MessageList({
             {m.role === "assistant" ? (
               <AssistantIdentity
                 label={isPlain(m) ? "CURA" : assistantContextLabel(m.provenance?.type, Boolean(m.experienceBlocks?.length && !m.presentation))}
-                busy={Boolean(m.experienceBlocks?.length && !m.presentation)}
+                busy={Boolean(m.experienceBlocks?.length && !m.presentation && !m.content?.trim())}
               />
             ) : null}
             {m.role === "user" && editingIndex === i ? (
@@ -131,7 +131,7 @@ export function MessageList({
                     hideHeadline={Boolean(topHeadline(m.presentation))}
                   />
                 ) : null}
-                {!m.presentation && m.experienceBlocks?.length ? <StreamingExperience blocks={m.experienceBlocks} /> : null}
+                {!m.presentation && !m.content?.trim() && m.experienceBlocks?.length ? <StreamingExperience blocks={m.experienceBlocks} /> : null}
               </>
               </>
             ) : (

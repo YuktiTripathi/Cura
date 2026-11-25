@@ -1791,7 +1791,8 @@ class ChatService:
             safety_mode=SafetyLayer.request_safety_mode(pre_safety),
             escalation=escalation,
         )
-        if turn_experience.stream_policy.value == "SEMANTIC_BLOCKS":
+        if turn_experience.stream_policy.value == "SEMANTIC_BLOCKS" and not getattr(self._progress, "tokens_streamed", False):
+            # Once the answer has streamed as text, blocks built from the same answer would repeat it.
             for block in turn_experience.blocks:
                 self._progress.experience_block(block)
 

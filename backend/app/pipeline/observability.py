@@ -86,7 +86,8 @@ class ProgressEmitter:
         token_callback: Callable[[str], None] | None = None,
     ):
         self._callback = callback
-        self.token_callback = token_callback
+        self.tokens_streamed = False
+        self.token_callback = self._count_tokens(token_callback) if token_callback else None
         self._preview_callback = preview_callback
         self._experience_callback = experience_callback
         self._started = time.perf_counter()
@@ -96,6 +97,14 @@ class ProgressEmitter:
         self.follow_up = False
         self.timing = TimingReport()
         self._marks: dict[str, float] = {}
+
+    def _count_tokens(self, callback):
+        def send(text: str) -> None:
+            if text:
+                self.tokens_streamed = True
+            callback(text)
+
+        return send
 
     def set_context(self, plan: QueryPlan | None, *, follow_up: bool = False) -> None:
         self.follow_up = follow_up

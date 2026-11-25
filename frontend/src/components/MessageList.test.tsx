@@ -353,7 +353,7 @@ describe("MessageList premium semantic streaming", () => {
         messages={[
           {
             role: "assistant",
-            content: "Your vitamin D is 24 ng/mL.\n\nThis is below your lab range.",
+            content: "",
             experienceBlocks: [
               { sequence: 1, kind: "direct_answer", text: "Your vitamin D is 24 ng/mL." },
               {
@@ -387,6 +387,27 @@ describe("MessageList premium semantic streaming", () => {
     expect(screen.getByText("Why this matters for you")).toBeTruthy();
     expect(screen.getByText("CURA is completing the picture")).toBeTruthy();
     expect(screen.getByLabelText(/CURA · Building your answer/)).toBeTruthy();
+  });
+
+  it("never prints the answer twice once the final answer is on screen", () => {
+    render(
+      <MessageList
+        messages={[
+          { role: "user", content: "Why is my Vitamin B12 low?" },
+          {
+            role: "assistant",
+            content: "Your B12 is below the range on your report.",
+            experienceBlocks: [{ sequence: 0, kind: "direct_answer", text: "Your B12 is below the range on your report." }],
+          },
+        ]}
+        onFollowUp={vi.fn()}
+        onAskContext={vi.fn()}
+        onFeedback={vi.fn()}
+      />
+    );
+
+    expect(screen.queryByTestId("streaming-experience")).toBeNull();
+    expect(screen.getAllByText("Your B12 is below the range on your report.")).toHaveLength(1);
   });
 
   it("shows follow-up suggestions as a continuation area", () => {
