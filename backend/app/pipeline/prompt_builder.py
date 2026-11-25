@@ -195,11 +195,19 @@ class PromptBuilder:
         depth = _depth_instruction(context)
         if personal and context.evidence_package:
             contract = context.task_contract or {}
+            # One resolved task. The goal, intent and focus are stated here once and nowhere else.
             task = {
+                "intent": getattr(context.intent, "value", context.intent),
+                "goal": contract.get("goal"),
+                "focus": contract.get("focus"),
                 "response_type": contract.get("response_type"),
-                "operations": contract.get("operations") or [],
-                "required_sources": contract.get("required_sources") or [],
+                "operations": contract.get("operations") or None,
+                "required_sources": contract.get("required_sources") or None,
+                "broad_summary": bool(contract.get("broad_summary")),
+                "recommendations_requested": bool(contract.get("recommendations_requested")),
+                "primary_source": contract.get("primary_source"),
             }
+            task = {k: v for k, v in task.items() if v not in (None, "", [], False)}
             evidence_block = ""
             if uses_answer_evidence(context) and getattr(context.intent, "value", context.intent) == "latest_result":
                 evidence = build_answer_evidence(context, user_message)
@@ -503,9 +511,7 @@ def _presentation_line(context: HealthContext, user_message: str) -> str:
     if spec.get("goal"):
         primary = spec.get("primary_source") or "unspecified"
         contract = (
-            f"ANSWER CONTRACT: goal={spec.get('goal')}; broad_summary={bool(spec.get('broad_summary'))}; "
-            f"recommendations={bool(spec.get('recommendations_requested'))}; primary_source={primary}. "
-            "Answer this task only. Do not call a selected fact reassuring if it is out of range or raised. "
+            "ANSWER CONTRACT: answer the TASK above and nothing else. Do not call a selected fact reassuring if it is out of range or raised. "
             + (
                 "Explain measured blood results; do not swap in Bio-AI scores.\n"
                 if primary == "blood_report"

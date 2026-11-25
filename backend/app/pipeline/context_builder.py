@@ -431,6 +431,14 @@ class ContextBuilder:
             return
         keys = wanted_metric_keys(plan)
         keys = _with_pattern_keys(plan.raw_message or "", keys)
+        if plan.intent == IntentType.bio_ai_explanation and plan.topic and not keys:
+            # An explanation of one Bio-AI assessment reads the blood tests that library lists for that condition.
+            from app.biomarkers.medical_registry import bio_ai_content, canonical_key
+
+            related = set((bio_ai_content().get(plan.topic) or {}).get("relevant_biomarkers") or [])
+            if related:
+                on_record = sorted({m.key for report in reports for m in report.markers if m.key})
+                keys = [key for key in on_record if canonical_key(key) in related]
         named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}
