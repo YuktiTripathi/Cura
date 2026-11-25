@@ -410,7 +410,7 @@ class ResponseComposer:
             presentation.topic_summary = experience.topic_summary.model_dump(mode="json")
         if presentation.mode.value == "CLINICIAN_HANDOFF" and presentation.summary:
             text = presentation.summary
-        if presentation.quiet_mode and presentation.mode.value == "QUIET_UPDATE":
+        if presentation.quiet_mode and presentation.mode.value == "QUIET_UPDATE" and not model_wrote:
             if not re.search(r"nothing new stands out|would not suggest changing", text, re.I):
                 text = (
                     "Nothing new stands out in these results. The available measurements look stable, "

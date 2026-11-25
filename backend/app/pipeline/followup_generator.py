@@ -133,7 +133,6 @@ class FollowUpBrief:
         """What the model sees when writing follow_up_questions. A Bio-AI question lists
         only the scores and the blood tests linked to them."""
         return {
-            "stages_in_order": list(STAGES),
             "stages_already_covered": [s for s in STAGES if s in self.covered],
             "already_asked": self.asked[-6:],
             "already_suggested": self.shown[-6:],

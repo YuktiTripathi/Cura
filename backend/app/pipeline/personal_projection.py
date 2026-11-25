@@ -105,7 +105,8 @@ def personal_context_payload(context, message: str = "") -> dict:
             out["about_member"] = about
         if interpretive:
             diet = [str(r.value) for r in (profile.dietary_preferences or []) if r.value]
-            if diet and keys.intersection(_FACT_KEYS["dietary_preference"]):
+            states_own_diet = bool(re.search(r"\b(if i (?:follow|am|eat|was)|as a|i am a|i'm a)\b[^?.]*\b(vegetarian|vegan|keto|jain|eggetarian|pescatarian)", text))
+            if diet and not states_own_diet and keys.intersection(_FACT_KEYS["dietary_preference"]):
                 out["dietary_preference"] = _fact(profile.dietary_preferences[0]) | {"value": diet[0]}
             allergies = [str(r.value) for r in (profile.allergies or []) if r.value]
             if allergies and (food or "eat" in text):
@@ -113,9 +114,7 @@ def personal_context_payload(context, message: str = "") -> dict:
             meds = [str(r.value) for r in (profile.medications or []) if r.value]
             if meds:
                 out["medicines_recorded"] = meds[:6]
-            conditions = [str(r.value) for r in (profile.relevant_conditions or []) if r.value]
-            if conditions:
-                out["relevant_conditions"] = conditions[:4]
+            # Bio-AI levels are sent with their assessment names in the evidence, never as bare conditions here.
             life = {}
             for row in profile.lifestyle or []:
                 wanted = _FACT_KEYS.get(row.fact)
