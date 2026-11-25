@@ -17,6 +17,8 @@ import { TestingOptionCard } from "./messages/TestingOptionCard";
 import { UserQuestionActions, UserQuestionEditor } from "./messages/UserQuestion";
 import { StreamingExperience } from "./messages/StreamingExperience";
 import { t } from "../i18n";
+import { ProgressStepper } from "./ProgressStepper";
+import type { ProcessingEvent } from "../lib/processingMessages";
 
 function assistantContextLabel(type?: string | null, streaming = false): string {
   if (streaming) return "Building your answer";
@@ -51,6 +53,7 @@ export function MessageList({
   onFeedback,
   onEditQuestion,
   editingDisabled = false,
+  processingEvents = [],
 }: {
   messages: ChatMessage[];
   onFollowUp: (value: string) => void;
@@ -58,6 +61,7 @@ export function MessageList({
   onFeedback: (rating: FeedbackRating, comment?: string) => void;
   onEditQuestion?: (index: number, text: string) => void;
   editingDisabled?: boolean;
+  processingEvents?: ProcessingEvent[];
 }) {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [draft, setDraft] = useState("");
@@ -83,13 +87,16 @@ export function MessageList({
       {messages.map((m, i) => {
         // An assistant placeholder stays empty until the answer arrives; the progress stepper covers that
         // wait. If Cura already sent the values being asked about, show them meanwhile.
+        const waiting = m.role === "assistant" && i === messages.length - 1 && processingEvents.length > 0 && !m.content;
         if (m.role === "assistant" && !m.content && !m.presentation && !(m.experienceBlocks && m.experienceBlocks.length > 0)) {
-          return m.preview && m.preview.length > 0 ? (
+          if (!waiting && !(m.preview && m.preview.length > 0)) return null;
+          return (
             <article key={i} className="assistant pending" aria-busy="true">
               <AssistantIdentity label="Reading your health context" busy />
-              <PreviewAnswer findings={m.preview} />
+              {waiting ? <ProgressStepper events={processingEvents} /> : null}
+              {m.preview && m.preview.length > 0 ? <PreviewAnswer findings={m.preview} /> : null}
             </article>
-          ) : null;
+          );
         }
         return (
           <article key={i} className={m.role}>
@@ -108,6 +115,10 @@ export function MessageList({
               />
             ) : m.role === "assistant" ? (
               <>
+                {i === messages.length - 1 && m.content && processingEvents.length > 0 ? (
+                  <p className="analyzed-pill">Analyzed blood report & Bio-AI</p>
+                ) : null}
+              <>
                 {topHeadline(m.presentation) ? <h3 className="answer-headline">{topHeadline(m.presentation)}</h3> : null}
                 {m.presentation?.risk_explanation ? <RiskExplanationView data={m.presentation.risk_explanation} onAsk={onFollowUp} /> : <MarkdownAnswer content={m.content} />}
                 {m.semantic?.blocks?.length ? <SemanticBlocks blocks={m.semantic.blocks} answer={m.content} /> : null}
@@ -121,6 +132,7 @@ export function MessageList({
                   />
                 ) : null}
                 {!m.presentation && m.experienceBlocks?.length ? <StreamingExperience blocks={m.experienceBlocks} /> : null}
+              </>
               </>
             ) : (
               <p>{m.content}</p>

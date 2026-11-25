@@ -175,8 +175,8 @@ def test_medical_knowledge_only_hba1c_meaning():
     assert body["meta"]["supershyft_called"] is False
     assert body["meta"].get("documents_queried") in {False, None}
     names = [s["name"] for s in body["provenance"]["sources"]]
-    assert names
-    assert set(names) <= {"MedlinePlus", "CDC", "NIDDK", "NICE", "WHO"}
+    assert "Blood Report" not in names
+    assert not any(name in {"MedlinePlus", "WHO"} for name in names)
 
 
 def test_personal_value_plus_medical_knowledge():

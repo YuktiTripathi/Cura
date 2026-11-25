@@ -3,7 +3,7 @@ import type { AnswerPreview, ChatResponse, ContextRef, ExperienceBlock } from ".
 import type { MeResponse } from "../types/me";
 import type { HealthOverview } from "../types/overview";
 import type { BodySystemOverview, RiskOverview } from "../types/bodySystems";
-import type { CategoryDetail, UnifiedOverview } from "../types/unifiedHealth";
+import type { CategoryDetail, Finding, UnifiedOverview } from "../types/unifiedHealth";
 
 const API = (import.meta.env.VITE_CURA_API_URL || "").replace(/\/$/, "");
 const USER = import.meta.env.VITE_CURA_USER_ID || "";
@@ -131,6 +131,23 @@ export async function getRiskOverview(reportId?: string | null): Promise<RiskOve
   const res = await fetch(`${API}/api/v1/me/bio-ai-risks${query}`, { headers: authHeaders() });
   if (!res.ok) throw new Error("Your Bio-AI report overview isn't available right now.");
   return (await res.json()) as RiskOverview;
+}
+
+export type HealthView = {
+  state: "ready" | "partial" | "unavailable";
+  snapshot_version: string;
+  overview: UnifiedOverview;
+  categories: Record<string, CategoryDetail>;
+  findings: Record<string, Finding>;
+  related_keys: Record<string, string[]>;
+  suggested_questions: Record<string, string[]>;
+};
+
+export async function getHealthView(): Promise<HealthView | null> {
+  const res = await fetch(`${API}/api/v1/health-explanation/view`, { headers: authHeaders() });
+  if (res.status === 404) return null;
+  if (!res.ok) throw new Error("Your health overview isn't available right now.");
+  return (await res.json()) as HealthView;
 }
 
 export async function getHealthOverview(): Promise<UnifiedOverview> {

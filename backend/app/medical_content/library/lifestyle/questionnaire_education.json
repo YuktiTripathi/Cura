@@ -1,0 +1,1177 @@
+[
+  {
+    "question_id": 1,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 2,
+    "education": [
+      "Body size and fat distribution can provide context for how your body handles energy and sugar."
+    ],
+    "limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 3,
+    "education": [
+      "Body size and fat distribution can provide context for how your body handles energy and sugar."
+    ],
+    "limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 4,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 5,
+    "education": [
+      "Body size and fat distribution can provide context for how your body handles energy and sugar."
+    ],
+    "limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 6,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 7,
+    "education": [
+      "Family history, reported diagnoses and treatments can help put your health results in context."
+    ],
+    "limitations": [
+      "Use only the selected condition; reported treatment does not identify a specific medicine or dose.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 8,
+    "education": [
+      "Family history, reported diagnoses and treatments can help put your health results in context."
+    ],
+    "limitations": [
+      "Use only the selected condition; reported treatment does not identify a specific medicine or dose.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 9,
+    "education": [
+      "Family history, reported diagnoses and treatments can help put your health results in context."
+    ],
+    "limitations": [
+      "Use only the selected condition; reported treatment does not identify a specific medicine or dose.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 10,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 11,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 12,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 13,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 14,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 15,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 16,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 17,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 18,
+    "education": [
+      "Sleep gives your body time to recover and can affect how it manages sugar."
+    ],
+    "limitations": [
+      "The answer describes perceived good-quality sleep, not a measured sleep disorder.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 19,
+    "education": [
+      "Alcohol can affect how your liver processes fats and may influence liver tests."
+    ],
+    "limitations": [
+      "Frequency does not establish total alcohol dose or liver disease.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 20,
+    "education": [
+      "Tobacco smoke can harm your blood vessels and heart."
+    ],
+    "limitations": [
+      "Reported smoking frequency is not a measure of lifetime exposure.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 21,
+    "education": [
+      "This answer helps CURA understand your reported health goals."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 22,
+    "education": [
+      "This answer helps CURA understand your reported health goals."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 23,
+    "education": [
+      "Your food supplies iron and vitamin B12, which help your body make healthy blood cells."
+    ],
+    "limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_b12",
+      "life_iron"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 24,
+    "education": [
+      "Your food supplies iron and vitamin B12, which help your body make healthy blood cells.",
+      "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods."
+    ],
+    "limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result.",
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed."
+    ],
+    "source_ids": [
+      "life_b12",
+      "life_c",
+      "life_iron"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 25,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 26,
+    "education": [
+      "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods."
+    ],
+    "limitations": [
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_c",
+      "life_iron"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 27,
+    "education": [
+      "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle."
+    ],
+    "limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_diet",
+      "life_liver"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 28,
+    "education": [
+      "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods."
+    ],
+    "limitations": [
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_c",
+      "life_iron"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 29,
+    "education": [
+      "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle."
+    ],
+    "limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_diet",
+      "life_liver"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 30,
+    "education": [
+      "Your thyroid needs iodine to make its hormones. Iodised salt can supply iodine."
+    ],
+    "limitations": [
+      "Salt choice alone cannot establish iodine intake or thyroid disease; do not suggest extra salt.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 31,
+    "education": [
+      "Too much sodium in food can raise blood pressure."
+    ],
+    "limitations": [
+      "Adding salt at the table does not measure all sodium eaten; blood sodium is not a dietary salt score.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_salt"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 32,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 33,
+    "education": [
+      "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle."
+    ],
+    "limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_diet",
+      "life_liver"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 34,
+    "education": [
+      "Foods high in saturated fat can raise LDL cholesterol in your blood."
+    ],
+    "limitations": [
+      "The type of meat, cooking method, portion size and other foods matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_fat"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 35,
+    "education": [
+      "Your food supplies iron and vitamin B12, which help your body make healthy blood cells.",
+      "Foods high in saturated fat can raise LDL cholesterol in your blood."
+    ],
+    "limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result.",
+      "The type of meat, cooking method, portion size and other foods matter."
+    ],
+    "source_ids": [
+      "life_b12",
+      "life_fat",
+      "life_iron"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 36,
+    "education": [
+      "When your body loses water, your kidneys may make more concentrated urine."
+    ],
+    "limitations": [
+      "Water glasses do not include all fluid sources or account for fluid restrictions.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_urine"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 37,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 38,
+    "education": [
+      "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels."
+    ],
+    "limitations": [
+      "One reading alone does not establish hypertension.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 39,
+    "education": [
+      "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels."
+    ],
+    "limitations": [
+      "One reading alone does not establish hypertension.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 40,
+    "education": [
+      "This answer helps CURA understand your reported health goals."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 41,
+    "education": [
+      "Moving regularly helps your muscles use sugar and supports your heart and blood vessels."
+    ],
+    "limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 42,
+    "education": [
+      "This answer helps CURA understand your reported health context."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 92,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 93,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 94,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 95,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 96,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 97,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 98,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 99,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 100,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 101,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 102,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 103,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 104,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 105,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 106,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 107,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 108,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 109,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 110,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 111,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 112,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 113,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 114,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 115,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 116,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 117,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 118,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 119,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 120,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 121,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 122,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 123,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 124,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 125,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 126,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 127,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 128,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 129,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 130,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 131,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 132,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 133,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 134,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 135,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 136,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 137,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 138,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 139,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "question_id": 140,
+    "education": [
+      "This answer records a health measurement separately from your blood report."
+    ],
+    "limitations": [
+      "No biomarker association is asserted for this question in this draft."
+    ],
+    "source_ids": [],
+    "status": "draft_pending_review",
+    "review_status": "pending_clinical_review"
+  }
+]

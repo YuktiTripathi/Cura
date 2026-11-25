@@ -1,0 +1,8 @@
+{
+  "library_name": "Medical Knowledge Library",
+  "content_version": "2.3",
+  "content_owner": "SuperShyft Medical Team",
+  "inventory_coverage": 330,
+  "release_date": null,
+  "revision": "see library_revision() at runtime"
+}

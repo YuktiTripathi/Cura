@@ -80,7 +80,7 @@ def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
 
 def test_house_follow_up_instruction_asks_for_four_kinds_of_question(house):
     system, _user = _build("What does my HbA1c mean?")
-    assert "exactly 4 questions" in system
+    assert "up to 4 questions" in system
     kinds = [system.index(f"{i}. {name}:") for i, name in enumerate(("Understanding", "Personal relevance", "Action", "Explore"), 1)]
     assert kinds == sorted(kinds)
     assert re.search(r"never repeat", system, re.I)

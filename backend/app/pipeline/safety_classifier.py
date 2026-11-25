@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import logging
+import time
 from dataclasses import dataclass
 from typing import Protocol
 
@@ -126,6 +127,7 @@ class LLMSafetyClassifier:
         api_key = settings.active_llm_api_key()
         if not api_key:
             return self._degraded(text)
+        started = time.perf_counter()
         try:
             payload = self._payload(text)
             client = self._client or httpx.Client(timeout=self.timeout)
@@ -147,7 +149,13 @@ class LLMSafetyClassifier:
                 category = "none"
             confidence = max(0.0, min(1.0, float(data.get("confidence", 0.0))))
         except Exception as exc:  # noqa: BLE001 - timeout, policy refusal, bad JSON
-            logger.warning("safety_classifier status=degraded error=%s", type(exc).__name__)
+            waited_ms = int((time.perf_counter() - started) * 1000)
+            logger.warning(
+                "safety_classifier status=degraded error=%s waited_ms=%s timeout_s=%s",
+                type(exc).__name__,
+                waited_ms,
+                self.timeout,
+            )
             return self._degraded(text)
         from app.pipeline.safety_messages import detect_safety_language
 

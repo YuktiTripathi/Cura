@@ -34,6 +34,9 @@ export type ContextRef = {
   report_id?: string | null;
   document_id?: string | null;
   entry_point?: "blood_report_overview" | "risk_explainer" | "health_area" | null;
+  category_id?: string | null;
+  finding_id?: string | null;
+  snapshot_version?: string | null;
 };
 
 export type Recommendation = {

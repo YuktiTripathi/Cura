@@ -145,6 +145,24 @@ def render_missing_blood_marker(context: HealthContext) -> str:
 
 
 def render_bio_ai_ambiguity(context: HealthContext) -> str:
+    named = list(getattr(context, "bio_ai_risks", None) or [])
+    labels_for = list(context.disambiguation or [])
+    if named:
+        bits = []
+        for index, risk in enumerate(named):
+            label = "Bio-AI report"
+            if index < len(labels_for):
+                label = bio_ai_source_label(labels_for[index].label or labels_for[index].source_line) or label
+            score = getattr(risk, "score", None)
+            status = getattr(risk, "status", None) or "unlabelled"
+            name = getattr(risk, "name", None) or "This assessment"
+            score_bit = f"{score:g}" if isinstance(score, (int, float)) else "an unreported score"
+            bits.append(f"{label}: {name} {score_bit}, {status}")
+        listed = "; ".join(bits)
+        return (
+            f"You have more than one Bio-AI assessment for this. {listed}. "
+            "A score is a risk estimate, not a diagnosis. Which report should I explain?"
+        )
     candidates = list(context.disambiguation or [])
     count = len(candidates)
     count_word = {2: "two", 3: "three"}.get(count, str(count) if count else "multiple")

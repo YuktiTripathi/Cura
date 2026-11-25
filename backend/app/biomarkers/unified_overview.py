@@ -102,12 +102,15 @@ def _risk_finding(risk: RiskResult) -> Finding:
         "risk_healthy": f"{risk.status or 'Healthy'} predicted risk" if risk_status_key(risk.status) == "healthy" else f"{risk.status} · predicted risk",
     }.get(status, "Risk band unavailable")
     name = risk.display_name or risk.name
+    from app.biomarkers.content_registry import risk_explanation
+
+    reviewed = risk_explanation(risk.code)
     return Finding(
         id=f"risk:{risk.code}",
         source_type="predicted_risk",
         name=name,
         medical_name=risk.medical_name if risk.medical_name and risk.medical_name.lower() != name.lower() else "",
-        explain=risk.explain or risk.about,
+        explain=reviewed or risk.explain or risk.about,
         status=status,
         status_label=label,
         score=risk.score,
@@ -291,7 +294,7 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
         id=p.cid,
         name=p.meta.name,
         icon=p.meta.icon,
-        description=p.meta.description,
+        description=_category_about(p.cid) or (p.meta.description if p.meta else ""),
         status=status,
         status_label=STATUS_LABELS[status],
         completeness=_completeness(m, r, p.system),
@@ -368,6 +371,12 @@ def build_unified_overview(blood: BodySystemOverview | None, bio: RiskOverview |
     )
 
 
+def _category_about(category_id: str) -> str:
+    from app.biomarkers.medical_registry import category_about
+
+    return category_about(category_id)
+
+
 def build_category_detail(category_id: str, blood: BodySystemOverview | None, bio: RiskOverview | None, wording: "Wording | None" = None) -> CategoryDetail | None:
     from app.pipeline.unified_wording import rules_wording
 
@@ -394,7 +403,7 @@ def build_category_detail(category_id: str, blood: BodySystemOverview | None, bi
     relationships = build_relationships(category_id, card.scenario, p.measured, p.risks, canonical)
     return CategoryDetail(
         **{**card.model_dump(), "summary": pick("summary")},
-        about=pick("about") or p.meta.about,
+        about=_category_about(category_id) or pick("about") or p.meta.about,
         findings=findings,
         interpretation=list(pick("interpretation") or []),
         insight=pick("insight") or "",

@@ -285,7 +285,8 @@ from app.biomarkers.education import education_for  # noqa: E402
 def test_explanations_come_from_the_reviewed_file_and_attach_to_measured_findings_only():
     d = build_category_detail("liver_health", blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
     alt = next(f for f in d.findings if f.name.startswith("SGPT"))
-    assert alt.education and alt.education.what_it_is.startswith("An enzyme mostly found in liver cells")
+    assert alt.education and alt.education.content_source == "medical_knowledge_v2.3"
+    assert "ALT" in alt.education.what_it_is
     assert alt.explain and alt.explain.endswith(".")
     assert next(f for f in d.findings if f.source_type == "predicted_risk").education is None
 
@@ -296,10 +297,14 @@ def test_cards_do_not_carry_the_long_explanations():
 
 
 def test_misspelt_lab_names_and_look_alike_tests_find_the_right_text():
-    assert education_for("hdl_cholesterol_direct", "HDL Cholestrol Direct").name == "HDL Cholesterol Direct"
-    assert education_for("urine_rbc", "RBC").name == "RBC (Urine)"
-    assert education_for("fasting_sugar", "Fasting Sugar").name == "Fasting Sugar"
-    assert education_for("urine_sugar", "Sugar").name == "Sugar"
+    hdl = education_for("hdl_cholesterol_direct", "HDL Cholestrol Direct")
+    urine_rbc = education_for("urine_rbc", "RBC")
+    fasting = education_for("fasting_sugar", "Fasting Sugar")
+    urine_sugar = education_for("urine_sugar", "Sugar")
+    assert hdl and urine_rbc and fasting and urine_sugar
+    assert hdl.content_source == urine_rbc.content_source == "medical_knowledge_v2.3"
+    assert fasting.name != urine_sugar.name
+    assert "urine" in urine_rbc.name.lower()
     assert education_for(None, "No Such Test") is None
 
 
@@ -321,7 +326,9 @@ def test_every_card_carries_its_fixed_description_from_the_registry():
     assert all(c.description for c in CATEGORIES)
     ov = build_unified_overview(blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
     liver = card(ov, "liver_health")
-    assert liver.description == "How your body processes food, breaks down medicines and removes waste."
+    from app.biomarkers.medical_registry import category_about
+
+    assert liver.description == category_about("liver_health")
     assert "—" not in liver.description
 
 

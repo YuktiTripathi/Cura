@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "source_content_key",
+    "related_content_key",
+    "source_biomarker_id",
+    "related_biomarker_id",
+    "relationship_type",
+    "priority",
+    "user_explanation",
+    "retrieve_when",
+    "clinical_limitations",
+    "source_ids",
+    "review_status"
+  ],
+  "properties": {
+    "retrieve_when": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "clinical_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_status": {
+      "const": "pending_clinical_review"
+    }
+  }
+}

@@ -823,8 +823,25 @@ class ContextBuilder:
             return
 
         if plan.intent == IntentType.bio_ai_explanation:
+            choice = select_bio_ai_report(
+                reports,
+                plan,
+                message=plan.raw_message,
+                conversation_report_id=conversation_report_id,
+            )
+            focus = [plan.topic] if plan.topic else codes
+            if choice.ambiguous and focus:
+                named = []
+                for report in choice.ambiguous:
+                    selected, _missing = select_bio_risks(report, focus)
+                    named.extend(self._stamp_bio_risk(rk, report) for rk in selected)
+                if named and len({(getattr(item, "code", None), getattr(item, "score", None)) for item in named}) > 1:
+                    ctx.status = "ambiguous"
+                    ctx.bio_ai_risks = named
+                    ctx.disambiguation = [self._bio_candidate(report) for report in choice.ambiguous]
+                    return
             previous = previous_bio_report(reports)
-            latest = latest_bio_report(reports)
+            latest = choice.report or latest_bio_report(reports)
             if latest is None:
                 ctx.missing.append(MissingItem(key=plan.topic or "bio_ai", name=plan.topic_name or "Bio-AI", reason="no_reports"))
                 return
@@ -870,7 +887,12 @@ class ContextBuilder:
                         ctx.missing.append(MissingItem(key=code, name=display_name_for(code), reason="score_not_available"))
                     return
                 ctx.status = "ambiguous"
-                ctx.bio_ai_risks = []
+                named = []
+                if codes:
+                    for report in choice.ambiguous:
+                        selected, _missing = select_bio_risks(report, codes)
+                        named.extend(self._stamp_bio_risk(rk, report) for rk in selected)
+                ctx.bio_ai_risks = named
                 ctx.disambiguation = [self._bio_candidate(report) for report in choice.ambiguous]
                 for report in choice.ambiguous:
                     selected, _missing = select_bio_risks(report, codes)

@@ -718,6 +718,24 @@ components:
             maxLength: 128
           - type: 'null'
           title: Report Id
+        category_id:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Category Id
+        finding_id:
+          anyOf:
+          - type: string
+            maxLength: 128
+          - type: 'null'
+          title: Finding Id
+        snapshot_version:
+          anyOf:
+          - type: string
+            maxLength: 64
+          - type: 'null'
+          title: Snapshot Version
         document_id:
           anyOf:
           - type: string

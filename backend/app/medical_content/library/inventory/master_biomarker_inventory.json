@@ -1,0 +1,5570 @@
+[
+  {
+    "inventory_id": "WB-001",
+    "workbook_row": 5,
+    "original_test_name": "Cholesterol Total",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "cholesterol_total",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-002",
+    "workbook_row": 6,
+    "original_test_name": "HDL Cholesterol Direct",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "hdl_cholesterol_direct",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-003",
+    "workbook_row": 7,
+    "original_test_name": "Triglycerides",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "triglycerides",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-004",
+    "workbook_row": 8,
+    "original_test_name": "Non-HDL Cholesterol",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "non_hdl_cholesterol",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-005",
+    "workbook_row": 9,
+    "original_test_name": "CHOL/HDL Ratio",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "chol_hdl_ratio",
+    "health_category": "heart_circulation",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-006",
+    "workbook_row": 10,
+    "original_test_name": "LDL Cholesterol Calculated",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "ldl_cholesterol_calculated",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-007",
+    "workbook_row": 11,
+    "original_test_name": "VLDL Cholesterol",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "vldl_cholesterol",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-008",
+    "workbook_row": 12,
+    "original_test_name": "LDL/HDL Cholesterol",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "ldl_hdl_cholesterol",
+    "health_category": "heart_circulation",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-009",
+    "workbook_row": 13,
+    "original_test_name": "HDL/LDL Cholesterol Ratio",
+    "test_profile": "Lipid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "hdl_ldl_cholesterol_ratio",
+    "health_category": "heart_circulation",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-010",
+    "workbook_row": 14,
+    "original_test_name": "Albumin",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "albumin",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-011",
+    "workbook_row": 15,
+    "original_test_name": "Alkaline Phosphatase",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "alkaline_phosphatase",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-012",
+    "workbook_row": 16,
+    "original_test_name": "Bilirubin Direct",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "bilirubin_direct",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-013",
+    "workbook_row": 17,
+    "original_test_name": "Bilirubin Total",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "bilirubin_total",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-014",
+    "workbook_row": 18,
+    "original_test_name": "GGTP",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "ggtp",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-015",
+    "workbook_row": 19,
+    "original_test_name": "Proteins Serum",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "proteins_serum",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-016",
+    "workbook_row": 20,
+    "original_test_name": "SGOT (AST)",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "sgot_ast",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-017",
+    "workbook_row": 21,
+    "original_test_name": "SGPT (ALT)",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "sgpt_alt",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-018",
+    "workbook_row": 22,
+    "original_test_name": "Bilirubin Indirect",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "bilirubin_indirect",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-019",
+    "workbook_row": 23,
+    "original_test_name": "Globulin",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "globulin",
+    "health_category": "liver_health",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-020",
+    "workbook_row": 24,
+    "original_test_name": "A/G Ratio",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "a_g_ratio",
+    "health_category": "liver_health",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-021",
+    "workbook_row": 25,
+    "original_test_name": "SGOT/SGPT Ratio",
+    "test_profile": "Liver Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "sgot_sgpt_ratio",
+    "health_category": "liver_health",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-022",
+    "workbook_row": 26,
+    "original_test_name": "BUN Urea Nitrogen",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "bun_urea_nitrogen",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-023",
+    "workbook_row": 27,
+    "original_test_name": "Calcium Total",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "calcium_total",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-024",
+    "workbook_row": 28,
+    "original_test_name": "Chlorides",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "chlorides",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-025",
+    "workbook_row": 29,
+    "original_test_name": "Creatinine",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "creatinine",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-026",
+    "workbook_row": 30,
+    "original_test_name": "Sodium",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "sodium",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-027",
+    "workbook_row": 31,
+    "original_test_name": "Urea",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urea",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-028",
+    "workbook_row": 32,
+    "original_test_name": "Uric Acid",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "uric_acid",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-029",
+    "workbook_row": 33,
+    "original_test_name": "BUN/Creatinine Ratio",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "bun_creatinine_ratio",
+    "health_category": "kidney_urinary",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-030",
+    "workbook_row": 34,
+    "original_test_name": "Urea/Creatinine Ratio",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urea_creatinine_ratio",
+    "health_category": "kidney_urinary",
+    "content_type": "calculated_ratio",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-031",
+    "workbook_row": 35,
+    "original_test_name": "eGFR",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "egfr",
+    "health_category": "kidney_urinary",
+    "content_type": "calculated_measurement",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-032",
+    "workbook_row": 36,
+    "original_test_name": "Phosphorus Inorganic",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "phosphorus_inorganic",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-033",
+    "workbook_row": 37,
+    "original_test_name": "Potassium",
+    "test_profile": "Kidney Function with K",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "potassium",
+    "health_category": "kidney_urinary",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-034",
+    "workbook_row": 38,
+    "original_test_name": "Magnesium",
+    "test_profile": "Sleep",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "magnesium",
+    "health_category": "vitamins_nutrition",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-035",
+    "workbook_row": 39,
+    "original_test_name": "Zinc",
+    "test_profile": "Sleep",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "zinc",
+    "health_category": "vitamins_nutrition",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-036",
+    "workbook_row": 40,
+    "original_test_name": "Vitamin B12",
+    "test_profile": "Vitamins",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "vitamin_b12",
+    "health_category": "vitamins_nutrition",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-037",
+    "workbook_row": 41,
+    "original_test_name": "Vitamin D Total-25 Hydroxy",
+    "test_profile": "Vitamins",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "vitamin_d_total_25_hydroxy",
+    "health_category": "vitamins_nutrition",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-038",
+    "workbook_row": 42,
+    "original_test_name": "Vitamin C",
+    "test_profile": "Vitamins",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "vitamin_c",
+    "health_category": "vitamins_nutrition",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-039",
+    "workbook_row": 43,
+    "original_test_name": "T3",
+    "test_profile": "Thyroid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "t3",
+    "health_category": "thyroid_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-040",
+    "workbook_row": 44,
+    "original_test_name": "T4",
+    "test_profile": "Thyroid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "t4",
+    "health_category": "thyroid_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-041",
+    "workbook_row": 45,
+    "original_test_name": "TSH",
+    "test_profile": "Thyroid Profile",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "tsh",
+    "health_category": "thyroid_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-042",
+    "workbook_row": 46,
+    "original_test_name": "Absolute Basophils Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "absolute_basophils_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-043",
+    "workbook_row": 47,
+    "original_test_name": "Absolute Eosinophils Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "absolute_eosinophils_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-044",
+    "workbook_row": 48,
+    "original_test_name": "Absolute Lymphocyte Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "absolute_lymphocyte_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-045",
+    "workbook_row": 49,
+    "original_test_name": "Absolute Monocyte Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "absolute_monocyte_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-046",
+    "workbook_row": 50,
+    "original_test_name": "Absolute Neutrophil Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "absolute_neutrophil_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-047",
+    "workbook_row": 51,
+    "original_test_name": "ESR Automated",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "esr_automated",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-048",
+    "workbook_row": 52,
+    "original_test_name": "Hemoglobin Hb",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "hemoglobin_hb",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-049",
+    "workbook_row": 53,
+    "original_test_name": "MCH",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "mch",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-050",
+    "workbook_row": 54,
+    "original_test_name": "MCHC",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "mchc",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-051",
+    "workbook_row": 55,
+    "original_test_name": "MCV",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "mcv",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-052",
+    "workbook_row": 56,
+    "original_test_name": "MPV Mean Platelate Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "mpv_mean_platelet_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-053",
+    "workbook_row": 57,
+    "original_test_name": "PCV/Hematocrit",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "pcv_hematocrit",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-054",
+    "workbook_row": 58,
+    "original_test_name": "Platelate Count",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "platelet_count",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-055",
+    "workbook_row": 59,
+    "original_test_name": "WBC",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "wbc",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-056",
+    "workbook_row": 60,
+    "original_test_name": "RDW",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "rdw",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-057",
+    "workbook_row": 61,
+    "original_test_name": "Neutrophils",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "neutrophils",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-058",
+    "workbook_row": 62,
+    "original_test_name": "Eosinophils",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "eosinophils",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-059",
+    "workbook_row": 63,
+    "original_test_name": "Lymphocytes",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "lymphocytes",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-060",
+    "workbook_row": 64,
+    "original_test_name": "Monocytes",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "monocytes",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-061",
+    "workbook_row": 65,
+    "original_test_name": "Basophils",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "basophils",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-062",
+    "workbook_row": 66,
+    "original_test_name": "RDW-CV",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "rdw_cv",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-063",
+    "workbook_row": 67,
+    "original_test_name": "MENTZER INDEX MCV/RCC",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "mentzer_index_mcv_rcc",
+    "health_category": "blood_iron",
+    "content_type": "calculated_index",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-064",
+    "workbook_row": 68,
+    "original_test_name": "Red blood cells",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "red_blood_cells",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-065",
+    "workbook_row": 69,
+    "original_test_name": "GK Index",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "gk_index",
+    "health_category": "blood_iron",
+    "content_type": "calculated_index",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-066",
+    "workbook_row": 70,
+    "original_test_name": "RDWI",
+    "test_profile": "Complete Hemogram",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "rdwi",
+    "health_category": "blood_iron",
+    "content_type": "calculated_index",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-067",
+    "workbook_row": 71,
+    "original_test_name": "Fasting Sugar",
+    "test_profile": "Diabetes Profile Pro+",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "fasting_sugar",
+    "health_category": "blood_sugar_metabolism",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-068",
+    "workbook_row": 72,
+    "original_test_name": "HbA1c",
+    "test_profile": "Diabetes Profile Pro+",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "hba1c",
+    "health_category": "blood_sugar_metabolism",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-069",
+    "workbook_row": 73,
+    "original_test_name": "Fasting Insulin",
+    "test_profile": "Diabetes Profile Pro+",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "fasting_insulin",
+    "health_category": "blood_sugar_metabolism",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-070",
+    "workbook_row": 74,
+    "original_test_name": "Average Blood Glucose",
+    "test_profile": "Diabetes Profile Pro+",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": null,
+    "health_category": "blood_sugar_metabolism",
+    "content_type": "measurement_method_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-071",
+    "workbook_row": 75,
+    "original_test_name": "pH Urine",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_ph_urine",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_quantitative",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-072",
+    "workbook_row": 76,
+    "original_test_name": "Urobilinogen",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_urobilinogen",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-073",
+    "workbook_row": 77,
+    "original_test_name": "Colour",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_colour",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_observation",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-074",
+    "workbook_row": 78,
+    "original_test_name": "Transparency",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_transparency",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_observation",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-075",
+    "workbook_row": 79,
+    "original_test_name": "Sugar",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_sugar",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-076",
+    "workbook_row": 80,
+    "original_test_name": "Blood(Urine)",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_blood_urine",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-077",
+    "workbook_row": 81,
+    "original_test_name": "RBC",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_rbc",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-078",
+    "workbook_row": 82,
+    "original_test_name": "Pus Cells",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_pus_cells",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-079",
+    "workbook_row": 83,
+    "original_test_name": "Epithelial Cells",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_epithelial_cells",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-080",
+    "workbook_row": 84,
+    "original_test_name": "Crystals",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_crystals",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-081",
+    "workbook_row": 85,
+    "original_test_name": "Cast",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_cast",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-082",
+    "workbook_row": 86,
+    "original_test_name": "Bacteria",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_bacteria",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-083",
+    "workbook_row": 87,
+    "original_test_name": "Yeast Cells",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_yeast_cells",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_microscopy",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-084",
+    "workbook_row": 88,
+    "original_test_name": "Nitrate",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_nitrate",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-085",
+    "workbook_row": 89,
+    "original_test_name": "Urine Ketone",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_urine_ketone",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-086",
+    "workbook_row": 90,
+    "original_test_name": "Urine Protein",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_urine_protein",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-087",
+    "workbook_row": 91,
+    "original_test_name": "Leucocyte Estrase",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_leukocyte_esterase",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-088",
+    "workbook_row": 92,
+    "original_test_name": "Bile Pigments",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_bile_pigments",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_qualitative_or_semquantitative_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-089",
+    "workbook_row": 93,
+    "original_test_name": "Specific Gravity",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_specific_gravity",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_quantitative",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-090",
+    "workbook_row": 94,
+    "original_test_name": "Volume-Urine",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_volume_urine",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_quantitative",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-091",
+    "workbook_row": 95,
+    "original_test_name": "Others-Urine",
+    "test_profile": "Urine Routine and Microscopy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "urine_others_urine",
+    "health_category": "kidney_urinary",
+    "content_type": "urine_observation",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-092",
+    "workbook_row": 96,
+    "original_test_name": "Homocysteine",
+    "test_profile": "Inflammatory",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "homocysteine",
+    "health_category": "immunity_inflammation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-093",
+    "workbook_row": 97,
+    "original_test_name": "hs-CRP",
+    "test_profile": "Inflammatory",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "hs_crp",
+    "health_category": "immunity_inflammation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-094",
+    "workbook_row": 98,
+    "original_test_name": "ESR",
+    "test_profile": "Inflammatory",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "esr",
+    "health_category": "immunity_inflammation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-095",
+    "workbook_row": 99,
+    "original_test_name": "Total Testosterone",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "total_testosterone",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-096",
+    "workbook_row": 100,
+    "original_test_name": "DHEAS",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "dheas",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-097",
+    "workbook_row": 101,
+    "original_test_name": "IGF-1",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "igf_1",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-098",
+    "workbook_row": 102,
+    "original_test_name": "Cortisol",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "cortisol",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-099",
+    "workbook_row": 103,
+    "original_test_name": "PTH",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "pth",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-100",
+    "workbook_row": 104,
+    "original_test_name": "Prolactin",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "prolactin",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-101",
+    "workbook_row": 105,
+    "original_test_name": "LH",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "lh",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-102",
+    "workbook_row": 106,
+    "original_test_name": "FSH",
+    "test_profile": "Hormones",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "fsh",
+    "health_category": "hormonal_health",
+    "content_type": "hormone",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-103",
+    "workbook_row": 107,
+    "original_test_name": "Calcium",
+    "test_profile": "Bone Health",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "calcium",
+    "health_category": "bone_mineral",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-104",
+    "workbook_row": 108,
+    "original_test_name": "PSA",
+    "test_profile": "Cancer",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": "psa",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-105",
+    "workbook_row": 109,
+    "original_test_name": "CEA",
+    "test_profile": "Cancer",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "cea",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-106",
+    "workbook_row": 110,
+    "original_test_name": "AFP (Alpha Feto protein - Amniotic fluid )",
+    "test_profile": "Cancer",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "afp_alpha_feto_protein_amniotic_fluid",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-107",
+    "workbook_row": 111,
+    "original_test_name": "CA 19-9",
+    "test_profile": "Cancer",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "ca_19_9",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-108",
+    "workbook_row": 112,
+    "original_test_name": "CA 125",
+    "test_profile": "Cancer",
+    "male_package": false,
+    "female_package": true,
+    "biomarker_id": "ca_125",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-109",
+    "workbook_row": 113,
+    "original_test_name": "CA 15.3",
+    "test_profile": "Cancer",
+    "male_package": false,
+    "female_package": true,
+    "biomarker_id": "ca_15_3",
+    "health_category": "cancer_related",
+    "content_type": "tumour_marker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-110",
+    "workbook_row": 114,
+    "original_test_name": "Lipo A - Lipoprotein(a)",
+    "test_profile": "Heart Health",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "lipo_a_lipoprotein_a",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-111",
+    "workbook_row": 115,
+    "original_test_name": "Apo B - Apolipoprotein B",
+    "test_profile": "Heart Health",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": "apo_b_apolipoprotein_b",
+    "health_category": "heart_circulation",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-112",
+    "workbook_row": 116,
+    "original_test_name": "Iron Serum",
+    "test_profile": "Iron Studies with Ferritin",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": "iron_serum",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-113",
+    "workbook_row": 117,
+    "original_test_name": "TIBC",
+    "test_profile": "Iron Studies with Ferritin",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": "tibc",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-114",
+    "workbook_row": 118,
+    "original_test_name": "UIBC",
+    "test_profile": "Iron Studies with Ferritin",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": "ubic",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-115",
+    "workbook_row": 119,
+    "original_test_name": "Transferrin Saturation",
+    "test_profile": "Iron Studies with Ferritin",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": "transferrin_saturation",
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "matched_registry_label_or_alias",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-116",
+    "workbook_row": 120,
+    "original_test_name": "Ferritin",
+    "test_profile": "Iron Studies with Ferritin",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": null,
+    "health_category": "blood_iron",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-117",
+    "workbook_row": 121,
+    "original_test_name": "CK/CPK",
+    "test_profile": "Muscle & Tissue Health",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": null,
+    "health_category": "other_unmapped",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-118",
+    "workbook_row": 122,
+    "original_test_name": "Lactate Dehydrogenase (LDH)",
+    "test_profile": "Muscle & Tissue Health",
+    "male_package": true,
+    "female_package": false,
+    "biomarker_id": null,
+    "health_category": "other_unmapped",
+    "content_type": "quantitative_biomarker",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-119",
+    "workbook_row": 123,
+    "original_test_name": "Pigeon Droppings",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-120",
+    "workbook_row": 124,
+    "original_test_name": "Pigeon Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-121",
+    "workbook_row": 125,
+    "original_test_name": "Turkey Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-122",
+    "workbook_row": 126,
+    "original_test_name": "Epithelium + Serum Proteins Prot. Mouse",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-123",
+    "workbook_row": 127,
+    "original_test_name": "Pig Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-124",
+    "workbook_row": 128,
+    "original_test_name": "Goose Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-125",
+    "workbook_row": 129,
+    "original_test_name": "Cat Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-126",
+    "workbook_row": 130,
+    "original_test_name": "Cat Dander",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-127",
+    "workbook_row": 131,
+    "original_test_name": "Budgerigar Dropping",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-128",
+    "workbook_row": 132,
+    "original_test_name": "Dog Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-129",
+    "workbook_row": 133,
+    "original_test_name": "Budgerigar Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-130",
+    "workbook_row": 134,
+    "original_test_name": "Dog Dander",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-131",
+    "workbook_row": 135,
+    "original_test_name": "Canarian Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-132",
+    "workbook_row": 136,
+    "original_test_name": "Budgerigar Serum Proteins",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-133",
+    "workbook_row": 137,
+    "original_test_name": "Rabbit Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-134",
+    "workbook_row": 138,
+    "original_test_name": "Goat Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-135",
+    "workbook_row": 139,
+    "original_test_name": "Chicken Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-136",
+    "workbook_row": 140,
+    "original_test_name": "Chicken Droppings",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-137",
+    "workbook_row": 141,
+    "original_test_name": "Sheep Epithelium",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-138",
+    "workbook_row": 142,
+    "original_test_name": "Duck Feathers",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-139",
+    "workbook_row": 143,
+    "original_test_name": "Cow Dander",
+    "test_profile": "Allergy Pets",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-140",
+    "workbook_row": 144,
+    "original_test_name": "Penicillin V",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-141",
+    "workbook_row": 145,
+    "original_test_name": "Penicillin G",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-142",
+    "workbook_row": 146,
+    "original_test_name": "Benzocaine",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-143",
+    "workbook_row": 147,
+    "original_test_name": "Aspirin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-144",
+    "workbook_row": 148,
+    "original_test_name": "Ibuprofen",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-145",
+    "workbook_row": 149,
+    "original_test_name": "Diclofenac",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-146",
+    "workbook_row": 150,
+    "original_test_name": "Azithromycin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-147",
+    "workbook_row": 151,
+    "original_test_name": "Sulfamethoxazole",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-148",
+    "workbook_row": 152,
+    "original_test_name": "Gentamycin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-149",
+    "workbook_row": 153,
+    "original_test_name": "Ascorbic Acid (Vitamin C)",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-150",
+    "workbook_row": 154,
+    "original_test_name": "Cobalamin (Vitamin B12)",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-151",
+    "workbook_row": 155,
+    "original_test_name": "Cephalosporin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-152",
+    "workbook_row": 156,
+    "original_test_name": "Metronidazole",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-153",
+    "workbook_row": 157,
+    "original_test_name": "Chloramphenicol",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-154",
+    "workbook_row": 158,
+    "original_test_name": "Tetracycline",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-155",
+    "workbook_row": 159,
+    "original_test_name": "Ofloxacin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-156",
+    "workbook_row": 160,
+    "original_test_name": "Bromhexine",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-157",
+    "workbook_row": 161,
+    "original_test_name": "Amoxicillin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-158",
+    "workbook_row": 162,
+    "original_test_name": "Oxacillin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-159",
+    "workbook_row": 163,
+    "original_test_name": "Ampicillin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-160",
+    "workbook_row": 164,
+    "original_test_name": "Ciprofloxacin",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-161",
+    "workbook_row": 165,
+    "original_test_name": "Paracetamol",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-162",
+    "workbook_row": 166,
+    "original_test_name": "Thiamine (Vitamin B1)",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-163",
+    "workbook_row": 167,
+    "original_test_name": "Prilocaine",
+    "test_profile": "Allergy Drugs",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-164",
+    "workbook_row": 168,
+    "original_test_name": "Euroglyphus Maynei",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-165",
+    "workbook_row": 169,
+    "original_test_name": "Tyrophagus Putrescentiae",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-166",
+    "workbook_row": 170,
+    "original_test_name": "Tobacco Dust",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-167",
+    "workbook_row": 171,
+    "original_test_name": "Lepidoglyphus Destructor",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-168",
+    "workbook_row": 172,
+    "original_test_name": "House Dust – IFCI 1",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-169",
+    "workbook_row": 173,
+    "original_test_name": "Dermatophagoides Microceras",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-170",
+    "workbook_row": 174,
+    "original_test_name": "Acarus Siro",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-171",
+    "workbook_row": 175,
+    "original_test_name": "Blomia Tropicalis",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-172",
+    "workbook_row": 176,
+    "original_test_name": "Glycyphagus Domesticus",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-173",
+    "workbook_row": 177,
+    "original_test_name": "Dermatophagoides Farinae",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-174",
+    "workbook_row": 178,
+    "original_test_name": "Dermatophagoides Pteronyssinus",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-175",
+    "workbook_row": 179,
+    "original_test_name": "Hay Dust",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-176",
+    "workbook_row": 180,
+    "original_test_name": "Books Dust",
+    "test_profile": "Allergy Dust Mites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-177",
+    "workbook_row": 181,
+    "original_test_name": "Vespula Germanica",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-178",
+    "workbook_row": 182,
+    "original_test_name": "Blatella Germanica",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-179",
+    "workbook_row": 183,
+    "original_test_name": "Heterocera Mix",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-180",
+    "workbook_row": 184,
+    "original_test_name": "Aedes Communis",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-181",
+    "workbook_row": 185,
+    "original_test_name": "Housefly Musca Domestica",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-182",
+    "workbook_row": 186,
+    "original_test_name": "Apis Mellifera",
+    "test_profile": "Allergy Insects",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-183",
+    "workbook_row": 187,
+    "original_test_name": "Dactylis Glomerata",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-184",
+    "workbook_row": 188,
+    "original_test_name": "Phleum Pratense",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-185",
+    "workbook_row": 189,
+    "original_test_name": "Cynodon Dactylon",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-186",
+    "workbook_row": 190,
+    "original_test_name": "Lolium Perenne",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-187",
+    "workbook_row": 191,
+    "original_test_name": "Agrostis Stolonifera",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-188",
+    "workbook_row": 192,
+    "original_test_name": "Sorghum Halepense",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-189",
+    "workbook_row": 193,
+    "original_test_name": "Festuca Elatior",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-190",
+    "workbook_row": 194,
+    "original_test_name": "Phragmites Communis",
+    "test_profile": "Allergy Grass",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-191",
+    "workbook_row": 195,
+    "original_test_name": "Penicillium Notatum",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-192",
+    "workbook_row": 196,
+    "original_test_name": "Cladosporium Herbarum",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-193",
+    "workbook_row": 197,
+    "original_test_name": "Aspergillus Fumigatus",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-194",
+    "workbook_row": 198,
+    "original_test_name": "Mucor Racemosus",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-195",
+    "workbook_row": 199,
+    "original_test_name": "Candida Albicans",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-196",
+    "workbook_row": 200,
+    "original_test_name": "Alternaria Alternata",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-197",
+    "workbook_row": 201,
+    "original_test_name": "Curvularia Lunata",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-198",
+    "workbook_row": 202,
+    "original_test_name": "Trichoderma Viride",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-199",
+    "workbook_row": 203,
+    "original_test_name": "Phoma Betae",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-200",
+    "workbook_row": 204,
+    "original_test_name": "Rhizopus Nigricans",
+    "test_profile": "Allergy Moulds & Yeast",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-201",
+    "workbook_row": 205,
+    "original_test_name": "Amaranthus Retroflexus",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-202",
+    "workbook_row": 206,
+    "original_test_name": "Eucalyptus Spp",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-203",
+    "workbook_row": 207,
+    "original_test_name": "Xanthium Commune",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-204",
+    "workbook_row": 208,
+    "original_test_name": "Morus Alba",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-205",
+    "workbook_row": 209,
+    "original_test_name": "Prosopis Juliflora",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-206",
+    "workbook_row": 210,
+    "original_test_name": "Nart V1 / Artemisia Vulgaris",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-207",
+    "workbook_row": 211,
+    "original_test_name": "Acacia Spp",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-208",
+    "workbook_row": 212,
+    "original_test_name": "Oak Wood",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-209",
+    "workbook_row": 213,
+    "original_test_name": "Salix Caprea",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-210",
+    "workbook_row": 214,
+    "original_test_name": "Chenopodium Album",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-211",
+    "workbook_row": 215,
+    "original_test_name": "Brassica Napus",
+    "test_profile": "Allergy Weed & Tree",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-212",
+    "workbook_row": 216,
+    "original_test_name": "Egg Plant / Aubergine",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-213",
+    "workbook_row": 217,
+    "original_test_name": "Onion",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-214",
+    "workbook_row": 218,
+    "original_test_name": "Garlic",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-215",
+    "workbook_row": 219,
+    "original_test_name": "Cauliflower",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-216",
+    "workbook_row": 220,
+    "original_test_name": "Pumpkin",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-217",
+    "workbook_row": 221,
+    "original_test_name": "Red Radish",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-218",
+    "workbook_row": 222,
+    "original_test_name": "Sweet Potato",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-219",
+    "workbook_row": 223,
+    "original_test_name": "Spinach",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-220",
+    "workbook_row": 224,
+    "original_test_name": "Lettuce",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-221",
+    "workbook_row": 225,
+    "original_test_name": "Cabbage",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-222",
+    "workbook_row": 226,
+    "original_test_name": "Cucumber",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-223",
+    "workbook_row": 227,
+    "original_test_name": "Carrot",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-224",
+    "workbook_row": 228,
+    "original_test_name": "French Bean",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-225",
+    "workbook_row": 229,
+    "original_test_name": "Broccoli",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-226",
+    "workbook_row": 230,
+    "original_test_name": "Tomato",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-227",
+    "workbook_row": 231,
+    "original_test_name": "Beet",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-228",
+    "workbook_row": 232,
+    "original_test_name": "Potato",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-229",
+    "workbook_row": 233,
+    "original_test_name": "Date",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-230",
+    "workbook_row": 234,
+    "original_test_name": "Apricot",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-231",
+    "workbook_row": 235,
+    "original_test_name": "Cherry",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-232",
+    "workbook_row": 236,
+    "original_test_name": "Pineapple",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-233",
+    "workbook_row": 237,
+    "original_test_name": "Plum",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-234",
+    "workbook_row": 238,
+    "original_test_name": "Orange",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-235",
+    "workbook_row": 239,
+    "original_test_name": "Grape",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-236",
+    "workbook_row": 240,
+    "original_test_name": "Pomegranate",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-237",
+    "workbook_row": 241,
+    "original_test_name": "Guava",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-238",
+    "workbook_row": 242,
+    "original_test_name": "Cranberry",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-239",
+    "workbook_row": 243,
+    "original_test_name": "Fig",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-240",
+    "workbook_row": 244,
+    "original_test_name": "Olive",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-241",
+    "workbook_row": 245,
+    "original_test_name": "Watermelon",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-242",
+    "workbook_row": 246,
+    "original_test_name": "Lychee",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-243",
+    "workbook_row": 247,
+    "original_test_name": "Papaya",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-244",
+    "workbook_row": 248,
+    "original_test_name": "Strawberry",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-245",
+    "workbook_row": 249,
+    "original_test_name": "Mango",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-246",
+    "workbook_row": 250,
+    "original_test_name": "Apple",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-247",
+    "workbook_row": 251,
+    "original_test_name": "Banana",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-248",
+    "workbook_row": 252,
+    "original_test_name": "Kiwi",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-249",
+    "workbook_row": 253,
+    "original_test_name": "Melon",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-250",
+    "workbook_row": 254,
+    "original_test_name": "Peach",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-251",
+    "workbook_row": 255,
+    "original_test_name": "Rice",
+    "test_profile": "Allergy Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-252",
+    "workbook_row": 256,
+    "original_test_name": "Mackerel",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-253",
+    "workbook_row": 257,
+    "original_test_name": "Sardine",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-254",
+    "workbook_row": 258,
+    "original_test_name": "Carp Fish",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-255",
+    "workbook_row": 259,
+    "original_test_name": "Salmon",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-256",
+    "workbook_row": 260,
+    "original_test_name": "Fish (Cod)",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-257",
+    "workbook_row": 261,
+    "original_test_name": "Mutton",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-258",
+    "workbook_row": 262,
+    "original_test_name": "Chicken Meat",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-259",
+    "workbook_row": 263,
+    "original_test_name": "Turkey",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-260",
+    "workbook_row": 264,
+    "original_test_name": "Duck Meat",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-261",
+    "workbook_row": 265,
+    "original_test_name": "Beef",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-262",
+    "workbook_row": 266,
+    "original_test_name": "Pork",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-263",
+    "workbook_row": 267,
+    "original_test_name": "Crab",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-264",
+    "workbook_row": 268,
+    "original_test_name": "Shrimp",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-265",
+    "workbook_row": 269,
+    "original_test_name": "Lobster",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-266",
+    "workbook_row": 270,
+    "original_test_name": "Whole Egg (Hen)",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-267",
+    "workbook_row": 271,
+    "original_test_name": "Egg Yolk Elisa",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-268",
+    "workbook_row": 272,
+    "original_test_name": "Egg White Elisa",
+    "test_profile": "Allergy Non-Veg",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-269",
+    "workbook_row": 273,
+    "original_test_name": "Cheese Cheddar Type",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-270",
+    "workbook_row": 274,
+    "original_test_name": "Coconut Milk",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-271",
+    "workbook_row": 275,
+    "original_test_name": "Chocolate",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-272",
+    "workbook_row": 276,
+    "original_test_name": "Coffee",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-273",
+    "workbook_row": 277,
+    "original_test_name": "Tea",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-274",
+    "workbook_row": 278,
+    "original_test_name": "Tofu (Bean Curd)",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-275",
+    "workbook_row": 279,
+    "original_test_name": "Curd",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-276",
+    "workbook_row": 280,
+    "original_test_name": "Cow Milk",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-277",
+    "workbook_row": 281,
+    "original_test_name": "Yogurt",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-278",
+    "workbook_row": 282,
+    "original_test_name": "Yeast",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-279",
+    "workbook_row": 283,
+    "original_test_name": "Mushrooms",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-280",
+    "workbook_row": 284,
+    "original_test_name": "Casein (Milk Protein)",
+    "test_profile": "Allergy Dairy",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-281",
+    "workbook_row": 285,
+    "original_test_name": "Raisin",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-282",
+    "workbook_row": 286,
+    "original_test_name": "Wheat Flour",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-283",
+    "workbook_row": 287,
+    "original_test_name": "Pea",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-284",
+    "workbook_row": 288,
+    "original_test_name": "Pumpkin Seed",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-285",
+    "workbook_row": 289,
+    "original_test_name": "Barley",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-286",
+    "workbook_row": 290,
+    "original_test_name": "Peanut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-287",
+    "workbook_row": 291,
+    "original_test_name": "Oats",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-288",
+    "workbook_row": 292,
+    "original_test_name": "Maize",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-289",
+    "workbook_row": 293,
+    "original_test_name": "Soya Bean",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-290",
+    "workbook_row": 294,
+    "original_test_name": "Sunflower Seed",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-291",
+    "workbook_row": 295,
+    "original_test_name": "Hazelnut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-292",
+    "workbook_row": 296,
+    "original_test_name": "Semolina",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-293",
+    "workbook_row": 297,
+    "original_test_name": "Walnut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-294",
+    "workbook_row": 298,
+    "original_test_name": "Almond",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-295",
+    "workbook_row": 299,
+    "original_test_name": "Cashew Nut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-296",
+    "workbook_row": 300,
+    "original_test_name": "Sesame Seed",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-297",
+    "workbook_row": 301,
+    "original_test_name": "Poppy (Seed)",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-298",
+    "workbook_row": 302,
+    "original_test_name": "Pistachio Nut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-299",
+    "workbook_row": 303,
+    "original_test_name": "Flaxseed",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-300",
+    "workbook_row": 304,
+    "original_test_name": "Lentil",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-301",
+    "workbook_row": 305,
+    "original_test_name": "Coconut",
+    "test_profile": "Allergy Seeds/Nuts/Legumes",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-302",
+    "workbook_row": 306,
+    "original_test_name": "Cinnamon",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-303",
+    "workbook_row": 307,
+    "original_test_name": "Mint",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-304",
+    "workbook_row": 308,
+    "original_test_name": "Mustard",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-305",
+    "workbook_row": 309,
+    "original_test_name": "Vanilla",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-306",
+    "workbook_row": 310,
+    "original_test_name": "Coriander",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-307",
+    "workbook_row": 311,
+    "original_test_name": "Ginger",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-308",
+    "workbook_row": 312,
+    "original_test_name": "Anise",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-309",
+    "workbook_row": 313,
+    "original_test_name": "Cardamon",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-310",
+    "workbook_row": 314,
+    "original_test_name": "Saffron",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-311",
+    "workbook_row": 315,
+    "original_test_name": "Thyme",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-312",
+    "workbook_row": 316,
+    "original_test_name": "Basil",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-313",
+    "workbook_row": 317,
+    "original_test_name": "Oregano",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-314",
+    "workbook_row": 318,
+    "original_test_name": "Fennel",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-315",
+    "workbook_row": 319,
+    "original_test_name": "Sweet Pepper",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-316",
+    "workbook_row": 320,
+    "original_test_name": "Cloves",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-317",
+    "workbook_row": 321,
+    "original_test_name": "Curry",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-318",
+    "workbook_row": 322,
+    "original_test_name": "Black Pepper",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-319",
+    "workbook_row": 323,
+    "original_test_name": "Nutmeg",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-320",
+    "workbook_row": 324,
+    "original_test_name": "Curcuma",
+    "test_profile": "Allergy Spices",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-321",
+    "workbook_row": 325,
+    "original_test_name": "Jute",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-322",
+    "workbook_row": 326,
+    "original_test_name": "Sheep Wool (Treated)",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-323",
+    "workbook_row": 327,
+    "original_test_name": "Silk (Bombyx Mori)",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-324",
+    "workbook_row": 328,
+    "original_test_name": "Latex",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-325",
+    "workbook_row": 329,
+    "original_test_name": "Henna",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-326",
+    "workbook_row": 330,
+    "original_test_name": "Cotton Linters",
+    "test_profile": "Allergy Occupational",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-327",
+    "workbook_row": 331,
+    "original_test_name": "Ascaris",
+    "test_profile": "Allergy Parasites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-328",
+    "workbook_row": 332,
+    "original_test_name": "Toxocara Canis",
+    "test_profile": "Allergy Parasites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-329",
+    "workbook_row": 333,
+    "original_test_name": "Anisakis",
+    "test_profile": "Allergy Parasites",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "allergy_assay_unconfirmed",
+    "applicable_result_states": [
+      "assay_unconfirmed"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "inventory_id": "WB-330",
+    "workbook_row": 334,
+    "original_test_name": "IGE total",
+    "test_profile": "Allergy IgE",
+    "male_package": true,
+    "female_package": true,
+    "biomarker_id": null,
+    "health_category": "allergy",
+    "content_type": "total_ige",
+    "applicable_result_states": [
+      "low",
+      "normal",
+      "high",
+      "reference_unavailable"
+    ],
+    "mapping_status": "unresolved",
+    "review_status": "pending_clinical_review"
+  }
+]

@@ -1,11 +1,20 @@
 import { useState } from "react";
 import type { ContextRef } from "../../types/chat";
 import type { CategoryCard, CategoryDetail, EducationNote, Finding } from "../../types/unifiedHealth";
-import { useHealthCategory, useHealthOverview } from "../../hooks/useHealthOverview";
+import { useHealthCategory, useHealthOverview, useHealthView } from "../../hooks/useHealthOverview";
 import { HealthIcon } from "./HealthIcon";
 import { t } from "../../i18n";
 
-const AREA_REF: ContextRef = { type: "bio_ai_report", source: "supershyft", entry_point: "health_area" };
+function areaRef(categoryId?: string | null, snapshotVersion?: string | null, findingId?: string | null): ContextRef {
+  return {
+    type: "bio_ai_report",
+    source: "supershyft",
+    entry_point: "health_area",
+    category_id: categoryId ?? null,
+    finding_id: findingId ?? null,
+    snapshot_version: snapshotVersion ?? null,
+  };
+}
 type Ask = (text: string, contextRef: ContextRef) => void;
 
 function formatValue(f: Finding) {
@@ -51,6 +60,20 @@ function ScoreDetails({ f }: { f: Finding }) {
         </ul>
       ) : null}
     </div>
+  );
+}
+
+function RangeBar({ f }: { f: Finding }) {
+  const lo = f.reference_low;
+  const hi = f.reference_high;
+  const value = typeof f.value === "number" ? f.value : null;
+  const span = lo != null && hi != null && hi > lo ? hi - lo : null;
+  const pct = span != null && value != null ? Math.min(100, Math.max(0, ((value - lo!) / span) * 100)) : null;
+  return (
+    <span className="range-bar" title={rangeText(f)}>
+      <span className="range-bar-track">{pct != null ? <span className="range-bar-mark" style={{ left: `${pct}%` }} /> : null}</span>
+      <span className="muted finding-value">{formatValue(f)}{rangeText(f) ? ` · ${rangeText(f)}` : ""}</span>
+    </span>
   );
 }
 
@@ -109,12 +132,7 @@ export function FindingRow({ f, explanation }: { f: Finding; explanation?: strin
       </div>
       <div className="finding-side">
         <span className="finding-status" data-tone={tone}>{f.status_label}</span>
-        {f.source_type === "measured" && f.value != null ? (
-          <span className="muted finding-value">
-            {formatValue(f)}
-            {rangeText(f) ? ` (${rangeText(f)})` : ""}
-          </span>
-        ) : null}
+        {f.source_type === "measured" && f.value != null ? <RangeBar f={f} /> : null}
       </div>
       {explanation ? <p className="finding-explanation">{explanation}</p> : null}
       {f.previous_value != null && explanation ? (
@@ -130,32 +148,27 @@ export function FindingRow({ f, explanation }: { f: Finding; explanation?: strin
 
 function Summary({ data }: { data: NonNullable<ReturnType<typeof useHealthOverview>["data"]> }) {
   const tot = { blood_within: 0, blood_outside: 0, blood_no_range: 0, blood_unavailable: 0, risks_assessed: 0, risks_raised: 0, metabolic_age: null, ...(data.totals ?? {}) };
-  const sum = tot.blood_within + tot.blood_outside + tot.blood_no_range + tot.blood_unavailable || 1;
-  const pct = (n: number) => `${(n / sum) * 100}%`;
-  const sub = [
-    tot.blood_no_range ? `${tot.blood_no_range} ${t("ui.unified.no_range", "results without a reference range")}` : "",
-    tot.blood_unavailable ? `${tot.blood_unavailable} ${t("ui.unified.unavailable", "results unavailable")}` : "",
-    tot.risks_raised ? `${tot.risks_raised} ${t("ui.unified.risks_raised", "predicted risks need attention")}` : "",
+  const categories = data.categories ?? [];
+  const attention = categories.filter((c) => c.status === "worth_attention" || c.status === "needs_closer_attention").length;
+  const steady = categories.filter((c) => c.status === "looking_good").length;
+  const notes = [
+    tot.blood_no_range ? `${tot.blood_no_range} results have no reference range, so they were not judged.` : "",
+    tot.blood_unavailable ? `${tot.blood_unavailable} results are unavailable.` : "",
   ].filter(Boolean);
   return (
     <section className="unified-summary" aria-label={t("ui.unified.summary", "Overall assessment")}>
-      <dl className="unified-numbers">
-        <div><dt>{t("ui.unified.within", "Blood results within range")}</dt><dd data-tone="good">{tot.blood_within}</dd></div>
-        <div><dt>{t("ui.unified.outside", "Blood results outside range")}</dt><dd data-tone="attention">{tot.blood_outside}</dd></div>
-        <div><dt>{t("ui.unified.risks", "Future risks assessed")}</dt><dd>{tot.risks_assessed}</dd></div>
-      </dl>
-      <div className="unified-bar" role="img" aria-label={`${tot.blood_within} within range, ${tot.blood_outside} outside range`}>
-        <span data-tone="good" style={{ width: pct(tot.blood_within) }} />
-        <span data-tone="attention" style={{ width: pct(tot.blood_outside) }} />
-        <span data-tone="neutral" style={{ width: pct(tot.blood_no_range) }} />
-        <span data-tone="faint" style={{ width: pct(tot.blood_unavailable) }} />
-      </div>
-      {sub.length > 0 ? <p className="muted">{sub.join(" · ")}</p> : null}
+      <p className="unified-status-line">
+        {categories.length > 0
+          ? `${steady} of ${categories.length} body systems look steady · ${attention} need closer attention`
+          : t("ui.unified.summary", "Overall assessment")}
+        {notes.length > 0 ? (
+          <span className="info-tip" tabIndex={0} aria-label={notes.join(" ")}>ⓘ<span>{notes.join(" ")}</span></span>
+        ) : null}
+      </p>
       {tot.metabolic_age != null ? (
         <div className="unified-metabolic">
           <span className="muted">{t("ui.unified.metabolic_age", "Your metabolic age")}</span>
           <strong>{`${tot.metabolic_age} years`}</strong>
-          <span className="muted">{t("ui.unified.metabolic_note", "An estimate of your body's metabolic health.")}</span>
         </div>
       ) : null}
     </section>
@@ -168,7 +181,8 @@ function CategoryCardView({ card, onOpen }: { card: CategoryCard; onOpen: () => 
     <button type="button" className="health-card" data-status={card.status} onClick={onOpen} aria-label={`${card.name}. ${card.status_label}.`}>
       <span className="health-card-icon"><HealthIcon name={card.icon} /></span>
       <strong className="health-card-name">{card.name}</strong>
-      <span className="health-card-description">{card.description}</span>
+      {(card.status === "worth_attention" || card.status === "needs_closer_attention") ? <span className="focus-badge">Focus Area</span> : null}
+      <span className="health-card-description">{card.summary || card.detail_line || card.description}</span>
       <span className="health-card-status" data-status={card.status}>{card.status_label}</span>
       <span className="health-card-foot">
         <span className="muted">{card.count_line}</span>
@@ -191,6 +205,7 @@ export function HealthOverviewView({
   onOpenReport: (kind: "blood" | "bio_ai") => void;
 }) {
   const query = useHealthOverview();
+  const view = useHealthView();
   const data = query.data;
   if (openId) return <CategoryScreen id={openId} onAsk={onAsk} />;
   if (query.isLoading) return <section className="overview" aria-busy="true"><p className="muted">{t("ui.unified.loading", "Putting your health picture together…")}</p></section>;
@@ -202,8 +217,7 @@ export function HealthOverviewView({
       </section>
     );
   }
-  const categories = data.categories ?? [];
-  const priorities = data.priorities ?? [];
+  const categories = [...(data.categories ?? [])].sort((a, b) => Number(b.status !== "looking_good") - Number(a.status !== "looking_good"));
   const prov: { blood_report_date?: string | null; bio_ai_report_date?: string | null } = data.provenance ?? {};
   if (!data.available || categories.length === 0) {
     return <section className="overview"><h2>{t("ui.unified.title", "My Health Overview")}</h2><p>{t("ui.unified.none", "No blood results or Bio-AI report are available yet.")}</p></section>;
@@ -215,20 +229,7 @@ export function HealthOverviewView({
       {dates.length > 0 ? <p className="muted">{dates.join(" | ")}</p> : null}
       {data.opening ? <p className="unified-opening">{data.opening}</p> : null}
       <Summary data={data} />
-      {priorities.length > 0 ? (
-        <section aria-labelledby="priorities-title">
-          <h3 id="priorities-title">{t("ui.unified.priorities", "Your health priorities")}</h3>
-          <ul className="priority-list">
-            {priorities.map((p) => (
-              <li key={p.category_id + p.title} data-tone={p.tone}>
-                <span className="priority-icon"><HealthIcon name={p.icon} size={20} /></span>
-                <div><strong>{p.title}</strong><p>{p.detail}</p></div>
-              </li>
-            ))}
-          </ul>
-          <button type="button" className="unified-overall" onClick={() => onAsk(data.overall_question, AREA_REF)}>{data.overall_question}</button>
-        </section>
-      ) : null}
+      <button type="button" className="unified-overall" onClick={() => onAsk(data.overall_question, areaRef(null, view.data?.snapshot_version))}>{data.overall_question}</button>
       <section aria-labelledby="explore-title">
         <h3 id="explore-title">{t("ui.unified.explore", "Explore your health")}</h3>
         <p className="muted">{t("ui.unified.explore_note", "Understand what's happening inside your body and what it could mean for your future health.")}</p>
@@ -237,9 +238,10 @@ export function HealthOverviewView({
         </div>
       </section>
       {(data.limitations ?? []).length > 0 ? (
-        <section className="overview-note" aria-label={t("ui.unified.limits", "What this overview could not cover")}>
+        <details className="overview-note">
+          <summary>{t("ui.unified.limits", "What this overview could not cover")}</summary>
           <ul>{(data.limitations ?? []).map((line) => <li key={line}>{line}</li>)}</ul>
-        </section>
+        </details>
       ) : null}
       <p className="muted unified-disclaimer">{data.disclaimer}</p>
       <p className="unified-reports muted">
@@ -252,6 +254,8 @@ export function HealthOverviewView({
 }
 
 function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
+  const view = useHealthView();
+  const cardRef = areaRef(id, view.data?.snapshot_version);
   const query = useHealthCategory(id);
   const [all, setAll] = useState(false);
   const d: CategoryDetail | undefined = query.data;
@@ -316,7 +320,7 @@ function CategoryScreen({ id, onAsk }: { id: string; onAsk: Ask }) {
         <section aria-labelledby="cat-follow">
           <h3 id="cat-follow" className="eyebrow">{t("ui.unified.continue", "Continue with CURA")}</h3>
           <div className="follow-list">
-            {followUps.map((q) => <button key={q} type="button" onClick={() => onAsk(q, AREA_REF)}>{q}<span aria-hidden="true">↗</span></button>)}
+            {followUps.map((q) => <button key={q} type="button" onClick={() => onAsk(q, cardRef)}>{q}<span aria-hidden="true">↗</span></button>)}
           </div>
         </section>
       ) : null}
@@ -354,7 +358,7 @@ function CategoryStoryView({ detail, story, onAsk }: { detail: CategoryDetail; s
             {story.self_reported.map((factor) => (
               <li key={factor.key}>
                 <div>
-                  <span className="finding-kind">Self-reported · {factor.source === "profile" ? "SuperShyft profile" : "Questionnaire"}</span>
+                  <span className="habit-pills"><span className="habit-pill">Self-reported</span><span className="habit-pill">{factor.source === "profile" ? "Profile" : "Questionnaire"}</span><span className="habit-pill">{factor.label}</span></span>
                   <p><strong>{factor.label}</strong> · {factor.value}{factor.unit ? ` ${factor.unit}` : ""}</p>
                 </div>
               </li>
@@ -390,7 +394,7 @@ function CategoryStoryView({ detail, story, onAsk }: { detail: CategoryDetail; s
         <h3 id="story-next">Your next steps</h3>
         {story.monitoring.map((line) => <p key={line}>{line}</p>)}
         <div className="follow-list">
-          {story.questions.map((q) => <button key={q} type="button" onClick={() => onAsk(q, AREA_REF)}>{q}<span aria-hidden="true">↗</span></button>)}
+          {story.questions.map((q) => <button key={q} type="button" onClick={() => onAsk(q, areaRef(detail.id, null))}>{q}<span aria-hidden="true">↗</span></button>)}
         </div>
       </section>
     </>

@@ -2,7 +2,6 @@ import json
 
 import pytest
 
-from app.core.config import settings
 from app.pipeline.prompt_modules import BIO_AI_RULES, house_system
 from app.retrieval.hybrid import HybridMedicalKnowledgeProvider
 from app.retrieval.medical import (
@@ -13,11 +12,6 @@ from app.retrieval.medical import (
 )
 
 provider = HybridMedicalKnowledgeProvider()
-
-
-@pytest.fixture(autouse=True)
-def reviewed_only(monkeypatch):
-    monkeypatch.setattr(settings, "medical_require_reviewed", True)
 
 
 def _guide():
@@ -119,5 +113,5 @@ def test_why_my_risk_is_high_if_my_marker_is_normal_is_personal():
         headers={"X-Cura-User-Id": "demo-user-001"},
         json={"message": "Why is my Bio-AI cardiac risk high if my cholesterol is normal?"},
     ).json()
-    sources = [s["name"].lower() for s in reply["provenance"]["sources"]]
-    assert any("bio-ai" in name or "blood report" in name for name in sources), sources
+    names = [s["name"] for s in reply["provenance"]["sources"]]
+    assert "WHO" not in names and "MedlinePlus" not in names

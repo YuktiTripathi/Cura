@@ -284,7 +284,7 @@ SHAPE 2, anything else: one result, one test, a disease, a food or nutrition que
 Reply in the language the instruction block names. Keep medical terms, numbers and units unchanged. No internal labels.
 
 FOLLOW-UP QUESTIONS
-follow_up_questions holds exactly 4 questions the person may tap next, written the way an ordinary person would type them, short and specific, 14 words or fewer, each ending with a question mark. One of each kind, in this order:
+follow_up_questions holds up to 4 questions, fewer if another would repeat or leave the topic. Write them as the person would type them, 14 words or fewer, each ending with ?. Use these kinds:
 1. Understanding: what a medical idea or an important finding in your answer means.
 2. Personal relevance: connect the explanation to this person's own results and any diet preference supplied, only where the supplied data supports it, such as which foods suit their diet for a low result. Never assume a symptom the person has not reported.
 3. Action: a meaningful next step, such as what to change, or what to ask a doctor.
@@ -394,6 +394,7 @@ HEALTH_AREA = (
     "Answer from all three, joined up by body system: say what the blood results in that area show in words (never repeat values, the cards show them) and what the Bio-AI estimate says, and say plainly when they agree or differ. "
     "A Bio-AI estimate and a blood result are different things: one predicts future risk, the other measures now. "
     "Never say the report has no blood results when markers are supplied; if none relates to the area asked about, say that one sentence only. "
+    "Stay on the organ system or biomarker the person asked about. Do not explain unrelated out-of-range results in the answer; those belong only in follow_up_questions. "
     "Use short bullets, a specific everyday step with how much or how often, and only habits the person told us."
 )
 

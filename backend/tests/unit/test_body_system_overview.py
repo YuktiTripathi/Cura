@@ -322,9 +322,10 @@ def test_unknown_names_are_kept_under_other_results_for_review():
 
 
 def test_tests_outside_the_supplied_registry_are_not_guessed_into_a_system():
-    for name, key in (("Ferritin", "ferritin"), ("Free T4", "free_t4"), ("Transferrin", "transferrin")):
-        ov = build_body_system_overview([report([m(name, 5, key=key)])])
-        assert [s.id for s in ov.systems] == ["other_unmapped"], name
+    ferritin = build_body_system_overview([report([m("Ferritin", 5, key="ferritin")])])
+    assert [s.id for s in ferritin.systems] == ["blood_iron"]
+    unknown = build_body_system_overview([report([m("Not A Real Assay", 5, key="not_a_real_assay")])])
+    assert [s.id for s in unknown.systems] == ["other_unmapped"]
 
 
 def test_report_flags_values_units_ranges_and_dates_are_preserved():

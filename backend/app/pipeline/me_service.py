@@ -156,6 +156,9 @@ def schedule_latest_preload(principal: AuthenticatedPrincipal, registry: Provide
         name="cura-health-preload",
         daemon=True,
     ).start()
+    from app.pipeline.overview_cache import schedule_overview_precompute
+
+    schedule_overview_precompute(principal, registry)
 
 
 def build_me_response(

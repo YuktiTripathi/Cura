@@ -1,0 +1,849 @@
+[
+  {
+    "relationship_id": "Q13-1",
+    "question_id": 13,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q14-2",
+    "question_id": 14,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q15-3",
+    "question_id": 15,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q16-4",
+    "question_id": 16,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q17-5",
+    "question_id": 17,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q41-6",
+    "question_id": 41,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "cardiac_health",
+      "hypertension"
+    ],
+    "user_explanation": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "clinical_limitations": [
+      "Reported time or sport does not establish exercise intensity, total activity or blood sugar response.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_activity",
+      "life_glucose"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q18-7",
+    "question_id": 18,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes"
+    ],
+    "user_explanation": "Sleep gives your body time to recover and can affect how it manages sugar.",
+    "clinical_limitations": [
+      "The answer describes perceived good-quality sleep, not a measured sleep disorder.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q19-8",
+    "question_id": 19,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-014",
+      "WB-016",
+      "WB-017",
+      "WB-003"
+    ],
+    "related_biomarker_ids": [
+      "ggtp",
+      "sgot_ast",
+      "sgpt_alt",
+      "triglycerides"
+    ],
+    "related_risk_ids": [
+      "cardiac_health"
+    ],
+    "user_explanation": "Alcohol can affect how your liver processes fats and may influence liver tests.",
+    "clinical_limitations": [
+      "Frequency does not establish total alcohol dose or liver disease.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q23-10",
+    "question_id": 23,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-036",
+      "WB-048",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_b12",
+      "hemoglobin_hb",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Your food supplies iron and vitamin B12, which help your body make healthy blood cells.",
+    "clinical_limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_iron",
+      "life_b12"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q24-11",
+    "question_id": 24,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-036",
+      "WB-048",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_b12",
+      "hemoglobin_hb",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Your food supplies iron and vitamin B12, which help your body make healthy blood cells.",
+    "clinical_limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_iron",
+      "life_b12"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q35-12",
+    "question_id": 35,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-036",
+      "WB-048",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_b12",
+      "hemoglobin_hb",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Your food supplies iron and vitamin B12, which help your body make healthy blood cells.",
+    "clinical_limitations": [
+      "Food labels and frequency do not establish nutrient amounts, absorption or deficiency.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_iron",
+      "life_b12"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q24-13",
+    "question_id": 24,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-038",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_c",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods.",
+    "clinical_limitations": [
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_c",
+      "life_iron"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q26-14",
+    "question_id": 26,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-038",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_c",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods.",
+    "clinical_limitations": [
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_c",
+      "life_iron"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q28-15",
+    "question_id": 28,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-038",
+      "WB-112",
+      "WB-116"
+    ],
+    "related_biomarker_ids": [
+      "vitamin_c",
+      "iron_serum"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "Vitamin C in some fruits and vegetables helps your body absorb iron from plant foods.",
+    "clinical_limitations": [
+      "Food frequency does not tell us the amount of vitamin C or iron absorbed.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_c",
+      "life_iron"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q27-16",
+    "question_id": 27,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "clinical_limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_liver",
+      "life_diet"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q29-17",
+    "question_id": 29,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "clinical_limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_liver",
+      "life_diet"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q33-18",
+    "question_id": 33,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "clinical_limitations": [
+      "Bread is not necessarily sugary; drink ingredients, serving sizes and the rest of the diet matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_liver",
+      "life_diet"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": [
+      "3",
+      "5"
+    ],
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q30-19",
+    "question_id": 30,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-039",
+      "WB-040",
+      "WB-041"
+    ],
+    "related_biomarker_ids": [
+      "t3",
+      "t4",
+      "tsh"
+    ],
+    "related_risk_ids": [
+      "thyroid"
+    ],
+    "user_explanation": "Your thyroid needs iodine to make its hormones. Iodised salt can supply iodine.",
+    "clinical_limitations": [
+      "Salt choice alone cannot establish iodine intake or thyroid disease; do not suggest extra salt.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q34-21",
+    "question_id": 34,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-006",
+      "WB-004"
+    ],
+    "related_biomarker_ids": [
+      "ldl_cholesterol_calculated",
+      "non_hdl_cholesterol"
+    ],
+    "related_risk_ids": [
+      "dyslipidemia",
+      "cardiac_health"
+    ],
+    "user_explanation": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "clinical_limitations": [
+      "The type of meat, cooking method, portion size and other foods matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_fat"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q35-22",
+    "question_id": 35,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-006",
+      "WB-004"
+    ],
+    "related_biomarker_ids": [
+      "ldl_cholesterol_calculated",
+      "non_hdl_cholesterol"
+    ],
+    "related_risk_ids": [
+      "dyslipidemia",
+      "cardiac_health"
+    ],
+    "user_explanation": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "clinical_limitations": [
+      "The type of meat, cooking method, portion size and other foods matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_fat"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q36-23",
+    "question_id": 36,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-089"
+    ],
+    "related_biomarker_ids": [
+      "urine_specific_gravity"
+    ],
+    "related_risk_ids": [],
+    "user_explanation": "When your body loses water, your kidneys may make more concentrated urine.",
+    "clinical_limitations": [
+      "Water glasses do not include all fluid sources or account for fluid restrictions.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [
+      "life_urine"
+    ],
+    "evidence_status": "partial_source_support_pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q2-24",
+    "question_id": 2,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "obesity",
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "clinical_limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q3-25",
+    "question_id": 3,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "obesity",
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "clinical_limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  },
+  {
+    "relationship_id": "Q5-26",
+    "question_id": 5,
+    "question_key": null,
+    "field_provenance": "staging export; production question_key and definition require confirmation",
+    "related_content_keys": [
+      "WB-067",
+      "WB-068"
+    ],
+    "related_biomarker_ids": [
+      "fasting_sugar",
+      "hba1c"
+    ],
+    "related_risk_ids": [
+      "obesity",
+      "type_2_diabetes",
+      "nafld"
+    ],
+    "user_explanation": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "clinical_limitations": [
+      "A single body measurement is not a diagnosis; body composition and measurement method matter.",
+      "This answer alone does not establish the cause of a result."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "retrieve_when": [
+      "questionnaire_answer_present",
+      "relevant_to_question",
+      "related_result_present_for_personal_interpretation"
+    ],
+    "option_values": null,
+    "model_contributor_confirmed": false
+  }
+]

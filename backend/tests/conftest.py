@@ -5,6 +5,7 @@ from app.providers.registry import set_registry
 from integrations.supershyft.db import reset_engine
 
 settings.health_provider = "mock"
+settings.member_snapshot_enabled = False
 settings.allow_mock_auth_with_real_health = True
 settings.mock_user_id = ""
 settings.allow_mock_header_override = False

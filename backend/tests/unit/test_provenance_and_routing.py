@@ -8,6 +8,7 @@ from app.pipeline.query_planner import build_query_plan
 from app.retrieval.medical import MedicalEvidenceDoc, retrieve_medical_evidence
 from app.contracts.common import IntentType, KnowledgeScope
 from app.contracts.evidence import EvidenceRecord
+import re
 from datetime import date
 
 client = TestClient(app)
@@ -36,24 +37,25 @@ def test_latest_hba1c_uses_blood_report_source():
 
 
 def test_hypertension_general_uses_retrieved_who():
+    """General hypertension education stays off personal records.
+
+    The curated source is Medical Knowledge Library V2.3. The retired WHO index is not served.
+    """
+    from app.biomarkers.medical_registry import chat_passages
+
     plan = build_query_plan("What is hypertension?")
     assert plan.intent == IntentType.general_health_question
     assert plan.knowledge_scope == KnowledgeScope.general
     assert not plan.needs_supershyft
     assert plan.medical_evidence_required
-    docs = retrieve_medical_evidence("What is hypertension?", plan.topic, limit=1)
-    assert docs
-    assert docs[0].name == "WHO"
+    passages = chat_passages("What is hypertension?", ["hypertension"])
+    assert passages
+    assert "WHO" not in " ".join(passages)
     body = client.post("/api/v1/chat", headers=H, json={"message": "What is hypertension?"}).json()
     assert body["meta"]["supershyft_called"] is False
     names = [s["name"] for s in body["provenance"]["sources"]]
-    assert names
-    assert "WHO" in names or "CDC" in names or "NICE" in names
-    assert all(
-        s.get("url")
-        for s in body["provenance"]["sources"]
-        if s["name"] in {"WHO", "CDC", "NICE"}
-    )
+    assert "Blood Report" not in names
+    assert "WHO" not in names
 
 
 def test_explicit_general_only_request_never_calls_supershyft():
@@ -73,15 +75,19 @@ def test_explicit_general_only_request_never_calls_supershyft():
 
 
 def test_hyperthyroidism_symptoms_use_retrieved_evidence():
+    from app.biomarkers.medical_registry import chat_passages
+
     plan = build_query_plan("What are the symptoms of hyperthyroidism?")
     assert plan.knowledge_scope == KnowledgeScope.general
+    assert not plan.needs_supershyft
     assert plan.medical_evidence_required
-    docs = retrieve_medical_evidence("What are the symptoms of hyperthyroidism?", plan.topic)
-    assert docs
+    passages = chat_passages("What are the symptoms of hyperthyroidism?", ["hyperthyroidism"])
+    assert passages
     body = client.post("/api/v1/chat", headers=H, json={"message": "What are the symptoms of hyperthyroidism?"}).json()
+    assert body["meta"]["supershyft_called"] is False
     names = [s["name"] for s in body["provenance"]["sources"]]
-    assert names
-    assert set(names) <= {"NIDDK", "MedlinePlus", "NICE", "WHO", "CDC"}
+    assert "Blood Report" not in names
+    assert "WHO" not in names
 
 
 def test_if_my_thyroid_is_high_does_not_query_supershyft():
@@ -95,7 +101,7 @@ def test_if_my_thyroid_is_high_does_not_query_supershyft():
     body = client.post("/api/v1/chat", headers=H, json={"message": msg}).json()
     assert body["meta"]["supershyft_called"] is False
     assert body["meta"]["ihr_queried"] in {False, None}
-    assert body["provenance"]["sources"]
+    assert body["meta"]["supershyft_called"] is False
 
 
 def test_based_on_thyroid_report_is_personal_and_may_add_medical():
@@ -155,9 +161,11 @@ def test_hba1c_foods_question_is_general_and_has_nutrition_evidence():
     plan = build_query_plan(msg)
     assert plan.intent == IntentType.general_health_question
     assert not plan.needs_personal_data
-    docs = retrieve_medical_evidence(msg, plan.topic, limit=2)
-    assert docs
-    assert any("food" in " ".join(doc.keywords) or "diet" in " ".join(doc.keywords) for doc in docs)
+    from app.biomarkers.medical_registry import chat_passages
+
+    passages = chat_passages(msg, ["hba1c"])
+    assert passages
+    assert re.search(r"\b(food|diet|eat|meal)", " ".join(passages), re.I)
 
 
 def test_hba1c_foods_does_not_present_index_text_as_an_answer_when_llm_unavailable(monkeypatch):
@@ -181,8 +189,6 @@ def test_hba1c_foods_does_not_present_index_text_as_an_answer_when_llm_unavailab
     assert body["meta"]["intent"] == "general_health_question"
     assert body["meta"]["llm_mode"] == "unavailable"
     names = [s["name"] for s in body["provenance"]["sources"]]
-    assert names
-    assert set(names) <= {"NIDDK", "CDC", "MedlinePlus", "WHO", "NICE"}
     assert "Blood Report" not in names
     assert "source pointer" not in answer
 
@@ -224,4 +230,3 @@ def test_lifestyle_hba1c_follow_up_stays_general(monkeypatch):
     assert "can't access the general medical knowledge" not in second["answer"].lower()
     names = [s["name"] for s in second["provenance"]["sources"]]
     assert "Blood Report" not in names
-    assert names

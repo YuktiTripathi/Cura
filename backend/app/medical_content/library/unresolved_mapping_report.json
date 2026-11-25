@@ -1,0 +1,1949 @@
+{
+  "count": 216,
+  "entries": [
+    {
+      "inventory_id": "WB-070",
+      "original_test_name": "Average Blood Glucose",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": "average_blood_glucose",
+      "production_canonical_id": null,
+      "proposal_evidence": "Descriptive proposal based on workbook label only; not a confirmed production ID."
+    },
+    {
+      "inventory_id": "WB-116",
+      "original_test_name": "Ferritin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": "ferritin",
+      "production_canonical_id": null,
+      "proposal_evidence": "Existing retrieval relationship map uses ferritin but primary registry does not contain it."
+    },
+    {
+      "inventory_id": "WB-117",
+      "original_test_name": "CK/CPK",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": "creatine_kinase",
+      "production_canonical_id": null,
+      "proposal_evidence": "Descriptive proposal based on workbook label only; not a confirmed production ID."
+    },
+    {
+      "inventory_id": "WB-118",
+      "original_test_name": "Lactate Dehydrogenase (LDH)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": "lactate_dehydrogenase",
+      "production_canonical_id": null,
+      "proposal_evidence": "Descriptive proposal based on workbook label only; not a confirmed production ID."
+    },
+    {
+      "inventory_id": "WB-119",
+      "original_test_name": "Pigeon Droppings",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-120",
+      "original_test_name": "Pigeon Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-121",
+      "original_test_name": "Turkey Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-122",
+      "original_test_name": "Epithelium + Serum Proteins Prot. Mouse",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-123",
+      "original_test_name": "Pig Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-124",
+      "original_test_name": "Goose Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-125",
+      "original_test_name": "Cat Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-126",
+      "original_test_name": "Cat Dander",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-127",
+      "original_test_name": "Budgerigar Dropping",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-128",
+      "original_test_name": "Dog Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-129",
+      "original_test_name": "Budgerigar Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-130",
+      "original_test_name": "Dog Dander",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-131",
+      "original_test_name": "Canarian Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-132",
+      "original_test_name": "Budgerigar Serum Proteins",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-133",
+      "original_test_name": "Rabbit Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-134",
+      "original_test_name": "Goat Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-135",
+      "original_test_name": "Chicken Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-136",
+      "original_test_name": "Chicken Droppings",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-137",
+      "original_test_name": "Sheep Epithelium",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-138",
+      "original_test_name": "Duck Feathers",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-139",
+      "original_test_name": "Cow Dander",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-140",
+      "original_test_name": "Penicillin V",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-141",
+      "original_test_name": "Penicillin G",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-142",
+      "original_test_name": "Benzocaine",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-143",
+      "original_test_name": "Aspirin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-144",
+      "original_test_name": "Ibuprofen",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-145",
+      "original_test_name": "Diclofenac",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-146",
+      "original_test_name": "Azithromycin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-147",
+      "original_test_name": "Sulfamethoxazole",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-148",
+      "original_test_name": "Gentamycin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-149",
+      "original_test_name": "Ascorbic Acid (Vitamin C)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-150",
+      "original_test_name": "Cobalamin (Vitamin B12)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-151",
+      "original_test_name": "Cephalosporin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-152",
+      "original_test_name": "Metronidazole",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-153",
+      "original_test_name": "Chloramphenicol",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-154",
+      "original_test_name": "Tetracycline",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-155",
+      "original_test_name": "Ofloxacin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-156",
+      "original_test_name": "Bromhexine",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-157",
+      "original_test_name": "Amoxicillin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-158",
+      "original_test_name": "Oxacillin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-159",
+      "original_test_name": "Ampicillin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-160",
+      "original_test_name": "Ciprofloxacin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-161",
+      "original_test_name": "Paracetamol",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-162",
+      "original_test_name": "Thiamine (Vitamin B1)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-163",
+      "original_test_name": "Prilocaine",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-164",
+      "original_test_name": "Euroglyphus Maynei",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-165",
+      "original_test_name": "Tyrophagus Putrescentiae",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-166",
+      "original_test_name": "Tobacco Dust",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-167",
+      "original_test_name": "Lepidoglyphus Destructor",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-168",
+      "original_test_name": "House Dust – IFCI 1",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-169",
+      "original_test_name": "Dermatophagoides Microceras",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-170",
+      "original_test_name": "Acarus Siro",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-171",
+      "original_test_name": "Blomia Tropicalis",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-172",
+      "original_test_name": "Glycyphagus Domesticus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-173",
+      "original_test_name": "Dermatophagoides Farinae",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-174",
+      "original_test_name": "Dermatophagoides Pteronyssinus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-175",
+      "original_test_name": "Hay Dust",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-176",
+      "original_test_name": "Books Dust",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-177",
+      "original_test_name": "Vespula Germanica",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-178",
+      "original_test_name": "Blatella Germanica",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-179",
+      "original_test_name": "Heterocera Mix",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-180",
+      "original_test_name": "Aedes Communis",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-181",
+      "original_test_name": "Housefly Musca Domestica",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-182",
+      "original_test_name": "Apis Mellifera",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-183",
+      "original_test_name": "Dactylis Glomerata",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-184",
+      "original_test_name": "Phleum Pratense",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-185",
+      "original_test_name": "Cynodon Dactylon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-186",
+      "original_test_name": "Lolium Perenne",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-187",
+      "original_test_name": "Agrostis Stolonifera",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-188",
+      "original_test_name": "Sorghum Halepense",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-189",
+      "original_test_name": "Festuca Elatior",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-190",
+      "original_test_name": "Phragmites Communis",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-191",
+      "original_test_name": "Penicillium Notatum",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-192",
+      "original_test_name": "Cladosporium Herbarum",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-193",
+      "original_test_name": "Aspergillus Fumigatus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-194",
+      "original_test_name": "Mucor Racemosus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-195",
+      "original_test_name": "Candida Albicans",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-196",
+      "original_test_name": "Alternaria Alternata",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-197",
+      "original_test_name": "Curvularia Lunata",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-198",
+      "original_test_name": "Trichoderma Viride",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-199",
+      "original_test_name": "Phoma Betae",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-200",
+      "original_test_name": "Rhizopus Nigricans",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-201",
+      "original_test_name": "Amaranthus Retroflexus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-202",
+      "original_test_name": "Eucalyptus Spp",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-203",
+      "original_test_name": "Xanthium Commune",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-204",
+      "original_test_name": "Morus Alba",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-205",
+      "original_test_name": "Prosopis Juliflora",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-206",
+      "original_test_name": "Nart V1 / Artemisia Vulgaris",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-207",
+      "original_test_name": "Acacia Spp",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-208",
+      "original_test_name": "Oak Wood",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-209",
+      "original_test_name": "Salix Caprea",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-210",
+      "original_test_name": "Chenopodium Album",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-211",
+      "original_test_name": "Brassica Napus",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-212",
+      "original_test_name": "Egg Plant / Aubergine",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-213",
+      "original_test_name": "Onion",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-214",
+      "original_test_name": "Garlic",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-215",
+      "original_test_name": "Cauliflower",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-216",
+      "original_test_name": "Pumpkin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-217",
+      "original_test_name": "Red Radish",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-218",
+      "original_test_name": "Sweet Potato",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-219",
+      "original_test_name": "Spinach",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-220",
+      "original_test_name": "Lettuce",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-221",
+      "original_test_name": "Cabbage",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-222",
+      "original_test_name": "Cucumber",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-223",
+      "original_test_name": "Carrot",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-224",
+      "original_test_name": "French Bean",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-225",
+      "original_test_name": "Broccoli",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-226",
+      "original_test_name": "Tomato",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-227",
+      "original_test_name": "Beet",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-228",
+      "original_test_name": "Potato",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-229",
+      "original_test_name": "Date",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-230",
+      "original_test_name": "Apricot",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-231",
+      "original_test_name": "Cherry",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-232",
+      "original_test_name": "Pineapple",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-233",
+      "original_test_name": "Plum",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-234",
+      "original_test_name": "Orange",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-235",
+      "original_test_name": "Grape",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-236",
+      "original_test_name": "Pomegranate",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-237",
+      "original_test_name": "Guava",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-238",
+      "original_test_name": "Cranberry",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-239",
+      "original_test_name": "Fig",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-240",
+      "original_test_name": "Olive",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-241",
+      "original_test_name": "Watermelon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-242",
+      "original_test_name": "Lychee",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-243",
+      "original_test_name": "Papaya",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-244",
+      "original_test_name": "Strawberry",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-245",
+      "original_test_name": "Mango",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-246",
+      "original_test_name": "Apple",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-247",
+      "original_test_name": "Banana",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-248",
+      "original_test_name": "Kiwi",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-249",
+      "original_test_name": "Melon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-250",
+      "original_test_name": "Peach",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-251",
+      "original_test_name": "Rice",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-252",
+      "original_test_name": "Mackerel",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-253",
+      "original_test_name": "Sardine",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-254",
+      "original_test_name": "Carp Fish",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-255",
+      "original_test_name": "Salmon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-256",
+      "original_test_name": "Fish (Cod)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-257",
+      "original_test_name": "Mutton",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-258",
+      "original_test_name": "Chicken Meat",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-259",
+      "original_test_name": "Turkey",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-260",
+      "original_test_name": "Duck Meat",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-261",
+      "original_test_name": "Beef",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-262",
+      "original_test_name": "Pork",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-263",
+      "original_test_name": "Crab",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-264",
+      "original_test_name": "Shrimp",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-265",
+      "original_test_name": "Lobster",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-266",
+      "original_test_name": "Whole Egg (Hen)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-267",
+      "original_test_name": "Egg Yolk Elisa",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-268",
+      "original_test_name": "Egg White Elisa",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-269",
+      "original_test_name": "Cheese Cheddar Type",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-270",
+      "original_test_name": "Coconut Milk",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-271",
+      "original_test_name": "Chocolate",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-272",
+      "original_test_name": "Coffee",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-273",
+      "original_test_name": "Tea",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-274",
+      "original_test_name": "Tofu (Bean Curd)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-275",
+      "original_test_name": "Curd",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-276",
+      "original_test_name": "Cow Milk",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-277",
+      "original_test_name": "Yogurt",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-278",
+      "original_test_name": "Yeast",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-279",
+      "original_test_name": "Mushrooms",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-280",
+      "original_test_name": "Casein (Milk Protein)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-281",
+      "original_test_name": "Raisin",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-282",
+      "original_test_name": "Wheat Flour",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-283",
+      "original_test_name": "Pea",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-284",
+      "original_test_name": "Pumpkin Seed",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-285",
+      "original_test_name": "Barley",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-286",
+      "original_test_name": "Peanut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-287",
+      "original_test_name": "Oats",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-288",
+      "original_test_name": "Maize",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-289",
+      "original_test_name": "Soya Bean",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-290",
+      "original_test_name": "Sunflower Seed",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-291",
+      "original_test_name": "Hazelnut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-292",
+      "original_test_name": "Semolina",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-293",
+      "original_test_name": "Walnut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-294",
+      "original_test_name": "Almond",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-295",
+      "original_test_name": "Cashew Nut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-296",
+      "original_test_name": "Sesame Seed",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-297",
+      "original_test_name": "Poppy (Seed)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-298",
+      "original_test_name": "Pistachio Nut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-299",
+      "original_test_name": "Flaxseed",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-300",
+      "original_test_name": "Lentil",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-301",
+      "original_test_name": "Coconut",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-302",
+      "original_test_name": "Cinnamon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-303",
+      "original_test_name": "Mint",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-304",
+      "original_test_name": "Mustard",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-305",
+      "original_test_name": "Vanilla",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-306",
+      "original_test_name": "Coriander",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-307",
+      "original_test_name": "Ginger",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-308",
+      "original_test_name": "Anise",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-309",
+      "original_test_name": "Cardamon",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-310",
+      "original_test_name": "Saffron",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-311",
+      "original_test_name": "Thyme",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-312",
+      "original_test_name": "Basil",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-313",
+      "original_test_name": "Oregano",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-314",
+      "original_test_name": "Fennel",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-315",
+      "original_test_name": "Sweet Pepper",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-316",
+      "original_test_name": "Cloves",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-317",
+      "original_test_name": "Curry",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-318",
+      "original_test_name": "Black Pepper",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-319",
+      "original_test_name": "Nutmeg",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-320",
+      "original_test_name": "Curcuma",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-321",
+      "original_test_name": "Jute",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-322",
+      "original_test_name": "Sheep Wool (Treated)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-323",
+      "original_test_name": "Silk (Bombyx Mori)",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-324",
+      "original_test_name": "Latex",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-325",
+      "original_test_name": "Henna",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-326",
+      "original_test_name": "Cotton Linters",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-327",
+      "original_test_name": "Ascaris",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-328",
+      "original_test_name": "Toxocara Canis",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-329",
+      "original_test_name": "Anisakis",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": null,
+      "production_canonical_id": null,
+      "proposal_evidence": "Individual allergen IDs absent from inspected primary registry; verify identity and assay first."
+    },
+    {
+      "inventory_id": "WB-330",
+      "original_test_name": "IGE total",
+      "reason": "No individual canonical ID in inspected primary registry; further registry/assay confirmation required.",
+      "approval_status": "requires_phase_2b_approval",
+      "proposed_canonical_id": "total_ige",
+      "production_canonical_id": null,
+      "proposal_evidence": "Descriptive proposal based on workbook label only; not a confirmed production ID."
+    }
+  ]
+}

@@ -103,7 +103,10 @@ _STYLE_REQUEST = re.compile(
 
 # Follow-ups that fit any answer ("any new symptoms?") are noise; only conversation-specific ones are kept.
 _GENERIC_FOLLOW_UP = re.compile(
-    r"\b(?:any (?:new )?(?:symptoms|medications?)|anything else|other questions?|how (?:are|do) you feel)\b", re.I
+    r"\b(?:any (?:new )?(?:symptoms|medications?)|anything else|other questions?|how (?:are|do) you feel|"
+    r"stands out most|everything in my report|focus on first|fuller picture of my health|next blood test|"
+    r"what should i focus on improving)\b",
+    re.I,
 )
 
 _SEMANTIC_CLARIFICATIONS = {
@@ -474,6 +477,25 @@ class ChatService:
         )
         if pre_safety.blocked:
             return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety)
+        if re.search(
+            r"\b(another (?:member|person|patient|user)|someone else(?:'s)?|other (?:member|person|patient))\b",
+            payload.message or "",
+            re.I,
+        ):
+            from app.pipeline.safety import PreSafetyDecision
+
+            return self._safety_block_response(
+                principal,
+                payload,
+                request_id,
+                eval_turn,
+                PreSafetyDecision(
+                    blocked=True,
+                    answer="I can only use the health records for the member who is signed in. I can't show another person's results.",
+                    category="out_of_scope",
+                    flags=["member_isolation"],
+                ),
+            )
         from app.pipeline.me_service import schedule_entry_preload
 
         schedule_entry_preload(principal, self.registry, payload.context_ref)
@@ -577,7 +599,15 @@ class ChatService:
             try:
                 pre_safety = classifier_future.result(timeout=float(settings.safety_classifier_timeout_seconds) + 2)
             except Exception:  # noqa: BLE001 - keep the rule decision and flag the outage
-                pre_safety.flags = [*(pre_safety.flags or []), "safety_classifier_unavailable"]
+                from app.pipeline.safety import SYMPTOM_HINT, educational_symptom_question
+                from app.pipeline.safety_messages import see_doctor_soon_message
+
+                flags = [*(pre_safety.flags or []), "safety_classifier_unavailable"]
+                if SYMPTOM_HINT.search(payload.message or "") and not educational_symptom_question(payload.message or ""):
+                    flags.append("symptom_caution")
+                    if not pre_safety.caution:
+                        pre_safety.caution = see_doctor_soon_message(getattr(pre_safety, "reply_language", None))
+                pre_safety.flags = flags
             eval_turn["pre_safety"] = pre_safety
             if pre_safety.blocked:
                 return self._safety_block_response(principal, payload, request_id, eval_turn, pre_safety, conv=conv)
@@ -1396,21 +1426,17 @@ class ChatService:
         if explainer_only:
             use_knowledge = True
         if use_knowledge:
-            # Three passages by default, five for broader "what should I do" questions (plan 4.5).
-            limit = 5 if re.search(r"\b(treatment|options|should|avoid|foods|diet|lifestyle|exercise)\b", payload.message, re.I) else 3
-            if explainer_only:
-                limit = 2
             with perf.stage("knowledge_lookup"):
+                from app.biomarkers.medical_registry import chat_passages, related_ids
                 from app.pipeline.evidence_inventory import requested_marker_keys
-                from app.retrieval.relationship_map import related_keys
 
-                focus = " ".join(related_keys(requested_marker_keys(payload.message), payload.message)[:6])
-                query_kwargs = {"only_provenance": BIO_AI_EXPLAINER} if explainer_only else {}
-                medical_hits = self.medical_knowledge.query(
-                    f"{payload.message} {focus}".strip(), plan.topic, limit=limit, **query_kwargs
-                )
-            context.medical_passages = [passage_label(doc) for doc in medical_hits]
-            attach_medical_evidence(context, medical_hits)
+                keys = list(requested_marker_keys(payload.message))
+                for key in list(keys):
+                    for other in related_ids(key)[:4]:
+                        if other not in keys:
+                            keys.append(other)
+                context.medical_passages = chat_passages(payload.message, keys[:8])
+            medical_hits = []
             ContextMerger().merge_into(context, plan, principal.subject_id)
         # Recent user statements ("I now work out 5 days a week") supersede older questionnaire answers.
         context.recent_user_messages = [
@@ -1624,6 +1650,44 @@ class ChatService:
         llm_follow = on_topic(llm_follow, payload.message, answer)
         suggestions = _topic_follow_ups(suggestions, payload.message, answer)
         eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)]
+        from app.contracts.followup import FollowUpSuggestion
+
+        model_items = [
+            FollowUpSuggestion(
+                text=question,
+                category="conversation",
+                intent=plan.intent.value,
+                requires_personal_context=plan.knowledge_scope != KnowledgeScope.general,
+                source="conversation",
+                knowledge_scope="general" if plan.knowledge_scope == KnowledgeScope.general else "personal",
+                handling_path="model",
+            )
+            for question in eval_turn["model_follow_ups"]
+        ]
+        seen = {item.text for item in model_items}
+        suggestions = model_items + [item for item in suggestions if item.text not in seen]
+        suggestions = [item for item in suggestions if not _GENERIC_FOLLOW_UP.search(item.text)]
+        if not re.search(r"\b(score|risk|bio-?ai|prediction)\b", payload.message or "", re.I):
+            suggestions = [item for item in suggestions if not re.search(r"\bscore\b", item.text, re.I)]
+        if not suggestions and plan.intent == IntentType.latest_result and plan.topic_name:
+            name = plan.topic_name
+            suggestions = [
+                FollowUpSuggestion(
+                    text=question,
+                    category="conversation",
+                    intent=plan.intent.value,
+                    requires_personal_context=False,
+                    source="conversation",
+                    handling_path="generator",
+                )
+                for question in (
+                    f"What does {name} do in the body?",
+                    f"Why does {name} matter?",
+                    f"How is {name} connected to my other results?",
+                    f"What can influence {name}?",
+                )
+            ]
+        suggestions = suggestions[:4]
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
@@ -1646,12 +1710,28 @@ class ChatService:
                     member_findings=self._member_findings(principal, plan, context),
                 )
         suggestions = _topic_follow_ups(suggestions, payload.message, pre_compose_answer)
+        suggestions = [item for item in suggestions if not _GENERIC_FOLLOW_UP.search(getattr(item, "text", "") or "")]
+        if not re.search(r"\b(score|risk|bio-?ai|prediction)\b", payload.message or "", re.I):
+            suggestions = [item for item in suggestions if not re.search(r"\bscore\b", getattr(item, "text", "") or "", re.I)]
         from app.pipeline.followup_generator import is_cross_source
 
         suggestions = [item for item in suggestions if not is_cross_source(getattr(item, "text", "") or "")]
         from app.pipeline.tone_signals import trim_follow_ups
 
         suggestions = trim_follow_ups(suggestions, tone.tone, bool(rewrite_angle))
+        if not suggestions and plan.intent == IntentType.latest_result and plan.topic_name:
+            from app.contracts.followup import FollowUpSuggestion
+
+            name = plan.topic_name
+            suggestions = [
+                FollowUpSuggestion(text=question, category="conversation", intent=plan.intent.value, handling_path="generator")
+                for question in (
+                    f"What does {name} do in the body?",
+                    f"Why does {name} matter?",
+                    f"How is {name} connected to my other results?",
+                    f"What can influence {name}?",
+                )
+            ]
         if presentation is not None:
             presentation.suggestion_chips = [item.text for item in suggestions if getattr(item, "text", None)]
             if presentation.summary and presentation.summary.strip() != (answer or "").strip():

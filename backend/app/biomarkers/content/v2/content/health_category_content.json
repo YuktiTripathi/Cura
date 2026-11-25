@@ -1,0 +1,412 @@
+[
+  {
+    "health_category": "heart_circulation",
+    "display_name": "Heart Circulation",
+    "short_description": "Your heart pumps blood and vessels carry it around your body.",
+    "what_happens_inside_my_body": [
+      "Your heart pumps blood and vessels carry it around your body."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "cholesterol_total",
+      "hdl_cholesterol_direct",
+      "triglycerides",
+      "non_hdl_cholesterol",
+      "chol_hdl_ratio",
+      "ldl_cholesterol_calculated",
+      "vldl_cholesterol",
+      "ldl_hdl_cholesterol",
+      "hdl_ldl_cholesterol_ratio",
+      "lipo_a_lipoprotein_a",
+      "apo_b_apolipoprotein_b"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my heart circulation results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "liver_health",
+    "display_name": "Liver Health",
+    "short_description": "Your liver processes nutrients, makes proteins and helps remove waste.",
+    "what_happens_inside_my_body": [
+      "Your liver processes nutrients, makes proteins and helps remove waste."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "albumin",
+      "alkaline_phosphatase",
+      "bilirubin_direct",
+      "bilirubin_total",
+      "ggtp",
+      "proteins_serum",
+      "sgot_ast",
+      "sgpt_alt",
+      "bilirubin_indirect",
+      "globulin",
+      "a_g_ratio",
+      "sgot_sgpt_ratio"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my liver health results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "blood_sugar_metabolism",
+    "display_name": "Blood Sugar Metabolism",
+    "short_description": "Your body turns food into energy and uses hormones to manage blood sugar.",
+    "what_happens_inside_my_body": [
+      "Your body turns food into energy and uses hormones to manage blood sugar."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "fasting_sugar",
+      "hba1c",
+      "fasting_insulin"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my blood sugar metabolism results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "kidney_urinary",
+    "display_name": "Kidney Urinary",
+    "short_description": "Your kidneys filter blood and balance water and salts.",
+    "what_happens_inside_my_body": [
+      "Your kidneys filter blood and balance water and salts."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "bun_urea_nitrogen",
+      "calcium_total",
+      "chlorides",
+      "creatinine",
+      "sodium",
+      "urea",
+      "uric_acid",
+      "bun_creatinine_ratio",
+      "urea_creatinine_ratio",
+      "egfr",
+      "phosphorus_inorganic",
+      "potassium",
+      "urine_ph_urine",
+      "urine_urobilinogen",
+      "urine_colour",
+      "urine_transparency",
+      "urine_sugar",
+      "urine_blood_urine",
+      "urine_rbc",
+      "urine_pus_cells",
+      "urine_epithelial_cells",
+      "urine_crystals",
+      "urine_cast",
+      "urine_bacteria",
+      "urine_yeast_cells",
+      "urine_nitrate",
+      "urine_urine_ketone",
+      "urine_urine_protein",
+      "urine_leukocyte_esterase",
+      "urine_bile_pigments",
+      "urine_specific_gravity",
+      "urine_volume_urine",
+      "urine_others_urine"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my kidney urinary results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "blood_iron",
+    "display_name": "Blood Iron",
+    "short_description": "Red blood cells deliver oxygen; iron supports their production.",
+    "what_happens_inside_my_body": [
+      "Red blood cells deliver oxygen; iron supports their production."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "absolute_basophils_count",
+      "absolute_eosinophils_count",
+      "absolute_lymphocyte_count",
+      "absolute_monocyte_count",
+      "absolute_neutrophil_count",
+      "esr_automated",
+      "hemoglobin_hb",
+      "mch",
+      "mchc",
+      "mcv",
+      "mpv_mean_platelet_count",
+      "pcv_hematocrit",
+      "platelet_count",
+      "wbc",
+      "rdw",
+      "neutrophils",
+      "eosinophils",
+      "lymphocytes",
+      "monocytes",
+      "basophils",
+      "rdw_cv",
+      "mentzer_index_mcv_rcc",
+      "red_blood_cells",
+      "gk_index",
+      "rdwi",
+      "iron_serum",
+      "tibc",
+      "ubic",
+      "transferrin_saturation"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my blood iron results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "vitamins_nutrition",
+    "display_name": "Vitamins Nutrition",
+    "short_description": "Vitamins and minerals help your cells, nerves and bones work.",
+    "what_happens_inside_my_body": [
+      "Vitamins and minerals help your cells, nerves and bones work."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "magnesium",
+      "zinc",
+      "vitamin_b12",
+      "vitamin_d_total_25_hydroxy",
+      "vitamin_c"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my vitamins nutrition results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "thyroid_health",
+    "display_name": "Thyroid Health",
+    "short_description": "Your thyroid makes hormones that help control energy use.",
+    "what_happens_inside_my_body": [
+      "Your thyroid makes hormones that help control energy use."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "t3",
+      "t4",
+      "tsh"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my thyroid health results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "immunity_inflammation",
+    "display_name": "Immunity Inflammation",
+    "short_description": "Your immune system responds to germs and injury.",
+    "what_happens_inside_my_body": [
+      "Your immune system responds to germs and injury."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "homocysteine",
+      "hs_crp",
+      "esr"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my immunity inflammation results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "hormonal_health",
+    "display_name": "Hormonal Health",
+    "short_description": "Hormones carry messages between different parts of your body.",
+    "what_happens_inside_my_body": [
+      "Hormones carry messages between different parts of your body."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "total_testosterone",
+      "dheas",
+      "igf_1",
+      "cortisol",
+      "pth",
+      "prolactin",
+      "lh",
+      "fsh"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my hormonal health results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "bone_mineral",
+    "display_name": "Bone Mineral",
+    "short_description": "Bones support your body and store minerals.",
+    "what_happens_inside_my_body": [
+      "Bones support your body and store minerals."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "calcium"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my bone mineral results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "cancer_related",
+    "display_name": "Cancer Related",
+    "short_description": "Some substances measured in blood can help clinicians monitor specific conditions.",
+    "what_happens_inside_my_body": [
+      "Some substances measured in blood can help clinicians monitor specific conditions."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [
+      "psa",
+      "cea",
+      "afp_alpha_feto_protein_amniotic_fluid",
+      "ca_19_9",
+      "ca_125",
+      "ca_15_3"
+    ],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my cancer related results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "sleep_recovery",
+    "display_name": "Sleep Recovery",
+    "short_description": "Rest supports recovery; some blood markers add context but do not measure sleep itself.",
+    "what_happens_inside_my_body": [
+      "Rest supports recovery; some blood markers add context but do not measure sleep itself."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my sleep recovery results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "allergy",
+    "display_name": "Allergy",
+    "short_description": "Your immune system can react to substances that are usually harmless.",
+    "what_happens_inside_my_body": [
+      "Your immune system can react to substances that are usually harmless."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my allergy results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "other_unmapped",
+    "display_name": "Other Unmapped",
+    "short_description": "These measurements are not yet grouped into a confirmed health category.",
+    "what_happens_inside_my_body": [
+      "These measurements are not yet grouped into a confirmed health category."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my other unmapped results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  },
+  {
+    "health_category": "other_risks",
+    "display_name": "Other Risks",
+    "short_description": "These predicted risks are not yet grouped into a confirmed category.",
+    "what_happens_inside_my_body": [
+      "These predicted risks are not yet grouped into a confirmed category."
+    ],
+    "why_it_matters": [
+      "Related measurements may give more context."
+    ],
+    "associated_biomarkers": [],
+    "associated_bio_ai_risks": [],
+    "suggested_questions": [
+      "What do my other risks results tell me?"
+    ],
+    "source_ids": [],
+    "review_status": "pending_clinical_review",
+    "draft_status": "partial"
+  }
+]

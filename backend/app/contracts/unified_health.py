@@ -40,6 +40,12 @@ class EducationNote(BaseModel):
     if_low: str = ""
     next_step: str = ""
     common_factors: str = ""
+    why_it_matters: str = ""
+    body: str = ""
+    limitations: str = ""
+    content_version: str = ""
+    review_status: str = ""
+    content_source: str = ""
 
 
 class Finding(BaseModel):

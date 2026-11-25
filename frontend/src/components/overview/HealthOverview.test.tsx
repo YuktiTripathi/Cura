@@ -7,6 +7,11 @@ import * as api from "../../lib/api";
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 
+function mockViewOff() {
+  vi.spyOn(api, "getHealthView").mockResolvedValue(null);
+  vi.spyOn(api, "getCurrentUser").mockResolvedValue({ user_id: "demo", first_name: null, last_name: null, display_name: null, greeting: "Hi", profile_available: false, capabilities: { has_blood_report: true, has_bio_ai_report: true, has_questionnaire: false, has_nutrition: false, has_health_scenario: false } });
+}
+
 const counts = { total: 2, within_range: 1, outside_range: 1, no_range: 0, unavailable: 0 };
 const card = (over: Record<string, unknown> = {}) => ({
   id: "liver_health", name: "Liver Health", description: "How your body processes food, breaks down medicines and removes waste.", icon: "liver", status: "worth_attention", status_label: "Worth paying attention to", completeness: "complete",
@@ -36,27 +41,31 @@ function wrap(ui: React.ReactElement) {
 
 describe("My Health Overview", () => {
   it("shows the combined summary, priorities and one card per category with one action each", async () => {
+    mockViewOff();
     vi.spyOn(api, "getHealthOverview").mockResolvedValue(overview);
     wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
     expect(await screen.findByText("Here is your whole picture.")).toBeTruthy();
-    expect(screen.getByText("42")).toBeTruthy();
-    expect(screen.getByText("Look after your liver")).toBeTruthy();
+    expect(screen.getByText(/1 of 2 body systems look steady/)).toBeTruthy();
+    expect(screen.getByText("43 years")).toBeTruthy();
+    expect(screen.queryByText("Look after your liver")).toBeNull();
     const cards = document.querySelectorAll("button.health-card");
     expect(cards).toHaveLength(2);
-    expect(screen.getAllByText("How your body processes food, breaks down medicines and removes waste.")).toHaveLength(1);
+    expect(screen.getByText("Focus Area")).toBeTruthy();
+    expect(screen.getByText("Two liver results are above range, even though your fatty liver risk is healthy.")).toBeTruthy();
     expect(screen.getAllByText("8 blood tests · 1 risk assessed").length).toBeGreaterThan(0);
     expect(screen.queryByText(/Explore my/)).toBeNull();
-    cards.forEach((c) => expect(c.textContent).not.toMatch(/outside range|above range|unavailable/));
     expect(screen.queryByText("What does this mean?")).toBeNull();
   });
 
   it("says what the overview could not cover", async () => {
+    mockViewOff();
     vi.spyOn(api, "getHealthOverview").mockResolvedValue({ ...overview, limitations: ["5 blood results have no reference range, so they were not judged as in or out of range."] } as unknown as UnifiedOverview);
     wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
-    expect(await screen.findByText(/have no reference range/)).toBeTruthy();
+    expect((await screen.findAllByText(/have no reference range/)).length).toBeGreaterThan(0);
   });
 
   it("opens a category and keeps individual reports reachable", async () => {
+    mockViewOff();
     vi.spyOn(api, "getHealthOverview").mockResolvedValue(overview);
     const onOpenChange = vi.fn();
     const onOpenReport = vi.fn();
@@ -68,6 +77,7 @@ describe("My Health Overview", () => {
   });
 
   it("shows measured and predicted findings in one list, expands the rest, and asks with the area context", async () => {
+    mockViewOff();
     vi.spyOn(api, "getHealthCategory").mockResolvedValue(detail);
     const onAsk = vi.fn();
     wrap(<HealthOverviewView onAsk={onAsk} openId="liver_health" onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
@@ -84,7 +94,7 @@ describe("My Health Overview", () => {
 
   it("prints verified values and ranges exactly as given", () => {
     render(<ul><FindingRow f={detail.findings![0]} /></ul>);
-    expect(screen.getByText(/0\.5 mg\/dL \(0 to 0\.3\)/)).toBeTruthy();
+    expect(screen.getByText(/0\.5 mg\/dL · 0 to 0\.3/)).toBeTruthy();
   });
 
   it("shows the source and date of each result and never implies one moment in time", () => {
@@ -109,6 +119,7 @@ describe("My Health Overview", () => {
   });
 
   it("says plainly when nothing is available", async () => {
+    mockViewOff();
     vi.spyOn(api, "getHealthOverview").mockResolvedValue({ ...overview, available: false, categories: [] } as unknown as UnifiedOverview);
     wrap(<HealthOverviewView onAsk={vi.fn()} openId={null} onOpenChange={vi.fn()} onOpenReport={vi.fn()} />);
     expect(await screen.findByText(/No blood results or Bio-AI report/)).toBeTruthy();
@@ -135,6 +146,7 @@ describe("About this test", () => {
 
 it("renders the six story sections and keeps each evidence source visible", async () => {
   const onAsk = vi.fn();
+  mockViewOff();
   vi.spyOn(api, "getHealthCategory").mockResolvedValue({
     ...detail,
     story: {
@@ -160,7 +172,7 @@ it("renders the six story sections and keeps each evidence source visible", asyn
   ]) {
     expect(await screen.findByRole("heading", { name })).toBeTruthy();
   }
-  expect(screen.getByText("Self-reported · Questionnaire")).toBeTruthy();
+  expect(screen.getByText("Questionnaire")).toBeTruthy();
   expect(screen.getByText("Your report placed this risk in the healthy band.")).toBeTruthy();
   expect(screen.getByText("This is above the range used by your lab.")).toBeTruthy();
   fireEvent.click(screen.getByRole("button", { name: "About this test" }));

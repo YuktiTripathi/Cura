@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "content_key",
+    "biomarker_id",
+    "original_test_names",
+    "health_category",
+    "content_type",
+    "short_description",
+    "what_happens_inside_my_body",
+    "why_this_test_matters",
+    "result_explanations",
+    "suggested_questions",
+    "source_ids",
+    "review_status"
+  ],
+  "properties": {
+    "content_key": {
+      "type": "string"
+    },
+    "biomarker_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "review_status": {
+      "const": "pending_clinical_review"
+    },
+    "what_happens_inside_my_body": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "suggested_questions": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "maxItems": 4,
+        "items": {
+          "type": "string"
+        }
+      }
+    },
+    "result_explanations": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "array",
+        "items": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

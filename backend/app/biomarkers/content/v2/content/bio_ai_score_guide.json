@@ -1,0 +1,22 @@
+{
+  "source": "CURA repository backend/app/retrieval/content/markdown/cura_bio_ai_knowledge_base.md",
+  "version": "1.0",
+  "explanations": [
+    "Bio-AI combines blood results and reported lifestyle information to highlight possible health risks.",
+    "The score is an engine indicator, not a diagnosis or disease probability.",
+    "A low score does not rule out disease.",
+    "Use current report labels and approved configuration; do not infer model weights or prediction time horizons."
+  ],
+  "sample_report_scale": {
+    "minimum": 0,
+    "maximum": 100,
+    "labels": [
+      "Healthy",
+      "Increased Risk",
+      "High Risk",
+      "Very High Risk"
+    ],
+    "note": "Repository guide describes sample-report ranges; underlying official sample report not independently inspected for this deliverable."
+  },
+  "review_status": "pending_clinical_review"
+}

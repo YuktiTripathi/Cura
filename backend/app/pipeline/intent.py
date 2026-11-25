@@ -496,6 +496,19 @@ def classify_intent(
     educational = is_educational_utterance(message)
     contextual = bool(follow_up_topic) and is_contextual_follow_up(message)
 
+    refers_to_active = bool(
+        follow_up_topic
+        and re.search(
+            r"\b(my result|this result|that result|this prediction|the prediction|does it|is it|is that)\b",
+            text,
+        )
+    )
+    if refers_to_active and not marker and not bio:
+        contextual = True
+        if follow_up_topic in BLOOD_KEYS or follow_up_topic not in BIO_KEYS:
+            marker = marker or follow_up_topic
+        elif follow_up_topic in BIO_KEYS:
+            bio = follow_up_topic
     if contextual and not marker and not bio:
         if follow_up_topic in BLOOD_KEYS:
             marker = follow_up_topic
@@ -555,6 +568,8 @@ def classify_intent(
     if bio and personal_turn:
         if marker and not _BIO_CUE.search(text):
             pass
+        elif _contains(text, "mean", "means", "explain", "interpret", "understand", "prediction"):
+            return IntentType.bio_ai_explanation, bio, _name(bio), depth
         else:
             return IntentType.bio_ai_score, bio, _name(bio), depth
     if bio and not personal_turn:

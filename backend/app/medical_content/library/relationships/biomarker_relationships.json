@@ -1,0 +1,4624 @@
+[
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your body needs stored iron to make haemoglobin for carrying oxygen.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-112",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "iron_serum",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Ferritin reflects stored iron; serum iron reflects iron circulating at collection.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-113",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "tibc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Stored iron and iron-carrying capacity help assess different parts of iron balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-115",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "transferrin_saturation",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Ferritin reflects iron stores, while saturation reflects how much transport capacity is filled.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-093",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "hs_crp",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Inflammation can raise ferritin even when iron stores are low; CRP adds context.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "HDL and LDL carry cholesterol in different particles; both add context to artery risk.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-003",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "triglycerides",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "Triglycerides are circulating energy fats and add context to the cholesterol pattern.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-001",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "cholesterol_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Total cholesterol includes HDL cholesterol. HDL helps carry cholesterol back to the liver.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-025",
+    "related_content_key": "WB-031",
+    "source_biomarker_id": "creatinine",
+    "related_biomarker_id": "egfr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is used to estimate how quickly your kidneys filter blood.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-025",
+    "related_content_key": "WB-027",
+    "source_biomarker_id": "creatinine",
+    "related_biomarker_id": "urea",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urea and creatinine are wastes removed by your kidneys. Their production differs.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-068",
+    "related_content_key": "WB-067",
+    "source_biomarker_id": "hba1c",
+    "related_biomarker_id": "fasting_sugar",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Fasting sugar is a single measurement; HbA1c reflects sugar levels over several weeks.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "a1c"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-068",
+    "related_content_key": "WB-069",
+    "source_biomarker_id": "hba1c",
+    "related_biomarker_id": "fasting_insulin",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "Insulin helps regulate sugar; its fasting level can add context to glucose patterns.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-041",
+    "related_content_key": "WB-039",
+    "source_biomarker_id": "tsh",
+    "related_biomarker_id": "t3",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "T3 and TSH help clarify certain patterns of thyroid overactivity.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-041",
+    "related_content_key": "WB-040",
+    "source_biomarker_id": "tsh",
+    "related_biomarker_id": "t4",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "TSH tells your thyroid to produce hormones, and T4 feeds back to regulate TSH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-037",
+    "related_content_key": "WB-023",
+    "source_biomarker_id": "vitamin_d_total_25_hydroxy",
+    "related_biomarker_id": "calcium_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin D helps your gut absorb calcium from food.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-037",
+    "related_content_key": "WB-099",
+    "source_biomarker_id": "vitamin_d_total_25_hydroxy",
+    "related_biomarker_id": "pth",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin D affects calcium absorption, which influences PTH release.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-037",
+    "related_content_key": "WB-032",
+    "source_biomarker_id": "vitamin_d_total_25_hydroxy",
+    "related_biomarker_id": "phosphorus_inorganic",
+    "relationship_type": "functional_context",
+    "priority": "primary",
+    "user_explanation": "Vitamin D helps regulate absorption of phosphate as well as calcium.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCV shows whether red cells are small or large, which helps explore low haemoglobin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-049",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "mch",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCH shows how much haemoglobin each red cell contains.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-056",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "rdw",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Variation in red cell size can help explore the cause of low haemoglobin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-017",
+    "related_content_key": "WB-016",
+    "source_biomarker_id": "sgpt_alt",
+    "related_biomarker_id": "sgot_ast",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Both AST and ALT may enter blood when liver cells are injured; AST also comes from muscle.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-017",
+    "related_content_key": "WB-011",
+    "source_biomarker_id": "sgpt_alt",
+    "related_biomarker_id": "alkaline_phosphatase",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "ALT and alkaline phosphatase can help distinguish patterns of liver cell injury and bile flow changes.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-017",
+    "related_content_key": "WB-014",
+    "source_biomarker_id": "sgpt_alt",
+    "related_biomarker_id": "ggtp",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "GGT adds context about liver and bile duct changes.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-017",
+    "related_content_key": "WB-013",
+    "source_biomarker_id": "sgpt_alt",
+    "related_biomarker_id": "bilirubin_total",
+    "relationship_type": "complementary",
+    "priority": "primary",
+    "user_explanation": "ALT reflects cell injury while bilirubin adds context about waste processing and removal.",
+    "retrieve_when": [
+      "interpretation_of_source_marker"
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review",
+    "clinical_limitations": [
+      "This association alone does not identify a diagnosis."
+    ]
+  },
+  {
+    "source_content_key": "WB-012",
+    "related_content_key": "WB-013",
+    "source_biomarker_id": "bilirubin_direct",
+    "related_biomarker_id": "bilirubin_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Direct bilirubin is one part of total bilirubin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-018",
+    "related_content_key": "WB-013",
+    "source_biomarker_id": "bilirubin_indirect",
+    "related_biomarker_id": "bilirubin_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Indirect bilirubin is the portion not yet processed by the liver, usually estimated from total and direct results.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-075",
+    "related_content_key": "WB-067",
+    "source_biomarker_id": "urine_sugar",
+    "related_biomarker_id": "fasting_sugar",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blood sugar may help explain sugar in urine, although kidney handling and medicines also matter.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "glucose"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-001",
+    "related_content_key": "WB-002",
+    "source_biomarker_id": "cholesterol_total",
+    "related_biomarker_id": "hdl_cholesterol_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Total cholesterol includes HDL cholesterol. HDL helps carry cholesterol back to the liver.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-001",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "cholesterol_total",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is one part of total cholesterol and is linked to artery buildup.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-001",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "cholesterol_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is one part of total cholesterol and is linked to artery buildup.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-001",
+    "related_content_key": "WB-004",
+    "source_biomarker_id": "cholesterol_total",
+    "related_biomarker_id": "non_hdl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL is total cholesterol minus HDL.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-004",
+    "related_content_key": "WB-001",
+    "source_biomarker_id": "non_hdl_cholesterol",
+    "related_biomarker_id": "cholesterol_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL is total cholesterol minus HDL.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-004",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "non_hdl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL excludes cholesterol carried in HDL particles.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-004",
+    "related_content_key": "WB-002",
+    "source_biomarker_id": "non_hdl_cholesterol",
+    "related_biomarker_id": "hdl_cholesterol_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL excludes cholesterol carried in HDL particles.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-003",
+    "related_content_key": "WB-007",
+    "source_biomarker_id": "triglycerides",
+    "related_biomarker_id": "vldl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "VLDL particles carry much of the triglyceride made by your liver.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-007",
+    "related_content_key": "WB-003",
+    "source_biomarker_id": "vldl_cholesterol",
+    "related_biomarker_id": "triglycerides",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "VLDL particles carry much of the triglyceride made by your liver.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-003",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "triglycerides",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Triglycerides can affect the accuracy of some LDL calculations.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-003",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "triglycerides",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Triglycerides can affect the accuracy of some LDL calculations.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-111",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "apo_b_apolipoprotein_b",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL measures cholesterol carried in LDL particles, while ApoB helps estimate the number of several types of particles.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-111",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "apo_b_apolipoprotein_b",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL measures cholesterol carried in LDL particles, while ApoB helps estimate the number of several types of particles.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-004",
+    "related_content_key": "WB-111",
+    "source_biomarker_id": "non_hdl_cholesterol",
+    "related_biomarker_id": "apo_b_apolipoprotein_b",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL measures cholesterol in several types of particles; ApoB helps estimate their number.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-111",
+    "related_content_key": "WB-004",
+    "source_biomarker_id": "apo_b_apolipoprotein_b",
+    "related_biomarker_id": "non_hdl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Non-HDL measures cholesterol in several types of particles; ApoB helps estimate their number.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-110",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "lipo_a_lipoprotein_a",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL and Lp(a) provide different information about the risk of artery disease.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-110",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "lipo_a_lipoprotein_a",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL and Lp(a) provide different information about the risk of artery disease.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-005",
+    "related_content_key": "WB-001",
+    "source_biomarker_id": "chol_hdl_ratio",
+    "related_biomarker_id": "cholesterol_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Total cholesterol is the top number in this ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-001",
+    "related_content_key": "WB-005",
+    "source_biomarker_id": "cholesterol_total",
+    "related_biomarker_id": "chol_hdl_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Total cholesterol is the top number in this ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-005",
+    "related_content_key": "WB-002",
+    "source_biomarker_id": "chol_hdl_ratio",
+    "related_biomarker_id": "hdl_cholesterol_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the bottom number in the total cholesterol to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-005",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "chol_hdl_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the bottom number in the total cholesterol to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-008",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "ldl_hdl_cholesterol",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is the top number in the LDL to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-008",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "ldl_hdl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is the top number in the LDL to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-008",
+    "related_content_key": "WB-002",
+    "source_biomarker_id": "ldl_hdl_cholesterol",
+    "related_biomarker_id": "hdl_cholesterol_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the bottom number in the LDL to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-008",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "ldl_hdl_cholesterol",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the bottom number in the LDL to HDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-009",
+    "related_content_key": "WB-002",
+    "source_biomarker_id": "hdl_ldl_cholesterol_ratio",
+    "related_biomarker_id": "hdl_cholesterol_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the top number in the HDL to LDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-002",
+    "related_content_key": "WB-009",
+    "source_biomarker_id": "hdl_cholesterol_direct",
+    "related_biomarker_id": "hdl_ldl_cholesterol_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "HDL is the top number in the HDL to LDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-009",
+    "related_content_key": "WB-006",
+    "source_biomarker_id": "hdl_ldl_cholesterol_ratio",
+    "related_biomarker_id": "ldl_cholesterol_calculated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is the bottom number in the HDL to LDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-006",
+    "related_content_key": "WB-009",
+    "source_biomarker_id": "ldl_cholesterol_calculated",
+    "related_biomarker_id": "hdl_ldl_cholesterol_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDL is the bottom number in the HDL to LDL ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "lipids"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-010",
+    "related_content_key": "WB-015",
+    "source_biomarker_id": "albumin",
+    "related_biomarker_id": "proteins_serum",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Albumin makes up a large part of total blood protein.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-015",
+    "related_content_key": "WB-010",
+    "source_biomarker_id": "proteins_serum",
+    "related_biomarker_id": "albumin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Albumin makes up a large part of total blood protein.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-015",
+    "related_content_key": "WB-019",
+    "source_biomarker_id": "proteins_serum",
+    "related_biomarker_id": "globulin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Globulins make up much of the blood protein apart from albumin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-019",
+    "related_content_key": "WB-015",
+    "source_biomarker_id": "globulin",
+    "related_biomarker_id": "proteins_serum",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Globulins make up much of the blood protein apart from albumin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-020",
+    "related_content_key": "WB-010",
+    "source_biomarker_id": "a_g_ratio",
+    "related_biomarker_id": "albumin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Albumin is one of the two proteins compared in this ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-010",
+    "related_content_key": "WB-020",
+    "source_biomarker_id": "albumin",
+    "related_biomarker_id": "a_g_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Albumin is one of the two proteins compared in this ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-020",
+    "related_content_key": "WB-019",
+    "source_biomarker_id": "a_g_ratio",
+    "related_biomarker_id": "globulin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Globulin is the other protein group in the albumin to globulin ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-019",
+    "related_content_key": "WB-020",
+    "source_biomarker_id": "globulin",
+    "related_biomarker_id": "a_g_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Globulin is the other protein group in the albumin to globulin ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-011",
+    "related_content_key": "WB-014",
+    "source_biomarker_id": "alkaline_phosphatase",
+    "related_biomarker_id": "ggtp",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALP can come from bones or liver; GGT may help clarify a liver or bile duct source.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-014",
+    "related_content_key": "WB-011",
+    "source_biomarker_id": "ggtp",
+    "related_biomarker_id": "alkaline_phosphatase",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALP can come from bones or liver; GGT may help clarify a liver or bile duct source.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-011",
+    "related_content_key": "WB-012",
+    "source_biomarker_id": "alkaline_phosphatase",
+    "related_biomarker_id": "bilirubin_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALP and direct bilirubin may both change when bile has trouble draining.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-012",
+    "related_content_key": "WB-011",
+    "source_biomarker_id": "bilirubin_direct",
+    "related_biomarker_id": "alkaline_phosphatase",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALP and direct bilirubin may both change when bile has trouble draining.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-013",
+    "related_content_key": "WB-012",
+    "source_biomarker_id": "bilirubin_total",
+    "related_biomarker_id": "bilirubin_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Direct bilirubin is one part of total bilirubin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-013",
+    "related_content_key": "WB-018",
+    "source_biomarker_id": "bilirubin_total",
+    "related_biomarker_id": "bilirubin_indirect",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Indirect bilirubin is the portion not yet processed by the liver, usually estimated from total and direct results.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-012",
+    "related_content_key": "WB-018",
+    "source_biomarker_id": "bilirubin_direct",
+    "related_biomarker_id": "bilirubin_indirect",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "These two forms help distinguish bilirubin before and after liver processing.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-018",
+    "related_content_key": "WB-012",
+    "source_biomarker_id": "bilirubin_indirect",
+    "related_biomarker_id": "bilirubin_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "These two forms help distinguish bilirubin before and after liver processing.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-016",
+    "related_content_key": "WB-017",
+    "source_biomarker_id": "sgot_ast",
+    "related_biomarker_id": "sgpt_alt",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Both AST and ALT may enter blood when liver cells are injured; AST also comes from muscle.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-021",
+    "related_content_key": "WB-016",
+    "source_biomarker_id": "sgot_sgpt_ratio",
+    "related_biomarker_id": "sgot_ast",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "AST is the first measurement in the AST to ALT ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-016",
+    "related_content_key": "WB-021",
+    "source_biomarker_id": "sgot_ast",
+    "related_biomarker_id": "sgot_sgpt_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "AST is the first measurement in the AST to ALT ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-021",
+    "related_content_key": "WB-017",
+    "source_biomarker_id": "sgot_sgpt_ratio",
+    "related_biomarker_id": "sgpt_alt",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALT is the second measurement in the AST to ALT ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-017",
+    "related_content_key": "WB-021",
+    "source_biomarker_id": "sgpt_alt",
+    "related_biomarker_id": "sgot_sgpt_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "ALT is the second measurement in the AST to ALT ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "liver"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-016",
+    "related_content_key": "WB-117",
+    "source_biomarker_id": "sgot_ast",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "AST and CK can both rise after muscle injury, so CK may help clarify a muscle source.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-117",
+    "related_content_key": "WB-016",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "sgot_ast",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "AST and CK can both rise after muscle injury, so CK may help clarify a muscle source.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-022",
+    "related_content_key": "WB-027",
+    "source_biomarker_id": "bun_urea_nitrogen",
+    "related_biomarker_id": "urea",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "BUN measures the nitrogen in urea; urea measures the whole waste substance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-027",
+    "related_content_key": "WB-022",
+    "source_biomarker_id": "urea",
+    "related_biomarker_id": "bun_urea_nitrogen",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "BUN measures the nitrogen in urea; urea measures the whole waste substance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-031",
+    "related_content_key": "WB-025",
+    "source_biomarker_id": "egfr",
+    "related_biomarker_id": "creatinine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is used to estimate how quickly your kidneys filter blood.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-025",
+    "related_content_key": "WB-022",
+    "source_biomarker_id": "creatinine",
+    "related_biomarker_id": "bun_urea_nitrogen",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Both are waste-related measurements, but protein intake and muscle mass affect them differently.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-022",
+    "related_content_key": "WB-025",
+    "source_biomarker_id": "bun_urea_nitrogen",
+    "related_biomarker_id": "creatinine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Both are waste-related measurements, but protein intake and muscle mass affect them differently.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-027",
+    "related_content_key": "WB-025",
+    "source_biomarker_id": "urea",
+    "related_biomarker_id": "creatinine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urea and creatinine are wastes removed by your kidneys. Their production differs.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "creatinine"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-029",
+    "related_content_key": "WB-022",
+    "source_biomarker_id": "bun_creatinine_ratio",
+    "related_biomarker_id": "bun_urea_nitrogen",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "BUN is the first measurement in the BUN to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-022",
+    "related_content_key": "WB-029",
+    "source_biomarker_id": "bun_urea_nitrogen",
+    "related_biomarker_id": "bun_creatinine_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "BUN is the first measurement in the BUN to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-029",
+    "related_content_key": "WB-025",
+    "source_biomarker_id": "bun_creatinine_ratio",
+    "related_biomarker_id": "creatinine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is the second measurement in the BUN to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-025",
+    "related_content_key": "WB-029",
+    "source_biomarker_id": "creatinine",
+    "related_biomarker_id": "bun_creatinine_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is the second measurement in the BUN to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-030",
+    "related_content_key": "WB-027",
+    "source_biomarker_id": "urea_creatinine_ratio",
+    "related_biomarker_id": "urea",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urea is the first measurement in the urea to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-027",
+    "related_content_key": "WB-030",
+    "source_biomarker_id": "urea",
+    "related_biomarker_id": "urea_creatinine_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urea is the first measurement in the urea to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-030",
+    "related_content_key": "WB-025",
+    "source_biomarker_id": "urea_creatinine_ratio",
+    "related_biomarker_id": "creatinine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is the second measurement in the urea to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-025",
+    "related_content_key": "WB-030",
+    "source_biomarker_id": "creatinine",
+    "related_biomarker_id": "urea_creatinine_ratio",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Creatinine is the second measurement in the urea to creatinine ratio.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-023",
+    "related_content_key": "WB-010",
+    "source_biomarker_id": "calcium_total",
+    "related_biomarker_id": "albumin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Some calcium in blood is attached to albumin, so albumin changes can affect total calcium.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-010",
+    "related_content_key": "WB-023",
+    "source_biomarker_id": "albumin",
+    "related_biomarker_id": "calcium_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Some calcium in blood is attached to albumin, so albumin changes can affect total calcium.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-023",
+    "related_content_key": "WB-099",
+    "source_biomarker_id": "calcium_total",
+    "related_biomarker_id": "pth",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH helps control blood calcium. Calcium is needed to interpret PTH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-099",
+    "related_content_key": "WB-023",
+    "source_biomarker_id": "pth",
+    "related_biomarker_id": "calcium_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH helps control blood calcium. Calcium is needed to interpret PTH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-023",
+    "related_content_key": "WB-037",
+    "source_biomarker_id": "calcium_total",
+    "related_biomarker_id": "vitamin_d_total_25_hydroxy",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin D helps your gut absorb calcium from food.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-032",
+    "related_content_key": "WB-099",
+    "source_biomarker_id": "phosphorus_inorganic",
+    "related_biomarker_id": "pth",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH affects how much phosphate your kidneys remove.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-099",
+    "related_content_key": "WB-032",
+    "source_biomarker_id": "pth",
+    "related_biomarker_id": "phosphorus_inorganic",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH affects how much phosphate your kidneys remove.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-032",
+    "related_content_key": "WB-031",
+    "source_biomarker_id": "phosphorus_inorganic",
+    "related_biomarker_id": "egfr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Kidneys remove phosphate; reduced filtering can affect phosphate balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-031",
+    "related_content_key": "WB-032",
+    "source_biomarker_id": "egfr",
+    "related_biomarker_id": "phosphorus_inorganic",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Kidneys remove phosphate; reduced filtering can affect phosphate balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-033",
+    "related_content_key": "WB-031",
+    "source_biomarker_id": "potassium",
+    "related_biomarker_id": "egfr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your kidneys help remove extra potassium and maintain its balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-031",
+    "related_content_key": "WB-033",
+    "source_biomarker_id": "egfr",
+    "related_biomarker_id": "potassium",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your kidneys help remove extra potassium and maintain its balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-034",
+    "related_content_key": "WB-033",
+    "source_biomarker_id": "magnesium",
+    "related_biomarker_id": "potassium",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Low magnesium can make low potassium harder to correct.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-033",
+    "related_content_key": "WB-034",
+    "source_biomarker_id": "potassium",
+    "related_biomarker_id": "magnesium",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Low magnesium can make low potassium harder to correct.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-034",
+    "related_content_key": "WB-023",
+    "source_biomarker_id": "magnesium",
+    "related_biomarker_id": "calcium_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Magnesium is involved in calcium control, including the action of PTH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-023",
+    "related_content_key": "WB-034",
+    "source_biomarker_id": "calcium_total",
+    "related_biomarker_id": "magnesium",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Magnesium is involved in calcium control, including the action of PTH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-039",
+    "related_content_key": "WB-040",
+    "source_biomarker_id": "t3",
+    "related_biomarker_id": "t4",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your body converts some T4 into T3, which helps control how cells use energy.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-040",
+    "related_content_key": "WB-039",
+    "source_biomarker_id": "t4",
+    "related_biomarker_id": "t3",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your body converts some T4 into T3, which helps control how cells use energy.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-040",
+    "related_content_key": "WB-041",
+    "source_biomarker_id": "t4",
+    "related_biomarker_id": "tsh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "TSH tells your thyroid to produce hormones, and T4 feeds back to regulate TSH.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-039",
+    "related_content_key": "WB-041",
+    "source_biomarker_id": "t3",
+    "related_biomarker_id": "tsh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "T3 and TSH help clarify certain patterns of thyroid overactivity.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-064",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "red_blood_cells",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Haemoglobin carries oxygen inside red cells; the cell count shows how many cells are present.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "hb"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-064",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "red_blood_cells",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Haemoglobin carries oxygen inside red cells; the cell count shows how many cells are present.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "hb"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-053",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "pcv_hematocrit",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Haematocrit measures how much of your blood is red cells; haemoglobin measures oxygen-carrying protein.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "hb"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-053",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "pcv_hematocrit",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Haematocrit measures how much of your blood is red cells; haemoglobin measures oxygen-carrying protein.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "hb"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCV shows whether red cells are small or large, which helps explore low haemoglobin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-049",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "mch",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCH shows how much haemoglobin each red cell contains.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-050",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": "mchc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCHC shows how concentrated haemoglobin is inside red cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-050",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "mchc",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCHC shows how concentrated haemoglobin is inside red cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-056",
+    "related_content_key": "WB-048",
+    "source_biomarker_id": "rdw",
+    "related_biomarker_id": "hemoglobin_hb",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Variation in red cell size can help explore the cause of low haemoglobin.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-056",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "rdw",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCV is the average size; RDW shows how much sizes differ.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-056",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "rdw",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MCV is the average size; RDW shows how much sizes differ.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-036",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "vitamin_b12",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "A shortage of vitamin B12 can make red cells larger.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-036",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "vitamin_b12",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "A shortage of vitamin B12 can make red cells larger.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-052",
+    "related_content_key": "WB-054",
+    "source_biomarker_id": "mpv_mean_platelet_count",
+    "related_biomarker_id": "platelet_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MPV measures average platelet size, while platelet count shows how many are present.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-054",
+    "related_content_key": "WB-052",
+    "source_biomarker_id": "platelet_count",
+    "related_biomarker_id": "mpv_mean_platelet_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "MPV measures average platelet size, while platelet count shows how many are present.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-062",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "rdw_cv",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "RDW-CV expresses size variation relative to average red cell size.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-062",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "rdw_cv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "RDW-CV expresses size variation relative to average red cell size.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "rbc_indices"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-063",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "mentzer_index_mcv_rcc",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The Mentzer index uses average red cell size; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-063",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "mentzer_index_mcv_rcc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The Mentzer index uses average red cell size; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-063",
+    "related_content_key": "WB-064",
+    "source_biomarker_id": "mentzer_index_mcv_rcc",
+    "related_biomarker_id": "red_blood_cells",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The Mentzer index uses the red cell count; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-064",
+    "related_content_key": "WB-063",
+    "source_biomarker_id": "red_blood_cells",
+    "related_biomarker_id": "mentzer_index_mcv_rcc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The Mentzer index uses the red cell count; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-065",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": "gk_index",
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The GK index is intended to explore small red cell patterns; confirm its formula first.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-065",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": "gk_index",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The GK index is intended to explore small red cell patterns; confirm its formula first.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-066",
+    "related_content_key": "WB-056",
+    "source_biomarker_id": "rdwi",
+    "related_biomarker_id": "rdw",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "RDWI uses red cell size variation; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-056",
+    "related_content_key": "WB-066",
+    "source_biomarker_id": "rdw",
+    "related_biomarker_id": "rdwi",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "RDWI uses red cell size variation; confirm the lab formula.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-067",
+    "related_content_key": "WB-068",
+    "source_biomarker_id": "fasting_sugar",
+    "related_biomarker_id": "hba1c",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Fasting sugar is a single measurement; HbA1c reflects sugar levels over several weeks.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "a1c"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-067",
+    "related_content_key": "WB-069",
+    "source_biomarker_id": "fasting_sugar",
+    "related_biomarker_id": "fasting_insulin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Fasting glucose gives context to how much insulin is circulating before a meal.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "glucose"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-069",
+    "related_content_key": "WB-067",
+    "source_biomarker_id": "fasting_insulin",
+    "related_biomarker_id": "fasting_sugar",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Fasting glucose gives context to how much insulin is circulating before a meal.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "glucose"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-068",
+    "related_content_key": "WB-070",
+    "source_biomarker_id": "hba1c",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Some average glucose results are calculated from HbA1c; confirm the reported method.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "a1c"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-070",
+    "related_content_key": "WB-068",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "hba1c",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Some average glucose results are calculated from HbA1c; confirm the reported method.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "a1c"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-067",
+    "related_content_key": "WB-075",
+    "source_biomarker_id": "fasting_sugar",
+    "related_biomarker_id": "urine_sugar",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blood sugar may help explain sugar in urine, although kidney handling and medicines also matter.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "glucose"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-076",
+    "related_content_key": "WB-077",
+    "source_biomarker_id": "urine_blood_urine",
+    "related_biomarker_id": "urine_rbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "A urine chemical blood signal may detect pigment even when intact red cells are not seen.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-077",
+    "related_content_key": "WB-076",
+    "source_biomarker_id": "urine_rbc",
+    "related_biomarker_id": "urine_blood_urine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "A urine chemical blood signal may detect pigment even when intact red cells are not seen.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-078",
+    "related_content_key": "WB-087",
+    "source_biomarker_id": "urine_pus_cells",
+    "related_biomarker_id": "urine_leukocyte_esterase",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Leukocyte esterase is a substance in white cells; microscopy can look for the cells themselves.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-087",
+    "related_content_key": "WB-078",
+    "source_biomarker_id": "urine_leukocyte_esterase",
+    "related_biomarker_id": "urine_pus_cells",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Leukocyte esterase is a substance in white cells; microscopy can look for the cells themselves.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-078",
+    "related_content_key": "WB-082",
+    "source_biomarker_id": "urine_pus_cells",
+    "related_biomarker_id": "urine_bacteria",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "White cells suggest inflammation; bacteria may provide context about possible infection or contamination.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-082",
+    "related_content_key": "WB-078",
+    "source_biomarker_id": "urine_bacteria",
+    "related_biomarker_id": "urine_pus_cells",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "White cells suggest inflammation; bacteria may provide context about possible infection or contamination.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-080",
+    "related_content_key": "WB-071",
+    "source_biomarker_id": "urine_crystals",
+    "related_biomarker_id": "urine_ph_urine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urine acidity affects which types of crystals can form.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-071",
+    "related_content_key": "WB-080",
+    "source_biomarker_id": "urine_ph_urine",
+    "related_biomarker_id": "urine_crystals",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urine acidity affects which types of crystals can form.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-080",
+    "related_content_key": "WB-089",
+    "source_biomarker_id": "urine_crystals",
+    "related_biomarker_id": "urine_specific_gravity",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "More concentrated urine may promote formation of certain crystals.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-089",
+    "related_content_key": "WB-080",
+    "source_biomarker_id": "urine_specific_gravity",
+    "related_biomarker_id": "urine_crystals",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "More concentrated urine may promote formation of certain crystals.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-085",
+    "related_content_key": "WB-067",
+    "source_biomarker_id": "urine_urine_ketone",
+    "related_biomarker_id": "fasting_sugar",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blood sugar helps put urine ketones into context, especially when insulin is insufficient.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-067",
+    "related_content_key": "WB-085",
+    "source_biomarker_id": "fasting_sugar",
+    "related_biomarker_id": "urine_urine_ketone",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blood sugar helps put urine ketones into context, especially when insulin is insufficient.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-086",
+    "related_content_key": "WB-031",
+    "source_biomarker_id": "urine_urine_protein",
+    "related_biomarker_id": "egfr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urine protein and eGFR describe different aspects of kidney health: leakage and filtering.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-031",
+    "related_content_key": "WB-086",
+    "source_biomarker_id": "egfr",
+    "related_biomarker_id": "urine_urine_protein",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urine protein and eGFR describe different aspects of kidney health: leakage and filtering.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-088",
+    "related_content_key": "WB-012",
+    "source_biomarker_id": "urine_bile_pigments",
+    "related_biomarker_id": "bilirubin_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Processed bilirubin can appear in urine when it accumulates in blood; confirm the urine assay.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-012",
+    "related_content_key": "WB-088",
+    "source_biomarker_id": "bilirubin_direct",
+    "related_biomarker_id": "urine_bile_pigments",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Processed bilirubin can appear in urine when it accumulates in blood; confirm the urine assay.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-072",
+    "related_content_key": "WB-013",
+    "source_biomarker_id": "urine_urobilinogen",
+    "related_biomarker_id": "bilirubin_total",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urobilinogen forms in the gut from bilirubin, so blood bilirubin may provide useful context.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-013",
+    "related_content_key": "WB-072",
+    "source_biomarker_id": "bilirubin_total",
+    "related_biomarker_id": "urine_urobilinogen",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Urobilinogen forms in the gut from bilirubin, so blood bilirubin may provide useful context.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "bilirubin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-093",
+    "related_content_key": "WB-047",
+    "source_biomarker_id": "hs_crp",
+    "related_biomarker_id": "esr_automated",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "CRP and ESR can both change during inflammation but respond differently over time.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-047",
+    "related_content_key": "WB-093",
+    "source_biomarker_id": "esr_automated",
+    "related_biomarker_id": "hs_crp",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "CRP and ESR can both change during inflammation but respond differently over time.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-093",
+    "related_content_key": "WB-094",
+    "source_biomarker_id": "hs_crp",
+    "related_biomarker_id": "esr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "CRP and ESR are different signs of inflammation; neither identifies its cause.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-094",
+    "related_content_key": "WB-093",
+    "source_biomarker_id": "esr",
+    "related_biomarker_id": "hs_crp",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "CRP and ESR are different signs of inflammation; neither identifies its cause.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-092",
+    "related_content_key": "WB-036",
+    "source_biomarker_id": "homocysteine",
+    "related_biomarker_id": "vitamin_b12",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin B12 helps your body process homocysteine.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-036",
+    "related_content_key": "WB-092",
+    "source_biomarker_id": "vitamin_b12",
+    "related_biomarker_id": "homocysteine",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin B12 helps your body process homocysteine.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-095",
+    "related_content_key": "WB-101",
+    "source_biomarker_id": "total_testosterone",
+    "related_biomarker_id": "lh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LH signals the ovaries or testes to make sex hormones, including testosterone.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-101",
+    "related_content_key": "WB-095",
+    "source_biomarker_id": "lh",
+    "related_biomarker_id": "total_testosterone",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LH signals the ovaries or testes to make sex hormones, including testosterone.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-095",
+    "related_content_key": "WB-102",
+    "source_biomarker_id": "total_testosterone",
+    "related_biomarker_id": "fsh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "FSH and testosterone provide different information about reproductive hormone function.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-102",
+    "related_content_key": "WB-095",
+    "source_biomarker_id": "fsh",
+    "related_biomarker_id": "total_testosterone",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "FSH and testosterone provide different information about reproductive hormone function.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-101",
+    "related_content_key": "WB-102",
+    "source_biomarker_id": "lh",
+    "related_biomarker_id": "fsh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LH and FSH are signals from the brain that help regulate ovaries or testes.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-102",
+    "related_content_key": "WB-101",
+    "source_biomarker_id": "fsh",
+    "related_biomarker_id": "lh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LH and FSH are signals from the brain that help regulate ovaries or testes.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-100",
+    "related_content_key": "WB-101",
+    "source_biomarker_id": "prolactin",
+    "related_biomarker_id": "lh",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "High prolactin may interfere with reproductive hormone signalling.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-101",
+    "related_content_key": "WB-100",
+    "source_biomarker_id": "lh",
+    "related_biomarker_id": "prolactin",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "High prolactin may interfere with reproductive hormone signalling.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-099",
+    "related_content_key": "WB-037",
+    "source_biomarker_id": "pth",
+    "related_biomarker_id": "vitamin_d_total_25_hydroxy",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Vitamin D affects calcium absorption, which influences PTH release.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-099",
+    "related_content_key": "WB-031",
+    "source_biomarker_id": "pth",
+    "related_biomarker_id": "egfr",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Kidneys help regulate minerals; kidney disease can alter PTH levels.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-031",
+    "related_content_key": "WB-099",
+    "source_biomarker_id": "egfr",
+    "related_biomarker_id": "pth",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Kidneys help regulate minerals; kidney disease can alter PTH levels.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-103",
+    "related_content_key": "WB-099",
+    "source_biomarker_id": "calcium",
+    "related_biomarker_id": "pth",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH helps regulate calcium; confirm which calcium assay was used.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-099",
+    "related_content_key": "WB-103",
+    "source_biomarker_id": "pth",
+    "related_biomarker_id": "calcium",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "PTH helps regulate calcium; confirm which calcium assay was used.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-107",
+    "related_content_key": "WB-012",
+    "source_biomarker_id": "ca_19_9",
+    "related_biomarker_id": "bilirubin_direct",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blocked bile drainage can raise both CA 19-9 and direct bilirubin, without proving cancer.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-012",
+    "related_content_key": "WB-107",
+    "source_biomarker_id": "bilirubin_direct",
+    "related_biomarker_id": "ca_19_9",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Blocked bile drainage can raise both CA 19-9 and direct bilirubin, without proving cancer.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-112",
+    "related_content_key": "WB-113",
+    "source_biomarker_id": "iron_serum",
+    "related_biomarker_id": "tibc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Serum iron measures iron carried in blood; TIBC estimates how much the transport protein could carry.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-113",
+    "related_content_key": "WB-112",
+    "source_biomarker_id": "tibc",
+    "related_biomarker_id": "iron_serum",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Serum iron measures iron carried in blood; TIBC estimates how much the transport protein could carry.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-112",
+    "related_content_key": "WB-115",
+    "source_biomarker_id": "iron_serum",
+    "related_biomarker_id": "transferrin_saturation",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Transferrin saturation estimates the share of iron transport capacity that is occupied.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-115",
+    "related_content_key": "WB-112",
+    "source_biomarker_id": "transferrin_saturation",
+    "related_biomarker_id": "iron_serum",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Transferrin saturation estimates the share of iron transport capacity that is occupied.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-113",
+    "related_content_key": "WB-114",
+    "source_biomarker_id": "tibc",
+    "related_biomarker_id": "ubic",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "TIBC describes total carrying capacity; UIBC describes the unused part. Confirm the lab definition.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-114",
+    "related_content_key": "WB-113",
+    "source_biomarker_id": "ubic",
+    "related_biomarker_id": "tibc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "TIBC describes total carrying capacity; UIBC describes the unused part. Confirm the lab definition.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-113",
+    "related_content_key": "WB-115",
+    "source_biomarker_id": "tibc",
+    "related_biomarker_id": "transferrin_saturation",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Iron-binding capacity is used with serum iron to calculate transferrin saturation.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-115",
+    "related_content_key": "WB-113",
+    "source_biomarker_id": "transferrin_saturation",
+    "related_biomarker_id": "tibc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Iron-binding capacity is used with serum iron to calculate transferrin saturation.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-112",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "iron_serum",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Ferritin reflects stored iron; serum iron reflects iron circulating at collection.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-113",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "tibc",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Stored iron and iron-carrying capacity help assess different parts of iron balance.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-115",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "transferrin_saturation",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Ferritin reflects iron stores, while saturation reflects how much transport capacity is filled.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "iron_tests"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-048",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "hemoglobin_hb",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Your body needs stored iron to make haemoglobin for carrying oxygen.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-093",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "hs_crp",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Inflammation can raise ferritin even when iron stores are low; CRP adds context.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-116",
+    "related_content_key": "WB-051",
+    "source_biomarker_id": null,
+    "related_biomarker_id": "mcv",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Low iron stores can lead to smaller red cells, measured by MCV.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-051",
+    "related_content_key": "WB-116",
+    "source_biomarker_id": "mcv",
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "Low iron stores can lead to smaller red cells, measured by MCV.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "ferritin"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-118",
+    "related_content_key": "WB-117",
+    "source_biomarker_id": null,
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDH can rise with injury in many tissues; CK can provide context about muscle injury.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-117",
+    "related_content_key": "WB-118",
+    "source_biomarker_id": null,
+    "related_biomarker_id": null,
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "LDH can rise with injury in many tissues; CK can provide context about muscle injury.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-042",
+    "related_content_key": "WB-061",
+    "source_biomarker_id": "absolute_basophils_count",
+    "related_biomarker_id": "basophils",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-061",
+    "related_content_key": "WB-042",
+    "source_biomarker_id": "basophils",
+    "related_biomarker_id": "absolute_basophils_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-042",
+    "related_content_key": "WB-055",
+    "source_biomarker_id": "absolute_basophils_count",
+    "related_biomarker_id": "wbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-055",
+    "related_content_key": "WB-042",
+    "source_biomarker_id": "wbc",
+    "related_biomarker_id": "absolute_basophils_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-043",
+    "related_content_key": "WB-058",
+    "source_biomarker_id": "absolute_eosinophils_count",
+    "related_biomarker_id": "eosinophils",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-058",
+    "related_content_key": "WB-043",
+    "source_biomarker_id": "eosinophils",
+    "related_biomarker_id": "absolute_eosinophils_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-043",
+    "related_content_key": "WB-055",
+    "source_biomarker_id": "absolute_eosinophils_count",
+    "related_biomarker_id": "wbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-055",
+    "related_content_key": "WB-043",
+    "source_biomarker_id": "wbc",
+    "related_biomarker_id": "absolute_eosinophils_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-044",
+    "related_content_key": "WB-059",
+    "source_biomarker_id": "absolute_lymphocyte_count",
+    "related_biomarker_id": "lymphocytes",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-059",
+    "related_content_key": "WB-044",
+    "source_biomarker_id": "lymphocytes",
+    "related_biomarker_id": "absolute_lymphocyte_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-044",
+    "related_content_key": "WB-055",
+    "source_biomarker_id": "absolute_lymphocyte_count",
+    "related_biomarker_id": "wbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-055",
+    "related_content_key": "WB-044",
+    "source_biomarker_id": "wbc",
+    "related_biomarker_id": "absolute_lymphocyte_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-045",
+    "related_content_key": "WB-060",
+    "source_biomarker_id": "absolute_monocyte_count",
+    "related_biomarker_id": "monocytes",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-060",
+    "related_content_key": "WB-045",
+    "source_biomarker_id": "monocytes",
+    "related_biomarker_id": "absolute_monocyte_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-045",
+    "related_content_key": "WB-055",
+    "source_biomarker_id": "absolute_monocyte_count",
+    "related_biomarker_id": "wbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-055",
+    "related_content_key": "WB-045",
+    "source_biomarker_id": "wbc",
+    "related_biomarker_id": "absolute_monocyte_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-046",
+    "related_content_key": "WB-057",
+    "source_biomarker_id": "absolute_neutrophil_count",
+    "related_biomarker_id": "neutrophils",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-057",
+    "related_content_key": "WB-046",
+    "source_biomarker_id": "neutrophils",
+    "related_biomarker_id": "absolute_neutrophil_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The absolute count shows the number of this type of white cell, while the percentage shows its share of all white cells.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-046",
+    "related_content_key": "WB-055",
+    "source_biomarker_id": "absolute_neutrophil_count",
+    "related_biomarker_id": "wbc",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  },
+  {
+    "source_content_key": "WB-055",
+    "related_content_key": "WB-046",
+    "source_biomarker_id": "wbc",
+    "related_biomarker_id": "absolute_neutrophil_count",
+    "relationship_type": "complementary_measurement",
+    "priority": "primary",
+    "user_explanation": "The total white cell count gives context to the number of this individual type of white cell.",
+    "retrieve_when": [
+      "interpretation",
+      "relationship",
+      "possible_causes"
+    ],
+    "clinical_limitations": [
+      "The two findings provide context but cannot establish a diagnosis or prove a cause."
+    ],
+    "source_ids": [
+      "differential"
+    ],
+    "evidence_status": "pending_claim_verification",
+    "review_status": "pending_clinical_review"
+  }
+]

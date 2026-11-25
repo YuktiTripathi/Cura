@@ -56,14 +56,11 @@ def _load() -> tuple[dict[str, EducationNote], dict[str, str]]:
 
 
 def education_for(canonical_id: str | None, *names: str | None) -> EducationNote | None:
-    by_name, by_canonical = _load()
-    if canonical_id and canonical_id in by_canonical:
-        return by_name.get(by_canonical[canonical_id])
-    for name in names:
-        hit = by_name.get(normalize_label(name or ""))
-        if hit:
-            return hit
-    return None
+    """V2.3 only. A missing entry stays empty. The older education file is not a fallback."""
+
+    from app.biomarkers.content_registry import note_for
+
+    return note_for(canonical_id, *names)
 
 
 def first_sentence(text: str) -> str:

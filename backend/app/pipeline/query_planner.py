@@ -211,7 +211,7 @@ def build_query_plan(
         plan.needs_general = True
         plan.source = QuerySource.general
     if context_ref:
-        plan = _apply_context_ref(plan, context_ref)
+        plan = _apply_card_context(plan, context_ref, message)
         if context_ref.document_id and context_ref.document_id not in (document_ids or []):
             document_ids = [*(document_ids or []), context_ref.document_id]
     plan = apply_source_routing(
@@ -272,6 +272,60 @@ def _apply_kind_needs(update: dict, entry_point: str | None) -> None:
     update.update(entry_point=entry_point, needs_blood=spec.needs_blood, needs_bio_ai=spec.needs_bio_ai)
     if spec.needs_questionnaire:
         update["needs_questionnaire"] = True
+
+
+def _named_keys(plan: QueryPlan) -> set[str]:
+    keys = {item for item in (plan.requested_metrics or []) if item}
+    if plan.topic:
+        keys.add(plan.topic)
+    return keys
+
+
+def _apply_card_context(plan: QueryPlan, ref: ContextRef, message: str) -> QueryPlan:
+    """Card context is a hint. A named topic in the message wins. General questions stay general."""
+    from app.core.config import settings
+
+    if settings.member_snapshot_enabled:
+        named = _named_keys(plan)
+        card_key = (ref.marker_code or ref.risk_code or "").strip().lower().replace(" ", "_")
+        if plan.needs_general and not plan.needs_supershyft and not named:
+            logger_keys = "general"
+            _log_evidence(logger_keys, ref, plan)
+            return plan
+        if named and card_key and card_key not in named and not any(card_key in item or item in card_key for item in named):
+            _log_evidence(",".join(sorted(named)), ref, plan)
+            return plan
+    plan = _apply_context_ref(plan, ref)
+    if settings.member_snapshot_enabled and ref.marker_code and ref.type == "blood_marker":
+        from app.biomarkers.medical_registry import related_ids
+
+        key = primary_lab_key(ref.marker_code) or ref.marker_code.lower().replace(" ", "_")
+        text = (message or "").lower()
+        expand = any(word in text for word in ("why", "related", "connected", "together", "compare", "other"))
+        extras = [item for item in related_ids(key) if item and item != key] if expand else []
+        metrics = list(plan.requested_metrics or [])
+        for item in extras[:6]:
+            if item not in metrics:
+                metrics.append(item)
+        if key not in metrics:
+            metrics.insert(0, key)
+        plan = plan.model_copy(update={"requested_metrics": metrics})
+        if any(word in (message or "").lower() for word in ("previous", "history", "compare", "trend", "last time")):
+            plan = plan.model_copy(update={"history": True, "compare": True})
+    _log_evidence(",".join(sorted(_named_keys(plan))), ref, plan)
+    return plan
+
+
+def _log_evidence(entities: str, ref: ContextRef, plan: QueryPlan) -> None:
+    import logging
+
+    logging.getLogger("cura.snapshot").info(
+        "evidence_selection entities=%s card_type=%s personal=%s history=%s",
+        entities or "-",
+        ref.type,
+        bool(plan.needs_supershyft or plan.needs_blood or plan.needs_bio_ai),
+        bool(plan.history or plan.compare),
+    )
 
 
 def _apply_context_ref(plan: QueryPlan, ref: ContextRef) -> QueryPlan:

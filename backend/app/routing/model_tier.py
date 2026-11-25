@@ -656,6 +656,14 @@ def assess_answer_complexity(
         score += 3
         reasons.append("uploaded_document_analysis")
 
+    simple_definition = bool(
+        re.match(r"\s*(?:what(?:'s| is| are)|tell me about)\b", text, re.I)
+        and not re.search(r"\bmy\b", text, re.I)
+        and not _RELATION.search(text)
+    )
+    if simple_definition:
+        reasons.append("simple_general_definition")
+        return TierAssessment(1, AnswerModelTier.fast_reasoning, reasons)
     return TierAssessment(score, tier_for_score(score), reasons)
 
 

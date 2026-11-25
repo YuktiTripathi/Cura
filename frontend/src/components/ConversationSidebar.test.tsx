@@ -31,6 +31,7 @@ vi.mock("../lib/api", async () => {
         personal_unavailable: false,
       },
     })),
+    getHealthView: vi.fn(async () => null),
     listConversations: vi.fn(async () => [...conversations]),
     getConversation: vi.fn(async (id: string) => ({
       id,
@@ -133,5 +134,8 @@ describe("CuraPage shell", () => {
     expect(sidebar).toBeTruthy();
     expect(sidebar?.textContent).toContain("Recent conversations");
     expect(document.querySelector(".page")).toBeNull();
+    fireEvent.click(screen.getByRole("button", { name: /My Health Overview/ }));
+    expect(screen.getByRole("heading", { name: "Health information is unavailable" })).toBeTruthy();
+    expect(screen.queryByText("How can I help you understand your health better?")).toBeNull();
   });
 });

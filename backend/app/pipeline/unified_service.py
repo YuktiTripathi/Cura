@@ -72,12 +72,25 @@ def _has_consent(principal: AuthenticatedPrincipal, db: Session | None) -> bool:
     )
 
 
-def unified_overview(principal: AuthenticatedPrincipal, registry: ProviderRegistry, db: Session | None = None):
+def build_overview(principal: AuthenticatedPrincipal, registry: ProviderRegistry, db: Session | None = None, *, with_wording: bool = True):
     blood, bio = _load(principal, registry)
-    return build_unified_overview(blood, bio, _wording(principal, registry, db, blood, bio))
+    wording = _wording(principal, registry, db, blood, bio) if with_wording else None
+    return build_unified_overview(blood, bio, wording)
 
 
-def unified_category(principal: AuthenticatedPrincipal, registry: ProviderRegistry, category_id: str, db: Session | None = None):
+def unified_overview(principal: AuthenticatedPrincipal, registry: ProviderRegistry, db: Session | None = None):
+    from app.contracts.unified_health import UnifiedOverview
+    from app.pipeline.overview_cache import overview_key, read_payload, schedule_overview_precompute
+
+    cached = read_payload(overview_key(principal.subject_id))
+    if cached:
+        return UnifiedOverview.model_validate(cached)
+    # A tap before the background job finishes gets the lab and Bio-AI numbers without waiting on the model.
+    schedule_overview_precompute(principal, registry)
+    return build_overview(principal, registry, db, with_wording=False)
+
+
+def build_category(principal: AuthenticatedPrincipal, registry: ProviderRegistry, category_id: str, db: Session | None = None, *, allow_model: bool | None = None):
     blood, bio = _load(principal, registry)
     detail = build_category_detail(category_id, blood, bio)
     if detail is None:
@@ -89,8 +102,20 @@ def unified_category(principal: AuthenticatedPrincipal, registry: ProviderRegist
     entities.extend(f.id.removeprefix("risk:") for f in detail.findings if f.source_type == "predicted_risk")
     consent = _has_consent(principal, db)
     profile = load_profile(principal, registry, entities) if consent else CategoryProfile(None, None, [])
-    detail.story = build_story(detail, profile, principal.subject_id, allow_model=settings.enable_llm and consent)
+    use_model = settings.enable_llm and consent if allow_model is None else bool(allow_model and consent)
+    detail.story = build_story(detail, profile, principal.subject_id, allow_model=use_model)
     return detail
+
+
+def unified_category(principal: AuthenticatedPrincipal, registry: ProviderRegistry, category_id: str, db: Session | None = None):
+    from app.contracts.unified_health import CategoryDetail
+    from app.pipeline.overview_cache import read_payload, schedule_overview_precompute, system_key
+
+    cached = read_payload(system_key(principal.subject_id, category_id))
+    if cached:
+        return CategoryDetail.model_validate(cached)
+    schedule_overview_precompute(principal, registry)
+    return build_category(principal, registry, category_id, db, allow_model=False)
 
 
 def unified_finding(principal: AuthenticatedPrincipal, registry: ProviderRegistry, finding_id: str):

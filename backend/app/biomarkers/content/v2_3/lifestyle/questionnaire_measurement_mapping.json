@@ -1,0 +1,525 @@
+[
+  {
+    "question_id": 92,
+    "candidate_content_keys": [
+      "WB-048"
+    ],
+    "candidate_canonical_ids": [
+      "hemoglobin_hb"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 93,
+    "candidate_content_keys": [
+      "WB-064"
+    ],
+    "candidate_canonical_ids": [
+      "red_blood_cells"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 94,
+    "candidate_content_keys": [
+      "WB-055"
+    ],
+    "candidate_canonical_ids": [
+      "wbc"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 95,
+    "candidate_content_keys": [
+      "WB-057",
+      "WB-046"
+    ],
+    "candidate_canonical_ids": [
+      "neutrophils",
+      "absolute_neutrophil_count"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 96,
+    "candidate_content_keys": [
+      "WB-059",
+      "WB-044"
+    ],
+    "candidate_canonical_ids": [
+      "lymphocytes",
+      "absolute_lymphocyte_count"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 97,
+    "candidate_content_keys": [
+      "WB-060",
+      "WB-045"
+    ],
+    "candidate_canonical_ids": [
+      "monocytes",
+      "absolute_monocyte_count"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 98,
+    "candidate_content_keys": [
+      "WB-058",
+      "WB-043"
+    ],
+    "candidate_canonical_ids": [
+      "eosinophils",
+      "absolute_eosinophils_count"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 99,
+    "candidate_content_keys": [
+      "WB-061",
+      "WB-042"
+    ],
+    "candidate_canonical_ids": [
+      "basophils",
+      "absolute_basophils_count"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 100,
+    "candidate_content_keys": [
+      "WB-054"
+    ],
+    "candidate_canonical_ids": [
+      "platelet_count"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 101,
+    "candidate_content_keys": [
+      "WB-052"
+    ],
+    "candidate_canonical_ids": [
+      "mpv_mean_platelet_count"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 102,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 103,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 104,
+    "candidate_content_keys": [
+      "WB-013"
+    ],
+    "candidate_canonical_ids": [
+      "bilirubin_total"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 105,
+    "candidate_content_keys": [
+      "WB-012"
+    ],
+    "candidate_canonical_ids": [
+      "bilirubin_direct"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 106,
+    "candidate_content_keys": [
+      "WB-016"
+    ],
+    "candidate_canonical_ids": [
+      "sgot_ast"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 107,
+    "candidate_content_keys": [
+      "WB-017"
+    ],
+    "candidate_canonical_ids": [
+      "sgpt_alt"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 108,
+    "candidate_content_keys": [
+      "WB-011"
+    ],
+    "candidate_canonical_ids": [
+      "alkaline_phosphatase"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 109,
+    "candidate_content_keys": [
+      "WB-015"
+    ],
+    "candidate_canonical_ids": [
+      "proteins_serum"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 110,
+    "candidate_content_keys": [
+      "WB-010"
+    ],
+    "candidate_canonical_ids": [
+      "albumin"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 111,
+    "candidate_content_keys": [
+      "WB-019"
+    ],
+    "candidate_canonical_ids": [
+      "globulin"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 112,
+    "candidate_content_keys": [
+      "WB-014"
+    ],
+    "candidate_canonical_ids": [
+      "ggtp"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 113,
+    "candidate_content_keys": [
+      "WB-067"
+    ],
+    "candidate_canonical_ids": [
+      "fasting_sugar"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 114,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 115,
+    "candidate_content_keys": [
+      "WB-025"
+    ],
+    "candidate_canonical_ids": [
+      "creatinine"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 116,
+    "candidate_content_keys": [
+      "WB-022"
+    ],
+    "candidate_canonical_ids": [
+      "bun_urea_nitrogen"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 117,
+    "candidate_content_keys": [
+      "WB-028"
+    ],
+    "candidate_canonical_ids": [
+      "uric_acid"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 118,
+    "candidate_content_keys": [
+      "WB-023",
+      "WB-103"
+    ],
+    "candidate_canonical_ids": [
+      "calcium_total",
+      "calcium"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 119,
+    "candidate_content_keys": [
+      "WB-031"
+    ],
+    "candidate_canonical_ids": [
+      "egfr"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 120,
+    "candidate_content_keys": [
+      "WB-001"
+    ],
+    "candidate_canonical_ids": [
+      "cholesterol_total"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 121,
+    "candidate_content_keys": [
+      "WB-003"
+    ],
+    "candidate_canonical_ids": [
+      "triglycerides"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 122,
+    "candidate_content_keys": [
+      "WB-002"
+    ],
+    "candidate_canonical_ids": [
+      "hdl_cholesterol_direct"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 123,
+    "candidate_content_keys": [
+      "WB-006"
+    ],
+    "candidate_canonical_ids": [
+      "ldl_cholesterol_calculated"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 124,
+    "candidate_content_keys": [
+      "WB-039"
+    ],
+    "candidate_canonical_ids": [
+      "t3"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 125,
+    "candidate_content_keys": [
+      "WB-040"
+    ],
+    "candidate_canonical_ids": [
+      "t4"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 126,
+    "candidate_content_keys": [
+      "WB-041"
+    ],
+    "candidate_canonical_ids": [
+      "tsh"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 127,
+    "candidate_content_keys": [
+      "WB-069"
+    ],
+    "candidate_canonical_ids": [
+      "fasting_insulin"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 128,
+    "candidate_content_keys": [
+      "WB-094"
+    ],
+    "candidate_canonical_ids": [
+      "esr"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 129,
+    "candidate_content_keys": [
+      "WB-068"
+    ],
+    "candidate_canonical_ids": [
+      "hba1c"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 130,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 131,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 132,
+    "candidate_content_keys": [
+      "WB-118"
+    ],
+    "candidate_canonical_ids": [],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 133,
+    "candidate_content_keys": [],
+    "candidate_canonical_ids": [],
+    "status": "no_matching_inventory_parameter",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 134,
+    "candidate_content_keys": [
+      "WB-093"
+    ],
+    "candidate_canonical_ids": [
+      "hs_crp"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 135,
+    "candidate_content_keys": [
+      "WB-117"
+    ],
+    "candidate_canonical_ids": [],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 136,
+    "candidate_content_keys": [
+      "WB-037"
+    ],
+    "candidate_canonical_ids": [
+      "vitamin_d_total_25_hydroxy"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 137,
+    "candidate_content_keys": [
+      "WB-036"
+    ],
+    "candidate_canonical_ids": [
+      "vitamin_b12"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 138,
+    "candidate_content_keys": [
+      "WB-101"
+    ],
+    "candidate_canonical_ids": [
+      "lh"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 139,
+    "candidate_content_keys": [
+      "WB-102"
+    ],
+    "candidate_canonical_ids": [
+      "fsh"
+    ],
+    "status": "candidate_label_match",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  },
+  {
+    "question_id": 140,
+    "candidate_content_keys": [
+      "WB-095"
+    ],
+    "candidate_canonical_ids": [
+      "total_testosterone"
+    ],
+    "status": "requires_unit_assay_or_fraction_confirmation",
+    "note": "Never replace IHR blood result; preserve questionnaire provenance, units and date."
+  }
+]

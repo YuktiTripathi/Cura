@@ -400,6 +400,8 @@ class OpenAICompatibleLLMClient:
                             streamer.feed(delta)
                             if streamer.emitted:
                                 self._answer_streamed = True
+                                if getattr(self, "first_visible_ms", None) is None:
+                                    self.first_visible_ms = int((time.perf_counter() - started) * 1000)
         except httpx.HTTPError as exc:
             openrouter_breaker.record_failure()
             raise LLMUnavailableError("LLM request failed") from exc

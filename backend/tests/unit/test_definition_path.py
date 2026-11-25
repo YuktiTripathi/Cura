@@ -27,7 +27,6 @@ def reviewed_hba1c(tmp_path, monkeypatch):
         "expires_on": (today + timedelta(days=300)).isoformat(),
     }]))
     monkeypatch.setattr(medical, "CONTENT_DIR", tmp_path)
-    monkeypatch.setattr(settings, "medical_require_reviewed", True)
     monkeypatch.setattr(settings, "enable_llm", True)
     calls = []
 

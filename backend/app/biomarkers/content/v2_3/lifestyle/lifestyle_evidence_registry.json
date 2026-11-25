@@ -1,0 +1,62 @@
+[
+  {
+    "source_id": "life_activity",
+    "title": "CDC physical activity benefits",
+    "url": "https://www.cdc.gov/physical-activity-basics/health-benefits/adults.html",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_glucose",
+    "title": "CDC activity and diabetes",
+    "url": "https://www.cdc.gov/diabetes/living-with/physical-activity.html",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_liver",
+    "title": "NIDDK fatty liver diagnosis",
+    "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/diagnosis",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_iron",
+    "title": "NIH iron",
+    "url": "https://ods.od.nih.gov/factsheets/iron-consumer/",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_b12",
+    "title": "NIH vitamin B12",
+    "url": "https://ods.od.nih.gov/factsheets/vitaminb12-consumer/",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_c",
+    "title": "NIH vitamin C",
+    "url": "https://ods.od.nih.gov/factsheets/VitaminC-consumer/",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_salt",
+    "title": "AHA blood pressure diet",
+    "url": "https://www.heart.org/en/health-topics/high-blood-pressure/changes-you-can-make-to-manage-high-blood-pressure/managing-blood-pressure-with-a-heart-healthy-diet/",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_fat",
+    "title": "AHA fats",
+    "url": "https://www.heart.org/en/healthy-living/healthy-eating/eat-smart/fats/fats-in-foods",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_diet",
+    "title": "AHA dietary guidance",
+    "url": "https://professional.heart.org/en/science-news/2026-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know",
+    "verification": "search excerpt inspected; full claim verification pending"
+  },
+  {
+    "source_id": "life_urine",
+    "title": "MedlinePlus urine specific gravity",
+    "url": "https://medlineplus.gov/ency/article/003587.htm",
+    "verification": "search excerpt inspected; full claim verification pending"
+  }
+]

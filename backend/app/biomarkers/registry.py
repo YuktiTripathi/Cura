@@ -153,6 +153,22 @@ def load_registry() -> Registry:
         if canonical not in entries:
             raise RegistryError(f"review note for unknown canonical id {canonical!r}")
 
+    extension_path = DATA_DIR / "identity_extension_v2.json"
+    if extension_path.exists():
+        extension = json.loads(extension_path.read_text(encoding="utf-8"))
+        known_systems = {system.id for system in __import__("app.biomarkers.systems", fromlist=["SYSTEMS"]).SYSTEMS}
+        for item in extension.get("entries") or []:
+            canonical = item["canonical_id"]
+            if canonical in entries or canonical.startswith("WB-"):
+                continue
+            primary = item.get("health_category") or "other_unmapped"
+            if primary not in known_systems:
+                primary = "other_unmapped"
+            entries[canonical] = RegistryEntry(canonical_id=canonical, primary_system=primary, secondary_systems=())
+            label = normalize_label(item.get("original_name") or "", spelling)
+            if label:
+                by_label.setdefault(label, []).append((canonical, ""))
+
     return Registry(
         version=str(overlay["registry_version"]),
         status=str(overlay.get("status", "")),

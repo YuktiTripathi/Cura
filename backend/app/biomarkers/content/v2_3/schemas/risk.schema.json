@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": [
+    "risk_id",
+    "display_name",
+    "what_happens_inside_my_body",
+    "why_it_matters",
+    "clinical_limitations",
+    "suggested_questions",
+    "source_ids",
+    "review_status"
+  ],
+  "properties": {
+    "what_happens_inside_my_body": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "why_it_matters": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "clinical_limitations": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    },
+    "suggested_questions": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 4
+    },
+    "source_ids": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "review_status": {
+      "const": "pending_clinical_review"
+    }
+  }
+}

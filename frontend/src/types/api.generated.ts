@@ -1363,8 +1363,12 @@ export interface components {
         };
         /** ContextRef */
         ContextRef: {
+            /** Category Id */
+            category_id?: string | null;
             /** Document Id */
             document_id?: string | null;
+            /** Finding Id */
+            finding_id?: string | null;
             /** Entry Point */
             entry_point?: ("blood_report_overview" | "risk_explainer" | "health_area") | null;
             /** Marker Code */
@@ -1373,6 +1377,8 @@ export interface components {
             report_id?: string | null;
             /** Risk Code */
             risk_code?: string | null;
+            /** Snapshot Version */
+            snapshot_version?: string | null;
             /**
              * Source
              * @enum {string}

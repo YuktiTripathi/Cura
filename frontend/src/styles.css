@@ -1,3 +1,20 @@
+.cura-home, .cura-overview, .cura-category, .cura-detail { padding: 1.25rem 1rem 2rem; max-width: min(40rem, 100%); box-sizing: border-box; }
+.main-column, .main-scroll { min-width: 0; }
+.cura-home h1, .cura-overview h1, .cura-detail h1 { font-size: 1.75rem; letter-spacing: -0.02em; margin: 0.25rem 0 0.5rem; }
+.lede { font-size: 1.05rem; color: var(--text-muted); }
+.primary-action, .starter { min-height: 44px; border-radius: 999px; border: 1px solid var(--border-card); background: var(--surface); color: var(--text); padding: 0.6rem 1rem; }
+.primary-action { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+.starter-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
+.result-card { background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1rem; }
+.health-card span { display: block; font-weight: 400; color: var(--text-muted); }
+.range-track { position: relative; height: 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border-subtle); margin: 0.5rem 0; }
+.range-mark { position: absolute; top: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); transform: translateX(-50%); }
+.cura-detail, .cura-category, .cura-overview, .cura-home { overflow-wrap: anywhere; }
+.composer-dock { position: sticky; bottom: 0; }
+@media (min-width: 768px) {
+  .cura-home, .cura-overview, .cura-category, .cura-detail { padding-left: 2rem; max-width: 46rem; }
+}
+
 /* Design tokens. Light values match the original palette; dark overrides below. */
 :root {
   --bg: #f4f7fb;
@@ -1308,6 +1325,17 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .finding-row { display: flex; justify-content: space-between; gap: 12px; padding: 8px 0; border-bottom: 1px solid var(--border-divider); }
 .finding-main { display: grid; gap: 2px; }
 .finding-kind { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--text-faint); }
+.unified-status-line { font-size: 1.15rem; font-weight: 650; }
+.info-tip { position: relative; margin-left: 8px; cursor: help; font-weight: 500; }
+.info-tip span { display: none; position: absolute; left: 0; top: 1.4rem; width: 240px; padding: 8px; background: var(--surface, #fff); border: 1px solid var(--border, #d8dde6); border-radius: 8px; font-size: 0.85rem; font-weight: 400; }
+.info-tip:hover span, .info-tip:focus span { display: block; }
+.focus-badge { display: inline-block; font-size: 0.75rem; padding: 2px 8px; border-radius: 999px; background: #fff4e5; }
+.range-bar { display: block; min-width: 140px; }
+.range-bar-track { position: relative; display: block; height: 8px; border-radius: 999px; background: linear-gradient(90deg, #f3d2d2, #d9f0df 50%, #f3d2d2); margin-bottom: 4px; }
+.range-bar-mark { position: absolute; top: -3px; width: 4px; height: 14px; background: #1f2933; border-radius: 2px; }
+.habit-pills { display: flex; flex-wrap: wrap; gap: 8px; }
+.habit-pill { border: 1px solid var(--border, #d8dde6); border-radius: 999px; padding: 2px 8px; font-size: 0.8rem; }
+.analyzed-pill { display: inline-block; margin: 0 0 8px; padding: 2px 8px; border-radius: 999px; background: var(--surface-2, #f4f6f8); font-size: 0.8rem; }
 .finding-side { display: grid; gap: 2px; text-align: right; align-content: start; }
 .finding-status { font-weight: 600; font-size: 0.9rem; }
 .finding-status[data-tone="good"] { color: #2e6b3a; }

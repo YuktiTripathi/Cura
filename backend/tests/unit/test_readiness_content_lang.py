@@ -55,16 +55,12 @@ def test_unreviewed_index_is_not_served_when_review_required(monkeypatch):
         for doc in medical.load_content_dir(medical.CONTENT_DIR)
     )
     monkeypatch.setattr(medical, "load_content_dir", lambda _path: drafts)
-    monkeypatch.setattr(settings, "medical_require_reviewed", True)
     assert medical.retrieve_medical_evidence("what is hypertension") == []
-    monkeypatch.setattr(settings, "medical_require_reviewed", False)
-    assert medical.retrieve_medical_evidence("what is hypertension")
 
 
 def test_content_files_are_loaded(tmp_path, monkeypatch):
     (tmp_path / "vitd.json").write_text(json.dumps([{**_doc().__dict__, "topics": ["vitamin_d"], "keywords": ["vitamin d"]}]))
     monkeypatch.setattr(medical, "CONTENT_DIR", tmp_path)
-    monkeypatch.setattr(settings, "medical_require_reviewed", True)
     monkeypatch.setattr(medical, "is_servable", lambda doc, today=None: doc.review_status == "published")
     hits = medical.retrieve_medical_evidence("is my vitamin d low")
     assert [d.name for d in hits] == ["ICMR"]

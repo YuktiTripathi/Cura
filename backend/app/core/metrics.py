@@ -20,6 +20,11 @@ SAFETY_FLAGS = Counter("cura_safety_flags_total", "Safety flags raised", ["flag"
 TOKENS = Counter("cura_llm_tokens_total", "Model tokens", ["kind", "tier"])
 ANSWER_CACHE = Counter("cura_answer_cache_total", "Model answer cache lookups", ["result"])
 HEALTH_DATA_CACHE = Counter("cura_health_data_cache_total", "Supershyft read cache lookups", ["kind", "result"])
+SNAPSHOT_CACHE = Counter("cura_member_snapshot_cache_total", "Member snapshot cache lookups", ["result"])
+SNAPSHOT_BUILD = Histogram("cura_member_snapshot_build_seconds", "Member snapshot assembly", ["outcome"], buckets=_LATENCY_BUCKETS)
+SNAPSHOT_PAYLOAD_BYTES = Gauge("cura_member_snapshot_payload_bytes", "Last member snapshot payload size")
+SNAPSHOT_NAVIGATION = Histogram("cura_member_snapshot_navigation_seconds", "Snapshot slice latency", ["screen"], buckets=_LATENCY_BUCKETS)
+EXPLORATION_LLM = Counter("cura_exploration_llm_calls_total", "LLM calls from health exploration")
 SPEND_SPIKE = Counter("cura_spend_spike_downgrades_total", "Deep answers sent to standard during a spend spike")
 COST = Counter("cura_llm_cost_usd_total", "Estimated model cost in USD", ["tier"])
 

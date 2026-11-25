@@ -22,6 +22,9 @@ class ContextRef(BaseModel):
     document_id: str | None = Field(default=None, max_length=36)
     # Set only by an explicit entry point. Message text must not infer this.
     entry_point: Literal["blood_report_overview", "risk_explainer", "health_area"] | None = None
+    category_id: str | None = Field(default=None, max_length=64)
+    finding_id: str | None = Field(default=None, max_length=128)
+    snapshot_version: str | None = Field(default=None, max_length=64)
 
     @model_validator(mode="after")
     def validate_identifiers(self) -> "ContextRef":

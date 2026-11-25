@@ -430,9 +430,7 @@ def load_markdown_dir(path: Path) -> tuple[MedicalEvidenceDoc, ...]:
 
 def active_corpus() -> tuple[MedicalEvidenceDoc, ...]:
     corpus = CORPUS + load_content_dir(CONTENT_DIR) + load_markdown_dir(CONTENT_DIR / "markdown")
-    if settings.medical_require_reviewed_enabled():
-        return tuple(doc for doc in corpus if is_servable(doc))
-    return corpus
+    return tuple(doc for doc in corpus if is_servable(doc))
 
 
 class MedicalKnowledgeProvider(Protocol):
@@ -455,6 +453,31 @@ def retrieve_medical_evidence(
     message: str, topic: str | None = None, limit: int = 2, *, only_provenance: str | None = None
 ) -> list[MedicalEvidenceDoc]:
     text = (message or "").lower()
+    from app.biomarkers.medical_registry import biomarker_content, eligible
+
+    selective: list[MedicalEvidenceDoc] = []
+    for row in biomarker_content().values():
+        label = (row.get("display_name") or "").lower()
+        if label and len(label) > 3 and label in text and eligible(row):
+            selective.append(
+                MedicalEvidenceDoc(
+                    name=row.get("display_name") or row.get("biomarker_id") or "biomarker",
+                    title=row.get("display_name") or "Biomarker",
+                    url="",
+                    source_type="cura_knowledge_base",
+                    tier=2,
+                    topics=(row.get("biomarker_id") or "",),
+                    keywords=(label,),
+                    excerpt=row.get("short_description") or "",
+                    provenance="medical_registry_v2_3",
+                    review_status=row.get("review_status") or "draft",
+                    version=row.get("content_version") or "2.3",
+                    content_kind="cura_summary",
+                    licence_status="own_content",
+                    region="IN",
+                )
+            )
+            break
     topic_key = (topic or "").lower().replace(" ", "_")
     bio_ai_question = bool(_BIO_AI_ANCHOR.search(text))
     scored: list[tuple[int, int, int, MedicalEvidenceDoc]] = []

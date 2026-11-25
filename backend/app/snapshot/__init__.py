@@ -1,0 +1,1 @@
+"""Deterministic member health snapshot."""

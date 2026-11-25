@@ -63,7 +63,9 @@ def _score_probabilities(text: str, context: HealthContext) -> tuple[str, list[s
 
 
 _ABSENCE = re.compile(
-    r"\b(not found|not available|not on file|was not found|were not found|wasn't found|not retrieved|are missing|is missing|was not measured|were not measured|has not been measured)\b",
+    r"\b(not found|not available|not on file|was not found|were not found|wasn't found|not retrieved|"
+    r"are missing|is missing|was not measured|were not measured|has not been measured|"
+    r"does not include|doesn't include|do not include|not include)\b",
     re.I,
 )
 _PERSONAL_LIFESTYLE = re.compile(
@@ -257,9 +259,8 @@ def review_clinical_output(answer: str, *, plan: QueryPlan, context: HealthConte
     if _PII.search(out):
         flags.append("sensitive_payload_leak")
         out = _PII.sub("[removed]", out)
-    if "ferritin" in (plan.topic or "").lower() or any(
-        (item.key or "").lower() == "ferritin" for item in (context.missing or [])
-    ):
+    ferritin_missing = any((item.key or "").lower() == "ferritin" for item in (context.missing or []))
+    if ferritin_missing:
         if _FERRITIN_SUB.search(out):
             flags.append("missing_value_substituted")
             out = re.sub(_FERRITIN_SUB, "ferritin is not available in the retrieved results", out)

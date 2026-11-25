@@ -175,9 +175,10 @@ export function useCuraChat() {
       setMessages((current) => {
         const next = [...current];
         const last = next.length - 1;
+        const streamed = next[last]?.role === "assistant" ? next[last].content : "";
         next[last] = {
           role: "assistant",
-          content: res.answer,
+          content: streamed.trim() ? streamed : res.answer,
           evidence: res.evidence,
           followUps: res.follow_ups,
           recommendations: res.recommendations || [],

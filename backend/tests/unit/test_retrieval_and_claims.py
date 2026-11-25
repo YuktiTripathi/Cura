@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import pytest
 
-from app.core.config import settings
 from app.pipeline.claim_check import (
     map_claims_to_passages,
     revise_unsupported_answer,
@@ -17,7 +16,10 @@ from app.retrieval.medical import MedicalEvidenceDoc
 
 @pytest.fixture(autouse=True)
 def allow_index(monkeypatch):
-    monkeypatch.setattr(settings, "medical_require_reviewed", False)
+    from app.retrieval import hybrid, medical
+
+    corpus = medical.CORPUS + medical.load_content_dir(medical.CONTENT_DIR) + medical.load_markdown_dir(medical.CONTENT_DIR / "markdown")
+    monkeypatch.setattr(hybrid, "active_corpus", lambda: corpus)
 
 
 @pytest.mark.parametrize(

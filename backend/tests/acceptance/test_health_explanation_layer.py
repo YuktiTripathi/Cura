@@ -231,7 +231,7 @@ def test_story_validates_model_blocks_and_only_sends_category_context(monkeypatc
     assert story == build_story(detail, profile, "member-secret")
     assert {"diet_preference", "physical_activity_frequency"} <= {step.action_id for step in story.improvement_plan}
     assert "Invented diagnosis" not in story.model_dump_json()
-    assert "Physical activity can affect HDL cholesterol." in story.influences
+    assert any("answers alone" in line or "HDL" in line for line in story.influences)
 
     def complete_valid(messages, **kwargs):
         payload = json.loads(messages[1]["content"])

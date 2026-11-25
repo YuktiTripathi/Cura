@@ -356,8 +356,24 @@ class ReasoningService:
                 answer = render_bio_ai_score_list(context.bio_ai_risks)
             return ReasoningResult(answer=answer, llm_mode="structured_bio_ai")
         if (
+            plan.intent in {IntentType.bio_ai_score, IntentType.bio_ai_explanation}
+            and context.status == "ambiguous"
+            and plan.topic
+            and context.bio_ai_risks
+            and not plan.needs_user_uploaded
+        ):
+            answer = render_bio_ai_ambiguity(context)
+            if re.search(r"\b(diagnos\w*|do i have|have heart disease|mean i have)\b", message or "", re.I):
+                answer = (
+                    "This prediction does not show whether you have the condition. "
+                    "It does not confirm it, and it does not rule it out. "
+                    + answer
+                )
+            return ReasoningResult(answer=answer, llm_mode="structured_bio_ai")
+        if (
             plan.intent == IntentType.bio_ai_score
             and context.status == "ambiguous"
+            and not plan.topic
             and not plan.needs_user_uploaded
         ):
             from app.pipeline.answer_consistency import blood_half_for_ambiguity
@@ -496,6 +512,7 @@ class ReasoningService:
                     answer_client=answer_client,
                     model_fallback_used=fallback,
                     latency_ms=int((time.perf_counter() - started) * 1000),
+                    first_token_ms=getattr(answer_client, "first_visible_ms", None),
                 )
             except LLMUnavailableError as exc:
                 if reviewed_definition:
@@ -803,8 +820,6 @@ def definition_from_reviewed_passage(message: str, plan, medical_hits) -> bool:
 
     if not settings.deterministic_definitions_enabled or not medical_hits:
         return False
-    if not settings.medical_require_reviewed_enabled():
-        return False  # never answer directly from the unreviewed development index
     if is_high_risk_topic(message) or not _DEFINITION.search(message or ""):
         return False
     if len((message or "").split()) > 14:

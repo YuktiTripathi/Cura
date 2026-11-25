@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useLayoutEffect, useRef, useState } from "react";
 import { useStickToBottom } from "../hooks/useStickToBottom";
 import { useCuraChat } from "../hooks/useCuraChat";
 import { useMe } from "../hooks/useMe";
@@ -6,15 +6,13 @@ import { AppShell } from "../components/AppShell";
 import { Composer } from "../components/Composer";
 import { CuraHeader } from "../components/CuraHeader";
 import { DocumentPanel } from "../components/DocumentPanel";
-import { ProgressStepper } from "../components/ProgressStepper";
 import { MessageList } from "../components/MessageList";
 import { ConversationSidebar } from "../components/ConversationSidebar";
+import { ExploreJourney } from "../components/explore/ExploreJourney";
 import { WelcomeExperience } from "../components/WelcomeExperience";
-import { BodySystemOverviewView } from "../components/overview/BodySystemOverviewView";
-import { RiskOverviewView } from "../components/overview/RiskOverviewView";
-import { HealthOverviewView } from "../components/overview/HealthOverviewView";
 import type { ContextRef } from "../types/chat";
 import { useOverview } from "../hooks/useOverview";
+import { useHealthView } from "../hooks/useHealthOverview";
 import { MarkerPanel } from "../components/marker/MarkerPanel";
 import { MarkerPanelProvider } from "../components/marker/MarkerPanelContext";
 import { useDocumentUpload } from "../hooks/useDocumentUpload";
@@ -39,10 +37,10 @@ export function CuraPage() {
     resumeConversation,
   } = useCuraChat();
   const { me, loading: meLoading } = useMe();
+  const health = useHealthView();
   const [docTick, setDocTick] = useState(0);
   const [selectedDocumentIds, setSelectedDocumentIds] = useState<string[]>([]);
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const started = messages.length > 0;
   const inputRef = useRef<HTMLInputElement>(null);
   const scrollRef = useRef<HTMLDivElement>(null);
   const userTurns = messages.filter((m) => m.role === "user").length;
@@ -65,27 +63,35 @@ export function CuraPage() {
       return false;
     }
   });
-  const [overviewKind, setOverviewKind] = useState<"blood" | "bio_ai" | "unified" | null>(null);
-  const [openGroupId, setOpenGroupId] = useState<string | null>(null);
-  // Remember which overview a chat came from, so Back returns there before going home.
-  const [returnTo, setReturnTo] = useState<"blood" | "bio_ai" | "unified" | null>(null);
+  const [showExplore, setShowExplore] = useState(false);
+  const [place, setPlace] = useState<"home" | "overview" | "category" | "marker" | "risk">("home");
+  const [categoryId, setCategoryId] = useState<string | null>(null);
+  const [findingId, setFindingId] = useState<string | null>(null);
+  const spots = useRef<Record<string, number>>({});
+  const spotKey = `${place}|${categoryId ?? ""}|${findingId ?? ""}`;
+  function rememberScroll() {
+    if (scrollRef.current) spots.current[spotKey] = scrollRef.current.scrollTop;
+  }
   function askFromOverview(text: string, contextRef: ContextRef) {
-    setReturnTo(overviewKind);
-    setOverviewKind(null);
-    setOpenGroupId(null);
+    rememberScroll();
+    setShowExplore(false);
     void sendWithContext(text, [], contextRef);
   }
+  useLayoutEffect(() => {
+    if (showExplore && scrollRef.current) scrollRef.current.scrollTop = spots.current[spotKey] || 0;
+  }, [showExplore, spotKey]);
 
   // One step back each time: out of an opened card, then out of the overview, then out of a chat.
-  const goBack =
-    overviewKind && !started
-      ? () => (openGroupId ? setOpenGroupId(null) : setOverviewKind(null))
-      : started
-        ? () => {
-            const back = returnTo;
-            startNew();
-            if (back) setOverviewKind(back);
-          }
+  const started = messages.length > 0;
+  const goBack = !showExplore && started
+    ? () => setShowExplore(true)
+    : showExplore && place !== "overview"
+      ? () => {
+          rememberScroll();
+          setPlace(place === "category" ? "overview" : "category");
+        }
+      : showExplore
+        ? () => setShowExplore(false)
         : undefined;
 
   const overview = useOverview();
@@ -120,9 +126,10 @@ export function CuraPage() {
 
   function startNew() {
     newConversation();
-    setReturnTo(null);
-    setOverviewKind(null);
-    setOpenGroupId(null);
+    setShowExplore(false);
+    setPlace("overview");
+    setCategoryId(null);
+    setFindingId(null);
     setSelectedDocumentIds([]);
     setDrawerOpen(false);
   }
@@ -156,24 +163,44 @@ export function CuraPage() {
     >
       <CuraHeader onOpenSidebar={() => setDrawerOpen(true)} onBack={goBack} />
       <div className="main-scroll" ref={scrollRef}>
-        {!started && overviewKind === "unified" && (
-          <HealthOverviewView
+        {showExplore && (
+          <ExploreJourney
+            view={health.data}
+            loading={health.isLoading || meLoading}
+            error={health.isError}
+            name={me?.display_name || me?.first_name || null}
+            place={place === "home" ? "overview" : place}
+            categoryId={categoryId}
+            findingId={findingId}
+            onPlace={(next, category, finding) => {
+              if (next === "home") {
+                setShowExplore(false);
+                setPlace("overview");
+                return;
+              }
+              setPlace(next);
+              if (category !== undefined) setCategoryId(category);
+              if (finding !== undefined) setFindingId(finding ?? null);
+            }}
             onAsk={askFromOverview}
-            openId={openGroupId}
-            onOpenChange={setOpenGroupId}
-            onOpenReport={(kind) => { setOpenGroupId(null); setOverviewKind(kind); }}
           />
         )}
-        {!started && overviewKind === "blood" && <BodySystemOverviewView onAsk={askFromOverview} openId={openGroupId} onOpenChange={setOpenGroupId} />}
-        {!started && overviewKind === "bio_ai" && <RiskOverviewView onAsk={askFromOverview} openId={openGroupId} onOpenChange={setOpenGroupId} />}
-        {!started && !overviewKind && (
+        {!showExplore && !started && (
           <WelcomeExperience
             returning={returning}
             me={me}
             meLoading={meLoading}
             suggestions={suggestions}
-            onSend={sendWithContext}
-            onOpenOverview={(kind) => { setOpenGroupId(null); setOverviewKind(kind); }}
+            onSend={(text, ids, ref) => {
+              setShowExplore(false);
+              void sendWithContext(text, ids, ref);
+            }}
+            onOpenOverview={() => {
+              setPlace("overview");
+              setCategoryId(null);
+              setFindingId(null);
+              setShowExplore(true);
+            }}
             inputRef={inputRef}
           />
         )}
@@ -183,7 +210,7 @@ export function CuraPage() {
           onSelectedChange={setSelectedDocumentIds}
           onReview={setReviewId}
         />
-        <MessageList
+        {!showExplore && <MessageList
           messages={messages}
           onFollowUp={(text) => sendWithContext(text)}
           onAskContext={(text, ref) => sendWithContext(text, [], ref)}
@@ -194,8 +221,8 @@ export function CuraPage() {
             if (!loading) void editAndResend(index, text);
           }}
           editingDisabled={loading}
-        />
-        {loading && <ProgressStepper events={processingSteps} />}
+          processingEvents={loading ? processingSteps : []}
+        />}
         {error && (
           <div className="error-banner" role="alert">
             <p>{error}</p>

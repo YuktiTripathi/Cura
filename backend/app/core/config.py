@@ -176,7 +176,6 @@ class Settings(BaseSettings):
     translation_model: str = "openai/gpt-5.6-luna"
     translation_timeout_seconds: float = 8.0
     # Serve only reviewed, in-date medical passages (default on outside development).
-    medical_require_reviewed: bool | None = None
     # Read-only SuperShyft session guards (defence in depth behind the read-only role).
     supershyft_statement_timeout_ms: int = 5000
     # Reuse one member's SuperShyft provider reads for this long. 0 disables the cache.
@@ -188,6 +187,14 @@ class Settings(BaseSettings):
     health_data_cache_lock_seconds: int = 20
     health_data_cache_wait_seconds: float = 5.0
     health_data_cache_version: str = "1"
+    # One MemberSnapshot per authenticated member. Off keeps the existing overview path,
+    # including model wording. On builds a deterministic snapshot and serves exploration
+    # from that cache. In-process request_controls is the development fallback only.
+    member_snapshot_enabled: bool = False
+    member_snapshot_ttl_seconds: int = 600
+    member_snapshot_lock_seconds: int = 20
+    member_snapshot_wait_seconds: float = 5.0
+    member_snapshot_schema_version: str = "1"
     document_encryption_key: str = ""
     document_retention_days: int = 90
     # Conversations untouched for this many days are purged with their derived rows. 0 disables.
@@ -353,11 +360,6 @@ class Settings(BaseSettings):
     def public_meta_enabled(self) -> bool:
         if self.public_meta_only is not None:
             return bool(self.public_meta_only)
-        return not self.is_development
-
-    def medical_require_reviewed_enabled(self) -> bool:
-        if self.medical_require_reviewed is not None:
-            return bool(self.medical_require_reviewed)
         return not self.is_development
 
     def document_workers_external(self) -> bool:

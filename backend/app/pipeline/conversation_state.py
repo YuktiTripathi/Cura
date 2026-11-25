@@ -71,7 +71,15 @@ def apply_to_query_plan(plan: QueryPlan, state: ConversationState | None) -> Que
     if not continuing:
         return plan
     if named_now:
-        # This turn names its own tests. Do not keep the previous topic's markers or heading.
+        # A relationship question names the new test and still needs the one already in the conversation.
+        if re.search(r"\b(connect\w*|relat\w*|together|versus|compared with)\b", plan.raw_message or "", re.I):
+            extra = [
+                item
+                for item in state.active_entities
+                if is_lab_key(item) and item not in (plan.requested_metrics or [])
+            ]
+            if extra:
+                plan.requested_metrics = list(plan.requested_metrics or []) + extra[:2]
         return plan
     if not named_now:
         labs = [item for item in state.active_entities if is_lab_key(item)]
@@ -501,6 +509,12 @@ def _classify(
         has_prior
         and not current_entities
         and re.search(r"\b(foods?|eat|diet|help|exact value|how much|what can i|what should i)\b", text, re.I)
+    ):
+        return TurnType.follow_up_question
+    if has_prior and not current_entities and re.search(
+        r"\b(my result|this result|that result|this prediction|the prediction)\b",
+        text,
+        re.I,
     ):
         return TurnType.follow_up_question
     return TurnType.new_question
