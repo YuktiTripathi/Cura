@@ -61,7 +61,9 @@ def test_house_core_has_no_dashes_and_one_json_contract():
 def test_house_core_is_smaller_than_the_legacy_system_prompt():
     from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS
 
-    assert len(HOUSE_CORE) < len(SAFETY_INSTRUCTIONS)
+    # The default prompt is the CURA conversational behaviour text plus a short contract.
+    assert SAFETY_INSTRUCTIONS.startswith("CURA: Conversational Behaviour")
+    assert len(SAFETY_INSTRUCTIONS) < 4500
 
 
 @pytest.mark.parametrize("message", QUESTIONS)
@@ -102,8 +104,8 @@ def test_legacy_variant_is_unchanged_and_still_available():
         system, user = _build("What does my HbA1c mean?")
     finally:
         settings.cura_prompt_variant = old
-    assert system.startswith("You are Cura, SuperShyft's preventive-health companion")
-    assert "NARRATIVE LENGTH" in user
+    assert system.startswith("CURA: Conversational Behaviour")
+    assert "NARRATIVE LENGTH" not in user
 
 
 def test_house_variant_raises_the_structured_answer_temperature(house):

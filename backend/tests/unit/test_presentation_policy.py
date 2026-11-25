@@ -92,22 +92,19 @@ def test_general_prompt_includes_the_note():
         knowledge_scope=KnowledgeScope.general,
     )
     messages = PromptBuilder().build(ctx, "", "What is heart health?")
-    assert "PRESENTATION:" in messages[1]["content"]
-    assert "NARRATIVE LENGTH:" in messages[1]["content"]
-    assert "about 30 to 60 words" in messages[1]["content"]
-    assert "The whole answer is bullets" in messages[0]["content"]
-    assert "Do not end the answer with a question" in messages[0]["content"]
-    assert "PLAIN LANGUAGE" in messages[0]["content"]
-    assert "higher-than-expected blood sugar" in messages[0]["content"]
-    assert "Never invent a fact" in messages[0]["content"]
-    assert "without bold labels" in messages[1]["content"]
+    assert "PRESENTATION:" not in messages[1]["content"]
+    assert "NARRATIVE LENGTH:" not in messages[1]["content"]
+    assert "The whole answer is bullets" not in messages[0]["content"]
+    assert "no medical background" in messages[0]["content"]
+    assert "Invent no personal data" in messages[0]["content"]
+    assert "without bold labels" not in messages[1]["content"]
 
 
 def test_personal_prompt_uses_the_same_plain_language_policy():
     from app.pipeline.prompt_builder import PLAIN_LANGUAGE, SAFETY_INSTRUCTIONS
 
-    assert "Assume the person has no medical background" in PLAIN_LANGUAGE
+    assert "no medical background" in PLAIN_LANGUAGE
     assert PLAIN_LANGUAGE in SAFETY_INSTRUCTIONS
-    assert "prediction is not a diagnosis" in SAFETY_INSTRUCTIONS
-    assert "Keep every supplied value, unit" in SAFETY_INSTRUCTIONS or "Keep every supplied value, unit" in PLAIN_LANGUAGE
+    assert "predicted risk is not a diagnosis" in SAFETY_INSTRUCTIONS
+    assert "Keep values, units" in SAFETY_INSTRUCTIONS
     assert "everyday food names" in presentation_note("What should I eat for dinner?")

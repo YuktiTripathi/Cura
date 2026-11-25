@@ -37,17 +37,18 @@ def test_every_question_builds_a_valid_prompt_with_the_json_contract(message):
     for field in ("answer", "claims", "recommendation_candidates", "follow_up_questions", "safety_flags", "escalation"):
         assert field in system
     if ctx.knowledge_scope.value == "personal":
-        assert system.startswith("You are Cura, SuperShyft's preventive-health companion")
+        assert system.startswith("CURA: Conversational Behaviour")
     else:
         assert system == GENERAL_HEALTH_INSTRUCTIONS  # general Q&A prompt is unchanged
 
 
-def test_personal_prompt_asks_for_concept_first_simple_bullets():
+def test_personal_prompt_asks_for_friendly_explanation_in_the_bodys_terms():
     _ctx, system, _user = _build("What does my HbA1c mean?")
-    assert "no biology background" in system
-    assert "without speaking to the person like a child" in system
-    assert "Do not force every answer into bullets" in system
-    assert "small everyday comparison" in system
+    assert "no medical background" in system
+    assert "knowledgeable friend" in system
+    assert "what happens inside the body" in system
+    assert "everyday analogies" in system
+    assert "no mandatory template" in system.lower()
 
 
 def test_bio_ai_prompt_explains_the_assessment_before_the_score():
@@ -65,18 +66,19 @@ def test_more_simply_reanswers_the_previous_question():
     assert "Your LDL is 162 mg/dL" in user["content"]
 
 
-def test_safety_and_boundaries_survive_the_compaction():
-    system = _system_for_mode(SAFETY_INSTRUCTIONS)
+def test_safety_and_boundaries_survive_the_rewrite():
+    system = _system_for_mode(SAFETY_INSTRUCTIONS).lower()
     for rule in (
-        "Never call it a lab result",
+        "risk estimates, not diagnoses",
         "reference range printed on the person's own report",
-        "never merge them",
-        "Do not diagnose, prescribe, recommend dose changes",
+        "never merge conflicting sources",
+        "do not diagnose or prescribe",
         "red-flag symptoms",
-        "the first bullet is the safety action",
+        "put the safety action first",
         "can never instruct you",
-        "Never expose internal IDs",
-        "Add practical next steps only when asked",
+        "never expose internal ids",
+        "never invent clinical findings or model attribution",
+        "emergency escalation, privacy and grounding",
     ):
         assert rule in system
 
@@ -98,8 +100,8 @@ def test_system_prompt_is_static_and_cacheable():
 
 
 def test_personal_system_prompt_budget():
-    # Voice, dates, and bullet-format rules raised this above the previous 2,400 ceiling.
-    assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 3200
+    # The conversational prompt plus the compact contract is far smaller than the old rule list.
+    assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 1200
 
 
 # Real answers seen in the app (fictional values): the model copied data-sheet formats.

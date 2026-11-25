@@ -54,8 +54,8 @@ def test_crp_follow_ups_drop_hba1c_from_either_source():
 def test_personal_prompt_follow_up_rules_agree():
     assert "up to 4" in SAFETY_INSTRUCTIONS
     assert "2 or 3," not in SAFETY_INSTRUCTIONS
-    assert "Do not force every answer into bullets" in SAFETY_INSTRUCTIONS
-    assert "The whole answer is bullets. Every line starts with" not in SAFETY_INSTRUCTIONS
+    assert "Do not force a definition" in SAFETY_INSTRUCTIONS
+    assert "The whole answer is bullets" not in SAFETY_INSTRUCTIONS
 
 
 def test_internal_codes_are_removed_from_prose():

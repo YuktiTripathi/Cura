@@ -188,6 +188,7 @@ class HealthContext(BaseModel):
     recent_user_messages: list[str] = Field(default_factory=list)
     # Developer trace of what the answer director selected (never shown to members).
     answer_evidence_trace: dict | None = None
+    answer_transformations: list[dict] | None = None
     # Semantic plan for this turn (goal x topics x personalization). Internal only.
     semantic_plan: dict | None = None
     # Patterns across the whole latest report (names only), so a single-value answer can say

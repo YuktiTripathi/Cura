@@ -140,7 +140,7 @@ def test_overview_prompt_is_added_without_replacing_safety():
     )
     messages = PromptBuilder().build(context, "", BUTTON)
     system = messages[0]["content"]
-    assert "Do not diagnose, prescribe" in system  # the safety rules are not replaced
+    assert "Do not diagnose or prescribe" in system  # the safety rules are not replaced
     user = messages[1]["content"]
     assert "latest blood report" in user.lower()
 

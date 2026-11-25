@@ -35,12 +35,13 @@ def _chat(message):
     return client.post("/api/v1/chat", headers={"X-Cura-User-Id": USER}, json={"message": message}).json()
 
 
-def test_block_contract_is_only_asked_for_in_semantic_mode(monkeypatch):
+def test_model_is_not_asked_for_blocks_or_library_ids(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "semantic")
-    assert "SEMANTIC RESPONSE" in _system_for_mode(SAFETY_INSTRUCTIONS)
+    # The model is no longer asked to build blocks or pick library ids; the backend derives them.
     for mode in ("plain", "rich", "semantic"):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
-        assert "SEMANTIC RESPONSE" in _system_for_mode(SAFETY_INSTRUCTIONS)
+        system = _system_for_mode(SAFETY_INSTRUCTIONS)
+        assert "SEMANTIC RESPONSE" not in system and "LIBRARY_REFS" not in system
 
 
 _LIBRARY = {"medical_education", "medical_relationship", "lifestyle_education"}

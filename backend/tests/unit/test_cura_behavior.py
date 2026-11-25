@@ -74,8 +74,8 @@ def test_personalized_single_marker_answer_uses_report_range_and_explains():
     _assert_purpose_not_template(payload["how_to_answer"])
     system = prompt[0]["content"]
     assert "reference range printed on the person's own report" in system
-    assert "Explain, do not just retrieve" in system
-    assert "RESPONSE PLANNING" in system and "not a fixed template" in system
+    assert "Explain, do not just report" in system
+    assert "no mandatory template" in system.lower()
 
 
 def test_multi_marker_reasoning_does_not_concatenate_templates():
@@ -117,7 +117,7 @@ def test_priority_response_prioritizes_with_multiple_sources():
     assert any(f.get("source", "").startswith("Bio-AI") for f in evidence.supporting_facts)
     how = evidence.payload()["how_to_answer"]
     _assert_purpose_not_template(how)
-    assert "not a formal clinical ranking" in how and "outranks a minor finding" in how
+    assert "not a formal clinical ranking" in how
 
 
 def test_questionnaire_personalization_uses_reported_habits_without_inventing():

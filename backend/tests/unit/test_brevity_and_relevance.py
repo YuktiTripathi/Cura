@@ -106,12 +106,11 @@ def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
     for mode in ("rich", "plain", "semantic"):
         monkeypatch.setattr(settings, "cura_response_mode", mode)
         system = _system_for_mode(SAFETY_INSTRUCTIONS)
-        assert "shortest response that fully answers" in system
-        assert "2 or 3 short bullets" in system
-        assert "not a calibrated chance" in system
+        assert "a simple question gets a simple answer" in system.lower()
         assert "em dash" in system and EM not in system
-        assert "at most one short safety qualifier" in system.lower()
-    assert "familiar words" in GENERAL_HEALTH_INSTRUCTIONS and "The whole answer is bullets" in GENERAL_HEALTH_INSTRUCTIONS
+        assert "2 or 3 short bullets" not in system
+    assert "no medical background" in GENERAL_HEALTH_INSTRUCTIONS
+    assert "The whole answer is bullets" not in GENERAL_HEALTH_INSTRUCTIONS
     assert EM not in GENERAL_HEALTH_INSTRUCTIONS
 
 

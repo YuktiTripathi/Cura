@@ -95,36 +95,16 @@ _SHAPE_MODE = {
 # formats: the answer model decides the shape (one line, prose, bullets, a numbered list,
 # a comparison, rarely a small table) from the wording of the question and the evidence.
 GOAL_GUIDANCE = {
-    LOOKUP: (
-        "The member wants a value. Say whether it is in range and what that means. "
-        "The result card shows the number, unit, date and range, so do not repeat them unless no card can be shown."
-    ),
-    EXPLANATION: (
-        "The member wants to understand what this result means. Explain the meaning. "
-        "Do not add diet, exercise, or next-step advice unless they asked what to do."
-    ),
-    CAUSES: (
-        "The member wants possible reasons. Connect the listed evidence that fits or argues against each "
-        "possibility; say plainly if nothing listed explains it. Never present a possibility as the cause."
-    ),
-    ASSESSMENT: "The member wants a judgment (is it enough, okay, serious). Give the judgment plainly, with the evidence behind it.",
-    TREND: (
-        "The member wants to know how things changed. Say whether the result moved toward or away from the expected range. "
-        "Leave the exact previous and latest numbers to the comparison card unless no card can be shown."
-    ),
-    PRIORITIZATION: (
-        "The member wants to know what matters most. Decide the order from the evidence: how far outside range, "
-        "several markers agreeing (patterns), Bio-AI support, change over time, habits and history. A clearly "
-        "significant pattern outranks a minor finding. This is a sensible order, not a formal clinical ranking."
-    ),
-    ACTION_PLAN: "The member wants to know what to do. Tie actions to their findings and habits, skip what they already do, no medicines or doses.",
-    OVERVIEW: "The member wants the overall picture: what matters most, what is reassuring, and what to focus on.",
-    RISK: "The member wants to know whether to worry. Be calibrated: evidence for and against concern, and when a clinician visit makes sense.",
-    BIO_AI: (
-        "The member wants to understand their Bio-AI risk. It is an estimate from several inputs, not a diagnosis "
-        "and not one marker; connect it to the measured patterns and habits that point the same way and to what is "
-        "reassuring. Do not describe the model's internals."
-    ),
+    LOOKUP: "The person wants a value and what it means.",
+    EXPLANATION: "The person wants to understand what this result means and why it matters in the body.",
+    CAUSES: "The person wants possible reasons. Weigh the listed evidence for and against each; a possibility is never the cause.",
+    ASSESSMENT: "The person wants a judgment (is it enough, okay, serious). Give it plainly with the evidence behind it.",
+    TREND: "The person wants to know how things changed over time.",
+    PRIORITIZATION: "The person wants to know what matters most, from the evidence. This is a sensible order, not a formal clinical ranking.",
+    ACTION_PLAN: "The person wants to know what to do, tied to their findings and habits. No medicines or doses.",
+    OVERVIEW: "The person wants the overall picture.",
+    RISK: "The person wants to know whether to worry. Be calibrated about the evidence for and against concern.",
+    BIO_AI: "The person wants to understand a Bio-AI risk estimate. It is an estimate, not a diagnosis; connect it to the measured patterns that point the same way.",
 }
 
 # Context notes chosen from the shape of the selected evidence (still purposes, not formats).

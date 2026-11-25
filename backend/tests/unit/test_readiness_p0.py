@@ -120,5 +120,5 @@ def test_high_risk_topic_without_evidence_is_redirected_in_prompt():
 
     assert "HIGH RISK TOPIC" in _medical_block(Ctx(), "is this antibiotic safe in pregnancy")
     block = _medical_block(Ctx(), "how much sleep do adults need")
-    assert "LOW RISK EDUCATION" in block
+    assert "general knowledge" in block and "HIGH RISK" not in block
     assert "General information:" not in block

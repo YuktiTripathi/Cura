@@ -81,8 +81,8 @@ def test_system_prompt_plans_format_dynamically(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     ctx, _ = _evidence(COMPANION, "Why are my triglycerides high?")
     system = PromptBuilder().build(ctx, "", "Why are my triglycerides high?")[0]["content"]
-    assert "RESPONSE PLANNING" in system  # one planning section, no fixed template
-    assert "not a fixed template" in system
+    assert "Communicate naturally" in system  # structure is the model's choice, no fixed template
+    assert "no mandatory template" in system.lower()
     for heading in _TEMPLATE_HEADINGS:
         assert f"## {heading}" not in system
 

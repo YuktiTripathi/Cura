@@ -381,7 +381,7 @@ def test_fatigue_checks_relevant_markers_without_claiming_cause():
     codes = {f["code"] for f in evidence.primary_facts}
     assert codes <= {"hemoglobin", "ferritin", "vitamin_b12", "vitamin_d", "tsh", "fasting_blood_glucose"}
     how = evidence.payload()["how_to_answer"]
-    assert "possible reasons" in how and "never present a possibility as the cause" in how.lower()
+    assert "possible reasons" in how and "a possibility is never the cause" in how.lower()
 
 
 @pytest.mark.parametrize(

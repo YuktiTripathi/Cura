@@ -304,8 +304,8 @@ def test_named_marker_does_not_inherit_the_previous_topic():
 def test_a_first_explanation_is_in_everyday_words():
     from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS, _asked_task
 
-    assert "explain it in the same sentence" in SAFETY_INSTRUCTIONS
-    assert "not how serious it is" in SAFETY_INSTRUCTIONS
+    assert "no medical background" in SAFETY_INSTRUCTIONS
+    assert "everyday analogies" in SAFETY_INSTRUCTIONS
     for question in (
         "What does my alkaline phosphatase mean?",
         "What does my HbA1c mean?",
@@ -315,12 +315,9 @@ def test_a_first_explanation_is_in_everyday_words():
         "What does my creatinine mean?",
         "What does my Dyslipidemia score mean?",
     ):
-        hint = _asked_task(question)
-        assert "everyday words" in hint, question
-        assert "another test" in hint or "chance of disease" in hint
-    plain = _asked_task("What is cholesterol?")
-    assert "no medical background" in plain
-    assert "no personal results" in plain
+        # A first explanation is not given a scripted shape; the system prompt carries the plain-language behaviour.
+        assert _asked_task(question) == ""
+    assert _asked_task("What is cholesterol?") == ""
 
 
 def test_a_follow_up_knows_the_value_was_already_stated():

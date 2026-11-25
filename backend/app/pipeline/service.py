@@ -2777,6 +2777,8 @@ class ChatService:
                 meta.debug["semantic_plan"] = semantic_debug
             if context is not None and getattr(context, "answer_evidence_trace", None):
                 meta.debug["answer_evidence"] = context.answer_evidence_trace
+            if context is not None and getattr(context, "answer_transformations", None):
+                meta.debug["answer_transformations"] = context.answer_transformations
             if turn.get("answer_stages"):
                 meta.debug["answer_stages"] = {**turn["answer_stages"], "final_answer": response.answer}
         refs = []

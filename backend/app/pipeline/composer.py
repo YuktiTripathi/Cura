@@ -42,6 +42,17 @@ _HANDLED_LLM = re.compile(
 )
 
 
+def _record(context, step: str, before: str, after: str) -> None:
+    """Developer trace: which post-generation step changed the text (never user-facing)."""
+    if (before or "") != (after or ""):
+        try:
+            trace = list(getattr(context, "answer_transformations", None) or [])
+            trace.append({"step": step, "chars_before": len(before or ""), "chars_after": len(after or "")})
+            context.answer_transformations = trace
+        except Exception:  # noqa: BLE001 - tracing must never affect the answer
+            pass
+
+
 def _llm_handling(text: str) -> tuple[str | None, str | None]:
     if re.search(r"\b(symptoms?|medication|supplement)\b", text, re.I):
         return "CLINICAL_CONTEXT", "CONTINUE_INTERPRETATION"
@@ -296,7 +307,13 @@ class ResponseComposer:
         follow_text = question[0].text if question else None
         from app.pipeline.narrative import format_units_in_text
 
-        cleaned = format_units_in_text(sanitize_internal_ids(prefer_report_range(answer or "", context))) or ""
+        raw_model_text = answer or ""
+        cleaned = prefer_report_range(raw_model_text, context)
+        _record(context, "prefer_report_range", raw_model_text, cleaned)
+        step = sanitize_internal_ids(cleaned)
+        _record(context, "sanitize_internal_ids", cleaned, step)
+        cleaned = format_units_in_text(step) or ""
+        _record(context, "format_units", step, cleaned)
         if context.premise_verified is False and context.premise and context.premise.note:
             note = sanitize_internal_ids(context.premise.note)
             if note.lower() not in cleaned.lower():
@@ -427,16 +444,22 @@ class ResponseComposer:
         from app.pipeline.answer_shape import omit_duplicate_closing_offer
 
         offers = [item.text for item in combined if getattr(item, "text", None)]
+        before = text
         text = omit_duplicate_closing_offer(separate_answer_layout(text), offers)
+        _record(context, "layout_and_closing_offer", before, text)
         if presentation.summary:
             presentation.summary = omit_duplicate_closing_offer(separate_answer_layout(presentation.summary), offers)
         from app.pipeline.grounding import drop_unverified_claims
 
+        before = text
         text = drop_unverified_claims(text, context)
+        _record(context, "drop_unverified_claims", before, text)
         from app.pipeline.answer_polish import polish_answer
 
         intent_value = getattr(context.intent, "value", None)
+        before = text
         text = polish_answer(text, context, intent=intent_value)
+        _record(context, "polish_answer", before, text)
         from app.pipeline.answer_polish import incomplete_segments
 
         if not text.strip() or incomplete_segments(text):

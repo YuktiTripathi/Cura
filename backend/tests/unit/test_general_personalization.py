@@ -77,7 +77,7 @@ def test_prompt_teaches_first_and_carries_only_small_verified_context():
         ],
     )
     system, user = [item["content"] for item in PromptBuilder().build(ctx, "", "What is heart health?")]
-    assert "Answer the general concept first" in system
+    assert "Personalise intelligently" in system and "Explain, do not just report" in system
     assert "VERIFIED RELEVANT PERSONAL CONTEXT" in user
     assert '"name":"LDL"' in user and '"score":72.0' in user
     assert "model-estimated prediction, not a diagnosis" in user
