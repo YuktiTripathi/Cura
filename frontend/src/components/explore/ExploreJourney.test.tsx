@@ -45,6 +45,6 @@ describe("ExploreJourney", () => {
     fireEvent.click(screen.getByRole("button", { name: /ALT/ }));
     rerender(<ExploreJourney view={view} loading={false} error={false} name="Alex" place="marker" categoryId="liver_health" findingId="alt" onPlace={onPlace} onAsk={vi.fn()} />);
     expect(screen.getByText("Liver cells contain ALT.")).toBeTruthy();
-    expect(screen.getByText(/Reference range 0–40/)).toBeTruthy();
+    expect(screen.getByText(/range on your report: 0 to 40/)).toBeTruthy();
   });
 });
