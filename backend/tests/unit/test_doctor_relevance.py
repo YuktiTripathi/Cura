@@ -25,7 +25,7 @@ def test_narrow_questions_skip_report_layouts():
     from app.pipeline.prompt_modules import core_for
     narrow = SimpleNamespace(intent=IntentType.blood_marker_explanation)
     wide = SimpleNamespace(intent=IntentType.broad_health_summary)
-    assert "SHAPE 1A, a whole" not in core_for(narrow, "What is urea?") and "SHAPE 2" in core_for(narrow, "What is urea?")
+    assert "SHAPE 1A, a whole" not in core_for(narrow, "What is urea?") and "Answer exactly what the user is asking" in core_for(narrow, "What is urea?")
     assert "SHAPE 1A, a whole" in core_for(wide, "Explain my report")
 
 

@@ -94,7 +94,7 @@ def test_modes_never_break_the_prompt(monkeypatch, mode):
     monkeypatch.setattr(pm, "house_system", spy)
     res = TestClient(app).post("/api/v1/chat", headers={"X-Cura-User-Id": "demo-user-001"}, json={"message": "What does my latest HbA1c mean?"})
     assert res.status_code == 200
-    assert seen["system"].startswith("You are the SuperShyft Health Assistant")
+    assert seen["system"].startswith("# CURA, personal health companion")
     assert ("ANSWER PLAN" in seen["system"]) == (mode == "on")
 
 

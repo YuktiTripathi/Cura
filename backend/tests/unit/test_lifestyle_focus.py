@@ -23,10 +23,11 @@ def test_lab_questions_are_not_lifestyle_focused(message):
     assert not is_lifestyle_topic_question(message)
 
 
-def test_walkthrough_has_the_six_parts_in_order():
-    parts = ["What the test is", "What your result says", "How far outside", "What could explain it", "Should you worry", "What to do now"]
-    positions = [RESULT_WALKTHROUGH.index(p) for p in parts]
-    assert positions == sorted(positions)
+def test_walkthrough_is_flexible_and_not_a_fixed_six_part_template():
+    for rigid in ("What the test is", "How far outside", "Should you worry"):
+        assert rigid not in RESULT_WALKTHROUGH
+    assert "Answer the exact question asked" in RESULT_WALKTHROUGH
+    assert "sections_already_shown" in RESULT_WALKTHROUGH
     assert "—" not in RESULT_WALKTHROUGH and "–" not in RESULT_WALKTHROUGH and "—" not in LIFESTYLE_FOCUS
 
 
