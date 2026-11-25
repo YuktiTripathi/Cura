@@ -120,6 +120,8 @@ class HealthContext(BaseModel):
     resolved_topic_name: str | None = None
     # What kind of turn this is (see turn_kinds). The registry says what it needs.
     turn_kind: str = "general"
+    # Where the question came from. Labels only, never personal values (see ContextRef).
+    screen_context: dict | None = None
     status: str = "ok"
     markers: list[BloodMarker] = Field(default_factory=list)
     bio_ai_risks: list[BioAIRisk] = Field(default_factory=list)

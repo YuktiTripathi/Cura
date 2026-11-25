@@ -37,6 +37,8 @@ export type ContextRef = {
   category_id?: string | null;
   finding_id?: string | null;
   snapshot_version?: string | null;
+  suggested_question_id?: string | null;
+  displayed_sections?: string[];
 };
 
 export type Recommendation = {

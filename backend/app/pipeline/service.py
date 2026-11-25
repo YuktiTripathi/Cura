@@ -1503,6 +1503,13 @@ class ChatService:
             token_cb = getattr(self._progress, "token_callback", None)
             if token_cb is not None and not is_high_risk_topic(payload.message):
                 self._stream_cb = token_cb
+        ref = payload.context_ref
+        if ref is not None and ref.entry_point:
+            context.screen_context = {
+                "entry_point": ref.entry_point,
+                "category": ref.category_id,
+                "sections_already_shown": list(ref.displayed_sections or []),
+            }
         with perf.stage("reasoner"):
             reasoned = self.reasoner.run(
                 message=payload.message,

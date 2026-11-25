@@ -340,6 +340,23 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
+    "/api/v1/health-explanation/view": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /** Health View */
+        get: operations["health_view_api_v1_health_explanation_view_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/api/v1/health-snapshot": {
         parameters: {
             query?: never;
@@ -1365,12 +1382,14 @@ export interface components {
         ContextRef: {
             /** Category Id */
             category_id?: string | null;
+            /** Displayed Sections */
+            displayed_sections?: string[];
             /** Document Id */
             document_id?: string | null;
-            /** Finding Id */
-            finding_id?: string | null;
             /** Entry Point */
             entry_point?: ("blood_report_overview" | "risk_explainer" | "health_area") | null;
+            /** Finding Id */
+            finding_id?: string | null;
             /** Marker Code */
             marker_code?: string | null;
             /** Report Id */
@@ -1384,6 +1403,8 @@ export interface components {
              * @enum {string}
              */
             source: "supershyft" | "user_uploaded";
+            /** Suggested Question Id */
+            suggested_question_id?: string | null;
             /**
              * Type
              * @enum {string}
@@ -1527,10 +1548,25 @@ export interface components {
          */
         EducationNote: {
             /**
+             * Body
+             * @default
+             */
+            body: string;
+            /**
              * Common Factors
              * @default
              */
             common_factors: string;
+            /**
+             * Content Source
+             * @default
+             */
+            content_source: string;
+            /**
+             * Content Version
+             * @default
+             */
+            content_version: string;
             /**
              * If High
              * @default
@@ -1541,6 +1577,11 @@ export interface components {
              * @default
              */
             if_low: string;
+            /**
+             * Limitations
+             * @default
+             */
+            limitations: string;
             /** Name */
             name: string;
             /**
@@ -1548,8 +1589,18 @@ export interface components {
              * @default
              */
             next_step: string;
+            /**
+             * Review Status
+             * @default
+             */
+            review_status: string;
             /** What It Is */
             what_it_is: string;
+            /**
+             * Why It Matters
+             * @default
+             */
+            why_it_matters: string;
         };
         /** EvidenceItem */
         EvidenceItem: {
@@ -1908,6 +1959,68 @@ export interface components {
             supporting_fact_ids?: string[];
             /** Title */
             title: string;
+        };
+        /**
+         * HealthView
+         * @description Frontend exploration payload. No raw questionnaire and no provider metadata.
+         */
+        HealthView: {
+            availability: components["schemas"]["SourceAvailability"];
+            /**
+             * Built At
+             * Format: date-time
+             */
+            built_at: string;
+            /** Categories */
+            categories?: {
+                [key: string]: components["schemas"]["CategoryDetail"];
+            };
+            /** Display Name */
+            display_name?: string | null;
+            /** Findings */
+            findings?: {
+                [key: string]: components["schemas"]["Finding"];
+            };
+            /** Latest Bio Ai Date */
+            latest_bio_ai_date?: string | null;
+            /** Latest Blood Date */
+            latest_blood_date?: string | null;
+            /**
+             * Measured Count
+             * @default 0
+             */
+            measured_count: number;
+            /** Metabolic Age */
+            metabolic_age?: number | null;
+            overview: components["schemas"]["UnifiedOverview"];
+            /** Previous Bio Ai Date */
+            previous_bio_ai_date?: string | null;
+            /** Previous Blood Date */
+            previous_blood_date?: string | null;
+            /** Registry Version */
+            registry_version: string;
+            /** Related Keys */
+            related_keys?: {
+                [key: string]: string[];
+            };
+            /**
+             * Risk Count
+             * @default 0
+             */
+            risk_count: number;
+            /** Schema Version */
+            schema_version: string;
+            /** Snapshot Version */
+            snapshot_version: string;
+            /**
+             * State
+             * @enum {string}
+             */
+            state: "ready" | "partial" | "unavailable";
+            /** Suggested Questions */
+            suggested_questions?: {
+                [key: string]: string[];
+            };
         };
         /** HistoryPoint */
         HistoryPoint: {
@@ -3086,6 +3199,39 @@ export interface components {
             /** Title */
             title: string;
         };
+        /** SourceAvailability */
+        SourceAvailability: {
+            /**
+             * Bio Ai
+             * @default empty
+             * @enum {string}
+             */
+            bio_ai: "ready" | "empty" | "unavailable";
+            /**
+             * Blood
+             * @default empty
+             * @enum {string}
+             */
+            blood: "ready" | "empty" | "unavailable";
+            /**
+             * Lifestyle
+             * @default empty
+             * @enum {string}
+             */
+            lifestyle: "ready" | "empty" | "unavailable";
+            /**
+             * Profile
+             * @default empty
+             * @enum {string}
+             */
+            profile: "ready" | "empty" | "unavailable";
+            /**
+             * Questionnaire
+             * @default empty
+             * @enum {string}
+             */
+            questionnaire: "ready" | "empty" | "unavailable";
+        };
         /** SourceOutcome */
         SourceOutcome: {
             /** Detail */
@@ -4219,6 +4365,26 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UnifiedOverview"];
+                };
+            };
+        };
+    };
+    health_view_api_v1_health_explanation_view_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["HealthView"];
                 };
             };
         };

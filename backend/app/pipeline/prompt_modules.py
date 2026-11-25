@@ -366,7 +366,7 @@ FOCUS_SHAPE = (
 RESULT_WALKTHROUGH = (
     "THIS QUESTION IS ABOUT ONE OF THE PERSON'S OWN RESULTS. Answer the exact question asked. "
     "If they asked what it means, explain it in words. If they asked why it is low or high, focus on possible reasons that can push this test in this direction, as possibilities and never as a cause or diagnosis. "
-    "If they asked what to do, give one or two practical steps. Do not restate what the person has already been shown on the screen (see sections_already_shown when supplied) and do not walk through every angle. "
+    "If they asked what to do, give one or two practical steps. Do not restate what the person has already been shown on the screen (see screen_context.sections_already_shown when supplied) and do not walk through every angle. "
     "Use the personal result where it helps, without repeating the full value and range if a card shows them. Say how soon to see a doctor only when the result is outside the range."
 )
 

@@ -1096,21 +1096,21 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
         "facts": fact_rows,
         "meta": context.meta.model_dump(mode="json") if context.meta else None,
     }
+    if context.screen_context:
+        payload["screen_context"] = context.screen_context
     if context.goals:
         payload["goals"] = [row.model_dump(mode="json", exclude_none=True) for row in context.goals[: (4 if compact else 8)]]
     if context.personalization:
-        perso = context.personalization
-        payload["personalization"] = {
-            "primary_health_goal": perso.primary_health_goal,
-            "communication_preference": perso.communication_preference.value,
-            "dietary_preferences": perso.dietary_preferences,
-            "known_lifestyle": perso.known_lifestyle.model_dump(mode="json", exclude_none=True),
-            "recent_user_context": perso.recent_user_context.model_dump(mode="json", exclude_none=True),
-            "reassuring_domains": perso.reassuring_domains[:6],
-            "improved_domains": perso.improved_domains[:6],
-            "already_supportive_lifestyle": perso.known_lifestyle.already_supportive,
-            "longitudinal": perso.compact_longitudinal.model_dump(mode="json"),
-        }
+        from app.pipeline.personal_projection import project_personalization
+        from app.pipeline.turn_kinds import TurnKind, kind_of
+
+        entities = [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])]
+        payload["personalization"] = project_personalization(
+            context.personalization,
+            entities=entities,
+            food_question=kind_of(context, "") == TurnKind.nutrition_overview or context.intent.value == "nutrition_guidance",
+            wants_history=context.intent.value in {"trend", "previous_result", "bio_ai_comparison"},
+        )
     if context.health_story:
         payload["health_story"] = context.health_story.model_dump(mode="json")
     if context.quiet and context.quiet.active:

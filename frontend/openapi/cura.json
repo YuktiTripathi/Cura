@@ -2397,6 +2397,26 @@
       },
       "ContextRef": {
         "properties": {
+          "category_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Category Id"
+          },
+          "displayed_sections": {
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 12,
+            "title": "Displayed Sections",
+            "type": "array"
+          },
           "document_id": {
             "anyOf": [
               {
@@ -2424,6 +2444,18 @@
               }
             ],
             "title": "Entry Point"
+          },
+          "finding_id": {
+            "anyOf": [
+              {
+                "maxLength": 128,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Finding Id"
           },
           "marker_code": {
             "anyOf": [
@@ -2461,6 +2493,18 @@
             ],
             "title": "Risk Code"
           },
+          "snapshot_version": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Snapshot Version"
+          },
           "source": {
             "enum": [
               "supershyft",
@@ -2468,6 +2512,18 @@
             ],
             "title": "Source",
             "type": "string"
+          },
+          "suggested_question_id": {
+            "anyOf": [
+              {
+                "maxLength": 64,
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Suggested Question Id"
           },
           "type": {
             "enum": [
@@ -2896,9 +2952,24 @@
       "EducationNote": {
         "description": "Reviewed plain-language text about a test. General education, never a reading of this result.",
         "properties": {
+          "body": {
+            "default": "",
+            "title": "Body",
+            "type": "string"
+          },
           "common_factors": {
             "default": "",
             "title": "Common Factors",
+            "type": "string"
+          },
+          "content_source": {
+            "default": "",
+            "title": "Content Source",
+            "type": "string"
+          },
+          "content_version": {
+            "default": "",
+            "title": "Content Version",
             "type": "string"
           },
           "if_high": {
@@ -2911,6 +2982,11 @@
             "title": "If Low",
             "type": "string"
           },
+          "limitations": {
+            "default": "",
+            "title": "Limitations",
+            "type": "string"
+          },
           "name": {
             "title": "Name",
             "type": "string"
@@ -2920,8 +2996,18 @@
             "title": "Next Step",
             "type": "string"
           },
+          "review_status": {
+            "default": "",
+            "title": "Review Status",
+            "type": "string"
+          },
           "what_it_is": {
             "title": "What It Is",
+            "type": "string"
+          },
+          "why_it_matters": {
+            "default": "",
+            "title": "Why It Matters",
             "type": "string"
           }
         },
@@ -4028,6 +4114,164 @@
           "title"
         ],
         "title": "HealthTheme",
+        "type": "object"
+      },
+      "HealthView": {
+        "description": "Frontend exploration payload. No raw questionnaire and no provider metadata.",
+        "properties": {
+          "availability": {
+            "$ref": "#/components/schemas/SourceAvailability"
+          },
+          "built_at": {
+            "format": "date-time",
+            "title": "Built At",
+            "type": "string"
+          },
+          "categories": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CategoryDetail"
+            },
+            "title": "Categories",
+            "type": "object"
+          },
+          "display_name": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Display Name"
+          },
+          "findings": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Finding"
+            },
+            "title": "Findings",
+            "type": "object"
+          },
+          "latest_bio_ai_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Bio Ai Date"
+          },
+          "latest_blood_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Blood Date"
+          },
+          "measured_count": {
+            "default": 0,
+            "title": "Measured Count",
+            "type": "integer"
+          },
+          "metabolic_age": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Metabolic Age"
+          },
+          "overview": {
+            "$ref": "#/components/schemas/UnifiedOverview"
+          },
+          "previous_bio_ai_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Bio Ai Date"
+          },
+          "previous_blood_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Previous Blood Date"
+          },
+          "registry_version": {
+            "title": "Registry Version",
+            "type": "string"
+          },
+          "related_keys": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Related Keys",
+            "type": "object"
+          },
+          "risk_count": {
+            "default": 0,
+            "title": "Risk Count",
+            "type": "integer"
+          },
+          "schema_version": {
+            "title": "Schema Version",
+            "type": "string"
+          },
+          "snapshot_version": {
+            "title": "Snapshot Version",
+            "type": "string"
+          },
+          "state": {
+            "enum": [
+              "ready",
+              "partial",
+              "unavailable"
+            ],
+            "title": "State",
+            "type": "string"
+          },
+          "suggested_questions": {
+            "additionalProperties": {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            "title": "Suggested Questions",
+            "type": "object"
+          }
+        },
+        "required": [
+          "state",
+          "snapshot_version",
+          "schema_version",
+          "registry_version",
+          "built_at",
+          "availability",
+          "overview"
+        ],
+        "title": "HealthView",
         "type": "object"
       },
       "HistoryPoint": {
@@ -7368,6 +7612,62 @@
         "title": "SnapshotReport",
         "type": "object"
       },
+      "SourceAvailability": {
+        "properties": {
+          "bio_ai": {
+            "default": "empty",
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Bio Ai",
+            "type": "string"
+          },
+          "blood": {
+            "default": "empty",
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Blood",
+            "type": "string"
+          },
+          "lifestyle": {
+            "default": "empty",
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Lifestyle",
+            "type": "string"
+          },
+          "profile": {
+            "default": "empty",
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Profile",
+            "type": "string"
+          },
+          "questionnaire": {
+            "default": "empty",
+            "enum": [
+              "ready",
+              "empty",
+              "unavailable"
+            ],
+            "title": "Questionnaire",
+            "type": "string"
+          }
+        },
+        "title": "SourceAvailability",
+        "type": "object"
+      },
       "SourceOutcome": {
         "properties": {
           "detail": {
@@ -9326,6 +9626,27 @@
           }
         },
         "summary": "Refresh",
+        "tags": [
+          "health-explanation"
+        ]
+      }
+    },
+    "/api/v1/health-explanation/view": {
+      "get": {
+        "operationId": "health_view_api_v1_health_explanation_view_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthView"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health View",
         "tags": [
           "health-explanation"
         ]

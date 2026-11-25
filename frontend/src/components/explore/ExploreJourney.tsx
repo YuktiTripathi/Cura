@@ -46,6 +46,21 @@ function questions(view: HealthView, categoryId: string | null, limit = 4): stri
   return (view.suggested_questions?.[categoryId] || []).filter(Boolean).slice(0, limit);
 }
 
+/** Labels of the sections the detail screen shows, so CURA does not explain them again from scratch. */
+function shownSections(finding?: Finding | null): string[] {
+  if (!finding) return [];
+  const edu = finding.education as Edu | null | undefined;
+  const out: string[] = [];
+  if (edu?.what_it_is) out.push("what_it_is");
+  if (edu?.body && edu.body !== edu.what_it_is) out.push("inside_body");
+  if (finding.source_type === "predicted_risk") out.push("assessment", "score");
+  else out.push("your_result", "reference_range");
+  if (edu?.why_it_matters) out.push("why_it_matters");
+  if (edu?.limitations) out.push("limitations");
+  if (finding.previous_value != null) out.push("previous_result");
+  return out;
+}
+
 function refFor(view: HealthView, categoryId: string | null, finding?: Finding | null): ContextRef {
   const base: ContextRef = {
     type: finding?.source_type === "predicted_risk" ? "bio_ai_risk" : finding ? "blood_marker" : "bio_ai_report",
@@ -57,6 +72,7 @@ function refFor(view: HealthView, categoryId: string | null, finding?: Finding |
     report_id: finding?.report_id ?? null,
     marker_code: finding?.source_type === "measured" ? finding.id.split(":").pop() : null,
     risk_code: finding?.source_type === "predicted_risk" ? finding.id.replace(/^risk:/, "") : null,
+    displayed_sections: shownSections(finding),
   };
   return base;
 }
