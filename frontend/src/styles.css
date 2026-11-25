@@ -1355,7 +1355,7 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .about-test p { margin: 2px 0 0; color: var(--text-muted); }
 
 /* Overview cards: introduce the area only. Colour carries the status and nothing else. */
-button.health-card { text-align: left; font: inherit; color: inherit; cursor: pointer; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 6px; min-height: 210px; padding: 16px; }
+button.health-card { text-align: left; font: inherit; color: inherit; cursor: pointer; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 6px; min-height: 0; padding: 16px; }
 button.health-card:hover, button.health-card:focus-visible { border-color: var(--accent); box-shadow: 0 2px 10px rgba(16, 35, 61, 0.08); }
 .health-card .health-card-icon { color: var(--text-muted); }
 .health-card-name { font-size: 1.05rem; }
@@ -1427,3 +1427,11 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
 .range-viz .range-band { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--range-band); }
 .health-card-title { display: flex !important; align-items: center; gap: 0.5rem; }
 .health-card-title strong { flex: 1; }
+
+/* Layout corrections: headings sized to the content, room under the last item so the composer never covers it */
+.cura-category h1 { font-size: 1.5rem; letter-spacing: -0.02em; margin: 0.25rem 0 0.5rem; }
+.cura-category h2, .cura-detail h2 { font-size: 1.05rem; margin: 1.25rem 0 0.5rem; }
+.cura-category .result-row-button { min-height: 0; }
+.explore-card-icon { display: inline-flex; align-items: center; color: var(--accent); }
+.main-scroll { scroll-padding-bottom: 6rem; }
+.main-scroll::after { content: ""; display: block; height: 4.5rem; flex: none; }

@@ -2,28 +2,8 @@ import { useState } from "react";
 import type { RiskExplanationData } from "../../types/chat";
 import { ValueCard } from "../messages/ValueCard";
 import { t } from "../../i18n";
+import { LineIcon } from "../LineIcon";
 
-const ICON_PATHS: Record<string, string> = {
-  meal: "M7 3v8M4 3v5a3 3 0 0 0 3 3M10 3v5a3 3 0 0 1-3 3M7 11v10M17 3c-2 2-3 5-3 8h3v10",
-  move: "M8 4c-1.5 0-2.5 1.5-2.5 3.5S6.5 11 8 11s2.5-1 2.5-3.5S9.5 4 8 4zM6.5 14h3l.5 3a1.5 1.5 0 0 1-3 0zM16 8c-1.5 0-2.5 1.5-2.5 3.5S14.5 15 16 15s2.5-1 2.5-3.5S17.5 8 16 8zM14.5 18h3l.5 2a1.5 1.5 0 0 1-3 0z",
-  sleep: "M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5z",
-  stress: "M12 21c-4-3-7-6-7-10a4 4 0 0 1 7-2 4 4 0 0 1 7 2c0 4-3 7-7 10z",
-  water: "M12 3s6 6.5 6 11a6 6 0 0 1-12 0c0-4.5 6-11 6-11z",
-  test: "M9 3h6M10 3v6l-5 9a2 2 0 0 0 2 3h10a2 2 0 0 0 2-3l-5-9V3M8 15h8",
-  doctor: "M6 3v6a4 4 0 0 0 8 0V3M10 13v3a4 4 0 0 0 8 0v-2M18 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4z",
-  weight: "M5 8h14l1 12H4zM9 8a3 3 0 0 1 6 0M12 12v3",
-  smoke: "M4 16h13v3H4zM19 16v3M17 8c0-2 2-2 2-4M13 8c0-2 2-2 2-4",
-  habit: "M5 12l4 4 10-10",
-};
-
-/** A simple line icon. Decorative: the action title carries the meaning. */
-export function LineIcon({ name }: { name: string }) {
-  return (
-    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d={ICON_PATHS[name] ?? ICON_PATHS.habit} />
-    </svg>
-  );
-}
 
 type Card = NonNullable<RiskExplanationData["score_card"]>;
 

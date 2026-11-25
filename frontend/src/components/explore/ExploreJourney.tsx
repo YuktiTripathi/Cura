@@ -1,3 +1,4 @@
+import { LineIcon } from "../LineIcon";
 import type { ContextRef } from "../../types/chat";
 import type { CategoryDetail, Finding } from "../../types/unifiedHealth";
 import type { HealthView } from "../../lib/api";
@@ -139,7 +140,6 @@ export function ExploreJourney({
   if (place === "overview") {
     return (
       <section className="cura-overview">
-        <button type="button" className="text-button" onClick={() => onPlace("home")}>Home</button>
         <h1>My health</h1>
         <p className="muted">
           {view.overview?.provenance?.blood_report_date ? `Blood results from ${friendlyDate(view.overview.provenance.blood_report_date)}. ` : ""}
@@ -150,7 +150,7 @@ export function ExploreJourney({
           {categories.map((card) => (
             <button key={card.id} type="button" className="health-card" onClick={() => onPlace("category", card.id)}>
               <span className="health-card-title">
-                {card.icon ? <span aria-hidden="true">{card.icon}</span> : null}
+                {card.icon ? <span className="explore-card-icon"><LineIcon name={card.icon} size={20} /></span> : null}
                 <strong>{card.name}</strong>
                 <span className="result-row-chevron" aria-hidden="true">›</span>
               </span>
@@ -171,11 +171,9 @@ export function ExploreJourney({
     const risks = (detail.findings || []).filter((item) => item.source_type === "predicted_risk");
     return (
       <section className="cura-category">
-        <button type="button" className="text-button" onClick={() => onPlace("overview")}>My health</button>
         <h1>{detail.name}</h1>
         {detail.about ? <p>{detail.about}</p> : null}
-        <h2>Blood results</h2>
-        {measured.length === 0 ? <p className="muted">No blood results in this area.</p> : null}
+        {measured.length ? <h2>Blood results</h2> : null}
         <ul className="finding-list">
           {measured.map((item) => (
             <ResultRow
@@ -187,8 +185,7 @@ export function ExploreJourney({
             />
           ))}
         </ul>
-        <h2>Bio-AI assessments</h2>
-        {risks.length === 0 ? <p className="muted">No Bio-AI assessments in this area.</p> : null}
+        {risks.length ? <h2>Bio-AI assessments</h2> : null}
         <ul className="finding-list">
           {risks.map((item) => (
             <ResultRow
@@ -210,7 +207,6 @@ export function ExploreJourney({
     const related = (view.related_keys?.[finding.id] || []).map((key) => Object.values(view.findings || {}).find((item) => item.id.endsWith(key))).filter(Boolean) as Finding[];
     return (
       <article className="cura-detail">
-        <button type="button" className="text-button" onClick={() => onPlace("category", categoryId)}>Back</button>
         <p className="eyebrow">Measured blood result</p>
         <h1>{edu?.name || finding.name}</h1>
         {finding.medical_name ? <p className="muted">{finding.medical_name}</p> : null}
@@ -254,7 +250,7 @@ export function ExploreJourney({
         {finding.previous_value != null ? (
           <>
             <h2>Previous result</h2>
-            <p>{finding.previous_value} {finding.unit || ""}{finding.previous_on ? ` on ${friendlyDate(finding.previous_on)}` : ""}. Shown only because an earlier result used the same measurement.</p>
+            <p>{finding.previous_value} {finding.unit || ""}{finding.previous_on ? ` on ${friendlyDate(finding.previous_on)}` : ""}. It is shown because it is the same measurement.</p>
           </>
         ) : null}
         {related.length > 0 ? (
@@ -270,9 +266,9 @@ export function ExploreJourney({
 
   if (place === "risk" && finding) {
     const edu = finding.education as Edu | null | undefined;
+    const measuredHere = (detail?.findings || []).filter((item) => item.source_type === "measured" && item.value != null).slice(0, 6);
     return (
       <article className="cura-detail">
-        <button type="button" className="text-button" onClick={() => onPlace("category", categoryId)}>Back</button>
         <p className="eyebrow">Predicted Bio-AI assessment</p>
         <h1>{finding.name}</h1>
         {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
@@ -296,6 +292,23 @@ export function ExploreJourney({
           <>
             <h2>What this prediction cannot tell you</h2>
             <p>{edu.limitations}</p>
+          </>
+        ) : null}
+        {measuredHere.length > 0 ? (
+          <>
+            <h2>Measured results in this area</h2>
+            <p className="muted">These come from your blood report. They are measured, not predicted. The Bio-AI score above is a prediction and does not replace them.</p>
+            <ul className="finding-list">
+              {measuredHere.map((item) => (
+                <ResultRow
+                  key={item.id}
+                  title={item.name}
+                  value={item.value != null ? `${item.value}${item.unit ? " " + item.unit : ""}` : null}
+                  note={item.status_label}
+                  onOpen={() => onPlace("marker", categoryId, item.id)}
+                />
+              ))}
+            </ul>
           </>
         ) : null}
         <button type="button" className="primary-action" onClick={() => onAsk(`What does my ${finding.name} assessment mean for me?`, refFor(view, categoryId, finding))}>Ask CURA about this</button>
