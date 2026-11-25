@@ -40,8 +40,8 @@ describe("ExploreJourney", () => {
     fireEvent.click(screen.getByRole("button", { name: /Liver/ }));
     expect(onPlace).toHaveBeenCalledWith("category", "liver_health");
     rerender(<ExploreJourney view={view} loading={false} error={false} name="Alex" place="category" categoryId="liver_health" findingId={null} onPlace={onPlace} onAsk={vi.fn()} />);
-    expect(screen.getByText("Measured · Above range")).toBeTruthy();
-    expect(screen.getByText("Predicted · Healthy")).toBeTruthy();
+    expect(screen.getByText("Above range")).toBeTruthy();
+    expect(screen.getAllByText("Healthy").length).toBeGreaterThan(0);
     fireEvent.click(screen.getByRole("button", { name: /ALT/ }));
     rerender(<ExploreJourney view={view} loading={false} error={false} name="Alex" place="marker" categoryId="liver_health" findingId="alt" onPlace={onPlace} onAsk={vi.fn()} />);
     expect(screen.getByText("Liver cells contain ALT.")).toBeTruthy();

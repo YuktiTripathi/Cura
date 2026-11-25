@@ -11,6 +11,36 @@ type Edu = NonNullable<Finding["education"]> & {
   content_source?: string;
 };
 
+
+function plural(n: number, one: string, many: string): string {
+  return `${n} ${n === 1 ? one : many}`;
+}
+
+/** 2026-08-18 becomes "18 Aug 2026"; anything that is not an ISO date is shown as given. */
+function friendlyDate(value?: string | null): string | null {
+  if (!value) return null;
+  const match = /^(\d{4})-(\d{2})-(\d{2})/.exec(value);
+  if (!match) return value;
+  const date = new Date(Date.UTC(Number(match[1]), Number(match[2]) - 1, Number(match[3])));
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
+}
+
+function ResultRow({ title, value, note, onOpen }: { title: string; value?: string | null; note?: string | null; onOpen: () => void }) {
+  return (
+    <li className="result-row">
+      <button type="button" className="result-row-button" onClick={onOpen}>
+        <span className="result-row-main">
+          <strong>{title}</strong>
+          {note ? <span className="muted">{note}</span> : null}
+        </span>
+        {value ? <span className="result-row-value">{value}</span> : null}
+        <span className="result-row-chevron" aria-hidden="true">›</span>
+      </button>
+    </li>
+  );
+}
+
 function questions(view: HealthView, categoryId: string | null, limit = 4): string[] {
   if (!categoryId) return [];
   return (view.suggested_questions?.[categoryId] || []).filter(Boolean).slice(0, limit);
@@ -92,8 +122,8 @@ export function ExploreJourney({
         <button type="button" className="text-button" onClick={() => onPlace("home")}>Home</button>
         <h1>My health</h1>
         <p className="muted">
-          {view.overview?.provenance?.blood_report_date ? `Blood results from ${view.overview.provenance.blood_report_date}. ` : ""}
-          {view.overview?.provenance?.bio_ai_report_date ? `Bio-AI assessment from ${view.overview.provenance.bio_ai_report_date}.` : ""}
+          {view.overview?.provenance?.blood_report_date ? `Blood results from ${friendlyDate(view.overview.provenance.blood_report_date)}. ` : ""}
+          {view.overview?.provenance?.bio_ai_report_date ? `Bio-AI assessment from ${friendlyDate(view.overview.provenance.bio_ai_report_date)}.` : ""}
         </p>
         {categories.length === 0 ? <p>No blood results or Bio-AI assessments are available yet.</p> : null}
         <div className="health-grid">
@@ -102,8 +132,8 @@ export function ExploreJourney({
               <strong>{card.name}</strong>
               <span>{card.description || card.summary}</span>
               <span className="muted">
-                {card.measured?.total ? `${card.measured.total} blood tests` : "No blood tests"}
-                {card.risks?.assessed ? ` · ${card.risks.assessed} Bio-AI assessments` : ""}
+                {card.measured?.total ? plural(card.measured.total, "blood test", "blood tests") : "No blood tests"}
+                {card.risks?.assessed ? ` · ${plural(card.risks.assessed, "Bio-AI assessment", "Bio-AI assessments")}` : ""}
               </span>
             </button>
           ))}
@@ -124,25 +154,26 @@ export function ExploreJourney({
         {measured.length === 0 ? <p className="muted">No blood results in this area.</p> : null}
         <ul className="finding-list">
           {measured.map((item) => (
-            <li key={item.id}>
-              <button type="button" onClick={() => onPlace("marker", categoryId, item.id)}>
-                <strong>{item.name}</strong>
-                <span>{item.value ?? "—"} {item.unit || ""}</span>
-                <span className="muted">Measured · {item.status_label}</span>
-              </button>
-            </li>
+            <ResultRow
+              key={item.id}
+              title={item.name}
+              value={item.value != null ? `${item.value}${item.unit ? " " + item.unit : ""}` : null}
+              note={item.status_label}
+              onOpen={() => onPlace("marker", categoryId, item.id)}
+            />
           ))}
         </ul>
         <h2>Bio-AI assessments</h2>
         {risks.length === 0 ? <p className="muted">No Bio-AI assessments in this area.</p> : null}
         <ul className="finding-list">
           {risks.map((item) => (
-            <li key={item.id}>
-              <button type="button" onClick={() => onPlace("risk", categoryId, item.id)}>
-                <strong>{item.name}</strong>
-                <span className="muted">Predicted · {item.classification || item.status_label}</span>
-              </button>
-            </li>
+            <ResultRow
+              key={item.id}
+              title={item.name}
+              value={item.classification || null}
+              note={item.status_label}
+              onOpen={() => onPlace("risk", categoryId, item.id)}
+            />
           ))}
         </ul>
         <QuestionList prompts={questions(view, categoryId)} onAsk={(text) => onAsk(text, refFor(view, categoryId))} />
@@ -163,7 +194,7 @@ export function ExploreJourney({
         <section className="result-card">
           <p><strong>{finding.value != null ? finding.value : finding.status_label}</strong> {finding.value != null ? finding.unit || "" : ""}</p>
           <p>{finding.status_label}</p>
-          <p className="muted">{finding.measured_on || "Collection date unavailable"}</p>
+          <p className="muted">{friendlyDate(finding.measured_on) || "Collection date unavailable"}</p>
           <RangeNote finding={finding} />
         </section>
         <h2>What happens inside my body?</h2>
@@ -200,7 +231,7 @@ export function ExploreJourney({
         <p>{edu?.body || edu?.what_it_is || "Educational content is currently unavailable."}</p>
         <h2>What does my health report say?</h2>
         <p>{finding.classification || finding.status_label}{finding.score != null ? ` · score ${finding.score}` : ""}</p>
-        <p className="muted">{finding.measured_on || "Assessment date unavailable"}</p>
+        <p className="muted">{friendlyDate(finding.measured_on) || "Assessment date unavailable"}</p>
         <h2>What does this specifically mean for me?</h2>
         <p>{edu?.limitations || "A personal reading of this score is not available from your report alone."}</p>
         <h2>What can I do to protect my future health?</h2>
@@ -232,17 +263,29 @@ function RangeNote({ finding }: { finding: Finding }) {
   const unit = finding.unit || "";
   if (value == null) return <p className="muted">This result is shown as reported text, not on a number line.</p>;
   if (low != null && high != null && high > low) {
+    // The bar runs a little beyond the range on both sides, so a result outside the range is drawn outside the band.
     const span = high - low;
-    const pct = Math.min(100, Math.max(0, ((value - low) / span) * 100));
+    const min = Math.min(low - span * 0.5, value - span * 0.1);
+    const max = Math.max(high + span * 0.5, value + span * 0.1);
+    const at = (n: number) => `${(((n - min) / (max - min)) * 100).toFixed(1)}%`;
+    const relation = value < low ? "below" : value > high ? "above" : "within";
+    const words = { below: "below the range on your report", above: "above the range on your report", within: "within the range on your report" }[relation];
     return (
-      <div className="range-viz" aria-label={`Result ${value} ${unit}, reference ${low} to ${high}`}>
-        <div className="range-track"><span className="range-mark" style={{ left: `${pct}%` }} /></div>
-        <p className="muted">Reference range {low}–{high} {unit}</p>
+      <div className="range-viz" data-relation={relation} aria-label={`Result ${value} ${unit}, ${words}, range ${low} to ${high}`}>
+        <div className="range-track">
+          <span className="range-band" style={{ left: at(low), width: `${(((high - low) / (max - min)) * 100).toFixed(1)}%` }} />
+          <span className="range-mark" style={{ left: at(value) }} />
+        </div>
+        <p className="muted">Your result is {words}: {low} to {high} {unit}</p>
       </div>
     );
   }
-  if (low != null && high == null) return <p className="muted">Reference range starts at {low} {unit}. The report did not give an upper limit.</p>;
-  if (high != null && low == null) return <p className="muted">Reference range goes up to {high} {unit}. The report did not give a lower limit.</p>;
+  if (low != null && high == null) {
+    return <p className="muted">{value < low ? "Your result is below" : "Your result is at or above"} the lowest value on your report, {low} {unit}. The report gave no upper limit.</p>;
+  }
+  if (high != null && low == null) {
+    return <p className="muted">{value > high ? "Your result is above" : "Your result is at or below"} the highest value on your report, {high} {unit}. The report gave no lower limit.</p>;
+  }
   return <p className="muted">This report did not include a reference range.</p>;
 }
 

@@ -1410,3 +1410,18 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
     scroll-behavior: auto !important;
   }
 }
+
+/* Explore journey result rows */
+.finding-list { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; gap: 0.5rem; }
+.result-row-button { display: flex; align-items: center; gap: 0.75rem; width: 100%; min-height: 56px; padding: 0.75rem 1rem; text-align: left; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 12px; cursor: pointer; }
+.result-row-button:hover { border-color: var(--accent); }
+.result-row-button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.result-row-main { flex: 1; display: grid; gap: 2px; min-width: 0; }
+.result-row-value { font-variant-numeric: tabular-nums; font-weight: 600; white-space: nowrap; }
+.result-row-chevron { color: var(--text-muted); font-size: 1.25rem; }
+.cura-home, .cura-overview, .cura-category, .cura-detail { width: 100%; max-width: 760px; margin: 0 auto; padding: 1.25rem 1rem 6rem; box-sizing: border-box; }
+.health-grid { display: grid; gap: 0.75rem; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+.health-card { text-align: left; padding: 1rem; min-height: 56px; font: inherit; color: inherit; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; cursor: pointer; display: grid; gap: 4px; }
+.health-card:hover { border-color: var(--accent); }
+.range-viz[data-relation="above"] .range-mark, .range-viz[data-relation="below"] .range-mark { background: var(--status-out); }
+.range-viz .range-band { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--range-band); }

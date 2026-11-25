@@ -52,7 +52,7 @@ export function WelcomeExperience({
                   })
             }
           >
-            🩺 <strong>{t("ui.WelcomeExperience.my_health_overview", "My Health Overview")}</strong>
+            🩺 <strong>{t("ui.WelcomeExperience.understand_my_health_better", "Understand my health better")}</strong>
             <span>{t("ui.WelcomeExperience.blood_results_and_risks_together", "Your blood results and future risks together")}</span>
           </button>
         )}
@@ -67,7 +67,7 @@ export function WelcomeExperience({
             }
           >
             🥗 <strong>{t("ui.WelcomeExperience.nutrition", "Nutrition")}</strong>
-            <span>{t("ui.WelcomeExperience.explore_policy_checked_food_guidance", "Explore policy-checked food guidance")}</span>
+            <span>{t("ui.WelcomeExperience.explore_food_guidance", "Explore food guidance for your results")}</span>
           </button>
         )}
         <button type="button" onClick={() => inputRef.current?.focus()}>

@@ -121,7 +121,7 @@ describe("CuraPage shell", () => {
       expect(screen.getByText("Hi Yukti 👋")).toBeTruthy();
     });
     expect(screen.getByText("How can I help you understand your health better?")).toBeTruthy();
-    expect(screen.getByText("My Health Overview")).toBeTruthy();
+    expect(screen.getByText("Understand my health better")).toBeTruthy();
     expect(screen.queryByText("My Blood Report")).toBeNull();
     expect(screen.queryByText("My Health Scenario")).toBeNull();
     expect(screen.getByRole("button", { name: /Nutrition/ })).toBeTruthy();
@@ -134,7 +134,7 @@ describe("CuraPage shell", () => {
     expect(sidebar).toBeTruthy();
     expect(sidebar?.textContent).toContain("Recent conversations");
     expect(document.querySelector(".page")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /My Health Overview/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Understand my health better/ }));
     expect(screen.getByRole("heading", { name: "Health information is unavailable" })).toBeTruthy();
     expect(screen.queryByText("How can I help you understand your health better?")).toBeNull();
   });
