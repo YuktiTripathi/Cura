@@ -1260,19 +1260,17 @@ class ChatService:
 
         # Relevance-driven questionnaire enrichment: fetch lifestyle answers only when they can
         # change this answer (advice, "why", priorities, reviews), never for a plain lookup.
-        if (
-            not plan.needs_questionnaire
-            and plan.knowledge_scope == KnowledgeScope.personal
-            and should_enrich_with_questionnaire(
-                payload.message,
-                personal=True,
-                entities=list(dict.fromkeys([*(plan.requested_metrics or []), *([plan.topic] if plan.topic else [])])),
-                domains=list(plan.domains or []),
-                overall=plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
-                or "overall_health" in (plan.domains or []),
-            )
+        if plan.knowledge_scope == KnowledgeScope.personal and should_enrich_with_questionnaire(
+            payload.message,
+            personal=True,
+            entities=list(dict.fromkeys([*(plan.requested_metrics or []), *([plan.topic] if plan.topic else [])])),
+            domains=list(plan.domains or []),
+            overall=plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
+            or "overall_health" in (plan.domains or []),
         ):
-            plan = plan.model_copy(update={"needs_questionnaire": True})
+            # The same relevance decision brings both the recorded lifestyle fields and the questionnaire
+            # answers, so the personal context projection has them for every personal question.
+            plan = plan.model_copy(update={"needs_questionnaire": True, "needs_lifestyle": True})
             eval_turn["questionnaire_enriched"] = True
 
         general_only = (
@@ -1418,6 +1416,11 @@ class ChatService:
         use_knowledge = (
             getattr(plan, "medical_evidence_required", False) or general_answer
         ) and (settings.report_use_knowledge_base or not report_question)
+        # The Medical Knowledge Library V2.3 is the curated source for the markers and Bio-AI risks being
+        # discussed, so a personal question gets those passages too (never the whole library).
+        library_scope = bool(report_question and not use_knowledge and getattr(plan, "needs_personal_data", False))
+        if library_scope:
+            use_knowledge = True
         # A personal Bio-AI question still needs the Bio-AI guide (score is not a probability, what a
         # percentile is). Only that guide is allowed here; the person's own values stay authoritative.
         explainer_only = bool(
@@ -1431,6 +1434,9 @@ class ChatService:
                 from app.pipeline.evidence_inventory import requested_marker_keys
 
                 keys = list(requested_marker_keys(payload.message))
+                keys += [getattr(r, "code", None) for r in (context.bio_ai_risks or []) if getattr(r, "code", None) and not keys][:2]
+                if not keys:
+                    keys = [k for k in [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])] if k][:3]
                 for key in list(keys):
                     for other in related_ids(key)[:4]:
                         if other not in keys:

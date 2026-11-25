@@ -7,6 +7,7 @@ because of an old review status. The medical text is not rewritten here.
 from __future__ import annotations
 
 import json
+import re
 from functools import lru_cache
 from pathlib import Path
 
@@ -114,37 +115,98 @@ def category_intro(category_id: str | None) -> str:
     return (row.get("short_description") or "").strip() if eligible(row) else ""
 
 
+def _intent_of(text: str) -> str:
+    if re.search(r"\b(why|cause|causes|reason|reasons|explain why|what could|how come)\b", text):
+        return "possible_causes"
+    if re.search(r"\b(relate|related|relationship|connected|connection|link|linked|together|compare|affect|affects)\b", text):
+        return "relationship"
+    if re.search(r"\b(what does|mean|means|result|meaning)\b", text):
+        return "interpretation"
+    return "definition"
+
+
+def _clean_lines(value) -> list[str]:
+    if isinstance(value, str):
+        value = [value]
+    return [str(v).strip() for v in value or [] if str(v).strip()]
+
+
+def canonical_key(key: str | None) -> str | None:
+    """The library id for a CURA key ("hdl" becomes "hdl_cholesterol_direct"), or the key itself."""
+    if not key:
+        return key
+    if key in biomarker_content() or key in bio_ai_content():
+        return key
+    try:
+        from app.biomarkers.resolver import resolve_marker
+
+        hit = resolve_marker(key)
+        return hit.canonical_id if hit.canonical_id and hit.canonical_id in biomarker_content() else key
+    except Exception:  # noqa: BLE001 - a missing identity leaves the key as it was
+        return key
+
+
 def chat_passages(message: str, keys: list[str]) -> list[str]:
-    """Relevant V2.3 fields only. Never the whole library."""
+    """Relevant V2.3 fields for this question only. Never the whole library, never a biology lesson
+    when the person asked why a result is low."""
 
     text = (message or "").lower()
-    detailed = any(word in text for word in ("why", "low", "high", "connected", "related", "compare"))
+    mode = _intent_of(text)
+    side = "low" if re.search(r"\blow(er)?\b|\bbelow\b|\bdeficien", text) else "high" if re.search(r"\bhigh(er)?\b|\babove\b|\braised\b|\belevated\b", text) else ""
     lines: list[str] = []
-    for key in keys:
-        row = entry_for(key) or (bio_ai_content().get(key) if eligible(bio_ai_content().get(key)) else None)
+    seen: set[str] = set()
+
+    def add(label: str, parts: list[str]) -> None:
+        fresh = []
+        for part in parts:
+            key = " ".join(part.lower().split()).rstrip(".")
+            if key and key not in seen:
+                seen.add(key)
+                fresh.append(part.rstrip("."))
+        if fresh:
+            lines.append(f"{label}: " + ". ".join(fresh) + ".")
+
+    keys = [canonical_key(k) for k in keys if k]
+    for position, key in enumerate(keys):
+        risk = bio_ai_content().get(key)
+        row = entry_for(key) or (risk if eligible(risk) else None)
         if not row:
             continue
+        if position > 0 and mode != "definition":
+            continue  # related results contribute through the relationship lines only
         name = row.get("display_name") or row.get("clinical_name") or key
-        body = " ".join(row.get("what_happens_inside_my_body") or [])
-        why = " ".join(row.get("why_it_matters") or []) if isinstance(row.get("why_it_matters"), list) else (row.get("why_it_matters") or "")
-        if detailed:
-            explanations = row.get("result_explanations") or {}
-            side = "low" if "low" in text else "high" if "high" in text else ""
-            chosen = explanations.get(side) or [] if side else []
-            piece = " ".join(
-                part
-                for part in (
-                    body,
-                    " ".join(chosen),
-                    " ".join(row.get("clinical_limitations") or []),
-                )
-                if part
-            )
+        explanations = row.get("result_explanations") or {}
+        limits = _clean_lines(row.get("clinical_limitations"))
+        limits = [line for line in limits if "not confirmed" not in line.lower()]
+        if mode == "possible_causes":
+            if side:
+                add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
+            add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
+            add(f"{name}, limits", limits)
+        elif mode == "relationship":
+            add(f"{name}, summary", _clean_lines(row.get("short_description")))
+            add(f"{name}, limits", limits)
+        elif mode == "interpretation":
+            add(f"{name}", _clean_lines(row.get("short_description")))
+            if side:
+                add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
+            add(f"{name}, limits", limits)
         else:
-            piece = " ".join(part for part in (row.get("short_description") or "", body, why) if part)
-        if piece:
-            lines.append(f"{name}: {piece}")
-    return lines[:6]
+            add(name, _clean_lines(row.get("short_description")) + _clean_lines(row.get("what_happens_inside_my_body"))[:2])
+    if mode in {"possible_causes", "relationship", "interpretation"}:
+        wanted = set(keys[:1])
+        added = 0
+        for rel in sorted(relationships(), key=lambda r: 0 if r.get("priority") == "primary" else 1):
+            if added >= 3:
+                break
+            if not eligible(rel) or mode not in (rel.get("retrieve_when") or []):
+                continue
+            left, right = _endpoint(rel, "source"), _endpoint(rel, "related")
+            other = right if left in wanted else left if right in wanted else None
+            if other and rel.get("user_explanation"):
+                add(f"Relationship with {other.replace('_', ' ')}", [rel["user_explanation"]] + _clean_lines(rel.get("clinical_limitations"))[:1])
+                added += 1
+    return lines[:8]
 
 
 def entry_for(biomarker_id: str | None) -> dict | None:
@@ -178,6 +240,7 @@ def _endpoint(row: dict, side: str) -> str | None:
 def related_ids(biomarker_id: str, present: set[str] | None = None) -> list[str]:
     """One hop. When present is set, only biomarkers on this person's report."""
 
+    biomarker_id = canonical_key(biomarker_id) or biomarker_id
     found: list[str] = []
     for row in relationships():
         if not eligible(row):

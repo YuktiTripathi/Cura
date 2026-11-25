@@ -18,6 +18,7 @@ from app.pipeline.questionnaire_topics import SUMMARY_KEYS
 
 # Ordered by how often the key changes the advice for that marker.
 ENTITY_QUESTIONNAIRE_MATRIX: dict[str, tuple[str, ...]] = {
+    "vitamin_d": ("diet_preference", "food_groups"),
     # Glycemic / metabolic
     "hba1c": ("physical_activity_frequency", "sitting_hours", "food_groups", "exercise_frequency_week",
               "daily_active_duration", "healthy_breakfast_frequency", "sleeping_hours", "diet_preference"),

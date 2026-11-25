@@ -27,7 +27,7 @@ def test_tiny_gap_is_minor_and_brief_and_never_a_goal_to_chase():
     assert plan.proportion == Proportion.minor and plan.detail_level == "brief"
     assert "goal_to_raise_or_lower_waste_marker" in plan.must_not_claim
     text = plan_prompt(plan)
-    assert "only slightly outside" in text and "routine recheck" in text
+    assert "recheck" not in text.lower() and "minor" not in text.lower()
     assert "Never suggest raising or lowering" in text
 
 
@@ -95,7 +95,7 @@ def test_modes_never_break_the_prompt(monkeypatch, mode):
     res = TestClient(app).post("/api/v1/chat", headers={"X-Cura-User-Id": "demo-user-001"}, json={"message": "What does my latest HbA1c mean?"})
     assert res.status_code == 200
     assert seen["system"].startswith("# CURA, personal health companion")
-    assert ("ANSWER PLAN" in seen["system"]) == (mode == "on")
+    assert "ANSWER PLAN" not in seen["system"] and "Begin with ONE short friendly sentence" not in seen["system"]
 
 
 def test_plain_result_question_is_not_a_trend_just_because_an_earlier_report_exists():
@@ -149,19 +149,20 @@ def test_why_is_it_important_is_an_explanation_not_a_cause_question():
 def test_exact_point_count_is_passed_to_the_model():
     plan = build_answer_plan(_ctx([_marker("glucose", "Glucose", 95.0, 70.0, 100.0, "normal")], kind=None), "Summarise my health in 3 points")
     assert plan.requested_points == 3
-    assert "exactly 3 bullets" in plan_prompt(plan)
+    assert "exactly 3 points" in plan_prompt(plan)
     assert build_answer_plan(_ctx([]), "Explain it in two sentences").requested_points == 2
 
 
 def test_out_of_range_question_gets_a_list_plan_without_headings():
     plan = build_answer_plan(_ctx([_marker("ldl", "LDL", 138.0, 0.0, 100.0, "high")], kind=None), "Which of my blood values are out of range?")
     assert plan.intent == PlanIntent.out_of_range_list
-    assert "No headings" in plan_prompt(plan)
+    text = plan_prompt(plan)
+    assert "outside their range" in text and "ANSWER PLAN" not in text
 
 
-def test_marked_lookup_keeps_the_advice_to_see_a_doctor_and_an_opener():
+def test_plan_never_forces_a_shape_or_a_severity_from_range_distance():
     vit_d = _marker("vitamin_d", "Vitamin D", 12.6, 30.0, 100.0, "low")
     plan = build_answer_plan(_ctx([vit_d], goal="lookup"), "What is my latest Vitamin D?")
-    assert Component.escalation in plan.components
     text = plan_prompt(plan)
-    assert text.startswith("ANSWER PLAN. Begin with ONE short friendly sentence") and "worth showing to a doctor" in text
+    for forbidden in ("ANSWER PLAN", "Begin with ONE", "in this order", "well outside", "routine recheck", "not call it minor"):
+        assert forbidden not in text

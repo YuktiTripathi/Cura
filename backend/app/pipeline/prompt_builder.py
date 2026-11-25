@@ -179,6 +179,7 @@ def _system_for_mode(text: str) -> str:
 
 from app.pipeline.topic_risk import high_risk_topics  # noqa: E402
 from app.pipeline.answer_evidence import build_answer_evidence, uses_answer_evidence  # noqa: E402
+from app.pipeline.personal_projection import personal_context_block  # noqa: E402
 
 
 class PromptBuilder:
@@ -209,8 +210,10 @@ class PromptBuilder:
                 "Write the entire answer in English. Keep medical terms and numbers unchanged.\n"
                 "VERIFIED PATIENT EVIDENCE is the only source of this member's measurements and scores; add no other value. "
                 "Answer the task's response type only. "
-                "For a source under missing, say the member's report does not include it (never 'retrieved'); do not ask for an upload "
-                "when the status is NOT_PRESENT or NOT_RETRIEVED. Never print the words task contract or evidence package.\n"
+                "Each entry under missing has a status. NOT_PRESENT means the report was checked and does not include it: say so only if the "
+                "question needs it, and do not ask for an upload. NOT_RETRIEVED means it was not looked up for this answer, so never say the report "
+                "lacks it; if the question needs it, say you do not have it in this answer and offer to look. RETRIEVAL_FAILED or EXTRACTION_FAILED "
+                "means it could not be read just now: say that, never that it is absent. Never print the words task contract or evidence package.\n"
                 + (
                     "Use a supported comparison's values and dates. For an unsupported one, state no numeric change, copy no unit, "
                     "and do not say it improved or worsened.\n"
@@ -220,7 +223,8 @@ class PromptBuilder:
                 + f"TASK:\n{compact_json(task)}\n"
                 f"VERIFIED PATIENT EVIDENCE:\n{compact_json(context.evidence_package)}\n"
                 f"{evidence_block}"
-                f"{_follow_up_brief_block(context)}"
+                + personal_context_block(context, user_message)
+                + f"{_follow_up_brief_block(context)}"
                 + _selected_upload_block(context)
                 + _medical_block(context, user_message)
                 + "Conversation focus (topic and follow-up only; never a source of current lab values): "
@@ -253,6 +257,7 @@ class PromptBuilder:
                 "things out, not to list values.\n"
                 f"Data source: {context.data_source}\n"
                 + f"ANSWER EVIDENCE JSON:\n{compact_json(evidence.payload())}\n"
+                + personal_context_block(context, user_message)
                 + _medical_block(context, user_message)
                 + "Conversation focus (topic and follow-up only; never a source of current lab values): "
                 f"{conversation_summary}\n"
@@ -279,6 +284,7 @@ class PromptBuilder:
                 + _clinical_brief_block(context, user_message)
                 + _focus_brief_block(context)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{compact_json(payload)}\n"
+                + personal_context_block(context, user_message)
                 + _selected_upload_block(context)
                 + (
                     "Cards show: "
@@ -1096,21 +1102,6 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
         "facts": fact_rows,
         "meta": context.meta.model_dump(mode="json") if context.meta else None,
     }
-    if context.screen_context:
-        payload["screen_context"] = context.screen_context
-    if context.goals:
-        payload["goals"] = [row.model_dump(mode="json", exclude_none=True) for row in context.goals[: (4 if compact else 8)]]
-    if context.personalization:
-        from app.pipeline.personal_projection import project_personalization
-        from app.pipeline.turn_kinds import TurnKind, kind_of
-
-        entities = [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])]
-        payload["personalization"] = project_personalization(
-            context.personalization,
-            entities=entities,
-            food_question=kind_of(context, "") == TurnKind.nutrition_overview or context.intent.value == "nutrition_guidance",
-            wants_history=context.intent.value in {"trend", "previous_result", "bio_ai_comparison"},
-        )
     if context.health_story:
         payload["health_story"] = context.health_story.model_dump(mode="json")
     if context.quiet and context.quiet.active:
@@ -1146,10 +1137,6 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
             row.model_dump(mode="json", exclude_none=True)
             for row in context.questionnaire[: (4 if compact else 8)]
         ]
-    if context.profile:
-        profile = context.profile.model_dump(mode="json", exclude_none=True)
-        profile.pop("subject_id", None)
-        payload["profile"] = profile
     if context.source_status:
         payload["source_status"] = {
             key: row.model_dump(mode="json") for key, row in context.source_status.items()

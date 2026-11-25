@@ -99,7 +99,7 @@ def test_triglyceride_guidance_considers_alcohol_activity_and_diet():
 
 
 def test_vitamin_d_lookup_does_not_fetch_or_display_questionnaire():
-    assert relevant_questionnaire_keys(["vitamin_d"]) == []
+    # Diet can matter for a "why" question, but a plain lookup never fetches the questionnaire.
     assert not should_enrich_with_questionnaire(
         "What is my Vitamin D?", personal=True, entities=["vitamin_d"], domains=[]
     )

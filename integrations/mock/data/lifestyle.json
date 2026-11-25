@@ -3,20 +3,42 @@
     "subject_id": "demo-user-001",
     "activity_level": "moderate",
     "sleep_quality": "fair",
-    "notes": ["Desk-based workdays", "Walks most evenings"]
+    "notes": [
+      "Desk-based workdays",
+      "Walks most evenings"
+    ],
+    "dietary_preference": "non_vegetarian"
   },
   {
     "subject_id": "demo-user-002",
     "activity_level": "high",
     "sleep_quality": "good",
-    "notes": ["Regular training"]
+    "notes": [
+      "Regular training"
+    ]
   },
   {
     "subject_id": "eval-user-iron",
     "activity_level": "light",
     "sleep_quality": "fair",
-    "notes": ["Mostly vegetarian meals"]
+    "notes": [
+      "Mostly vegetarian meals"
+    ]
   },
-  {"subject_id": "eval-user-metabolic", "activity_level": "low", "sleep_quality": "fair", "notes": ["Desk job"]},
-  {"subject_id": "eval-user-companion", "activity_level": "low", "sleep_quality": "fair", "notes": ["Desk job"]}
+  {
+    "subject_id": "eval-user-metabolic",
+    "activity_level": "low",
+    "sleep_quality": "fair",
+    "notes": [
+      "Desk job"
+    ]
+  },
+  {
+    "subject_id": "eval-user-companion",
+    "activity_level": "low",
+    "sleep_quality": "fair",
+    "notes": [
+      "Desk job"
+    ]
+  }
 ]

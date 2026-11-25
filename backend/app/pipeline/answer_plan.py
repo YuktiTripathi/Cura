@@ -255,40 +255,29 @@ def build_answer_plan(context, message: str) -> AnswerPlan:
 
 
 def plan_prompt(plan: AnswerPlan) -> str:
-    """The plan as an instruction block. Empty when the plan adds nothing the standing prompt lacks."""
+    """Short, non conflicting notes from the plan. It never prescribes an answer shape.
+
+    The model chooses the natural structure for the question. Only things the person asked for (a list of
+    results, a number of points) and things already said in this chat shape the reply. Distance from a
+    laboratory range is never turned into a severity label or a retest instruction here.
+    """
     lines: list[str] = []
-    shaped = plan.intent in {PlanIntent.lookup, PlanIntent.personal_interpretation, PlanIntent.cause, PlanIntent.action, PlanIntent.trend}
     if plan.intent == PlanIntent.out_of_range_list:
         lines.append(
-            "ANSWER PLAN. After the friendly opener, list only the results that are outside their range, one bullet each: the name, the value in bold with its unit, "
-            "the range on the report and how far outside it is. No headings and no empty bullets. End with one bullet on what to do first, "
-            f"and keep it to about {plan.answer_length_target_words} words in all."
-        )
-    elif shaped or (plan.follow_up and plan.already_explained):
-        numbered = [f"{i}) {_PART_TEXT[c]}" for i, c in enumerate(plan.components, 1)]
-        lines.append(
-            "ANSWER PLAN. Begin with ONE short friendly sentence that is not a bullet, then give only these bullets, in this order, no labels, no headings, one idea each, about "
-            f"{plan.answer_length_target_words} words in all: " + " ".join(numbered) + "."
+            "The person asked which results are outside their range. List those results, each with its value, unit and the range on the report. "
+            "Leave out results inside the range."
         )
     if plan.requested_points:
         lines.append(
-            f"The person asked for {plan.requested_points} points. Give exactly {plan.requested_points} bullets after the opener, no headings, one sentence each, "
-            "the most important things first."
+            f"The person asked for {plan.requested_points} points. Give exactly {plan.requested_points} points, the most important first."
         )
     if plan.follow_up and plan.already_explained:
         lines.append(
             "Already explained in this chat, so do not explain it again: " + "; ".join(item.replace("_", " ") for item in plan.already_explained)
             + ". Answer only the new question."
         )
-    if plan.proportion == Proportion.minor:
-        lines.append(
-            "The result is only slightly outside its range. Say so plainly and calmly, say it is usually minor and that a routine recheck is enough, "
-            "and do not build a plan around it."
-        )
-    elif plan.proportion == Proportion.marked and plan.intent in {PlanIntent.lookup, PlanIntent.personal_interpretation, PlanIntent.cause}:
-        lines.append("The result is well outside its range. Say so plainly and kindly, do not call it minor, and say it is worth showing to a doctor.")
-    elif plan.proportion == Proportion.within_range:
-        lines.append("The result is inside its range. Say so warmly and keep it short.")
+    if plan.proportion == Proportion.within_range:
+        lines.append("The result is inside its range on the report. Say so plainly.")
     if "goal_to_raise_or_lower_waste_marker" in plan.must_not_claim:
         lines.append("Never suggest raising or lowering this marker as a goal in itself.")
     return " ".join(lines)
