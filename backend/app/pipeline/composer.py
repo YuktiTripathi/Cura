@@ -88,6 +88,11 @@ from app.pipeline.turn_kinds import TurnKind, kind_of  # noqa: E402
 
 _CARD_TITLES = {"Results linked to your diet", "Results outside your range", "Your Bio-AI scores"}
 
+def _asks_for_bio_ai(message: str | None) -> bool:
+    text = (message or "").lower()
+    return any(word in text for word in ("bio-ai", "bio ai", "bioai", "risk score", "predicted risk"))
+
+
 _OVERVIEW_INTENTS = {
     IntentType.report_explanation,
     IntentType.broad_health_summary,
@@ -310,12 +315,22 @@ class ResponseComposer:
                 presentation.headline = None
         if settings.cura_prompt_variant == "house" and plan.intent in _OVERVIEW_INTENTS and presentation.headline:
             # One result's name must not title a card that holds several results.
-            if plan.intent.value.startswith("bio_ai"):
+            shown = list(presentation.findings or [])
+            if plan.intent.value.startswith("bio_ai") and shown and all(f.source_type == "bio_ai_report" for f in shown):
                 presentation.headline = "Your Bio-AI scores"
+            elif any(f.source_type == "bio_ai_report" for f in shown) and any(f.source_type != "bio_ai_report" for f in shown):
+                # Measured blood results and predicted Bio-AI scores never share one title.
+                presentation.headline = None
             elif sum(1 for m in (context.markers or []) if _marker_out_of_range(m)) > 1:
                 presentation.headline = "Results outside your range"
         if settings.cura_prompt_variant == "house" and kind_of(context, plan.raw_message) == TurnKind.nutrition_overview and presentation.headline:
             presentation.headline = "Results linked to your diet"
+        if settings.cura_prompt_variant == "house" and not plan.intent.value.startswith("bio_ai") and not _asks_for_bio_ai(plan.raw_message):
+            # A blood result or food question carries no Bio-AI card unless the person asked for one.
+            presentation.findings = [f for f in presentation.findings if f.source_type != "bio_ai_report"]
+            presentation.raw_findings = [f for f in presentation.raw_findings if f.source_type != "bio_ai_report"]
+            if presentation.headline == "Your Bio-AI scores":
+                presentation.headline = None
         if settings.cura_prompt_variant == "house" and presentation.headline in _CARD_TITLES and not presentation.findings:
             # A card title with no card under it is just a stray heading.
             presentation.headline = None

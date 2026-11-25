@@ -147,7 +147,8 @@ export function MessageList({
             {m.testingOption && !m.presentation ? <TestingOptionCard option={m.testingOption} /> : null}
             {m.recommendations && <Recommendations items={m.recommendations} />}
             {m.meta?.escalation && <EscalationNote escalation={m.meta.escalation} contacts={m.meta.emergency_contacts} />}
-            {m.role === "assistant" && (
+            {m.role === "assistant" && groupEvidence(m.evidence).length === 0 && (
+              // One sources control per answer: the message actions already offer it when evidence exists.
               <ProvenanceLine
                 provenance={m.provenance}
                 findings={
