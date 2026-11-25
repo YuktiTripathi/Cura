@@ -17,7 +17,10 @@ export type BlockType =
   | "reassurance"
   | "action_list"
   | "nutrition"
-  | "warning";
+  | "warning"
+  | "medical_education"
+  | "medical_relationship"
+  | "lifestyle_education";
 
 export interface ResolvedValue {
   key: string; // blood.<code>.latest | blood.<code>.trend | bioai.<code>
@@ -48,6 +51,8 @@ export interface ResponseBlock {
   items?: BlockItem[];
   evidence?: string[];
   values?: ResolvedValue[];
+  ref?: string | null; // library reference the backend validated
+  lines?: string[]; // reviewed library text resolved by the backend
   increase?: string[];
   reduce?: string[];
   collapsed?: boolean;

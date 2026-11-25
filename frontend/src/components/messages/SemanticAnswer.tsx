@@ -94,6 +94,16 @@ export function Block({ block }: { block: ResponseBlock }) {
           <List items={block.items || []} ordered={block.type === "priority_list"} />
         </Section>
       );
+    case "medical_education":
+    case "medical_relationship":
+    case "lifestyle_education":
+      return (
+        <Section block={block}>
+          {(block.lines || []).map((line) => (
+            <p key={line} className="sem-library-line">{line}</p>
+          ))}
+        </Section>
+      );
     case "nutrition":
       return (
         <Section block={block}>

@@ -19,6 +19,7 @@ from __future__ import annotations
 
 import re
 
+from app.pipeline import supporting_content
 from app.contracts.semantic_response import (
     BLOCK_TYPES,
     BlockItem,
@@ -35,6 +36,7 @@ _KEY = re.compile(r"^(?:(blood|bioai|bio_ai)\.)?([a-z0-9_]+)(?:\.(latest|trend))
 _VALUE_BLOCKS = {"metric", "metric_group", "risk", "comparison"}
 _TEXT_BLOCKS = {"text", "insight", "reassurance", "warning"}
 _LIST_BLOCKS = {"priority_list", "action_list"}
+_LIBRARY_BLOCKS = {"medical_education", "medical_relationship", "lifestyle_education"}
 
 
 def _flag(marker) -> str | None:
@@ -137,6 +139,13 @@ def validate_block(raw: dict, index: _Index, context) -> ResponseBlock | None:
     title = _plain(raw.get("title"), limit=80)
     text = _plain(raw.get("text"))
     block = ResponseBlock(type=kind, title=title)
+    if kind in _LIBRARY_BLOCKS:
+        resolved = supporting_content.resolve(str(raw.get("ref") or ""), kind, index)
+        if not resolved or not resolved[1]:
+            return None
+        library_title, lines = resolved
+        block.ref, block.lines, block.title = str(raw.get("ref")).strip().lower(), lines, library_title or title
+        return block
     if kind in _VALUE_BLOCKS:
         evidence, values = _resolve_all(
             index, _keys(raw.get("evidence")), want_trend=kind == "comparison", only="bio_ai" if kind == "risk" else None

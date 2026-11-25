@@ -154,6 +154,7 @@ FOLLOW-UP QUESTIONS: up to 4, in the person's own first-person words, at most 12
 <<SEMANTIC_ONLY>>SEMANTIC RESPONSE (same JSON): also return "summary", the core answer in one to three sentences that stands on its own, and "blocks", 0-3 optional blocks (never more than 4) used only when the answer naturally holds separate ideas such as the evidence behind it, what is reassuring, or next steps. A simple question gets no blocks; never turn every sentence into a block and never repeat the summary inside one.
 Do not copy measured values into blocks: reference them with evidence keys and the app shows the exact values. Keys: blood.<code>.latest, blood.<code>.trend (previous vs latest), bioai.<code>, using the codes in the evidence.
 Block shapes: {"type":"metric"|"metric_group"|"risk"|"comparison","title","evidence":[keys]}; {"type":"insight"|"reassurance"|"warning"|"text","title","text","evidence":[keys]}; {"type":"priority_list"|"action_list","title","items":[{"title","text","evidence":[keys]}]}; {"type":"nutrition","title","increase":[foods],"reduce":[foods],"text":"why it matters"}. Titles are short and specific to this answer, never stock labels.
+Library blocks: {"type":"medical_education"|"medical_relationship"|"lifestyle_education","ref":"<id from LIBRARY_REFS>"}. Give only the ref; the app shows the reviewed library text. Use one only when it adds something the summary does not already say, and only refs listed in LIBRARY_REFS.
 <</SEMANTIC_ONLY>><<RICH_ONLY>>For a whole-health summary ("summarize my health scenario", "how am I doing", "what should I focus on") also return:
 - overall_summary: one or two original sentences, spoken to the person as "you". Name the pattern that matters. Do not list every value. Do not reuse a stock closer.
 - themes: 3 to 5 objects. Each needs title, priority (high|medium|low), status (needs_attention|reassuring|monitor|uncertain), supporting_fact_ids (canonical keys copied from the context), and interpretation.
@@ -294,6 +295,7 @@ class PromptBuilder:
                 + _focus_brief_block(context)
                 + f"PERSONAL HEALTH CONTEXT JSON:\n{compact_json(payload)}\n"
                 + personal_context_block(context, user_message)
+                + _library_refs_block(context)
                 + _selected_upload_block(context)
                 + (
                     "Cards show: "
@@ -1169,3 +1171,17 @@ def _minimal_context_payload(context: HealthContext, *, compact: bool = True) ->
     cleaned = to_model_safe_payload(payload)
     trace("MODEL PAYLOAD", fields=sorted(cleaned.keys()) if isinstance(cleaned, dict) else [])
     return cleaned
+
+
+def _library_refs_block(context: HealthContext) -> str:
+    """Compact ID menu of library content the model may point at. IDs only, no text."""
+    from app.pipeline import supporting_content
+    from app.pipeline.semantic_blocks import _Index
+
+    try:
+        menu = supporting_content.candidates(_Index(context))
+    except Exception:
+        return ""
+    if not menu:
+        return ""
+    return "LIBRARY_REFS (optional supporting content, ids only): " + "; ".join(f"{m['ref']} ({m['about']})" for m in menu[:12]) + "\n"

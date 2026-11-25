@@ -29,6 +29,9 @@ BlockType = Literal[
     "action_list",   # practical next steps
     "nutrition",     # increase / reduce / why it matters
     "warning",       # something that needs prompt attention (safety layer decides urgency)
+    "medical_education",     # V2.3 library text, resolved by the backend from ref edu.<id>
+    "medical_relationship",  # V2.3 relationship text, ref rel.<id_a>.<id_b>
+    "lifestyle_education",   # V2.3 influencing factors, ref life.<id>
 ]
 BLOCK_TYPES: tuple[str, ...] = BlockType.__args__  # type: ignore[attr-defined]
 
@@ -67,6 +70,8 @@ class ResponseBlock(BaseModel):
     increase: list[str] = Field(default_factory=list)  # nutrition
     reduce: list[str] = Field(default_factory=list)  # nutrition
     collapsed: bool = False  # metric_group: start folded (e.g. the full report)
+    ref: str | None = None  # library content reference the backend validated and resolved
+    lines: list[str] = Field(default_factory=list)  # library text, never model text
 
 
 class ResponseSource(BaseModel):
