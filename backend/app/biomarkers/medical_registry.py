@@ -189,7 +189,13 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
                 add(name, _clean_lines(row.get("short_description")) + _clean_lines(row.get("what_happens_inside_my_body"))[:2])
             add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
         elif mode == "possible_causes":
-            if side:
+            actual = (sides or {}).get(key)
+            if side and actual == "normal":
+                # The question assumes a result that the latest measurement is not.
+                add(f"{name}, premise check", [f"The latest result is inside the range on the report, so an explanation for a {side} result does not describe it"])
+            elif side and actual and actual != side:
+                add(f"{name}, premise check", [f"The latest result is {actual} on the report, not {side}"])
+            elif side:
                 add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
             add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
             add(f"{name}, limits", limits)

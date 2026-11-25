@@ -1451,7 +1451,7 @@ class ChatService:
                 sides = {}
                 for m in context.markers or []:
                     flag = str(getattr(m.flag, "value", m.flag))
-                    if flag in {"low", "high"} and m.value is not None:
+                    if flag in {"low", "high", "normal"} and m.value is not None:
                         sides[canonical_key(m.key) or m.key] = flag
                 context.medical_passages = chat_passages(payload.message, keys[:8], sides)
             medical_hits = []

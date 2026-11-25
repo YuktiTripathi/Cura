@@ -233,6 +233,7 @@ class PromptBuilder:
                 f"{depth}\n"
                 f"{_scope_line(context, user_message)}"
                 f"{_presentation_line(context, user_message)}"
+                f"{_adaptive_response_brief(context)}"
                 f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
         elif personal and uses_answer_evidence(context):
@@ -862,6 +863,8 @@ def _continuation_note(message: str, context: HealthContext | None) -> str:
     spec = (getattr(context, "task_contract", None) or {}) if context else {}
     if not spec.get("continuation"):
         return ""
+    if getattr(context, "rewrite_previous_answer", None):
+        return ""  # an explicit simplification may repeat what was said, in simpler words
     text = message or ""
     if re.search(r"\b(changed|change|since|previous|trend|compare|last report)\b", text, re.I):
         return "Lead with what changed. Do not define the topic again.\n"

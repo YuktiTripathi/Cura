@@ -657,7 +657,19 @@ class ReasoningService:
                             fallback_reason="privacy" if privacy else "model_unavailable",
                             latency_ms=int((time.perf_counter() - started) * 1000),
                         )
-                partial = render_partial_trend(message, context.markers, context.comparisons) if coverage["support"] in {"partial", "full"} else None
+                if not asks_change and context.intent.value in {"blood_marker_explanation", "latest_result"}:
+                    from app.pipeline.education_answer import education_answer
+
+                    taught = education_answer(message, context)
+                    if taught:
+                        return ReasoningResult(
+                            answer=taught,
+                            llm_called=False,
+                            llm_mode="deterministic_fallback",
+                            fallback_reason="privacy" if privacy else "model_unavailable",
+                            latency_ms=int((time.perf_counter() - started) * 1000),
+                        )
+                partial = render_partial_trend(message, context.markers, context.comparisons) if asks_change and coverage["support"] in {"partial", "full"} else None
                 if partial:
                     return ReasoningResult(
                         answer=partial,

@@ -131,7 +131,7 @@ class RecommendationEngine:
                     evidence_codes=sorted(keys & {"glucose", "fasting_blood_glucose", "hba1c"}),
                 )
             )
-        if want_diet and (keys & {"vitamin_b12", "ferritin"}) and not iron_pattern:
+        if want_diet and any(flags.get(k) == "low" for k in ("vitamin_b12", "ferritin")) and not iron_pattern:
             foods = "lentils, beans, fortified foods, nuts, and seeds" if vegetarian else (
                 "lentils, beans, eggs, fish or lean meat, and fortified foods"
             )

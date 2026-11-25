@@ -158,6 +158,7 @@ def build_answer_plan(context, message: str) -> AnswerPlan:
     intent_value = getattr(getattr(context, "intent", None), "value", "") or ""
     turn = str(getattr(context, "conversation_turn", None) or "")
     follow_up = turn in _FOLLOW_UP_TURNS
+    rewriting = bool(getattr(context, "rewrite_previous_answer", None))
     explained = [str(x) for x in dict.fromkeys([*(getattr(context, "facts_already_explained", None) or []), *(getattr(context, "explained_entities", None) or [])])][:6]
     markers = list(getattr(context, "markers", None) or [])
     risks = list(getattr(context, "bio_ai_risks", None) or [])
@@ -165,7 +166,7 @@ def build_answer_plan(context, message: str) -> AnswerPlan:
     proportion = _gap(focus) if focus is not None else Proportion.unknown
     wants_action = bool(ACTION_OR_FOOD.search(message or ""))
 
-    plan = AnswerPlan(follow_up=follow_up, already_explained=explained, proportion=proportion)
+    plan = AnswerPlan(follow_up=follow_up and not rewriting, already_explained=[] if rewriting else explained, proportion=proportion)
     points = _POINTS.search(message or "")
     if points:
         raw = points.group(1).lower()

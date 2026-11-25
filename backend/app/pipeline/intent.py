@@ -586,7 +586,7 @@ def classify_intent(
         return IntentType.latest_result, topic, _name(topic) if topic else "result", AnswerDepth.simple
     if marker and not personal_turn:
         return IntentType.general_health_question, marker, _name(marker), depth
-    if marker and (_contains(text, "why", "what does", "mean", "normal", "ok", "okay") or (contextual and educational and prior_personal)):
+    if marker and (_contains(text, "why", "what does", "mean", "normal", "ok", "okay", "relate", "relates", "related", "relationship", "connected", "connection", "linked", "affect", "affects") or (contextual and educational and prior_personal)):
         return IntentType.blood_marker_explanation, marker, _name(marker), depth
     if marker and is_personal_improvement_request(message):
         # Advice about the member's own result (a personal turn): interpret it, then personalize the steps.
@@ -600,6 +600,9 @@ def classify_intent(
         return IntentType.report_explanation, None, "latest report", AnswerDepth.broad
     if personal_turn and _PROFILE.search(text) and not marker:
         return IntentType.personal_profile, None, "health profile", AnswerDepth.focused
+    if personal_turn and _EAT.search(text):
+        # A food question stays a nutrition question, even when it states a diet or an "if" scenario.
+        return IntentType.nutrition_guidance, marker, _name(marker) if marker else "nutrition", AnswerDepth.focused
     if personal_turn and _SCENARIO.search(text):
         return IntentType.health_scenario, None, "health scenario", AnswerDepth.broad
     if personal_turn and _EAT.search(text):

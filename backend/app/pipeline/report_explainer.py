@@ -582,7 +582,7 @@ _ADVICE = {
     "vitamin_d": (
         "oily fish such as salmon, sardines and mackerel, egg yolks, and milk, curd or cereals fortified with vitamin D. "
         "Food alone rarely fixes a low level, because most vitamin D is made in the skin from sunlight",
-        "get some midday sun on your arms and face on most days (about 15 to 30 minutes, without burning), "
+        "spend some time in safe daytime sun on most days where that suits you, without burning, and ask your doctor what is right for you, "
         "and add vitamin D foods where you can",
         "too little sun on the skin (spending most of the day indoors, covering most of the skin, sunscreen), darker skin, higher body weight, "
         "and, less often, gut, liver or kidney conditions that affect absorption",

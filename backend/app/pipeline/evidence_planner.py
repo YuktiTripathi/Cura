@@ -11,6 +11,8 @@ when the plan's personalization requirement allows them.
 
 from __future__ import annotations
 
+import re
+
 import logging
 
 from app.contracts.common import IntentType, KnowledgeScope, QuerySource
@@ -160,6 +162,10 @@ def _sources_to_fetch(semantic: SemanticHealthPlan) -> set[HealthSource]:
     return wanted & SUPPORTED_SOURCES
 
 
+_FOOD_WORDS = re.compile(r"\b(eat|eating|diet|food|foods|meal|meals|nutrition|vegetarian|vegan)\b", re.I)
+_WHOLE_REPORT = re.compile(r"\b(whole|entire|full|complete|overall|summar\w+|how am i doing)\b", re.I)
+
+
 def _intent_for(semantic: SemanticHealthPlan, topics_markers: list[str], topics_bio: list[str]) -> IntentType:
     goal = semantic.primary_goal
     if goal == ReasoningGoal.compare:
@@ -229,6 +235,9 @@ def reconcile_query_plan(plan: QueryPlan, semantic: SemanticHealthPlan) -> tuple
             "clarification_removed" if clarifying else "general_to_personal" if general_routed else "summary_to_focused"
         )
         intent = _intent_for(semantic, semantic.markers, semantic.bio_ai)
+        if intent == IntentType.health_scenario and _FOOD_WORDS.search(plan.raw_message or "") and not _WHOLE_REPORT.search(plan.raw_message or ""):
+            # A question about food stays a nutrition question; it is never promoted to a whole health review.
+            intent = IntentType.nutrition_guidance
         topic = (semantic.markers or semantic.bio_ai or [None])[0]
         update = {
             "intent": intent,

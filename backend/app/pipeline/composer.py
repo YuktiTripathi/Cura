@@ -208,6 +208,11 @@ class ResponseComposer:
         member_findings: tuple[list, list] | None = None,
     ) -> tuple[str, list[FollowUpSuggestion], StructuredResponse]:
         experience = experience or build_experience_plan(plan.raw_message or "", plan, context)
+        if not (llm_result and (llm_result.answer or "").strip()):
+            # Text CURA wrote itself stays inside the diet in force (a stated scenario or the recorded diet).
+            from app.pipeline.diet_rules import apply_diet, diet_in_force
+
+            answer = apply_diet(answer, diet_in_force(context, plan.raw_message or ""))
         answer_turn = (conversation_turn or plan.conversation_turn) == "ANSWER_TO_ASSISTANT"
         extras: list[FollowUpSuggestion] = []
         for question in (llm_follow_ups or [])[:1]:

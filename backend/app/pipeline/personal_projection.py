@@ -76,6 +76,46 @@ def _fact(row) -> dict:
     return out
 
 
+_DIETS = r"(vegetarian|vegan|jain|eggetarian|pescatarian|pescetarian)"
+_DIET_CUE = re.compile(
+    r"(?:\bif i (?:follow|am|eat|was|were|go|went)\b[^?.!]{0,30}?|\bi(?:'m| am| follow| eat| have become| became)\b[^?.!]{0,20}?|\bas an? |\bfor an? |\bon an? |\bwhat if i(?: was| were| am)?\b[^?.!]{0,20}?)\b"
+    + _DIETS,
+    re.I,
+)
+_DIET_RULES = {
+    "vegetarian": "No meat, fish or poultry. Do not assume eggs or dairy are allowed; offer them only as options to confirm.",
+    "vegan": "No animal products at all: no meat, fish, poultry, eggs, dairy or honey.",
+    "jain": "No meat, fish, eggs or root vegetables; do not assume dairy beyond what the person confirms.",
+    "eggetarian": "No meat, fish or poultry. Eggs are allowed. Do not assume other animal products.",
+    "pescatarian": "No meat or poultry. Fish is allowed.",
+    "pescetarian": "No meat or poultry. Fish is allowed.",
+}
+
+
+def active_diet_scenario(context, message: str = "") -> dict | None:
+    """A diet the person stated in this conversation (a scenario or a current fact), latest first.
+
+    It is never written to the stored profile. It stays active for follow-ups such as "explain that more
+    simply" and overrides the recorded preference only for this conversation. Allergies never change.
+    """
+    texts = [message or "", *reversed(list(getattr(context, "recent_user_messages", None) or []))]
+    for text in texts:
+        found = _DIET_CUE.findall(text or "")
+        if found:
+            diet = found[-1].lower()
+            diet = "pescatarian" if diet == "pescetarian" else diet
+            return {"diet": diet, "rule": _DIET_RULES.get(diet, ""), "scope": "this conversation only, not saved to the profile"}
+    return None
+
+
+_NAMED_FACTS = (
+    ("activity_level", re.compile(r"\b(physical activity|exercise|exercising|workouts?|how active|activity level)\b", re.I), "physical activity"),
+    ("sleep_quality", re.compile(r"\b(sleep|sleeping)\b", re.I), "sleep"),
+    ("alcohol", re.compile(r"\b(alcohol|drinking)\b", re.I), "alcohol"),
+    ("smoking", re.compile(r"\b(smok\w+|tobacco)\b", re.I), "smoking"),
+)
+
+
 def personal_context_payload(context, message: str = "") -> dict:
     """The one personal context every personal chat path sends to the model.
 
@@ -90,6 +130,8 @@ def personal_context_payload(context, message: str = "") -> dict:
     intent = getattr(getattr(context, "intent", None), "value", "") or ""
     entities = [*(getattr(context, "requested_entity_codes", None) or []), *(getattr(context, "display_entity_codes", None) or [])]
     food = kind_of(context, message) == TurnKind.nutrition_overview or intent == "nutrition_guidance" or bool(re.search(r"\b(eat|diet|food|vegetarian|vegan|meal)\b", text))
+    scenario = active_diet_scenario(context, message)
+    food = food or bool(scenario)
     interpretive = food or any(word in text for word in _CAUSE_WORDS)
     keys = set(relevant_questionnaire_keys(entities))
     if food:
@@ -105,8 +147,7 @@ def personal_context_payload(context, message: str = "") -> dict:
             out["about_member"] = about
         if interpretive:
             diet = [str(r.value) for r in (profile.dietary_preferences or []) if r.value]
-            states_own_diet = bool(re.search(r"\b(if i (?:follow|am|eat|was)|as a|i am a|i'm a)\b[^?.]*\b(vegetarian|vegan|keto|jain|eggetarian|pescatarian)", text))
-            if diet and not states_own_diet and keys.intersection(_FACT_KEYS["dietary_preference"]):
+            if diet and not scenario and keys.intersection(_FACT_KEYS["dietary_preference"]):
                 out["dietary_preference"] = _fact(profile.dietary_preferences[0]) | {"value": diet[0]}
             allergies = [str(r.value) for r in (profile.allergies or []) if r.value]
             if allergies and (food or "eat" in text):
@@ -122,6 +163,25 @@ def personal_context_payload(context, message: str = "") -> dict:
                     life[row.fact] = _fact(row)
             if life:
                 out["lifestyle"] = life
+        # An attribute the person named is included when it is on record, whatever the relevance matcher said,
+        # and its absence is stated so the answer can say so instead of guessing.
+        named_life = dict(out.get("lifestyle") or {})
+        missing_named: list[str] = []
+        recorded = {row.fact: row for row in (profile.lifestyle or [])}
+        for fact, pattern, label in _NAMED_FACTS:
+            if not pattern.search(text):
+                continue
+            row = recorded.get(fact)
+            if row is not None and row.value not in (None, ""):
+                named_life[fact] = _fact(row)
+            else:
+                missing_named.append(label)
+        if named_life:
+            out["lifestyle"] = named_life
+        if missing_named:
+            out["asked_about_but_not_on_record"] = missing_named
+    if scenario:
+        out["active_conversation_scenario"] = scenario
     perso = getattr(context, "personalization", None)
     if perso is not None:
         projected = {"communication_preference": perso.communication_preference.value}

@@ -398,6 +398,12 @@ _ADVICE = re.compile(
 _WHY = re.compile(r"\bwhy\b|\bwhat (?:could|might) (?:cause|explain)|\breason\b", re.I)
 
 
+NAMED_LIFESTYLE_ATTRIBUTE = re.compile(
+    r"\b(physical activity|exercise|exercising|workouts?|how active|sleep|sleeping|smok\w+|tobacco|alcohol|drinking|diet|vegetarian|vegan)\b",
+    re.I,
+)
+
+
 def should_enrich_with_questionnaire(
     message: str,
     *,
@@ -413,6 +419,9 @@ def should_enrich_with_questionnaire(
     if not personal:
         return False
     if overall:
+        return True
+    if NAMED_LIFESTYLE_ATTRIBUTE.search(message or ""):
+        # The person named the habit themselves, so it is never dropped by the relevance matcher.
         return True
     if not relevant_questionnaire_keys(entities, domains):
         return False
