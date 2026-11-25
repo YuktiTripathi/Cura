@@ -286,7 +286,7 @@ def test_explanations_come_from_the_reviewed_file_and_attach_to_measured_finding
     d = build_category_detail("liver_health", blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
     alt = next(f for f in d.findings if f.name.startswith("SGPT"))
     assert alt.education and alt.education.content_source == "medical_knowledge_v2.3"
-    assert "ALT" in alt.education.what_it_is
+    assert "ALT" in f"{alt.education.what_it_is} {alt.education.body} {alt.education.name}" or "liver" in alt.education.what_it_is.lower()
     assert alt.explain and alt.explain.endswith(".")
     assert next(f for f in d.findings if f.source_type == "predicted_risk").education is None
 

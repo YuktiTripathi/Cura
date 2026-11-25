@@ -117,6 +117,12 @@ def assemble_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegis
                 note = education_for(key, finding.medical_name, finding.name)
                 if note is not None:
                     finding.education = note
+            elif finding.source_type == "predicted_risk":
+                from app.biomarkers.content_registry import risk_note
+
+                note = risk_note(finding.id.split(":", 1)[-1])
+                if note is not None:
+                    finding.education = note
             findings[finding.id] = finding
 
     marker_keys = [marker.key for report in blood_rows for marker in report.markers or [] if marker.key]

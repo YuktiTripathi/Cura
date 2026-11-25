@@ -190,23 +190,37 @@ export function ExploreJourney({
         <p className="eyebrow">Measured blood result</p>
         <h1>{edu?.name || finding.name}</h1>
         {finding.medical_name ? <p className="muted">{finding.medical_name}</p> : null}
-        <p>{edu?.what_it_is || "A short description is not available for this test yet."}</p>
+        {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
         <section className="result-card">
           <p><strong>{finding.value != null ? finding.value : finding.status_label}</strong> {finding.value != null ? finding.unit || "" : ""}</p>
           <p>{finding.status_label}</p>
           <p className="muted">{friendlyDate(finding.measured_on) || "Collection date unavailable"}</p>
           <RangeNote finding={finding} />
         </section>
-        <h2>What happens inside my body?</h2>
-        <p>{edu?.body || "A full explanation of this test is not available yet."}</p>
+        {edu?.body && edu.body !== edu.what_it_is ? (
+          <>
+            <h2>What happens inside my body?</h2>
+            <p>{edu.body}</p>
+          </>
+        ) : null}
         <h2>What does my result mean?</h2>
         <p>{resultMeaning(finding, edu)}</p>
-        <h2>Why is this test important?</h2>
-        <p>{edu?.why_it_matters || "Why this test matters is not available yet."}</p>
+        {edu?.why_it_matters && edu.why_it_matters !== edu.body ? (
+          <>
+            <h2>Why is this test important?</h2>
+            <p>{edu.why_it_matters}</p>
+          </>
+        ) : null}
+        {edu?.limitations ? (
+          <>
+            <h2>What this result cannot tell you</h2>
+            <p>{edu.limitations}</p>
+          </>
+        ) : null}
         {finding.previous_value != null ? (
           <>
             <h2>Previous result</h2>
-            <p>{finding.previous_value} {finding.unit || ""}{finding.previous_on ? ` on ${finding.previous_on}` : ""}. Shown only because an earlier result used the same measurement.</p>
+            <p>{finding.previous_value} {finding.unit || ""}{finding.previous_on ? ` on ${friendlyDate(finding.previous_on)}` : ""}. Shown only because an earlier result used the same measurement.</p>
           </>
         ) : null}
         {related.length > 0 ? (
@@ -227,16 +241,30 @@ export function ExploreJourney({
         <button type="button" className="text-button" onClick={() => onPlace("category", categoryId)}>Back</button>
         <p className="eyebrow">Predicted Bio-AI assessment</p>
         <h1>{finding.name}</h1>
-        <h2>What is this condition and what happens inside my body?</h2>
-        <p>{edu?.body || edu?.what_it_is || "Educational content is currently unavailable."}</p>
-        <h2>What does my health report say?</h2>
-        <p>{finding.classification || finding.status_label}{finding.score != null ? ` · score ${finding.score}` : ""}</p>
-        <p className="muted">{friendlyDate(finding.measured_on) || "Assessment date unavailable"}</p>
-        <h2>What does this specifically mean for me?</h2>
-        <p>{edu?.limitations || "A personal reading of this score is not available from your report alone."}</p>
-        <h2>What can I do to protect my future health?</h2>
-        <p>{edu?.next_step || edu?.common_factors || "Protective steps for this assessment are not in the curated content yet."}</p>
-        <button type="button" className="primary-action" onClick={() => onAsk(`Help me understand my ${finding.name} assessment`, refFor(view, categoryId, finding))}>Ask CURA about this</button>
+        {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
+        <section className="result-card">
+          <p><strong>{finding.classification || finding.status_label}</strong>{finding.score != null ? ` · score ${finding.score} out of 100` : ""}</p>
+          <p className="muted">A predicted risk from your Bio-AI report, not a diagnosis. {friendlyDate(finding.measured_on) || "Assessment date unavailable"}</p>
+        </section>
+        {edu?.body && edu.body !== edu.what_it_is ? (
+          <>
+            <h2>What happens inside my body?</h2>
+            <p>{edu.body}</p>
+          </>
+        ) : null}
+        {edu?.why_it_matters ? (
+          <>
+            <h2>Why does this matter?</h2>
+            <p>{edu.why_it_matters}</p>
+          </>
+        ) : null}
+        {edu?.limitations ? (
+          <>
+            <h2>What this prediction cannot tell you</h2>
+            <p>{edu.limitations}</p>
+          </>
+        ) : null}
+        <button type="button" className="primary-action" onClick={() => onAsk(`What does my ${finding.name} assessment mean for me?`, refFor(view, categoryId, finding))}>Ask CURA about this</button>
       </article>
     );
   }
