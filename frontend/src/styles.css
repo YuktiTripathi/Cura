@@ -1425,3 +1425,5 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
 .health-card:hover { border-color: var(--accent); }
 .range-viz[data-relation="above"] .range-mark, .range-viz[data-relation="below"] .range-mark { background: var(--status-out); }
 .range-viz .range-band { position: absolute; top: 0; bottom: 0; border-radius: 4px; background: var(--range-band); }
+.health-card-title { display: flex !important; align-items: center; gap: 0.5rem; }
+.health-card-title strong { flex: 1; }

@@ -775,7 +775,7 @@ def answer_markers(markers: list[BloodMarker], message: str | None = None) -> st
             parts.append(explain_markers(flagged))
             return "\n\n".join(p for p in parts if p)
         opening, advice = parts[0], [p for p in parts[1:] if p]
-        closing = "Recheck the test after about three months of changes to see how it is moving." if kind != "supplement" else ""
+        closing = ""  # No retest schedule: that needs an approved task policy.
         return "\n\n".join(p for p in (opening, _bullets(advice), closing) if p)
     return explain_markers(focus)
 

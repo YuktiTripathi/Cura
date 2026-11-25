@@ -107,6 +107,13 @@ def category_about(category_id: str | None) -> str:
     return " ".join(str(part) for part in body if part) or row.get("short_description") or ""
 
 
+def category_intro(category_id: str | None) -> str:
+    """The one-line V2.3 short description, for overview cards. Full text stays on the detail screen."""
+    rows = {row.get("health_category"): row for row in _load("content/health_category_content.json")}
+    row = rows.get(category_id or "")
+    return (row.get("short_description") or "").strip() if eligible(row) else ""
+
+
 def chat_passages(message: str, keys: list[str]) -> list[str]:
     """Relevant V2.3 fields only. Never the whole library."""
 

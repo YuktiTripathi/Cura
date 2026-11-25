@@ -12,6 +12,10 @@ type Edu = NonNullable<Finding["education"]> & {
 };
 
 
+function cap(text?: string | null): string {
+  return text ? text.charAt(0).toUpperCase() + text.slice(1) : "";
+}
+
 function plural(n: number, one: string, many: string): string {
   return `${n} ${n === 1 ? one : many}`;
 }
@@ -145,7 +149,11 @@ export function ExploreJourney({
         <div className="health-grid">
           {categories.map((card) => (
             <button key={card.id} type="button" className="health-card" onClick={() => onPlace("category", card.id)}>
-              <strong>{card.name}</strong>
+              <span className="health-card-title">
+                {card.icon ? <span aria-hidden="true">{card.icon}</span> : null}
+                <strong>{card.name}</strong>
+                <span className="result-row-chevron" aria-hidden="true">›</span>
+              </span>
               <span>{card.description || card.summary}</span>
               <span className="muted">
                 {card.measured?.total ? plural(card.measured.total, "blood test", "blood tests") : "No blood tests"}
@@ -186,8 +194,8 @@ export function ExploreJourney({
             <ResultRow
               key={item.id}
               title={item.name}
-              value={item.classification || null}
-              note={item.status_label}
+              value={cap(item.classification) || null}
+              note="Predicted risk"
               onOpen={() => onPlace("risk", categoryId, item.id)}
             />
           ))}
@@ -208,8 +216,14 @@ export function ExploreJourney({
         {finding.medical_name ? <p className="muted">{finding.medical_name}</p> : null}
         {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
         <section className="result-card">
-          <p><strong>{finding.value != null ? finding.value : finding.status_label}</strong> {finding.value != null ? finding.unit || "" : ""}</p>
-          <p>{finding.status_label}</p>
+          {finding.value != null ? (
+            <>
+              <p><strong>{finding.value}</strong> {finding.unit || ""}</p>
+              <p>{finding.status_label}</p>
+            </>
+          ) : (
+            <p><strong>No value was reported for this test</strong></p>
+          )}
           <p className="muted">{friendlyDate(finding.measured_on) || "Collection date unavailable"}</p>
           <RangeNote finding={finding} />
         </section>
@@ -219,8 +233,12 @@ export function ExploreJourney({
             <p>{edu.body}</p>
           </>
         ) : null}
-        <h2>What does my result mean?</h2>
-        <p>{resultMeaning(finding, edu)}</p>
+        {finding.value != null ? (
+          <>
+            <h2>What does my result mean?</h2>
+            <p>{resultMeaning(finding, edu)}</p>
+          </>
+        ) : null}
         {edu?.why_it_matters && edu.why_it_matters !== edu.body ? (
           <>
             <h2>Why is this test important?</h2>
@@ -259,7 +277,7 @@ export function ExploreJourney({
         <h1>{finding.name}</h1>
         {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
         <section className="result-card">
-          <p><strong>{finding.classification || finding.status_label}</strong>{finding.score != null ? ` · score ${finding.score} out of 100` : ""}</p>
+          <p><strong>{cap(finding.classification || finding.status_label)}</strong>{finding.score != null ? ` · score ${finding.score} out of 100` : ""}</p>
           <p className="muted">A predicted risk from your Bio-AI report, not a diagnosis. {friendlyDate(finding.measured_on) || "Assessment date unavailable"}</p>
         </section>
         {edu?.body && edu.body !== edu.what_it_is ? (
@@ -305,7 +323,7 @@ function RangeNote({ finding }: { finding: Finding }) {
   const high = finding.reference_high;
   const value = finding.value;
   const unit = finding.unit || "";
-  if (value == null) return <p className="muted">This result is shown as reported text, not on a number line.</p>;
+  if (value == null) return null;
   if (low != null && high != null && high > low) {
     // The bar runs a little beyond the range on both sides, so a result outside the range is drawn outside the band.
     const span = high - low;

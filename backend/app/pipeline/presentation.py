@@ -866,7 +866,8 @@ def attach_presentation_personalization(
         presentation.proactive_insights = [item.model_dump(mode="json") for item in insights[:3]]
     if context.health_journey:
         presentation.health_journey = context.health_journey.model_dump(mode="json")
-    if perso and perso.primary_health_goal:
+    if perso and perso.primary_health_goal and plan.intent in {IntentType.report_explanation, IntentType.broad_health_summary, IntentType.health_scenario}:
+        # Only a whole report answer is organised around the goal. A question about one result is not.
         label = perso.primary_health_goal.replace("_", " ")
         presentation.personal_relevance = (
             f"Findings are prioritized for your {label} goal where the available data supports that."

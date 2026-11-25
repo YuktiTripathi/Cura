@@ -66,6 +66,9 @@ def _note(row: dict, canonical_id: str | None) -> EducationNote:
     # used for its own purpose and a sentence is never shown twice.
     short = _distinct(_lines(row.get("short_description")), seen)
     body = _distinct(_lines(row.get("what_happens_inside_my_body")), seen)
+    # Sentences used for the result explanations are not repeated under "why this test matters".
+    for side in ("high", "above_range", "low", "below_range", "normal", "within_range"):
+        _distinct(_lines(explanations.get(side)), seen)
     why = _distinct(_lines(row.get("why_this_test_matters") or row.get("why_it_matters")), seen)
     return EducationNote(
         name=row.get("display_name") or row.get("clinical_name") or canonical_id or "",

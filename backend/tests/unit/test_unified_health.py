@@ -326,9 +326,11 @@ def test_every_card_carries_its_fixed_description_from_the_registry():
     assert all(c.description for c in CATEGORIES)
     ov = build_unified_overview(blood(LIVER_OUT), bio([("nafld", "mild", 12)]))
     liver = card(ov, "liver_health")
-    from app.biomarkers.medical_registry import category_about
+    from app.biomarkers.medical_registry import category_about, category_intro
 
-    assert liver.description == category_about("liver_health")
+    # The card carries the short V2.3 introduction; the full explanation belongs to the detail screen.
+    assert liver.description == category_intro("liver_health")
+    assert len(liver.description) < len(category_about("liver_health"))
     assert "—" not in liver.description
 
 

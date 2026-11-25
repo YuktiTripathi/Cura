@@ -294,7 +294,7 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
         id=p.cid,
         name=p.meta.name,
         icon=p.meta.icon,
-        description=_category_about(p.cid) or (p.meta.description if p.meta else ""),
+        description=_category_intro(p.cid) or _category_about(p.cid) or (p.meta.description if p.meta else ""),
         status=status,
         status_label=STATUS_LABELS[status],
         completeness=_completeness(m, r, p.system),
@@ -369,6 +369,12 @@ def build_unified_overview(blood: BodySystemOverview | None, bio: RiskOverview |
         limitations=_limitations(totals, bio),
         versions=_versions(),
     )
+
+
+def _category_intro(category_id: str) -> str:
+    from app.biomarkers.medical_registry import category_intro
+
+    return category_intro(category_id)
 
 
 def _category_about(category_id: str) -> str:
