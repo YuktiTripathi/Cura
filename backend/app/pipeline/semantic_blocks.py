@@ -53,6 +53,8 @@ class _Index:
 
     def __init__(self, context, reports=None):
         self.markers = {m.key: m for m in (getattr(context, "markers", None) or []) if m.key and m.value is not None}
+        self.focus = tuple(dict.fromkeys([*(getattr(context, "requested_entity_codes", None) or []),
+                                          *(getattr(context, "display_entity_codes", None) or [])]))
         self.risks = {r.code: r for r in (getattr(context, "bio_ai_risks", None) or []) if r.code}
         self.trends: dict[str, dict] = {}
         for c in getattr(context, "comparisons", None) or []:
@@ -145,6 +147,7 @@ def validate_block(raw: dict, index: _Index, context) -> ResponseBlock | None:
             return None
         library_title, lines = resolved
         block.ref, block.lines, block.title = str(raw.get("ref")).strip().lower(), lines, library_title or title
+        block.scope, block.collapsed = "general", True
         return block
     if kind in _VALUE_BLOCKS:
         evidence, values = _resolve_all(
@@ -375,6 +378,15 @@ def build_semantic_response(response, context, llm_result=None, path: str | None
                 blocks.append(block)
             if len(blocks) >= MAX_BLOCKS:
                 break
+    intent = getattr(getattr(context, "intent", None), "value", "") or ""
+    if not getattr(getattr(response, "meta", None), "escalation", None) and getattr(response.meta, "status", None) not in {"ambiguous", "safety_block", "clarification_required"}:
+        have = {b.ref for b in blocks if b.ref}
+        for kind, ref in supporting_content.essential(index, intent, (getattr(context, "task_contract", None) or {}).get("original_message") or ""):
+            if ref in have or len(blocks) >= MAX_BLOCKS:
+                continue
+            block = validate_block({"type": kind, "ref": ref}, index, context)
+            if block is not None:
+                blocks.append(block)
     if path == "structured_report_overview":
         blocks = _append_data_cards(blocks, _report_blocks(index))
     elif path == "structured_blood":

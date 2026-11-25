@@ -210,9 +210,9 @@ def test_vitamin_d_does_not_present_index_text_as_an_answer_when_llm_unavailable
         json={"message": "What does Vitamin D do in the body?"},
     ).json()
     answer = body["answer"].lower()
-    assert "can't access the general medical knowledge" in answer
     assert "source pointer" not in answer
-    assert body["meta"]["llm_mode"] == "unavailable"
+    assert "general explanation" in answer  # V2.3 library text, labelled as general
+    assert body["meta"]["llm_mode"] == "medical_library"
 
 
 def test_lifestyle_hba1c_follow_up_stays_general(monkeypatch):

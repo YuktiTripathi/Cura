@@ -1435,3 +1435,7 @@ button.health-card:hover, button.health-card:focus-visible { border-color: var(-
 .explore-card-icon { display: inline-flex; align-items: center; color: var(--accent); }
 .main-scroll { scroll-padding-bottom: 6rem; }
 .main-scroll::after { content: ""; display: block; height: 4.5rem; flex: none; }
+.sem-library-label { margin: 0 0 4px; font-size: 0.75em; color: var(--text-muted, #6b7280); text-transform: none; }
+.sem-library-line { margin: 0 0 6px; }
+.sem-library-more summary { cursor: pointer; font-size: 0.9em; color: var(--text-muted, #6b7280); }
+.sem-library { margin-top: 8px; }

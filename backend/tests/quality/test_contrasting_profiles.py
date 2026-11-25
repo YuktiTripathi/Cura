@@ -24,3 +24,20 @@ def test_same_b12_result_with_vegetarian_and_non_vegetarian_diet():
     _non_ctx, non = _user(message, {"diet_preference": "Non vegetarian"})
     assert "Vegetarian" in veg and "Non vegetarian" not in veg
     assert "Non vegetarian" in non
+
+
+def test_unavailable_lifestyle_is_stated_not_inferred_for_the_same_measurement():
+    from app.pipeline.personal_projection import personal_context_payload
+
+    message = "Why is my Vitamin D low and does sunlight matter?"
+    ctx, _ = _user(message, {})
+    payload = personal_context_payload(ctx, message)
+    assert "time outdoors" in (payload.get("asked_about_but_not_on_record") or [])
+    assert "outdoor_time" not in (payload.get("lifestyle") or {})  # nothing inferred from the profile
+
+
+def test_same_vitamin_d_result_differs_only_by_verified_activity_context():
+    message = "Why is my Vitamin D low?"
+    a_ctx, a = _user(message, {"physical_activity_frequency": "Rarely"})
+    b_ctx, b = _user(message, {"physical_activity_frequency": "Daily"})
+    assert {(m.key, m.value) for m in a_ctx.markers} == {(m.key, m.value) for m in b_ctx.markers}

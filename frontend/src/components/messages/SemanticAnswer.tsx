@@ -97,13 +97,7 @@ export function Block({ block }: { block: ResponseBlock }) {
     case "medical_education":
     case "medical_relationship":
     case "lifestyle_education":
-      return (
-        <Section block={block}>
-          {(block.lines || []).map((line) => (
-            <p key={line} className="sem-library-line">{line}</p>
-          ))}
-        </Section>
-      );
+      return <LibraryBlock block={block} />;
     case "nutrition":
       return (
         <Section block={block}>
@@ -244,4 +238,25 @@ function fmtValue(value: number | string | null | undefined, unit?: string | nul
   if (value == null || value === "") return "—";
   const u = unit ? (unit.trim() === "%" ? "%" : ` ${unit}`) : "";
   return `${value}${u}`;
+}
+
+function LibraryBlock({ block }: { block: ResponseBlock }) {
+  const lines = block.lines || [];
+  const [first, ...rest] = lines;
+  const label = block.type === "medical_relationship" ? "How these connect" : block.type === "lifestyle_education" ? "What can influence it" : "About this test";
+  return (
+    <section className={`sem-block sem-${block.type} sem-library`} aria-label={block.title || label}>
+      <p className="sem-library-label">General information, not a finding about you</p>
+      <h4 className="sem-title">{block.title || label}</h4>
+      {first ? <p className="sem-library-line">{first}</p> : null}
+      {rest.length ? (
+        <details className="sem-library-more">
+          <summary>Read more</summary>
+          {rest.map((line) => (
+            <p key={line} className="sem-library-line">{line}</p>
+          ))}
+        </details>
+      ) : null}
+    </section>
+  );
 }

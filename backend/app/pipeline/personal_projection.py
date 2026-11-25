@@ -111,6 +111,7 @@ def active_diet_scenario(context, message: str = "") -> dict | None:
 _NAMED_FACTS = (
     ("activity_level", re.compile(r"\b(physical activity|exercise|exercising|workouts?|how active|activity level)\b", re.I), "physical activity"),
     ("sleep_quality", re.compile(r"\b(sleep|sleeping)\b", re.I), "sleep"),
+    ("outdoor_time", re.compile(r"\b(outdoors?|sunlight|sun exposure|in the sun|sunshine)\b", re.I), "time outdoors"),
     ("alcohol", re.compile(r"\b(alcohol|drinking)\b", re.I), "alcohol"),
     ("smoking", re.compile(r"\b(smok\w+|tobacco)\b", re.I), "smoking"),
 )

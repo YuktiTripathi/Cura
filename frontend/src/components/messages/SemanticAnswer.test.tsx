@@ -88,5 +88,6 @@ describe("library blocks", () => {
       />,
     );
     expect(screen.getByText("HDL carries cholesterol away from the blood.")).toBeTruthy();
+    expect(screen.getByText(/General information/)).toBeTruthy();
   });
 });

@@ -13,6 +13,8 @@ Measured, predicted and historical content already resolve through evidence keys
 
 from __future__ import annotations
 
+import re
+
 from app.biomarkers import medical_registry as registry
 
 MAX_CANDIDATES = 8
@@ -32,6 +34,12 @@ def _on_record(index) -> dict[str, object]:
     return found
 
 
+def _relevant(index) -> set[str]:
+    """Biomarkers on this record plus the ones the question is about. Unmeasured ones allow general education only."""
+    asked = {registry.canonical_key(c) or c for c in getattr(index, "focus", ())}
+    return set(_on_record(index)) | asked
+
+
 def _lines(value, limit: int = 3) -> list[str]:
     if isinstance(value, str):
         value = [value]
@@ -47,8 +55,8 @@ def candidates(index) -> list[dict]:
         if row:
             menu.append({"ref": f"edu.{biomarker_id}", "about": row.get("display_name") or biomarker_id})
     seen: set[frozenset] = set()
-    for biomarker_id in present:
-        for other in registry.related_ids(biomarker_id, set(present)):
+    for biomarker_id in _relevant(index):
+        for other in registry.related_ids(biomarker_id):
             pair = frozenset({biomarker_id, other})
             if pair in seen or len(pair) != 2:
                 continue
@@ -61,6 +69,27 @@ def candidates(index) -> list[dict]:
         if row and _lines(row.get("possible_influencing_factors")):
             menu.append({"ref": f"life.{biomarker_id}", "about": f"factors for {row.get('display_name') or biomarker_id}"})
     return menu[:MAX_CANDIDATES * 3]
+
+
+def essential(index, intent: str, message: str = "") -> list[tuple[str, str]]:
+    """Education the resolved intent needs, chosen by the backend, not by the model.
+
+    Returns (block type, ref). One education block for the result being explained, one relationship when the
+    question is about a connection. Nothing for a plain value lookup, so the answer is not padded.
+    """
+    present = _on_record(index)
+    focus = [registry.canonical_key(c) or c for c in getattr(index, "focus", ())]
+    subject = next((f for f in focus if registry.entry_for(f)), None)
+    out: list[tuple[str, str]] = []
+    if intent in {"blood_marker_explanation", "nutrition_guidance"} and subject and subject in present:
+        out.append(("medical_education", f"edu.{subject}"))
+    if intent == "blood_marker_explanation" and subject and re.search(r"\b(relat\w*|connect\w*|link\w*|affect\w*|because|why)\b", message or "", re.I):
+        for other in registry.related_ids(subject):
+            a, b = sorted((subject, other))
+            if _relationship(a, b):
+                out.append(("medical_relationship", f"rel.{a}.{b}"))
+                break
+    return out
 
 
 def _relationship(a: str, b: str) -> dict | None:
@@ -79,16 +108,17 @@ def resolve(ref: str, kind: str, index) -> tuple[str | None, list[str]] | None:
     present = _on_record(index)
     if kind == "medical_education" and len(parts) == 2 and parts[0] == "edu":
         row = registry.entry_for(parts[1])
-        if not row or parts[1] not in present:
+        if not row or parts[1] not in _relevant(index):
             return None
-        side = _SIDE.get(_flag(present[parts[1]]) or "")
+        side = _SIDE.get(_flag(present[parts[1]]) or "") if parts[1] in present else None
         explanations = row.get("result_explanations") or {}
         lines = _lines(row.get("short_description"), 1) + _lines(row.get("what_happens_inside_my_body"), 2)
         if side:
             lines += _lines(explanations.get(side), 2)
         return row.get("display_name"), lines
     if kind == "medical_relationship" and len(parts) == 3 and parts[0] == "rel":
-        if parts[1] not in present or parts[2] not in present:
+        # A general relationship needs no measurement, only that it concerns what is being discussed.
+        if not ({parts[1], parts[2]} & _relevant(index)):
             return None
         row = _relationship(*sorted(parts[1:]))
         if not row:
@@ -96,7 +126,7 @@ def resolve(ref: str, kind: str, index) -> tuple[str | None, list[str]] | None:
         return None, [row["user_explanation"]] + _lines(row.get("clinical_limitations"), 1)
     if kind == "lifestyle_education" and len(parts) == 2 and parts[0] == "life":
         row = registry.entry_for(parts[1])
-        factors = _lines(row.get("possible_influencing_factors"), 5) if row and parts[1] in present else []
+        factors = _lines(row.get("possible_influencing_factors"), 5) if row and parts[1] in _relevant(index) else []
         if not factors:
             return None
         return f"What can influence {row.get('display_name') or parts[1]}", [

@@ -70,6 +70,7 @@ class ResponseBlock(BaseModel):
     increase: list[str] = Field(default_factory=list)  # nutrition
     reduce: list[str] = Field(default_factory=list)  # nutrition
     collapsed: bool = False  # metric_group: start folded (e.g. the full report)
+    scope: Literal["personal", "general"] = "personal"  # general: library education, not the member's result
     ref: str | None = None  # library content reference the backend validated and resolved
     lines: list[str] = Field(default_factory=list)  # library text, never model text
 

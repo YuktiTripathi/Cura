@@ -107,3 +107,47 @@ Read the report against section 3. Wall time per question is in the report. Toke
 * Live answer quality is unverified here.
 * Questionnaire mappings (section 7).
 * Clinical review of V2.3 content is still pending, so evidence status remains "pending clinical review" in the data.
+
+## 16. Final integration and verification (follow up brief)
+
+### 16.1 V2.3 in the normal journey, not only on failure
+
+The backend now chooses essential education from the resolved intent and the selected evidence, before and independent of the model (`supporting_content.essential`):
+
+* a result explanation or a food question about a result on the record gets one `medical_education` block for that result;
+* a question about a connection ("related", "why", "affect") gets one `medical_relationship` block;
+* a plain value lookup gets nothing, so answers are not padded;
+* the model may add further eligible references by ID. Duplicates are dropped and at most four blocks are shown;
+* nothing is added for an ambiguous Bio-AI report, a safety block or an escalation.
+
+The first line is shown and the rest sits behind "Read more". Each block says "General information, not a finding about you". The education text is library text and is not repeated inside the conversational answer.
+
+### 16.2 General relationships versus personal comparisons
+
+General V2.3 relationships and education need no measurement of either end. They only need to concern what is being discussed (a result on the record or one the question names). A personal comparison still needs verified measurements and still comes only from `blood.<code>.trend` or the comparison cards. A missing value is never invented and a relationship never prompts a suggestion to test.
+
+### 16.3 Report specific references
+
+References resolve against the context for the report being discussed, so a historical question uses that report's flag and not the latest one. Unknown biomarkers, relationships unrelated to the discussion and invented IDs are rejected. Same date Bio-AI ambiguity returns no supporting content and still asks which report. Regression tests: `tests/test_supporting_content.py` (historical flag, unrelated and unmeasured cases) and `tests/unit/test_education_in_chat.py`.
+
+### 16.4 Product inspection (desktop and mobile)
+
+Inspected in the running app at 1280 and 390 pixel widths, screenshots in `docs/cura_v2/screenshots/`: a biomarker opened from the explore journey and a suggested question tapped, a Bio-AI starter tapped, a general question, a personal nutrition question, the vegetarian scenario and "Explain that more simply". The original landing screen and navigation are unchanged. Three defects found by looking, all fixed:
+
+* A general question ("What is haemoglobin?") answered "I can't access the general medical knowledge service" when the service was unreachable. It now answers from V2.3 with a line that a fuller answer is available later.
+* "Explain that more simply" with no model blamed the knowledge service. It now says it cannot rewrite right now.
+* Library blocks touched each other. They now have spacing.
+
+Not covered: opening a specific historical report and a specific Bio-AI assessment through the explore screens were not separately captured. The tapped Bio-AI starter was.
+
+### 16.5 Semantic personalisation
+
+Cannot be judged here. The contrasting profile tests prove the model receives different personal context for identical results (activity level, diet, unavailable lifestyle) and identical measurements. Whether the written answers differ meaningfully needs a live model. The mock data has no outdoor or sun exposure field, so a verified outdoor context profile cannot be built. The context now says "time outdoors" was asked about and is not on record, and the sunlight answer is not inferred. SuperShyft needs to supply that attribute before a vitamin D answer can use it.
+
+### 16.6 Live nine question evaluation: blocked
+
+No model credential exists in this environment, so `scripts/live_eval_nine.py` was not run, and no intercepted or deterministic output is presented as a live result. Run it locally as in section 14. The report records answer, latency, follow ups and status per question. Still to capture on your side from the provider: selected model, token use and cached tokens. Retrieved V2.3 passages, personal context and rendered cards can be read from `docs/cura_v2/request_capture/` and the chat response.
+
+### 16.7 Governance
+
+No runtime clinical approval mechanism was restored. Content ownership, versioning, evidence traceability, rejected content handling and assay limitations are untouched. Review metadata still reads pending clinical review.

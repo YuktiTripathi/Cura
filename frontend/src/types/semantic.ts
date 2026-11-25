@@ -51,6 +51,7 @@ export interface ResponseBlock {
   items?: BlockItem[];
   evidence?: string[];
   values?: ResolvedValue[];
+  scope?: "personal" | "general";
   ref?: string | null; // library reference the backend validated
   lines?: string[]; // reviewed library text resolved by the backend
   increase?: string[];

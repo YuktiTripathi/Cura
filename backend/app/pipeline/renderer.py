@@ -531,8 +531,13 @@ class DeterministicRenderer:
             )
         if context.intent.value == "general_health_question":
             from app.core.copy import GENERAL_KNOWLEDGE_UNAVAILABLE
+            from app.pipeline.education_answer import general_education_answer
 
-            return GENERAL_KNOWLEDGE_UNAVAILABLE
+            from app.pipeline.education_answer import REWRITE_UNAVAILABLE
+
+            if getattr(context, "rewrite_previous_answer", None):
+                return REWRITE_UNAVAILABLE
+            return general_education_answer(message) or GENERAL_KNOWLEDGE_UNAVAILABLE
         return "I could not find that in your records yet. Try asking about a specific result, like your vitamin D or HbA1c, or upload a report and I will explain it."
 
 

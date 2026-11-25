@@ -522,6 +522,25 @@ class ReasoningService:
                         llm_mode="medical_corpus",
                         latency_ms=int((time.perf_counter() - started) * 1000),
                     )
+                from app.pipeline.education_answer import general_education_answer, REWRITE_UNAVAILABLE
+
+                if getattr(context, "rewrite_previous_answer", None):
+                    return ReasoningResult(
+                        answer=REWRITE_UNAVAILABLE,
+                        llm_called=True,
+                        llm_mode="unavailable",
+                        fallback_reason="privacy" if _privacy_block(exc) else "model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
+                taught = general_education_answer(message)
+                if taught:
+                    return ReasoningResult(
+                        answer=taught,
+                        llm_called=True,
+                        llm_mode="medical_library",
+                        fallback_reason="privacy" if _privacy_block(exc) else "model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
                 return ReasoningResult(
                     answer=general_knowledge_unavailable(response_lang),
                     llm_called=True,

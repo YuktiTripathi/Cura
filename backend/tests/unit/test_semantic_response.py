@@ -43,6 +43,14 @@ def test_block_contract_is_only_asked_for_in_semantic_mode(monkeypatch):
         assert "SEMANTIC RESPONSE" in _system_for_mode(SAFETY_INSTRUCTIONS)
 
 
+_LIBRARY = {"medical_education", "medical_relationship", "lifestyle_education"}
+
+
+def _model_blocks(body):
+    """Blocks the model asked for. Backend selected library education is checked separately."""
+    return [b for b in body["semantic"]["blocks"] if b["type"] not in _LIBRARY]
+
+
 def test_values_come_from_the_record_not_the_model(semantic, monkeypatch):
     _model(monkeypatch, summary="Your HbA1c is high.", blocks=[
         {"type": "insight", "title": "Connected", "text": "Glucose points the same way.",
@@ -50,7 +58,7 @@ def test_values_come_from_the_record_not_the_model(semantic, monkeypatch):
         {"type": "metric", "evidence": ["blood.hba1c.latest"], "values": [{"value": 1.0}]},  # model values ignored
     ])
     body = _chat("What does my HbA1c mean?")
-    blocks = body["semantic"]["blocks"]
+    blocks = _model_blocks(body)
     assert [b["type"] for b in blocks] == ["insight", "metric"]
     assert blocks[0]["evidence"] == ["blood.glucose.latest"]  # unknown key dropped
     assert blocks[0]["values"][0]["value"] == 214.47
@@ -65,7 +73,7 @@ def test_invalid_blocks_and_invented_numbers_are_removed(semantic, monkeypatch):
         {"type": "insight", "text": "Your LDL is 999 mg/dL. Glucose points the same way."},
         {"type": "nutrition", "increase": [], "reduce": []},
     ])
-    blocks = _chat("What does my HbA1c mean?")["semantic"]["blocks"]
+    blocks = _model_blocks(_chat("What does my HbA1c mean?"))
     assert [b["type"] for b in blocks] == ["insight"]
     # Card text is not rewritten. The metric card with no record is the part that is dropped.
     assert "999" in blocks[0]["text"]
@@ -74,7 +82,7 @@ def test_invalid_blocks_and_invented_numbers_are_removed(semantic, monkeypatch):
 def test_no_blocks_means_the_whole_answer_is_the_summary(semantic, monkeypatch):
     _model(monkeypatch, summary="Short.", blocks=[])
     semantic_body = _chat("Why are my triglycerides high?")["semantic"]
-    assert semantic_body["blocks"] == []
+    assert [b for b in semantic_body["blocks"] if b["type"] not in _LIBRARY] == []
     assert "Glucose agrees." in semantic_body["summary"]  # nothing hidden
 
 

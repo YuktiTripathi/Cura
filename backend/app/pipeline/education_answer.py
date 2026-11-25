@@ -88,3 +88,42 @@ def education_answer(message: str, context) -> str | None:
         parts.append(_sentence(note.limitations))
     parts.append(_LIMIT)
     return " ".join(p for p in parts if p)
+
+
+_GENERAL_LIMIT = "This is the general explanation. I can write a fuller one when the explanation service is available again."
+
+
+def general_education_answer(message: str) -> str | None:
+    """A general question about a test answered from V2.3 with no personal data and no model.
+
+    Only when the library has a usable entry for the test the question names. Never a value, never a cause for
+    a person, never a claim that a result is good or bad.
+    """
+    from app.biomarkers.medical_registry import canonical_key, entry_for
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    if re.search(r"\b(eat|foods?|diet|meals?|lower|reduce|raise|improve|increase|supplements?|treat\w*)\b", message or "", re.I):
+        return None  # a how-to question is not answered with a description of the test
+    for key in match_lab_keys(message or ""):
+        row = entry_for(canonical_key(key) or key)
+        if not row:
+            continue
+        name = row.get("display_name") or row.get("clinical_name") or key
+        parts = [_sentence(x) for x in ([row.get("short_description")] if row.get("short_description") else [])]
+        parts += [_sentence(x) for x in (row.get("what_happens_inside_my_body") or [])[:2]]
+        parts += [_sentence(x) for x in (row.get("why_this_test_matters") or [])[:1]]
+        parts = [p for p in dict.fromkeys(parts) if p]
+        if not parts:
+            continue
+        factors = [str(f).strip() for f in (row.get("possible_influencing_factors") or [])[:4] if str(f).strip()]
+        text = " ".join(parts)
+        if factors:
+            text += " Things that can influence it include " + ", ".join(factors) + "."
+        return f"{text} {_GENERAL_LIMIT}"
+    return None
+
+
+REWRITE_UNAVAILABLE = (
+    "I can't rewrite that in simpler words right now, so my earlier answer stands as it was. "
+    "Ask me again shortly and I will explain it more simply."
+)
