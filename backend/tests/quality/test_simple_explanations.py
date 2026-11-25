@@ -1,6 +1,7 @@
 """Blood-report and Bio-AI explanations: concept first, child-simple, bullet-first, and a
 smaller prompt. Fictional demo data; checks prompt contracts, not model wording."""
 
+import inspect
 import json
 
 import pytest
@@ -45,8 +46,7 @@ def test_personal_prompt_asks_for_concept_first_simple_bullets():
     _ctx, system, _user = _build("What does my HbA1c mean?")
     assert "no biology background" in system
     assert "without speaking to the person like a child" in system
-    assert 'Every line of the answer starts with "- "' in system
-    assert "Never pad" in system
+    assert "Do not force every answer into bullets" in system
     assert "small everyday comparison" in system
 
 
@@ -57,10 +57,12 @@ def test_bio_ai_prompt_explains_the_assessment_before_the_score():
 
 
 def test_more_simply_reanswers_the_previous_question():
-    # With no earlier turn it is answered as general education; in a conversation the
-    # personal system prompt carries the rule.
-    system = _system_for_mode(SAFETY_INSTRUCTIONS)
-    assert '"more simply": re-answer the previous question' in system
+    # The previous answer travels with the request, so "more simply" rewrites it in simpler words.
+    message = "Can you explain that more simply?"
+    ctx = _context(message)
+    ctx.rewrite_previous_answer = "Your LDL is 162 mg/dL, above your report's range."
+    _system, user = PromptBuilder().build(ctx, "", message)
+    assert "Your LDL is 162 mg/dL" in user["content"]
 
 
 def test_safety_and_boundaries_survive_the_compaction():

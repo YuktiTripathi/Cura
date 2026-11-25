@@ -1694,7 +1694,7 @@ class ChatService:
         suggestions = [item for item in suggestions if not _GENERIC_FOLLOW_UP.search(item.text)]
         if not re.search(r"\b(score|risk|bio-?ai|prediction)\b", payload.message or "", re.I):
             suggestions = [item for item in suggestions if not re.search(r"\bscore\b", item.text, re.I)]
-        if not suggestions and plan.intent == IntentType.latest_result and plan.topic_name:
+        if not suggestions and plan.intent in {IntentType.latest_result, IntentType.blood_marker_explanation} and plan.topic_name:
             name = plan.topic_name
             suggestions = [
                 FollowUpSuggestion(
@@ -1717,6 +1717,7 @@ class ChatService:
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
         pre_compose_answer = answer
+        engine_suggestions = list(suggestions)
         with perf.stage("composition"):
             answer, suggestions, presentation = self.composer.compose(
                     answer,
@@ -1744,7 +1745,13 @@ class ChatService:
         from app.pipeline.tone_signals import trim_follow_ups
 
         suggestions = trim_follow_ups(suggestions, tone.tone, bool(rewrite_angle))
-        if not suggestions and plan.intent == IntentType.latest_result and plan.topic_name:
+        if not suggestions and plan.intent == IntentType.nutrition_guidance and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
+            # Food questions keep the food questions the engine grounded before the generic journey replaced them.
+            suggestions = [
+                item for item in engine_suggestions
+                if not _GENERIC_FOLLOW_UP.search(getattr(item, "text", "") or "")
+            ][:4]
+        if not suggestions and plan.intent in {IntentType.latest_result, IntentType.blood_marker_explanation} and plan.topic_name and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
             from app.contracts.followup import FollowUpSuggestion
 
             name = plan.topic_name

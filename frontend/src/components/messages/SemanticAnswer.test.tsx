@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, it } from "vitest";
 import type { ResolvedValue, SemanticResponse } from "../../types/semantic";
-import { SemanticAnswer } from "./SemanticAnswer";
+import { SemanticAnswer, SemanticBlocks } from "./SemanticAnswer";
 
 const hba1c: ResolvedValue = {
   key: "blood.hba1c.latest", label: "HbA1c", kind: "blood", value: 9.1, unit: "%", status: "high",
@@ -77,5 +77,16 @@ describe("SemanticAnswer", () => {
   it("sources sit behind one compact affordance", () => {
     show({ sources: [{ type: "blood_report", date: "2026-09-28" }, { type: "medical_reference", label: "CDC" }] });
     expect(screen.getByText("Sources (2)")).toBeTruthy();
+  });
+});
+
+describe("library blocks", () => {
+  it("renders backend resolved library lines for medical education", () => {
+    render(
+      <SemanticBlocks
+        blocks={[{ type: "medical_education", title: "HDL", ref: "edu.hdl_cholesterol_direct", lines: ["HDL carries cholesterol away from the blood."] }]}
+      />,
+    );
+    expect(screen.getByText("HDL carries cholesterol away from the blood.")).toBeTruthy();
   });
 });

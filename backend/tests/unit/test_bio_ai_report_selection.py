@@ -264,9 +264,9 @@ def test_chat_same_date_risk_scores_never_hit_llm(monkeypatch):
 def test_chat_same_date_dyslipidemia_does_not_merge():
     body = client.post("/api/v1/chat", headers=H1, json={"message": "What is my Dyslipidemia score?"}).json()
     assert body["meta"]["status"] == "ambiguous"
-    assert "40" not in body["answer"] or "46" not in body["answer"]
-    assert "40" not in body["answer"]
-    assert "46" not in body["answer"]
+    # Each score is shown with its own source label and never merged into one number.
+    assert "Bio-AI assessment: Dyslipidemia 40" in body["answer"]
+    assert "Advanced Bio-AI assessment: Dyslipidemia 46" in body["answer"]
     assert "which report" in body["answer"].lower()
 
 

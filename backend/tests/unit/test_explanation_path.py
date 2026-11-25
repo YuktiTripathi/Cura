@@ -140,7 +140,9 @@ def test_omitted_bio_ai_score_is_added_from_the_record(monkeypatch):
     message = "What is my Bio-AI diabetes score?"
     plan = build_query_plan(message)
     risk = BioAIRisk(code="type_2_diabetes", name="Type 2 diabetes", score=68, status="high", measured_at=date(2026, 9, 20))
-    result = ReasoningService().run(message=message, plan=plan, context=_ctx(plan, risks=[risk]))
+    ctx = _ctx(plan, risks=[risk])
+    ctx.requested_entity_codes = ["type_2_diabetes"]  # the context builder sets this for a named score
+    result = ReasoningService().run(message=message, plan=plan, context=ctx)
     assert "68" in result.answer
     assert "not a diagnosis" in result.answer.lower() or "not diagnoses" in result.answer.lower()
 

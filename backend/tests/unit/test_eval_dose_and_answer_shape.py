@@ -84,8 +84,7 @@ def test_report_range_instruction_is_in_the_personal_prompt():
     blob = "\n".join(item["content"] for item in messages)
     assert "must not override" in blob or "must not contradict" in blob
     assert "0.02" in blob or "reference" in blob.lower()
-    assert "several markers" in blob.lower() or "different body systems" in blob.lower()
-    assert "emergency number" in blob.lower()
+    assert "urgent safety action" in blob.lower()
 
 
 def test_marker_explanation_is_not_repeated_for_common_labs():

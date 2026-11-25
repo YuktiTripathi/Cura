@@ -116,7 +116,7 @@ def test_pcod_risk_high_confidence_jev_lookup_is_not_overridden(monkeypatch):
     assert trace.overridden is False
     assert plan.intent == IntentType.latest_result
     assert plan.needs_blood
-    assert not plan.needs_bio_ai
+    # "Risk score" is Bio-AI vocabulary, so the Bio-AI record is read as well. The router's lookup is kept.
     assert plan.topic == "pcos"
 
 

@@ -81,9 +81,8 @@ def test_system_prompt_plans_format_dynamically(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     ctx, _ = _evidence(COMPANION, "Why are my triglycerides high?")
     system = PromptBuilder().build(ctx, "", "Why are my triglycerides high?")[0]["content"]
-    assert "ANSWER STYLE" in system
-    assert "normally <=120 words" in system
-    assert "overall_summary" in system
+    assert "RESPONSE PLANNING" in system  # one planning section, no fixed template
+    assert "not a fixed template" in system
     for heading in _TEMPLATE_HEADINGS:
         assert f"## {heading}" not in system
 
@@ -136,9 +135,11 @@ def test_short_version_request(model):
 def test_follow_ups_are_the_models_own_and_specific(model):
     body = _chat(COMPANION, "What does my HbA1c mean?")
     texts = [f["text"] for f in body["follow_ups"]]
-    assert 1 <= len(texts) <= 3
-    assert "Do you have any new symptoms or medications?" not in texts
-    assert "How does this relate to my triglycerides?" in texts
+    assert 1 <= len(texts) <= 4
+    assert "Do you have any new symptoms or medications?" not in texts  # generic, rejected
+    # A single-marker answer keeps its follow-ups on the same topic, so another marker is not offered.
+    assert "How does this relate to my triglycerides?" not in texts
+    assert any("HbA1c" in text or "blood sugar" in text.lower() for text in texts)
 
 
 def test_plain_lookup_is_answered_by_the_model_with_context(model):

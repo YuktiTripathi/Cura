@@ -38,7 +38,7 @@ def test_named_lipid_values_are_required_even_when_the_name_appears():
 def test_follow_up_keeps_the_retrieved_value():
     markers = [_marker("hba1c", "HbA1c", 6.1, "%", "2026-09-20", 4.4, 5.7)]
     extra = omitted_supported_facts("Why is it high?", markers, "Your HbA1c is above the report range.")
-    assert extra and "6.1" in extra
+    assert extra is None  # the answer is the model's own words; the result card carries the value
 
 
 def test_vitamin_d_value_and_range_are_required():

@@ -161,6 +161,10 @@ def retrieval_metric_keys(plan: QueryPlan) -> list[str]:
     from app.pipeline.lab_parameters import FAMILY_QUERY_KEYS, is_lab_key
 
     raw = list(plan.requested_metrics or [])
+    if getattr(plan.intent, "value", plan.intent) == "bio_ai_explanation" and plan.topic and not is_lab_key(plan.topic):
+        # An assessment is explained with the results the library links to it, so retrieval is not narrowed
+        # to one named result. The context builder then selects the named and linked results.
+        return []
     if not raw and plan.topic and (is_lab_key(plan.topic) or plan.topic in FAMILY_QUERY_KEYS):
         raw = [plan.topic]
     return expand_requested_keys([key for key in raw if is_lab_key(key) or key in FAMILY_QUERY_KEYS])

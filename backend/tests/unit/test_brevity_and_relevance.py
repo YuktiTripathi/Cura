@@ -135,8 +135,10 @@ def test_no_full_blood_table_under_conversational_answers(model, monkeypatch, qu
 
 
 def test_report_table_appears_when_explicitly_requested(monkeypatch):
-    pres = _chat("Show me my latest blood report.", "rich", monkeypatch)["presentation"]
-    assert pres["mode"] == "RESULT_LIST" and len(pres["findings"]) == 20
+    body = _chat("Show me my latest blood report.", "rich", monkeypatch)
+    assert body["presentation"]["mode"] == "RESULT_LIST"
+    # One authoritative rendered answer: the values are carried once, in the semantic view.
+    assert any(len(b.get("values") or []) == 20 for b in body["semantic"]["blocks"])
     blocks = _chat("Show me my latest blood report.", "semantic", monkeypatch)["semantic"]["blocks"]
     assert any(b.get("collapsed") and len(b["values"]) == 20 for b in blocks)
 

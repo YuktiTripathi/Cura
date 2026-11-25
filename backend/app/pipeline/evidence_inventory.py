@@ -199,7 +199,7 @@ def _select_measurements(kind: str, message: str, markers: list, *, broad: bool 
     if kind == "BIO_AI_SCORE_LIST":
         return []
     named = set(_expand_family_keys(requested_marker_keys(message), markers))
-    if named and not broad and kind not in {"ABNORMAL_LIST", "PRIORITIZED_CONCERNS", "SYMPTOM_CONTEXT"}:
+    if named and not broad and kind not in {"ABNORMAL_LIST", "PRIORITIZED_CONCERNS", "SYMPTOM_CONTEXT", "CROSS_SOURCE_EXPLANATION"}:
         chosen = [
             item
             for item in chosen
@@ -228,7 +228,7 @@ def _select_measurements(kind: str, message: str, markers: list, *, broad: bool 
     if re.search(r"\b(active enough|physical activity|exercise)\b", message or "", re.I):
         unrelated = {"mcv", "mch", "rdw", "basophils", "eosinophils", "calcium", "bilirubin"}
         chosen = [item for item in chosen if _key(getattr(item, "key", None)) not in unrelated]
-    return chosen[:24]
+    return chosen if (broad and (kind == "" or kind == "BLOOD_REPORT_OVERVIEW") and len(chosen) <= 60) else chosen[:24]
 
 
 def _with_related(message: str, chosen: list, pool: list) -> list:

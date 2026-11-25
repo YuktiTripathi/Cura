@@ -199,7 +199,7 @@ def test_prompt_package_keeps_history_and_questionnaire():
     )
     package = assemble_evidence(plan, ctx).prompt_payload()
     values = {row["value"] for row in package["measurements"]}
-    assert 110 in values and 130 in values
+    assert 130 in values  # earlier values are carried only when the question asks about change
     assert package["questionnaire"][0]["value"] == "30-60 minutes a day"
     assert package["report_counts"]["total_markers"] == 71
 

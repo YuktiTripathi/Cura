@@ -35,7 +35,8 @@ _NARRATIVE_ASK = re.compile(
     re.I,
 )
 _VIEW_ALL = re.compile(
-    r"\b(view all results|show all (?:my )?(?:results|values|markers)|full (?:report|table))\b",
+    r"\b(view all results|show all (?:my )?(?:results|values|markers)|full (?:report|table)"
+    r"|(?:show|list|display|view) (?:me )?(?:my |the )?(?:latest |most recent |current )?(?:blood )?(?:report|results)(?! (?:summary|explanation)))\b",
     re.I,
 )
 _ROBOTIC = re.compile(

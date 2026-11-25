@@ -107,8 +107,8 @@ def test_food_question_is_told_to_name_foods_first():
     from app.pipeline.prompt_builder import _asked_task
 
     line = _asked_task("Which foods should I cut first to lower my LDL and triglycerides?")
-    assert "foods to cut or eat" in line
-    assert "doctor visit" in line
+    assert "foods" in line and "everyday words" in line
+    assert "lab-value list" in line  # the answer does not open with a result dump
 
 
 def test_generic_topic_chip_is_rejected():

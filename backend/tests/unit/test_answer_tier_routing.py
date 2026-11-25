@@ -153,7 +153,7 @@ def test_tier_is_recalculated_per_turn_with_context_and_one_call_each(model, rou
     assert model[-1]["model"] == model_id_for_tier(DEEP)
     assert third["conversation_id"] == first["conversation_id"]
     # The deep model sees the earlier turns and the member's HbA1c value.
-    user_turn = model[-1]["messages"][-1]["content"]
+    user_turn = " ".join(m["content"] for m in model[-1]["messages"])
     assert "9.1" in user_turn
     assert routing[-1]["escalated"] is False
 

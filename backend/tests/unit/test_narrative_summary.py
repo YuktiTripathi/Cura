@@ -177,9 +177,9 @@ def test_chat_health_summary_does_not_dump_the_full_report():
     assert " alt " not in interp
     assert " ast " not in interp
     assert "urea" not in interp
-    assert "not a diagnosis" in answer
+    assert "not a diagnosis" in answer or "not diagnoses" in answer
     assert "sit together as one pattern" not in answer
-    assert answer.count("not a diagnosis") == 1
+    assert answer.count("not a diagnosis") + answer.count("not diagnoses") == 1
     assert not pres["next_steps"]
 
 

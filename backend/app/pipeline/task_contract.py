@@ -141,6 +141,9 @@ def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
         goal = "synthesize"
     else:
         goal = "explain"
+    overview = getattr(plan, "entry_point", None) == "blood_report_overview"
+    if overview:
+        broad, goal = True, "synthesize"  # the Blood Report button asks for the whole report
     if personal == "none" and goal in {"lookup", "interpret", "synthesize"}:
         goal = "explain"
         broad = False
@@ -177,6 +180,8 @@ def stamp_answer_spec(plan: QueryPlan, message: str | None = None) -> QueryPlan:
             "primary_source": primary,
         }
     )
+    if overview:
+        existing.update({"entry_point": "blood_report_overview", "response_type": "BLOOD_REPORT_OVERVIEW"})
     update: dict = {"task_contract": existing}
     # A report explanation keeps the source the user named. Later routing must not swap it.
     if primary == "blood_report":

@@ -150,7 +150,7 @@ def test_follow_ups_are_capped_once_and_unsafe_ones_stay_rejected():
     response.semantic = build_semantic_response(response, _context(), _llm())
     assert len(response.semantic.follow_ups) == 5
     finalize_response(response, "Why is my HbA1c high?")
-    assert len(response.follow_ups) == 5
+    assert len(response.follow_ups) == 4  # at most four
     assert response.semantic.follow_ups == [item.text for item in response.follow_ups]
     brief = FollowUpBrief()
     assert not valid_question("Should I start a statin?", brief)

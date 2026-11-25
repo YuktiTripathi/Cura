@@ -158,6 +158,11 @@ class RelevantContextSelector:
     ) -> HealthContext:
         """Keep requested + supporting markers on the context used for answering."""
         keep = set(relevant.requested_keys) | set(relevant.supporting_keys)
+        if getattr(context.intent, "value", context.intent) == "bio_ai_explanation":
+            # The context builder already chose the named results and the results the library links to this
+            # assessment. A relevance pass must not drop a linked result because the question did not name it.
+            context.notes = _with_pattern_note(context.notes, relevant.pattern_note)
+            return context
         if not keep:
             context.notes = _with_pattern_note(context.notes, relevant.pattern_note)
             return context

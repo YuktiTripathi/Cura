@@ -364,7 +364,7 @@ def on_topic(questions: list[str], message: str, answer: str = "") -> list[str]:
     from app.retrieval.relationship_map import panel_keys_for_text, related_keys
 
     asked = list(dict.fromkeys([*match_lab_keys(message), *panel_keys_for_text(message)]))
-    broad = bool(re.search(r"\b(report|my health|overall|diet|meal plan|foods)\b", message or "", re.I))
+    broad = bool(re.search(r"\b(report|my health|overall|diet|meal plan|foods?|eat|eating)\b", message or "", re.I))
     allowed = set(asked) | set(related_keys(asked, message or "", intent="interpretation", ignore_conditions=True))
     if broad or not asked:
         allowed |= set(match_lab_keys(answer or ""))

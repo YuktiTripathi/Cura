@@ -55,18 +55,18 @@ def test_active_defaults_are_the_legacy_rich_path():
     assert settings.cura_response_mode == "rich"
     _ctx, system, _user = _prompt("What does my HbA1c mean?")
     assert system.startswith(SAFETY_INSTRUCTIONS.split("\n")[0])
-    assert "Medical accuracy and safety." in system
+    assert "Medical accuracy and safety" in system
 
 
 def test_conflicts_resolved_in_system_prompt():
     _ctx, system, _user = _prompt("Explain my complete blood report")
     # Ranked priorities, with safety above format.
-    assert system.index("Medical accuracy and safety.") < system.index("Clear formatting")
+    assert system.index("Medical accuracy and safety") < system.index("Format and length")
     assert "then 3 to 5 Markdown bullets" not in system
     assert "stays within 150 words" not in system
-    assert "Never sacrifice medical accuracy" in system
-    assert "Include the actual value and unit" in system
-    assert "Do not automatically recommend lifestyle changes" in system
+    assert "never drop a safety or accuracy point" in system
+    assert "say its value and unit" in system
+    assert "Do not routinely advise" in system
 
 
 def test_single_marker_prompt_is_narrow_and_has_no_forced_next_step():
@@ -86,11 +86,11 @@ def test_whole_bio_ai_prompt_has_no_word_band_or_forced_bullets():
 def test_safety_rules_are_kept():
     _ctx, system, _user = _prompt("Explain my Bio-AI report")
     for rule in (
-        "BIO_AI_ASSESSMENT represents an assessment or prediction, not a diagnosis",
-        "QUESTIONNAIRE_RESPONSE and USER_STATED_HEALTH_INFORMATION represent information the person has shared",
+        "BIO_AI_ASSESSMENT is an assessment, not a diagnosis",
+        "QUESTIONNAIRE_RESPONSE and USER_STATED_HEALTH_INFORMATION are things you told us",
         "Use the reference range printed on the person's own report",
-        "Do not diagnose a disease",
-        "If two sources disagree, keep their values and sources separate",
+        "Do not diagnose, prescribe",
+        "keep each source and value separate",
         "Never invent values",
     ):
         assert rule in system
@@ -127,5 +127,4 @@ def test_bio_ai_score_note_only_adds_relevant_scores():
 def test_whole_report_score_note_skips_reassuring_scores():
     ctx = _context("Explain my Bio-AI report")
     note = _missing_score_note("Explain my Bio-AI report", ctx, "")
-    assert "Thyroid" not in note  # low band: reassuring, not worth a raw line
-    assert "Dyslipidemia" in note
+    assert note == ""  # a whole-report answer is not extended with a dump of stored scores

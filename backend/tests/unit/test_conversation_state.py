@@ -239,7 +239,7 @@ def test_alt_meaning_then_supplement_answer_continues_liver_interpretation():
     assert debug.get("retrieval_performed") is True
     assert debug.get("reasoner_called") in {True, False}
     chips = first.get("follow_ups") or []
-    assert any("symptom" in (item.get("text") or "").lower() for item in chips)
+    assert chips and all("symptom" not in (item.get("text") or "").lower() for item in chips)  # grounded, on the ALT topic
     assert all(item.get("handling_path") for item in chips)
 
     cid = first["conversation_id"]

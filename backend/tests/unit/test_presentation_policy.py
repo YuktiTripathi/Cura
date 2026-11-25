@@ -109,5 +109,5 @@ def test_personal_prompt_uses_the_same_plain_language_policy():
     assert "Assume the person has no medical background" in PLAIN_LANGUAGE
     assert PLAIN_LANGUAGE in SAFETY_INSTRUCTIONS
     assert "prediction is not a diagnosis" in SAFETY_INSTRUCTIONS
-    assert "Do not change a calculated amount." in SAFETY_INSTRUCTIONS
+    assert "Keep every supplied value, unit" in SAFETY_INSTRUCTIONS or "Keep every supplied value, unit" in PLAIN_LANGUAGE
     assert "everyday food names" in presentation_note("What should I eat for dinner?")

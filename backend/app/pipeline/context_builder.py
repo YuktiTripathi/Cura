@@ -327,7 +327,11 @@ class ContextBuilder:
             blood_reports = list(retrieval.blood_reports) if plan.needs_blood else []
             bio_reports = list(retrieval.bio_ai_reports) if plan.needs_bio_ai else []
         else:
-            blood_reports = self.registry.blood.query(principal, plan) if plan.needs_blood else []
+            blood_plan = plan
+            if plan.intent == IntentType.bio_ai_explanation and plan.topic and plan.requested_metrics:
+                # The linked results come from the library, so the query is not narrowed to the one named result.
+                blood_plan = plan.model_copy(update={"requested_metrics": []})
+            blood_reports = self.registry.blood.query(principal, blood_plan) if plan.needs_blood else []
             bio_reports = self.registry.bio_ai.query(principal, plan) if plan.needs_bio_ai else []
         blood_reports = sorted(blood_reports, key=lambda r: (r.report_date, r.report_id))
         bio_reports = sorted(bio_reports, key=lambda r: (r.report_date, r.report_id))
@@ -431,14 +435,17 @@ class ContextBuilder:
             return
         keys = wanted_metric_keys(plan)
         keys = _with_pattern_keys(plan.raw_message or "", keys)
-        if plan.intent == IntentType.bio_ai_explanation and plan.topic and not keys:
-            # An explanation of one Bio-AI assessment reads the blood tests that library lists for that condition.
+        if plan.intent == IntentType.bio_ai_explanation and plan.topic:
+            # An explanation of one Bio-AI assessment reads the blood tests that library lists for that condition,
+            # together with any result the person named. The assessment code itself is not a blood result.
             from app.biomarkers.medical_registry import bio_ai_content, canonical_key
 
             related = set((bio_ai_content().get(plan.topic) or {}).get("relevant_biomarkers") or [])
             if related:
                 on_record = sorted({m.key for report in reports for m in report.markers if m.key})
-                keys = [key for key in on_record if canonical_key(key) in related]
+                linked = [key for key in on_record if canonical_key(key) in related]
+                keys = [key for key in keys if key != plan.topic]
+                keys += [key for key in linked if key not in keys]
         named_keys = list(keys)
         operation = plan.time_operation or "latest_marker"
         ops = {str(item).upper() for item in (plan.operations or [])}
@@ -446,6 +453,8 @@ class ContextBuilder:
         if not keys and (ops & {"SUMMARIZE", "PRIORITIZE", "IDENTIFY_GAPS"} or plan.topic == "bio_ai"):
             # "my Bio-AI risk" as a whole: the blood picture behind it is the whole latest report.
             operation = "latest_report"
+        if not keys and getattr(plan, "entry_point", None) == "blood_report_overview":
+            operation = "latest_report"  # the Blood Report button reads the whole latest report
         if selectors & {"HIGH", "LOW", "ABNORMAL", "ALL", "NORMAL"} and (
             not keys or operation == "latest_report" or "overall_health" in (plan.domains or [])
         ):
@@ -664,12 +673,28 @@ class ContextBuilder:
                 markers = [item for item in markers if item.key in _FOOD_RELEVANT_MARKERS] or markers
             if wanted_flags:
                 markers = [item for item in markers if item.flag in wanted_flags]
-            elif not keys and len(markers) > 24:
+            elif not keys and len(markers) > 24 and getattr(plan, "entry_point", None) != "blood_report_overview":
                 markers = [
                     item for item in markers
                     if item.flag in {MarkerFlag.low, MarkerFlag.high, MarkerFlag.critical} and item.value is not None
                 ] or markers[:8]
+            if getattr(plan, "entry_point", None) == "blood_report_overview":
+                for item in markers:
+                    if item.value is None:
+                        ctx.missing.append(MissingItem(key=item.key, name=item.name, reason="not_measured"))
+                markers = [item for item in markers if item.value is not None]
             ctx.markers = markers
+            if getattr(plan, "entry_point", None) == "blood_report_overview":
+                earlier = [item for item in reports if item.report_id != report.report_id]
+                for item in markers:
+                    for prev_report in sorted(earlier, key=lambda r: r.report_date, reverse=True):
+                        prev = next((m for m in prev_report.markers if m.key == item.key and m.value is not None), None)
+                        if prev is not None:
+                            ctx.comparisons.append(
+                                comparison(item.key, prev.value, item.value, prev_report.report_id, report.report_id,
+                                           prev_report.report_date, report.report_date)
+                            )
+                            break
             if plan.intent != IntentType.latest_result:
                 ctx.in_range_summary = _range_counts(full)
             for m in markers:

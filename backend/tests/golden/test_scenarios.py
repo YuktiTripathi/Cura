@@ -60,7 +60,7 @@ def test_cardiac_score_ambiguous_and_retrieved():
 def test_cardiac_why_increased():
     res = chat("Why is my cardiac score increased?")
     body = res.json()
-    assert "diagnos" not in body["answer"].lower() or "not a medical diagnosis" in body["answer"].lower()
+    assert "diagnos" not in body["answer"].lower() or "not a diagnosis" in body["answer"].lower()
     assert "30" in body["answer"] and "48" in body["answer"]
     assert body["evidence"]
 
