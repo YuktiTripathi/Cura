@@ -34,6 +34,7 @@ def _identity_by_content_key() -> dict[str, str]:
     return {item["content_key"]: item["canonical_id"] for item in data.get("entries") or []}
 
 
+@lru_cache(maxsize=1)
 def biomarker_content() -> dict[str, dict]:
     from app.biomarkers.resolver import resolve_marker
 
@@ -97,6 +98,12 @@ def eligible(row: dict | None) -> bool:
     if not row:
         return False
     return row.get("review_status") != REJECTED
+
+
+def eligible_for_personal_interpretation(row: dict | None) -> bool:
+    """Draft educational material is not verified evidence for personalised reasoning."""
+    return bool(eligible(row) and row.get("review_status") in {"approved", "clinically_approved"}
+                and row.get("evidence_status") == "verified")
 
 
 def category_about(category_id: str | None) -> str:
@@ -172,14 +179,13 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
     for position, key in enumerate(keys):
         risk = bio_ai_content().get(key)
         row = entry_for(key) or (risk if eligible(risk) else None)
-        if not row:
+        if not eligible_for_personal_interpretation(row):
             continue
         if position > 0 and mode not in {"definition", "nutrition"}:
             continue  # related results contribute through the relationship lines only
         name = row.get("display_name") or row.get("clinical_name") or key
         explanations = row.get("result_explanations") or {}
         limits = _clean_lines(row.get("clinical_limitations"))
-        limits = [line for line in limits if "not confirmed" not in line.lower()]
         if mode == "nutrition":
             # Food advice reads what a result outside its range may reflect and what influences it, per result.
             own = (sides or {}).get(key) or (sides or {}).get(keys[position] if position < len(keys) else "") or side
@@ -219,7 +225,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
         for rel in sorted(relationships(), key=lambda r: 0 if r.get("priority") == "primary" else 1):
             if added >= 3:
                 break
-            if not eligible(rel) or mode not in (rel.get("retrieve_when") or []):
+            if not eligible_for_personal_interpretation(rel) or mode not in (rel.get("retrieve_when") or []):
                 continue
             left, right = _endpoint(rel, "source"), _endpoint(rel, "related")
             other = right if left in wanted else left if right in wanted else None
