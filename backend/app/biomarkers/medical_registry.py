@@ -184,6 +184,12 @@ def canonical_key(key: str | None) -> str | None:
         return key
 
 
+def _factor_lines(row: dict, limit: int = 4) -> list[str]:
+    """Factors with how each one acts, when the library explains them; names alone otherwise."""
+    explained = [f"{x.get('factor')}: {x.get('how_it_acts')}" for x in row.get("factor_explanations") or [] if x.get("factor") and x.get("how_it_acts")]
+    return explained[:limit] or _clean_lines(row.get("possible_influencing_factors") or row.get("influencing_factors"))
+
+
 def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = None) -> list[str]:
     """Relevant V2.3 fields for this question only. Never the whole library, never a biology lesson
     when the person asked why a result is low."""
@@ -222,7 +228,11 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
                 add(f"{name}, what a {own} result may reflect", _clean_lines(explanations.get(own)))
             else:
                 add(name, _clean_lines(row.get("short_description")) + _clean_lines(row.get("what_happens_inside_my_body"))[:2])
-            add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
+            add(f"{name}, how influencing factors act", _factor_lines(row))
+            if own == "normal":
+                add(f"{name}, keeping it healthy", _clean_lines(row.get("keeping_healthy"))[:2])
+            elif own:
+                add(f"{name}, everyday steps that may help", _clean_lines(row.get("everyday_support"))[:3])
         elif mode == "possible_causes":
             actual = (sides or {}).get(key)
             if side and actual == "normal":
@@ -232,7 +242,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
                 add(f"{name}, premise check", [f"The latest result is {actual} on the report, not {side}"])
             elif side:
                 add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
-            add(f"{name}, possible influencing factors", _clean_lines(row.get("possible_influencing_factors")))
+            add(f"{name}, how influencing factors act", _factor_lines(row))
             add(f"{name}, limits", limits)
         elif mode == "relationship":
             add(f"{name}, summary", _clean_lines(row.get("short_description")))
@@ -243,8 +253,16 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
                 add(f"{name}, in the body", _clean_lines(row.get("what_happens_inside_my_body")))
                 add(f"{name}, why it matters", _clean_lines(row.get("why_it_matters")))
                 add("MetSights inputs, not a formula", _clean_lines(row.get("product_inputs")))
-            if side:
-                add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
+            if risk is not None and row is risk:
+                add(f"{name}, what a Bio-AI band means", _clean_lines(row.get("risk_meaning"))[:3])
+            actual = (sides or {}).get(key)
+            if side or actual:
+                shown = side or actual
+                add(f"{name}, what {'an in-range' if shown == 'normal' else 'a ' + shown} result may reflect", _clean_lines(explanations.get(shown)))
+            if actual == "normal":
+                add(f"{name}, keeping it healthy", _clean_lines(row.get("keeping_healthy"))[:1])
+            add(f"{name}, lab range and clinical thresholds", _clean_lines(row.get("reference_range_note")))
+            add(f"{name}, a common misunderstanding", _clean_lines(row.get("common_misconceptions"))[:1])
             add(f"{name}, limits", limits)
         else:
             add(name, _clean_lines(row.get("short_description")) + _clean_lines(row.get("what_happens_inside_my_body"))[:2])
@@ -259,7 +277,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
             left, right = _endpoint(rel, "source"), _endpoint(rel, "related")
             other = right if left in wanted else left if right in wanted else None
             if other and rel.get("user_explanation"):
-                add(f"Relationship with {other.replace('_', ' ')}", [rel["user_explanation"]] + _clean_lines(rel.get("clinical_limitations"))[:1])
+                add(f"Relationship with {other.replace('_', ' ')}", [rel["user_explanation"]] + _clean_lines(rel.get("reading_together")) + _clean_lines(rel.get("clinical_limitations"))[:1])
                 added += 1
     return lines[:8]
 

@@ -17,7 +17,7 @@ H = {"X-Cura-User-Id": "demo-user-001"}
 QUESTION = "What does HbA1c measure?"
 
 
-def _captured_request(monkeypatch, access: str) -> str:
+def _captured_request(monkeypatch, access: str, question: str = QUESTION) -> str:
     seen: list = []
 
     def fake(self, messages, *args, **kwargs):
@@ -29,7 +29,7 @@ def _captured_request(monkeypatch, access: str) -> str:
     # The real client is replaced at the network edge: these are the messages CURA would send.
     monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", fake)
     monkeypatch.setattr(OpenAICompatibleLLMClient, "complete", fake)
-    client.post("/api/v1/chat", headers=H, json={"message": QUESTION})
+    client.post("/api/v1/chat", headers=H, json={"message": question})
     assert seen, "no model request was assembled"
     return "\n".join(m.get("content", "") for m in seen[-1] if isinstance(m, dict))
 
@@ -64,3 +64,40 @@ def test_default_access_depends_on_environment(monkeypatch):
     assert settings.library_chat_access() == "approved_only"
     monkeypatch.setattr(settings, "app_env", "development")
     assert settings.library_chat_access() == "evaluation"
+
+
+def _knowledge(text: str) -> str:
+    assert "CURATED KNOWLEDGE (V2.3)" in text
+    return text.split("CURATED KNOWLEDGE (V2.3)", 1)[1]
+
+
+def test_cause_questions_receive_explained_factors_not_bare_names(monkeypatch):
+    block = _knowledge(_captured_request(monkeypatch, "evaluation", "Why could my HbA1c be high?"))
+    assert "how influencing factors act" in block
+    assert "Very low iron: Very low iron can make HbA1c read falsely high" in block
+
+
+def test_result_questions_receive_threshold_note_and_a_misconception(monkeypatch):
+    block = _knowledge(_captured_request(monkeypatch, "evaluation", "What does my HbA1c result mean?"))
+    assert "5.7 to 6.4%" in block  # diagnostic threshold, kept apart from the lab range
+    assert "a common misunderstanding" in block
+
+
+def test_relationship_questions_receive_what_the_pair_shows(monkeypatch):
+    from app.biomarkers import medical_registry as lib
+
+    monkeypatch.setattr(settings, "medical_library_chat_access", "evaluation")
+    lines = lib.chat_passages("How are my ferritin and haemoglobin related?", ["ferritin", "hemoglobin_hb"])
+    joined = " ".join(lines)
+    assert "confirms iron-deficiency anaemia" in joined
+
+
+def test_passages_stay_concise(monkeypatch):
+    from app.biomarkers import medical_registry as lib
+
+    monkeypatch.setattr(settings, "medical_library_chat_access", "evaluation")
+    for question in ("Why is my ALT high?", "What should I eat for my LDL?", "What does my TSH mean?"):
+        key = {"ALT": "sgpt_alt", "LDL": "ldl_cholesterol_calculated", "TSH": "tsh"}[question.split()[-2] if question.split()[-2] in {"ALT", "TSH"} else "LDL"]
+        lines = lib.chat_passages(question, [key], {key: "high"})
+        assert 0 < len(lines) <= 8
+        assert sum(len(x) for x in lines) < 3500
