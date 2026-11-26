@@ -2,7 +2,7 @@
   {
     "risk_id": "cardiac_health",
     "display_name": "Heart health",
-    "short_description": "Over time, high pressure or cholesterol buildup can strain this system.",
+    "short_description": "Heart health describes how well your heart and blood vessels support blood flow.",
     "what_happens_inside_my_body": [
       "Your heart pumps blood around your body.",
       "Blood carries oxygen and nutrients to your cells.",
@@ -113,8 +113,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my heart health assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "What do my cholesterol results say about my heart?",
+      "Can I have heart risk without symptoms?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -141,12 +141,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose beans, vegetables and whole grains to support heart health.",
+      "Move regularly as your health allows; activity supports circulation."
+    ]
   },
   {
     "risk_id": "dyslipidemia",
     "display_name": "Cholesterol imbalance",
-    "short_description": "An imbalance in these blood fats may raise the risk of artery disease.",
+    "short_description": "Dyslipidemia means that levels of cholesterol or other fats in your blood are out of balance.",
     "what_happens_inside_my_body": [
       "Your body needs fats and cholesterol to function.",
       "They travel through blood inside tiny particles.",
@@ -188,8 +192,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my cholesterol imbalance assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Which of my cholesterol results matters most?",
+      "Can cholesterol be high even if I feel well?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -221,12 +225,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose unsaturated oils instead of butter or ghee more often to support healthy LDL levels.",
+      "Discuss your individual cholesterol targets with a clinician."
+    ]
   },
   {
     "risk_id": "hypertension",
     "display_name": "High blood pressure",
-    "short_description": "Over time, high pressure can damage blood vessels and organs.",
+    "short_description": "Hypertension means blood pressure stays higher than it should over time.",
     "what_happens_inside_my_body": [
       "Your heart pushes blood through your blood vessels.",
       "Blood pressure is the force of blood against their walls.",
@@ -315,8 +323,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my high blood pressure assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Can my blood pressure be high without symptoms?",
+      "How can I check my blood pressure at home?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -338,12 +346,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose less salty packaged foods to help manage blood pressure.",
+      "Ask about home blood pressure measurements to understand your actual readings."
+    ]
   },
   {
     "risk_id": "nafld",
     "display_name": "Fatty liver",
-    "short_description": "In some people, ongoing fat buildup can lead to irritation and scarring.",
+    "short_description": "Fatty liver means excess fat has collected inside liver cells.",
     "what_happens_inside_my_body": [
       "Your liver processes nutrients and stores some energy.",
       "Sometimes more fat builds up inside liver cells than they can handle.",
@@ -412,8 +424,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my fatty liver assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Can I have fatty liver with normal liver tests?",
+      "What tests can check for fat in my liver?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -440,12 +452,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose whole grains and water instead of sugary drinks to support metabolic health.",
+      "Build regular movement into your day as your health allows."
+    ]
   },
   {
     "risk_id": "type_2_diabetes",
     "display_name": "Type 2 diabetes",
-    "short_description": "If your body cannot make enough extra insulin, sugar stays high in blood.",
+    "short_description": "Type 2 diabetes develops when the body cannot use insulin effectively enough to keep blood sugar in a healthy range.",
     "what_happens_inside_my_body": [
       "Your food provides sugar that travels through your blood.",
       "Insulin helps sugar move into cells for energy.",
@@ -562,8 +578,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my type 2 diabetes assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "What does my HbA1c tell me about blood sugar?",
+      "Can I have high blood sugar without symptoms?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -585,12 +601,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose fibre-rich meals with pulses and vegetables to support blood sugar management.",
+      "Move regularly as your health allows to help muscles use glucose."
+    ]
   },
   {
     "risk_id": "obesity",
     "display_name": "Weight and metabolic health",
-    "short_description": "Extra body fat, especially around internal organs, can affect how the body handles sugar and fats.",
+    "short_description": "Obesity is a complex health condition involving excess body fat that can affect health.",
     "what_happens_inside_my_body": [
       "Your body uses food for energy.",
       "It can store unused energy as body fat.",
@@ -637,8 +657,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my weight and metabolic health assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Can my metabolic health improve without a large weight change?",
+      "How does fat around organs affect health?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -660,12 +680,16 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose satisfying, balanced meals and activity you enjoy rather than crash diets.",
+      "Discuss suitable weight and health goals with a clinician if needed."
+    ]
   },
   {
     "risk_id": "thyroid",
     "display_name": "Thyroid health",
-    "short_description": "Too much or too little thyroid hormone can affect many parts of your body.",
+    "short_description": "Thyroid health describes how well the gland in your neck makes hormones that regulate energy use.",
     "what_happens_inside_my_body": [
       "Your thyroid is a small gland in your neck.",
       "It makes hormones that help control how your cells use energy.",
@@ -698,8 +722,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my thyroid health assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "What do TSH and thyroid hormones tell me?",
+      "Can thyroid problems affect my energy?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -721,12 +745,15 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Discuss persistent symptoms and thyroid blood tests with a clinician; diet alone cannot establish or correct a hormone disorder."
+    ]
   },
   {
     "risk_id": "hypothyroidism",
     "display_name": "Underactive thyroid",
-    "short_description": "Some people notice tiredness, feeling cold or changes in bowel habits.",
+    "short_description": "Hypothyroidism means your thyroid does not supply enough thyroid hormone for your body's needs.",
     "what_happens_inside_my_body": [
       "Your thyroid makes hormones that help your cells use energy.",
       "When it makes too little, many body processes may slow down.",
@@ -751,8 +778,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my underactive thyroid assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Can low thyroid hormone explain my tiredness?",
+      "How are TSH and T4 connected?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -774,12 +801,15 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Discuss persistent tiredness, cold sensitivity or abnormal thyroid tests with a clinician; food alone may not correct low hormone levels."
+    ]
   },
   {
     "risk_id": "hyperthyroidism",
     "display_name": "Overactive thyroid",
-    "short_description": "Some people notice a fast heartbeat, feeling hot or weight changes.",
+    "short_description": "Hyperthyroidism means your thyroid makes more hormone than your body needs.",
     "what_happens_inside_my_body": [
       "Your thyroid releases hormones that help set the pace of body processes.",
       "When too much hormone circulates, some processes speed up.",
@@ -804,8 +834,8 @@
       "Model features, calibration and prediction time horizon are not confirmed here."
     ],
     "suggested_questions": [
-      "What does my overactive thyroid assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Can an overactive thyroid affect my heartbeat?",
+      "What blood tests check for an overactive thyroid?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -827,13 +857,21 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Seek medical assessment for persistent racing heartbeat, heat intolerance or unexplained weight loss; lifestyle changes alone cannot treat excess thyroid hormone."
+    ]
   },
   {
     "risk_id": "pcos",
     "display_name": "Polycystic ovary syndrome (PCOS)",
-    "aliases": ["PCOS", "PCOD", "polycystic ovary syndrome", "polycystic ovarian disease"],
-    "short_description": "PCOS is a common hormone pattern that can make periods less regular.",
+    "aliases": [
+      "PCOS",
+      "PCOD",
+      "polycystic ovary syndrome",
+      "polycystic ovarian disease"
+    ],
+    "short_description": "PCOS is a common hormonal condition that can affect ovulation, periods and metabolic health.",
     "what_happens_inside_my_body": [
       "The ovaries make hormones and usually release an egg in a cycle.",
       "With PCOS, that signalling can shift, so egg release becomes less regular.",
@@ -869,12 +907,13 @@
       "Medicines, supplements and doses are a doctor's decision, not something this explanation can set."
     ],
     "suggested_questions": [
-      "What is PCOS?",
-      "What does my PCOS assessment mean?",
-      "How can periods and blood sugar relate to PCOS?",
-      "When should I talk to a doctor about PCOS?"
+      "Can I have PCOS even if my weight is normal?",
+      "Can PCOS affect blood sugar?"
     ],
-    "source_ids": ["who_pcos", "pcos_guideline_2023"],
+    "source_ids": [
+      "who_pcos",
+      "pcos_guideline_2023"
+    ],
     "review_status": "pending_clinical_review",
     "draft_status": "expanded_draft",
     "relevant_biomarker_context": [
@@ -904,7 +943,11 @@
         "model_contributor_confirmed": false
       }
     ],
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose enjoyable regular activity and balanced meals to support metabolic health, regardless of body size.",
+      "Discuss irregular periods or troublesome symptoms with a clinician."
+    ]
   },
   {
     "risk_id": "oxidative_stress",
@@ -928,9 +971,8 @@
       "Ongoing stress"
     ],
     "everyday_support": [
-      "Include a variety of vegetables, fruit, pulses and other minimally processed foods.",
-      "Keep a sleep routine that gives you enough rest.",
-      "Stay physically active in a way that fits your usual day."
+      "Eat varied vegetables, fruit and pulses to support general health.",
+      "Move regularly as your health allows; this supports overall health, not a guaranteed score change."
     ],
     "relevant_biomarkers": [
       "hs_crp",
@@ -944,9 +986,8 @@
       "This score is a risk estimate, not a direct measurement of cell damage and not a diagnosis. A number out of 100 is the provider's score, not a percentage chance."
     ],
     "suggested_questions": [
-      "Why is my oxidative stress risk high when a blood test in this area is normal?",
-      "Which everyday habits are discussed in relation to oxidative stress?",
-      "Which foods are discussed for the body's protective systems?"
+      "Does this score directly measure cell damage?",
+      "Can my blood tests be normal with an increased predicted risk?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -968,7 +1009,7 @@
   {
     "risk_id": "metabolic_age",
     "display_name": "Metabolic age",
-    "short_description": "Metabolic age is an estimate that compares parts of metabolic health with age-related patterns.",
+    "short_description": "Metabolic age is a provider-reported estimate comparing aspects of metabolic health with age-related patterns.",
     "product_inputs": [
       "MetSights can look at blood biomarkers, lifestyle, food, activity, sleep, demographics and other questionnaire answers when it builds risk scores and metabolic scores.",
       "That is the known general input set. The formula, feature weights and reference population are not available, and not every answer feeds every score."
@@ -976,15 +1017,19 @@
     "what_happens_inside_my_body": [
       "The body turns food into energy, keeps blood sugar in a workable range and handles fats through the day. That is metabolic health. It is not how quickly someone burns calories or loses weight.",
       "Your actual age is how many years you have lived. Metabolic age is a Bio-AI estimate related to those processes, not a count of birthdays and not biological age.",
-      "A higher, lower or matching estimate is a way to look at metabolic health. It does not measure lifespan and it is not a diagnosis.",
-      "Favourable blood results and a higher estimate can exist together, because a prediction is not the same thing as a measurement.",
-      "A later assessment can show a different number. No habit is promised to move it by a set number of years."
+      "The estimate does not measure lifespan or establish a diagnosis. A prediction can differ from measured blood results.",
+      "A later assessment may change, but no habit guarantees a specific score change."
     ],
     "why_it_matters": [
       "A higher, lower or matching estimate is a starting point for looking at metabolic health, not a judgement of how well someone is ageing.",
       "It does not measure remaining lifespan, and it does not mean the whole body is that many years older or younger."
     ],
-    "relevant_biomarkers": ["fasting_sugar", "hba1c", "triglycerides", "hdl"],
+    "relevant_biomarkers": [
+      "fasting_sugar",
+      "hba1c",
+      "triglycerides",
+      "hdl"
+    ],
     "relevant_lifestyle_factors": [
       "Everyday movement, meals built around vegetables, pulses and unsweetened drinks, and regular sleep support metabolic health.",
       "Those habits are discussed separately from the estimate unless a documented method says they contributed to it."
@@ -1001,14 +1046,18 @@
       "Do not treat a missing estimate as normal health."
     ],
     "suggested_questions": [
-      "What does metabolic age mean?",
-      "How is metabolic age different from biological age?",
-      "Can a metabolic age estimate change over time?",
-      "What should I know before reading my metabolic age?"
+      "Can my metabolic age change over time?",
+      "Why can my metabolic age differ from my actual age?"
     ],
-    "source_ids": ["metsights_inputs"],
+    "source_ids": [
+      "metsights_inputs"
+    ],
     "review_status": "pending_clinical_review",
     "draft_status": "expanded_draft",
-    "evidence_status": "pending_claim_verification"
+    "evidence_status": "pending_claim_verification",
+    "everyday_support": [
+      "Choose sustainable activity and balanced meals to support metabolic health rather than trying to achieve a particular age score.",
+      "Compare future assessments alongside actual blood results and discuss unexpected findings with a clinician."
+    ]
   }
 ]
