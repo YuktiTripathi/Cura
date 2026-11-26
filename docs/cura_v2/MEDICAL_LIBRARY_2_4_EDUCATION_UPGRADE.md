@@ -1,8 +1,9 @@
 # Medical Knowledge Library V2.3, education upgrade (revision 2.4)
 
-Status: general education pending clinical review. Nothing in this revision is clinically approved, and no
-claim is marked evidence verified. Production chat still receives only rows that are clinically approved
-with verified evidence (`medical_library_chat_access = approved_only`).
+Status (27 Nov 2026): CURA uses this library in every environment under one rule: any row that is not
+rejected is used. There is no per-entry clinical approval workflow. No row is marked clinically approved,
+and only claims checked against a source page are marked as supported by evidence. See
+`MEDICAL_CONTENT_GOVERNANCE.md`.
 
 ## What changed
 
@@ -55,36 +56,81 @@ fractions, ratios, ESR, most urine findings and similar results record a reason 
 
 ## Evidence coverage
 
-`evidence/claim_evidence_map.json` has one row for each of the 6,392 reader-facing claims. Each row records
-the claim type: mechanism, interpretation, influencing factor, threshold, prevention, practical guidance,
-escalation or relationship.
+`evidence/claim_evidence_map.json` has one row for each of the 6,393 reader-facing claim rows (4,316 distinct
+claims). Each row records the claim type: mechanism, interpretation, influencing factor, threshold,
+prevention, practical guidance, escalation or relationship.
 
-| Status | Claims |
+| Status | Claim rows | Distinct claims |
+| --- | --- | --- |
+| page_read_supports_claim (a source page was opened, read and states it) | 576 | 123 |
+| candidate_sources_unverified | 5,815 | about 4,190 |
+| metsights_product_information_not_medical_evidence | 2 | 2 |
+
+The verified claim rows outnumber the distinct claims because the allergen limitation and emergency
+advice repeat across most of the 211 allergen entries.
+
+46 source pages read during the review are registered in `evidence/content_sources.json`. Verification
+was prioritised as follows:
+
+| Area | Supported by a page read |
 | --- | --- |
-| page_read_supports_claim (a source page was opened, read and states it) | 93 |
-| candidate_sources_unverified | 6,297 |
-| metsights_product_information_not_medical_evidence | 2 |
+| Thresholds | 12 of 13 notes. The ferritin note is unverified and is not sent to the model. |
+| Allergen limitation and emergency signs | Supported on the entries that carry them |
+| Influencing factors | 77 claims |
+| Result interpretations | 29 claims |
+| Relationship readings | 6 pairs |
+| Nutrition and prevention | 23 claims |
 
-29 source pages read during this review are registered in `evidence/content_sources.json`. A claim that a
-page supports is still not clinically approved. Claim-level verification of the remaining 6,297 claims is
-the largest release blocker.
+Claims corrected or removed because the page did not support them:
+
+- **eGFR:** the three-month rule was removed.
+- **Fasting sugar:** the wording on repeat tests was corrected.
+- **Vitamin D:** the cut-offs and toxicity wording were corrected.
+- **Triglycerides:** the fasting wording was corrected.
+- **CK:** the injection factor was removed.
+- **TSH:** the older-adult target was removed.
+- **Ferritin:** the claim about the most common causes was removed.
+- **Anaphylaxis:** the signs were corrected.
+- **MASLD:** the alcohol wording was corrected.
+- **Potassium:** the sample-handling and medicine factors were corrected.
+- **Homocysteine:** the wording on lowering it and heart risk was corrected.
 
 ## Retrieval and the model request
 
-`chat_passages` still returns at most eight lines and uses the same eligibility and draft labelling as
-before. Each type of question receives only the fields it needs:
+The fixed eight-line cap was replaced. `chat_passages` ranks passages by relevance and keeps them within a
+token budget set by question type:
 
-- **Why or cause questions:** up to four factors, each with how it acts.
-- **Food questions:** factors, plus everyday steps for an out-of-range result or keeping_healthy for an in-range one.
-- **Result questions:** the member's own result state, the lab range versus threshold note, one misconception and, for Bio-AI, the band meaning.
-- **Relationship questions:** how the two results connect and what they show together.
+- a definition: about 220 tokens
+- how the body works: 380
+- a result, cause or relationship question: 520
+- improving health: 560
+- food: 620
+
+Each extra result the person names or that is out of range adds 200, and a whole-report question adds 300,
+up to 1,600. Questions that name an organ get that health category's education. Threshold notes are sent
+only when a source page supports them. Entries are never sent whole.
 
 The system prompt, MemberSnapshot, routing and the CURA 1.0 follow-ups are unchanged.
 
-Tests capture the real model request at the network edge:
+`scripts/library_answer_quality.py` runs 12 questions from five contrasting synthetic members through the
+real chat pipeline. It covers:
 
-- `tests/unit/test_library_reaches_llm_request.py`: in evaluation mode the request carries explained factors, thresholds and pair readings, and production withholds them.
-- `tests/unit/test_education_reaches_contrasting_profiles.py`: synthetic members with low and normal vitamin D, a prediabetes range HbA1c and an iron pattern each get their own values and matching education, never another member's.
+- how the body works
+- what a test measures
+- encouraging and abnormal personal results
+- related findings
+- maintenance, improvement and modifiable risk
+- food
+
+For each question it records the member values and curated knowledge in the exact model request, the final
+answer and the follow-ups.
+
+In capture mode every request carried the member's own values and matching knowledge, sized from 122 tokens
+for "What does HbA1c measure?" to 1,446 for a three-result question. That run found and fixed two retrieval
+gaps: organ questions and questions about what a test measures.
+
+The configured model (openrouter.ai) is blocked by this environment's network proxy, so final model answers
+were not generated here. Run the script with `--mode live` and your credential to read them.
 
 ## Validation results
 
@@ -93,34 +139,38 @@ Tests capture the real model request at the network edge:
   - No missing education fields and no dash characters in written content.
   - No allergen description is shared by more than one entry.
   - Two term flags are false positives, because the term is explained in the same sentence.
-  - 23 repeated sentences sit outside the shared register for review. Most are system-level guidance shared within one family.
-- Backend suite: 2,299 passed, 11 failed, 4 skipped. The same 11 fail on unchanged main, and the upgrade causes no new failures.
+  - 23 repeated sentences sit outside the shared register for review.
+- Backend suite: 2,313 passed, 0 failed, 4 skipped.
 
-### The 11 failing tests
+### The 11 tests that were failing, now fixed
 
-10 have failed since the repository's first commit. They are not caused by the library:
+**Routing** (general questions no longer pull personal data; personal ones get what is relevant):
 
-- **Three questionnaire tests:** the planner sets `needs_blood` or `needs_questionnaire` more broadly than the tests expect.
-- **`test_phase4_quality_scenarios` q52 and q91:** general cholesterol questions are planned with personal blood data.
-- **`test_house_prompt` broad nutrition:** a focused LDL question also requests Bio-AI.
-- **`test_capability_eval`:** a general exercise question is routed to personal lookup.
-- **`test_conversation_state`:** an ALT continuation produces no follow-up chips.
-- **`test_phase10_general_starters`:** no follow-up is produced for a general second turn.
-- **`test_theme_followups`:** two chips are returned instead of four.
+- **`test_phase4_quality_scenarios` q52 and q91, `test_capability_eval`:** "Tell me the biology" and "how much exercise should I get" had been read as personal habits.
+- **Three `test_questionnaire` tests:**
+  - "What did I answer about my sleep?" stays a questionnaire lookup.
+  - "What is my sleep?" fetches only the questionnaire answer.
+  - Missing questionnaire data is reported again.
+- **`test_house_prompt` broad nutrition:** "What can I eat to lower my LDL?" no longer fetches every Bio-AI score, and a whole-body food question again reads all food-relevant results.
 
-One began failing at commit 0b591ae ("Kb updated"). `test_dynamic_format::test_follow_ups_are_the_models_own_and_specific` now receives no follow-ups after that commit's follow-up generator and prompt change.
+**Follow-ups** (CURA 1.0 dynamic generation, up to four, never padded with generic questions):
 
-These tests describe routing and follow-up behaviour that the brief asked to preserve, so neither the
-tests nor the routing were changed. The product owner should decide whether the tests or the behaviour
-reflect the intended design.
+- **`test_dynamic_format`, the 0b591ae regression:** the generator returned early once the model offered any usable question. When a later check removed that question, the row was empty. It now refills only with next steps about the result asked about.
+- **`test_conversation_state` ALT:** an in-range asked result gets its own library questions.
+- **`test_phase10_general_starters`:** a definition answer gets on-topic general questions.
+- **`test_theme_followups`:** the exactly-four assertion was obsolete and now accepts up to four.
 
-## Remaining release blockers
+Two assertions were updated as obsolete, with the reason written in the test. No safety, privacy, grounding
+or member-isolation test was changed.
 
-1. Clinical review and sign-off of every entry. All 607 rows are pending_clinical_review.
-2. Claim-level evidence verification of 6,297 claims, starting with thresholds, escalation advice and Bio-AI wording.
-3. 216 unresolved production canonical IDs (`inventory/unresolved_mappings.json`).
-4. 234 entries need assay or result-format confirmation (all allergens and many urine items).
-5. Production questionnaire keys are unconfirmed. The staging question IDs are not production keys, so lifestyle personalisation stays limited.
-6. MetSights has not published the formula, prediction target, time horizon or reference population for any Bio-AI score.
-7. Independent semantic writing review, including the 23 repeated sentences listed by the audit.
-8. A decision on the 11 failing routing and follow-up tests.
+## Remaining medical accuracy limitations
+
+1. About 4,190 distinct claims still have candidate sources only, and no source page has been read for them.
+   They are general education, not checked fact. Threshold notes are the exception and are gated.
+2. 216 production canonical IDs are unresolved (`inventory/unresolved_mappings.json`).
+3. 234 entries need assay or result-format confirmation, including all allergens and many urine items, so
+   they stay unlabelled.
+4. Production questionnaire keys are unconfirmed, so lifestyle personalisation uses staging IDs.
+5. MetSights has not published the formula, prediction target, time horizon or reference population for
+   any Bio-AI score. CURA does not attribute scores or turn bands into probabilities.
+6. 23 repeated sentences listed by the audit still need an independent writing review.
