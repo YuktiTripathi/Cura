@@ -515,13 +515,21 @@ _NOT_A_TOPIC = re.compile(
 
 def general_continuations(message: str) -> list[str]:
     """Two or three next questions that stay on a general topic. None if the topic is unclear."""
-    subject = re.sub(
+    text = (message or "").strip().rstrip("?.!")
+    # "What does HbA1c measure?" and "How does the liver work?" are about HbA1c and the liver.
+    about = re.match(r"^(?:what|how) (?:does|do) (.+?) (?:measure|show|test|check|do|work|mean)$", text, re.I)
+    subject = about.group(1) if about else re.sub(
         r"^(?:what(?:'s| is| are)|how does|how do|tell me about|explain)\s+",
         "",
-        (message or "").strip().rstrip("?.!"),
+        text,
         flags=re.I,
     )
     subject = re.sub(r"^(?:a|an|the)\s+", "", subject, flags=re.I).strip()
+    organ = re.fullmatch(r"(liver|kidneys?|heart|thyroid|pancreas|bones?|immune system|bone marrow|brain|lungs?|gut|stomach)", subject, re.I)
+    if organ:
+        # An organ is not a result, so result-style templates ("What does liver mean?") do not fit.
+        o = organ.group(1).lower()
+        return [f"Which everyday habits protect the {o}?", f"Which blood tests check the {o}?", f"What are early signs that the {o} is under strain?"]
     if not subject or len(subject.split()) > 8:
         return []
     # Only a noun phrase can be wrapped in a template. "is it serious" or "why is it low" is a question about

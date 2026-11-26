@@ -208,7 +208,14 @@ def _mentioned(row: dict, key: str, text: str) -> bool:
     return False
 
 
+_PERSONAL = re.compile(r"\b(my|mine|me|i|i'm|i've)\b")
+_ABOUT_TEST = re.compile(r"\bwhat (?:does|do) .+? (?:measure|measures|show|shows|test|tests|check|checks|do|does)\b")
+
+
 def question_mode(text: str) -> str:
+    if not _PERSONAL.search(text) and _ABOUT_TEST.search(text):
+        # "What does HbA1c measure?" asks about the test, not a result.
+        return "body" if re.search(r"\b(do|does)\??$", text.strip()) else "definition"
     mode = _intent_of(text)
     if mode in {"definition", "interpretation"} and _IMPROVE.search(text):
         return "improvement"
@@ -222,6 +229,33 @@ def passage_budget(mode: str, extra_results: int, broad: bool) -> int:
     if broad:
         budget += 300
     return min(budget, MAX_BUDGET)
+
+
+_ORGAN_WORDS = {
+    "liver_health": r"liver",
+    "kidney_urinary": r"kidneys?|urinary|bladder",
+    "heart_circulation": r"heart|arter(?:y|ies)|circulation|blood vessels?",
+    "thyroid_health": r"thyroid",
+    "blood_sugar_metabolism": r"blood sugar|insulin|metabolism|pancreas",
+    "bone_mineral": r"bones?",
+    "immunity_inflammation": r"immune system|immunity|inflammation",
+    "hormonal_health": r"hormones?|periods?|menstrual|ovar(?:y|ies)|testes",
+    "vitamins_nutrition": r"vitamins?|minerals?|nutrients?",
+    "blood_iron": r"bone marrow|red (?:blood )?cells|blood cells|anaemia|anemia",
+    "sleep_recovery": r"sleep",
+    "allergy": r"allerg(?:y|ies|ic)",
+}
+
+
+def categories_named(text: str) -> list[dict]:
+    """Health categories whose organ or system the message names, for questions such as "How does the liver work?"."""
+    rows = {row.get("health_category"): row for row in _load("content/health_category_content.json")}
+    out = []
+    for category, pattern in _ORGAN_WORDS.items():
+        row = rows.get(category)
+        if row and eligible(row) and re.search(rf"\b(?:{pattern})\b", text):
+            out.append(row)
+    return out[:2]
 
 
 def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = None) -> list[str]:
@@ -251,6 +285,15 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
 
     keys = [canonical_key(k) for k in keys if k]
     used_keys: list[str] = []
+    if not keys or mode == "body":
+        for category in categories_named(text):
+            name = category.get("display_name") or category["health_category"]
+            add(96, f"{name}, how it works", _clean_lines(category.get("what_happens_inside_my_body"))[:4])
+            add(70, f"{name}, why it matters", _clean_lines(category.get("why_it_matters"))[:2])
+            if mode in {"improvement", "nutrition"} or _IMPROVE.search(text):
+                add(85, f"{name}, keeping it healthy", _clean_lines(category.get("keeping_healthy"))[:2])
+                add(72, f"{name}, lowering modifiable risk", _clean_lines(category.get("lowering_risk"))[:2])
+            add(50, f"{name}, a common misunderstanding", _clean_lines(category.get("common_misconceptions"))[:1])
     for position, key in enumerate(keys):
         risk = bio_ai_content().get(key)
         row = entry_for(key) or (risk if eligible(risk) else None)

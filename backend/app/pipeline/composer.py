@@ -519,7 +519,10 @@ class ResponseComposer:
                 presentation.suggestion_chips = [item.text for item in combined]
                 presentation.follow_up = None
             presentation.suggestion_chips = [item.text for item in combined]
-        definition = bool(re.search(r"\bwhat is\b", plan.raw_message or "", re.I) and not re.search(r"\bmy\b", plan.raw_message or "", re.I))
+        definition = bool(
+            re.search(r"\b(?:what is|what are|what does|what do|how does|how do)\b", plan.raw_message or "", re.I)
+            and not re.search(r"\b(?:my|mine|me|i)\b", plan.raw_message or "", re.I)
+        )
         if not combined and definition and not answer_turn and context.status != "ambiguous":
             # The model offered no usable next questions. Stay on this topic rather than offering stock health
             # questions or an empty row; these are general questions and need no personal data.

@@ -64,10 +64,10 @@ def test_rejected_rows_are_never_used():
 def test_unverified_threshold_notes_are_not_sent(monkeypatch):
     from app.biomarkers import medical_registry as lib
 
-    row = lib.biomarker_content()["tsh"]
+    row = lib.biomarker_content()["ferritin"]
     assert row.get("reference_range_note")
     assert not lib.claim_verified(row["content_key"], "reference_range_note", row["reference_range_note"])
-    lines = lib.chat_passages("What does my TSH result mean?", ["tsh"], {"tsh": "high"})
+    lines = lib.chat_passages("What does my ferritin result mean?", ["ferritin"], {"ferritin": "low"})
     assert not any("lab range and clinical thresholds" in x for x in lines)
     verified = lib.chat_passages("What does my HbA1c result mean?", ["hba1c"], {"hba1c": "high"})
     assert any("5.7 to 6.4%" in x for x in verified)
@@ -125,3 +125,17 @@ def test_entries_are_never_sent_whole():
     joined = " ".join(lines)
     assert sum(1 for f in fx if f.rstrip(".") in joined) <= 4
     assert "everyday steps that may help" in joined
+
+
+def test_organ_questions_receive_category_education():
+    from app.biomarkers import medical_registry as lib
+
+    lines = lib.chat_passages("How does the liver work?", [])
+    assert any(line.startswith("Liver health, how it works") for line in lines)
+
+
+def test_questions_about_a_test_are_not_treated_as_personal_results():
+    from app.biomarkers import medical_registry as lib
+
+    assert lib.question_mode("what does hba1c measure?") == "definition"
+    assert lib.question_mode("what does my hba1c mean?") == "interpretation"
