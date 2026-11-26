@@ -33,6 +33,7 @@ X["WB-036"] = dict(
 )
 
 X["WB-037"] = dict(
+    fix=dict(high="Higher vitamin D is almost always caused by taking too much from supplements. NIH describes levels above 50 ng/mL as too high; very large doses can cause nausea, kidney stones and kidney damage."),
     fx=[
         ("Sunlight exposure", "Skin makes vitamin D in sunlight; working indoors, covering most skin and pollution reduce this."),
         ("Skin colour", "Darker skin makes vitamin D more slowly from the same sunlight."),
@@ -44,9 +45,9 @@ X["WB-037"] = dict(
     keep=["Some regular daylight on uncovered arms and face, when safe for your skin, plus vitamin D foods that suit your diet, help keep levels up."],
     myth=[
         "Living in a sunny country does not prevent low vitamin D. Low levels are very common in India.",
-        "More is not better. Very high vitamin D from large doses can raise calcium and harm the kidneys.",
+        "More is not better. NIH describes levels above 50 ng/mL as too high, and very large doses can cause nausea, kidney stones and kidney damage.",
     ],
-    thr="Labs and expert groups use different cut-offs for vitamin D. Many treat below 20 ng/mL as deficient and 20 to 30 as insufficient, but your report's range may differ, so a doctor decides whether treatment is needed.",
+    thr="NIH describes 20 ng/mL or above as adequate for most people and below 12 ng/mL as too low. Many labs print a higher lower limit, such as 30 ng/mL, so a result between 20 and 30 may be flagged low; a doctor decides whether treatment is needed.",
 )
 
 X["WB-038"] = dict(
@@ -80,7 +81,7 @@ X["WB-040"] = dict(
         _THY_FX,
         ("Pregnancy", "Pregnancy raises the proteins that carry T4, which changes total T4."),
         ("Thyroid tablets", "Levothyroxine is T4, so the dose and timing of the last tablet affect the result."),
-        ("Some medicines and supplements such as biotin", "Biotin (often in hair and nail supplements) can interfere with the lab test and give false results; stopping it a few days before testing helps."),
+        ("Some medicines and supplements such as biotin", "High-dose biotin, common in hair, skin and nail supplements, can interfere with many thyroid tests and give falsely high or low results, so tell the lab or doctor if you take it."),
     ],
     keep=_THY_KEEP,
     myth=["Thyroid problems are not only about weight. Tiredness, feeling cold or hot, periods, mood and heart rate can all change."],

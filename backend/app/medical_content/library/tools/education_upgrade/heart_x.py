@@ -73,7 +73,7 @@ X["WB-002"] = dict(
 
 X["WB-003"] = dict(
     fx=[
-        ("Recent meal or not fasting", "Fat from a meal enters the blood as triglycerides for several hours, so a non-fasting sample can read higher."),
+        ("Recent meal or not fasting", "Fat from a meal travels in the blood as triglycerides for some hours, which is why you may be asked to fast for 9 to 12 hours before this test."),
         ("Sugar and refined carbohydrates", "When you eat more sugar or refined flour than you burn, your liver turns the extra into triglycerides."),
         ("Alcohol", "Alcohol is turned into fat by the liver and can push triglycerides up sharply, even in moderate amounts for some people."),
         ("Body weight", "Extra weight, especially around the waist, goes with higher triglycerides."),

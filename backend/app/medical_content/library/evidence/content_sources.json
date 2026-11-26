@@ -249,7 +249,7 @@
   "source_id": "ods_vitd",
   "title": "NIH Office of Dietary Supplements: vitamin D consumer fact sheet",
   "url": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "mlp_tsh",
@@ -285,7 +285,7 @@
   "source_id": "mlp_crp",
   "title": "MedlinePlus: C-reactive protein (CRP) test",
   "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "mlp_homocysteine",
@@ -363,7 +363,7 @@
   "source_id": "mlp_ck",
   "title": "MedlinePlus: creatine kinase",
   "url": "https://medlineplus.gov/lab-tests/creatine-kinase/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "mlp_ldh",
@@ -400,5 +400,161 @@
   "title": "WHO fact sheet: obesity and overweight",
   "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
   "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "niddk_a1c_test",
+  "title": "NIDDK: The A1C test and diabetes",
+  "url": "https://www.niddk.nih.gov/health-information/diagnostic-tests/a1c-test",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_diabetes_tests",
+  "title": "NIDDK: Diabetes tests and diagnosis",
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/tests-diagnosis",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_insulin_resistance",
+  "title": "NIDDK: Insulin resistance and prediabetes",
+  "url": "https://www.niddk.nih.gov/health-information/diabetes/overview/what-is-diabetes/prediabetes-insulin-resistance",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "cdc_activity_diabetes",
+  "title": "CDC: Physical activity and diabetes",
+  "url": "https://www.cdc.gov/diabetes/living-with/physical-activity.html",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_ckd_tests",
+  "title": "NIDDK: Tests and diagnosis of chronic kidney disease",
+  "url": "https://www.niddk.nih.gov/health-information/kidney-disease/chronic-kidney-disease-ckd/tests-diagnosis",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_nafld_treatment",
+  "title": "NIDDK: Treatment for NAFLD and NASH",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/treatment",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_nafld_diet",
+  "title": "NIDDK: Eating, diet and nutrition for NAFLD and NASH",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/eating-diet-nutrition",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_alp_ency",
+  "title": "MedlinePlus: ALP blood test",
+  "url": "https://medlineplus.gov/ency/article/003470.htm",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_osteomalacia",
+  "title": "MedlinePlus: Osteomalacia",
+  "url": "https://medlineplus.gov/ency/article/000376.htm",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_esr_ency",
+  "title": "MedlinePlus: Sed rate (ESR)",
+  "url": "https://medlineplus.gov/ency/article/003638.htm",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_triglycerides",
+  "title": "MedlinePlus: Triglycerides test",
+  "url": "https://medlineplus.gov/lab-tests/triglycerides-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_vitd_test",
+  "title": "MedlinePlus: Vitamin D test",
+  "url": "https://medlineplus.gov/lab-tests/vitamin-d-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "harvard_bilirubin",
+  "title": "Harvard Health: What does a high bilirubin level mean?",
+  "url": "https://www.health.harvard.edu/digestive-health/what-does-a-high-bilirubin-level-in-my-blood-test-actually-mean",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "ods_b12_hp",
+  "title": "NIH ODS: Vitamin B12 fact sheet for health professionals",
+  "url": "https://ods.od.nih.gov/factsheets/VitaminB12-HealthProfessional/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "ods_b12_consumer",
+  "title": "NIH ODS: Vitamin B12 fact sheet for consumers",
+  "url": "https://ods.od.nih.gov/factsheets/VitaminB12-Consumer/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "livertox_hds",
+  "title": "LiverTox: Herbal and dietary supplements",
+  "url": "https://www.ncbi.nlm.nih.gov/books/NBK548441/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mayo_hdl",
+  "title": "Mayo Clinic: HDL cholesterol",
+  "url": "https://www.mayoclinic.org/diseases-conditions/high-blood-cholesterol/in-depth/hdl-cholesterol/art-20046388",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "medlineplus_hdl",
+  "title": "MedlinePlus: HDL, the good cholesterol",
+  "url": "https://medlineplus.gov/hdlthegoodcholesterol.html",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "nccih_antioxidants",
+  "title": "NCCIH: Antioxidant supplements, what you need to know",
+  "url": "https://www.nccih.nih.gov/health/antioxidant-supplements-what-you-need-to-know",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "cdc_lpa",
+  "title": "CDC: Lipoprotein (a)",
+  "url": "https://cdc.gov/heart-disease-family-history/about/about-lipoprotein-a.html",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "aha_lpa",
+  "title": "American Heart Association: Lipoprotein (a)",
+  "url": "https://www.heart.org/en/health-topics/cholesterol/genetic-conditions/lipoprotein-a",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "hsa_biotin_thyroid",
+  "title": "Health Sciences Authority Singapore: Biotin interference with thyroid function tests",
+  "url": "https://www.hsa.gov.sg/announcements/biotin-interference-with-thyroid-function-tests/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "health_canada_biotin",
+  "title": "Health Canada: Biotin and the risk of false lab test results",
+  "url": "https://www.canada.ca/en/health-canada/services/drugs-health-products/medical-devices/biotin-risk-false-lab-test-results.html",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "pmc_nafld_normal_enzymes",
+  "title": "Normal liver enzymes in NAFLD (PMC11299156)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11299156",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "pubmed_nafld_india",
+  "title": "NAFLD prevalence in India, meta-analysis (PubMed 35677499)",
+  "url": "https://pubmed.ncbi.nlm.nih.gov/35677499",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "pmc_lean_nafld_south_asia",
+  "title": "Non-obese NAFLD in South Asia (PMC10442973)",
+  "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10442973",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  }
 ]

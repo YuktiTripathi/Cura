@@ -171,6 +171,96 @@
    "family": "bio_ai_risk_meaning",
    "reason": "Every Bio-AI prediction carries the same explanation of what a predicted score means.",
    "sentence": "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  },
+  {
+   "family": "heart_guidance",
+   "reason": "Cholesterol results share heart maintenance, risk and lab cut-off guidance.",
+   "sentence": "Keep doing what supports your blood vessels: regular movement, not smoking, and meals built around vegetables, dal, whole grains and nuts."
+  },
+  {
+   "family": "heart_guidance",
+   "reason": "Cholesterol results share heart maintenance, risk and lab cut-off guidance.",
+   "sentence": "Cholesterol can change over years with weight, age and menopause, so repeat checks at the interval your doctor suggests matter even when this result is good."
+  },
+  {
+   "family": "heart_guidance",
+   "reason": "Cholesterol results share heart maintenance, risk and lab cut-off guidance.",
+   "sentence": "Blood pressure, blood sugar and smoking add to the same artery risk as cholesterol, so working on any of them protects your heart."
+  },
+  {
+   "family": "heart_guidance",
+   "reason": "Cholesterol results share heart maintenance, risk and lab cut-off guidance.",
+   "sentence": "If close family members had heart disease young, tell your doctor. It changes how your results are judged."
+  },
+  {
+   "family": "heart_guidance",
+   "reason": "Cholesterol results share heart maintenance, risk and lab cut-off guidance.",
+   "sentence": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "Keep blood pressure and blood sugar in a healthy range. They are the two most common causes of kidney damage."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "Drink water through the day, more in heat or after sweating, and use painkillers such as ibuprofen or diclofenac only as advised."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "If you have diabetes or high blood pressure, ask how often your kidneys should be checked. Kidney damage is often silent until late."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "Keeping salt low helps blood pressure, which protects the kidney filters."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "Healthy kidneys keep this level steady; when filtering falls, the level drifts out of range."
+  },
+  {
+   "family": "kidney_guidance",
+   "reason": "Kidney and salt results share kidney maintenance guidance and the filtering mechanism.",
+   "sentence": "Being short of water concentrates the blood and slows kidney filtering for a while, so this result can read higher; it settles once you drink normally."
+  },
+  {
+   "family": "liver_guidance",
+   "reason": "Liver enzyme results share liver maintenance and risk guidance.",
+   "sentence": "Keep doing what protects your liver: little or no alcohol, few sugary drinks and sweets, regular activity and a steady weight."
+  },
+  {
+   "family": "liver_guidance",
+   "reason": "Liver enzyme results share liver maintenance and risk guidance.",
+   "sentence": "Ask before starting herbal, weight-loss or bodybuilding supplements. Some herbal and dietary supplements can injure the liver."
+  },
+  {
+   "family": "liver_guidance",
+   "reason": "Liver enzyme results share liver maintenance and risk guidance.",
+   "sentence": "About one in three Indian adults has fat in the liver, often without being overweight, so keeping sugar, refined flour and alcohol low is worth it even when you feel well."
+  },
+  {
+   "family": "liver_guidance",
+   "reason": "Liver enzyme results share liver maintenance and risk guidance.",
+   "sentence": "Losing 3 to 5% of body weight can reduce liver fat, and regular activity helps the liver even when weight does not change."
+  },
+  {
+   "family": "liver_guidance",
+   "reason": "Liver enzyme results share liver maintenance and risk guidance.",
+   "sentence": "Normal liver enzymes do not rule out fatty liver. A good share of people with fat in the liver have normal ALT and AST."
+  },
+  {
+   "family": "urine_infection",
+   "reason": "Urine infection and contamination factors are shared across urine findings.",
+   "sentence": "Bacteria in the bladder or kidneys cause inflammation, which this finding can pick up."
+  },
+  {
+   "family": "urine_infection",
+   "reason": "Urine infection and contamination factors are shared across urine findings.",
+   "sentence": "If the first part of the stream or skin touches the sample, cells and bacteria from outside the bladder get in. A clean midstream sample avoids this."
   }
  ]
 }

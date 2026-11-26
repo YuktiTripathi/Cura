@@ -411,7 +411,7 @@ def build_risk(row, r):
 
 def write_shared_register():
     """Sentences deliberately shared within a family of tests. Anything else repeated across entries is flagged."""
-    import blood, bio_ai, bio_ai_x, hormones_cancer, kidney, liver, sugar_inflammation, sugar_inflammation_x, urine
+    import blood, bio_ai, bio_ai_x, heart_x, hormones_cancer, kidney, kidney_x, liver, liver_x, sugar_inflammation, sugar_inflammation_x, urine, urine_x
 
     families = {
         "white_cell_types": ("The five white cell types share the same background and the same reason for testing.",
@@ -424,6 +424,11 @@ def write_shared_register():
         "blood_sugar": ("Blood sugar results share the same guidance and referral advice.", sugar_inflammation_x.SUGAR_SUPPORT + sugar_inflammation._SUGAR_SEEK),
         "iron": ("Iron results share iron guidance.", blood._IRON_SUPPORT + blood._IRON_SEEK),
         "bio_ai_risk_meaning": ("Every Bio-AI prediction carries the same explanation of what a predicted score means.", bio_ai_x.RISK_MEANING),
+        "heart_guidance": ("Cholesterol results share heart maintenance, risk and lab cut-off guidance.", heart_x._HEART_KEEP + heart_x._HEART_RISK + [heart_x._LIPID_TARGET]),
+        "kidney_guidance": ("Kidney and salt results share kidney maintenance guidance and the filtering mechanism.", kidney_x._KIDNEY_KEEP + kidney_x._KIDNEY_RISK + [kidney_x._KIDNEY_FX[1], kidney_x._HYD[1]]),
+        "liver_guidance": ("Liver enzyme results share liver maintenance and risk guidance.", liver_x._LIVER_KEEP + liver_x._LIVER_RISK + [liver_x._ENZ_MYTH]),
+        "urine_infection": ("Urine infection and contamination factors are shared across urine findings.", [urine_x._UTI[1], urine_x._CONTAM[1]]),
+        "assay_unconfirmed_notice": ("Items whose lab method is unconfirmed share the same notice.", []),
     }
     rows = [{"family": fam, "reason": why, "sentence": line} for fam, (why, lines) in families.items() for line in lines]
     (ROOT / "audit").mkdir(exist_ok=True)
@@ -523,6 +528,9 @@ def main():
             sources.append({"source_id": sid, "title": title, "url": url, "verification": PROPOSED})
     dump("evidence/content_sources.json", sources)
     write_shared_register()
+    import evidence_map
+
+    evidence_map.main()  # the evidence register is rebuilt from baseline above, so re-register the pages read
     print(f"applied {REVISION}: {len(biomarkers)} biomarkers, 211 allergens, {len(risks)} Bio-AI entries, {len(NEW_SOURCES)} proposed sources")
 
 

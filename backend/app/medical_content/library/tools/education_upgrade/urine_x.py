@@ -82,7 +82,7 @@ X["WB-076"] = dict(
         ("Hard exercise", "Strenuous exercise can cause a little blood in urine for a day or two."),
         ("Muscle injury", "Damaged muscle releases myoglobin, which the strip reads as blood."),
     ],
-    keep=None, myth=["A positive strip without red cells under the microscope may be myoglobin from muscle, not blood."], na=_NA,
+    keep=None, myth=["A positive strip without red cells under the microscope may be myoglobin, a protein released from damaged muscle, not blood."], na=_NA,
 )
 X["WB-077"] = dict(
     fx=[

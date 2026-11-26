@@ -473,7 +473,7 @@
   "factor_explanations": [
    {
     "factor": "Recent meal or not fasting",
-    "how_it_acts": "Fat from a meal enters the blood as triglycerides for several hours, so a non-fasting sample can read higher."
+    "how_it_acts": "Fat from a meal travels in the blood as triglycerides for some hours, which is why you may be asked to fast for 9 to 12 hours before this test."
    },
    {
     "factor": "Sugar and refined carbohydrates",
@@ -4372,7 +4372,7 @@
   ],
   "result_explanations": {
    "low": [
-    "A lower eGFR means the kidneys are filtering less blood. A single low result can be caused by dehydration or a recent large meat meal. If it stays low for three months or more, it can mean chronic kidney disease."
+    "A lower eGFR means the kidneys are filtering less blood. A single low result can be caused by dehydration or a large meat meal before the test, so doctors repeat it and check urine before deciding whether it means kidney disease."
    ],
    "normal": [
     "Your eGFR is inside the lab's range, suggesting your kidneys are filtering normally for your age."
@@ -4479,9 +4479,9 @@
    "Keeping salt low helps blood pressure, which protects the kidney filters."
   ],
   "common_misconceptions": [
-   "One low eGFR is not a diagnosis. Chronic kidney disease is diagnosed when the result stays low for three months or more, or kidney damage shows in other tests."
+   "One low eGFR is not a diagnosis. Doctors repeat the test and look at urine results before deciding."
   ],
-  "reference_range_note": "Lab ranges for eGFR vary. Doctors use a fixed threshold: an eGFR below 60 for three months or more suggests chronic kidney disease, whatever the printed range."
+  "reference_range_note": "Lab ranges for eGFR vary. NIDDK notes that an eGFR below 60 may mean kidney disease, whatever the printed range, so a result under 60 is worth discussing with a doctor."
  },
  {
   "content_key": "WB-032",
@@ -5018,7 +5018,7 @@
   "factor_explanations": [
    {
     "factor": "Diet",
-    "how_it_acts": "Zinc comes from dal, nuts, seeds, whole grains, dairy, eggs and meat; phytates in some grains reduce how much is absorbed."
+    "how_it_acts": "Zinc comes from dal, nuts, seeds, whole grains, dairy, eggs and meat; phytates, natural compounds in some grains and pulses, reduce how much is absorbed."
    },
    {
     "factor": "Gut absorption",
@@ -5255,7 +5255,7 @@
     "Your vitamin D is inside the lab's range, which supports healthy bones and muscles."
    ],
    "high": [
-    "Higher vitamin D is almost always caused by taking too much from supplements. Very high levels can raise blood calcium, causing nausea, thirst and kidney problems."
+    "Higher vitamin D is almost always caused by taking too much from supplements. NIH describes levels above 50 ng/mL as too high; very large doses can cause nausea, kidney stones and kidney damage."
    ],
    "reference_unavailable": [
     "Your report did not include a reference range for vitamin D (25-hydroxy), so CURA cannot say whether it is high or low."
@@ -5351,9 +5351,9 @@
   ],
   "common_misconceptions": [
    "Living in a sunny country does not prevent low vitamin D. Low levels are very common in India.",
-   "More is not better. Very high vitamin D from large doses can raise calcium and harm the kidneys."
+   "More is not better. NIH describes levels above 50 ng/mL as too high, and very large doses can cause nausea, kidney stones and kidney damage."
   ],
-  "reference_range_note": "Labs and expert groups use different cut-offs for vitamin D. Many treat below 20 ng/mL as deficient and 20 to 30 as insufficient, but your report's range may differ, so a doctor decides whether treatment is needed."
+  "reference_range_note": "NIH describes 20 ng/mL or above as adequate for most people and below 12 ng/mL as too low. Many labs print a higher lower limit, such as 30 ng/mL, so a result between 20 and 30 may be flagged low; a doctor decides whether treatment is needed."
  },
  {
   "content_key": "WB-038",
@@ -5750,7 +5750,7 @@
    },
    {
     "factor": "Some medicines and supplements such as biotin",
-    "how_it_acts": "Biotin (often in hair and nail supplements) can interfere with the lab test and give false results; stopping it a few days before testing helps."
+    "how_it_acts": "High-dose biotin, common in hair, skin and nail supplements, can interfere with many thyroid tests and give falsely high or low results, so tell the lab or doctor if you take it."
    }
   ],
   "keeping_healthy": [
@@ -9466,7 +9466,7 @@
   "common_misconceptions": [
    "Feeling well does not mean blood sugar is normal. Prediabetes and early diabetes usually cause no symptoms."
   ],
-  "reference_range_note": "The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above, on two tests, for diabetes."
+  "reference_range_note": "The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above for diabetes, and usually confirm diabetes with a second test."
  },
  {
   "content_key": "WB-068",
@@ -10573,7 +10573,7 @@
    }
   ],
   "common_misconceptions": [
-   "A positive strip without red cells under the microscope may be myoglobin from muscle, not blood."
+   "A positive strip without red cells under the microscope may be myoglobin, a protein released from damaged muscle, not blood."
   ]
  },
  {
@@ -15669,7 +15669,7 @@
    },
    {
     "factor": "Muscle injury",
-    "how_it_acts": "Falls, injections into muscle or crush injuries raise CK."
+    "how_it_acts": "Injured muscle, for example after a fall or a crush injury, releases CK."
    },
    {
     "factor": "Muscle mass",

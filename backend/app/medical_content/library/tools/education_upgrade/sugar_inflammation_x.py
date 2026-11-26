@@ -31,7 +31,7 @@ X["WB-067"] = dict(
     keep=_SUGAR_KEEP,
     risk=_SUGAR_RISK,
     myth=["Feeling well does not mean blood sugar is normal. Prediabetes and early diabetes usually cause no symptoms."],
-    thr="The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above, on two tests, for diabetes.",
+    thr="The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above for diabetes, and usually confirm diabetes with a second test.",
 )
 
 X["WB-068"] = dict(
@@ -112,7 +112,7 @@ X["WB-093"] = dict(
 X["WB-117"] = dict(
     fx=[
         ("Recent exercise", "Hard or unaccustomed exercise causes small muscle injuries that release CK for several days."),
-        ("Muscle injury", "Falls, injections into muscle or crush injuries raise CK."),
+        ("Muscle injury", "Injured muscle, for example after a fall or a crush injury, releases CK."),
         ("Muscle mass", "People with more muscle have higher normal levels."),
         ("Statins and some other medicines", "Statins can occasionally irritate muscles and raise CK, especially with muscle pain."),
         ("Thyroid function", "An underactive thyroid can raise CK."),

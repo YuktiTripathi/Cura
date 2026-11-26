@@ -74,7 +74,7 @@ C["vitamins_nutrition"] = dict(
     ],
     why=["Low vitamin D and low B12 are very common in India, including in people who eat well.", "Shortages can cause tiredness, weak bones, tingling or anaemia."],
     keep=["A varied diet with vegetables, fruit, dal, whole grains and dairy or eggs if you eat them, plus some daylight, covers most needs."],
-    myth=["More is not always better. Large doses of vitamin D, for example, can raise calcium and harm the kidneys."],
+    myth=["More is not always better. Very large doses of vitamin D, for example, can cause nausea, kidney stones and kidney damage."],
 )
 C["thyroid_health"] = dict(
     body=[

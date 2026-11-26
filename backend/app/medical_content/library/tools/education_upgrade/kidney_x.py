@@ -119,8 +119,9 @@ X["WB-031"] = dict(
     ],
     keep=_KIDNEY_KEEP,
     risk=_KIDNEY_RISK,
-    myth=["One low eGFR is not a diagnosis. Chronic kidney disease is diagnosed when the result stays low for three months or more, or kidney damage shows in other tests."],
-    thr="Lab ranges for eGFR vary. Doctors use a fixed threshold: an eGFR below 60 for three months or more suggests chronic kidney disease, whatever the printed range.",
+    fix=dict(low="A lower eGFR means the kidneys are filtering less blood. A single low result can be caused by dehydration or a large meat meal before the test, so doctors repeat it and check urine before deciding whether it means kidney disease."),
+    myth=["One low eGFR is not a diagnosis. Doctors repeat the test and look at urine results before deciding."],
+    thr="Lab ranges for eGFR vary. NIDDK notes that an eGFR below 60 may mean kidney disease, whatever the printed range, so a result under 60 is worth discussing with a doctor.",
 )
 
 X["WB-032"] = dict(
@@ -165,7 +166,7 @@ X["WB-034"] = dict(
 
 X["WB-035"] = dict(
     fx=[
-        ("Diet", "Zinc comes from dal, nuts, seeds, whole grains, dairy, eggs and meat; phytates in some grains reduce how much is absorbed."),
+        ("Diet", "Zinc comes from dal, nuts, seeds, whole grains, dairy, eggs and meat; phytates, natural compounds in some grains and pulses, reduce how much is absorbed."),
         ("Gut absorption", "Gut conditions can reduce absorption."),
         ("Inflammation or illness", "During illness zinc moves out of the blood into tissues, so the blood level falls without a true shortage."),
         ("Alcohol", "Alcohol reduces absorption and increases loss."),

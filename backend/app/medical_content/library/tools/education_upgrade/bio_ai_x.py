@@ -145,7 +145,7 @@ X["pcos"] = dict(
         ("Physical activity", "Activity helps the body respond to insulin, which can ease symptoms."),
         ("Sleep and stress", "Poor sleep and ongoing stress can worsen insulin resistance and cycle regularity."),
     ],
-    fix=dict(misconceptions_add=["A predicted PCOS band is not a diagnosis. Only a doctor can diagnose PCOS, using your periods, signs of high androgens, blood tests and sometimes an ultrasound."]),
+    fix=dict(limits=["A doctor diagnoses PCOS from your periods, signs of high male-type hormones (androgens), blood tests and sometimes an ultrasound."], misconceptions_add=["A predicted PCOS band is not a diagnosis. Only a doctor can diagnose PCOS, using your periods, signs of high male-type hormones (androgens), blood tests and sometimes an ultrasound."]),
     keep=["Regular activity, meals that keep blood sugar steady and regular sleep support hormone and insulin balance, whatever your weight."],
 )
 X["oxidative_stress"] = dict(

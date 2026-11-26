@@ -1,0 +1,296 @@
+{
+ "revision": "2.4",
+ "entries_audited": {
+  "biomarkers": 119,
+  "bio_ai": 12,
+  "categories": 15,
+  "allergens": 211
+ },
+ "repeated_sentences_outside_register": [
+  {
+   "sentence": "The lab's method and reporting format for this item are not confirmed, so CURA does not label the result.",
+   "entries": [
+    "WB-072",
+    "WB-073",
+    "WB-074",
+    "WB-075",
+    "WB-076",
+    "WB-077",
+    "WB-078",
+    "WB-079",
+    "WB-080",
+    "WB-081",
+    "WB-082",
+    "WB-083",
+    "WB-084",
+    "WB-085",
+    "WB-086",
+    "WB-087",
+    "WB-088",
+    "WB-091"
+   ]
+  },
+  {
+   "sentence": "Use the wording on your report and ask the lab or your doctor if it is unclear.",
+   "entries": [
+    "WB-072",
+    "WB-073",
+    "WB-074",
+    "WB-075",
+    "WB-076",
+    "WB-077",
+    "WB-078",
+    "WB-079",
+    "WB-080",
+    "WB-081",
+    "WB-082",
+    "WB-083",
+    "WB-084",
+    "WB-085",
+    "WB-086",
+    "WB-087",
+    "WB-088",
+    "WB-091"
+   ]
+  },
+  {
+   "sentence": "If close family members had heart disease young, tell your doctor.",
+   "entries": [
+    "WB-001",
+    "WB-002",
+    "WB-004",
+    "WB-005",
+    "WB-007",
+    "WB-008",
+    "WB-009",
+    "WB-111"
+   ]
+  },
+  {
+   "sentence": "It changes how your results are judged.",
+   "entries": [
+    "WB-001",
+    "WB-002",
+    "WB-004",
+    "WB-005",
+    "WB-007",
+    "WB-008",
+    "WB-009",
+    "WB-111"
+   ]
+  },
+  {
+   "sentence": "Keep alcohol low or avoid it.",
+   "entries": [
+    "WB-003",
+    "WB-007",
+    "WB-014",
+    "WB-016",
+    "WB-017",
+    "nafld"
+   ]
+  },
+  {
+   "sentence": "Many labs print a desirable cut-off rather than a range drawn from healthy people.",
+   "entries": [
+    "WB-001",
+    "WB-003",
+    "WB-004",
+    "WB-006",
+    "WB-111"
+   ]
+  },
+  {
+   "sentence": "The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+   "entries": [
+    "WB-001",
+    "WB-003",
+    "WB-004",
+    "WB-006",
+    "WB-111"
+   ]
+  },
+  {
+   "sentence": "Drink water regularly through the day, more in hot weather or after sweating.",
+   "entries": [
+    "WB-022",
+    "WB-024",
+    "WB-025",
+    "WB-027",
+    "WB-031"
+   ]
+  },
+  {
+   "sentence": "Good hydration helps your kidneys and keeps results reliable.",
+   "entries": [
+    "WB-022",
+    "WB-024",
+    "WB-025",
+    "WB-027",
+    "WB-031"
+   ]
+  },
+  {
+   "sentence": "If you smoke, ask for help to stop.",
+   "entries": [
+    "WB-038",
+    "WB-092",
+    "WB-093",
+    "cardiac_health",
+    "oxidative_stress"
+   ]
+  },
+  {
+   "sentence": "This count shows how many of these cells are in a set amount of blood.",
+   "entries": [
+    "WB-042",
+    "WB-043",
+    "WB-044",
+    "WB-045",
+    "WB-046"
+   ]
+  },
+  {
+   "sentence": "This result is the share of all your white cells that are this type, so it moves when other types change.",
+   "entries": [
+    "WB-057",
+    "WB-058",
+    "WB-059",
+    "WB-060",
+    "WB-061"
+   ]
+  },
+  {
+   "sentence": "The absolute count is usually more useful.",
+   "entries": [
+    "WB-057",
+    "WB-058",
+    "WB-059",
+    "WB-060",
+    "WB-061"
+   ]
+  },
+  {
+   "sentence": "Talk to a doctor about any raised result, so it can be put in context and, if needed, repeated or followed up with other tests.",
+   "entries": [
+    "WB-104",
+    "WB-105",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "Most raised results are not caused by cancer.",
+   "entries": [
+    "WB-104",
+    "WB-105",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "This marker is not a cancer screening test on its own.",
+   "entries": [
+    "WB-104",
+    "WB-105",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "Many non-cancer conditions raise it, and a normal result does not rule out cancer.",
+   "entries": [
+    "WB-104",
+    "WB-105",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "Tumour markers are not cancer screening tests for most people.",
+   "entries": [
+    "WB-105",
+    "WB-106",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "Many non-cancer conditions raise them, and a normal result does not rule out cancer.",
+   "entries": [
+    "WB-105",
+    "WB-106",
+    "WB-107",
+    "WB-108",
+    "WB-109"
+   ]
+  },
+  {
+   "sentence": "Keep blood pressure and blood sugar in a healthy range.",
+   "entries": [
+    "WB-022",
+    "WB-025",
+    "WB-027",
+    "WB-031"
+   ]
+  },
+  {
+   "sentence": "They are the two most common causes of kidney damage.",
+   "entries": [
+    "WB-022",
+    "WB-025",
+    "WB-027",
+    "WB-031"
+   ]
+  },
+  {
+   "sentence": "Enough sleep is part of the lifestyle that may help prevent insulin resistance.",
+   "entries": [
+    "WB-067",
+    "WB-069",
+    "metabolic_age",
+    "type_2_diabetes"
+   ]
+  },
+  {
+   "sentence": "Thyroid conditions are not usually prevented by habits.",
+   "entries": [
+    "hyperthyroidism",
+    "hypothyroidism",
+    "thyroid",
+    "thyroid_health"
+   ]
+  }
+ ],
+ "possible_unexplained_terms": [
+  {
+   "id": "WB-035",
+   "field": "factor_explanations",
+   "term": "phytate",
+   "sentence": "Zinc comes from dal, nuts, seeds, whole grains, dairy, eggs and meat; phytates, natural compounds in some grains and pulses, reduce how much is absorbed."
+  },
+  {
+   "id": "pcos",
+   "field": "what_happens_inside_my_body",
+   "term": "androgen",
+   "sentence": "The ovaries may make more androgens, male-type hormones that can cause acne or extra hair growth."
+  }
+ ],
+ "generic_lifestyle_phrases": [
+  {
+   "id": "WB-028",
+   "field": "everyday_support",
+   "phrase": "drink plenty of water",
+   "sentence": "Drink plenty of water."
+  }
+ ],
+ "dash_characters": [],
+ "missing_education_fields": [],
+ "allergen_descriptions_shared_by_more_than_one_entry": [],
+ "note": "Heuristic audit for human review. Unexplained-term checks look for an explanation in the same sentence only."
+}
