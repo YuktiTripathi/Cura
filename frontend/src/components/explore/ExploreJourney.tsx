@@ -2,7 +2,6 @@ import { useState } from "react";
 import { LineIcon } from "../LineIcon";
 import { BODY_AT_WORK, CATEGORY_PLACEHOLDER, friendlyBiomarkerName } from "./bodyAtWork";
 import type { ChatMessage } from "../../hooks/useCuraChat";
-import { MarkdownAnswer } from "../messages/MarkdownAnswer";
 import { MessageList } from "../MessageList";
 import { Composer } from "../Composer";
 import type { ContextRef } from "../../types/chat";
@@ -57,81 +56,66 @@ function ResultRow({ title, value, note, open, onOpen }: { title: string; value?
   );
 }
 
-function uniqueParagraphs(parts: Array<string | null | undefined>): string[] {
-  const seen = new Set<string>();
-  const out: string[] = [];
-  for (const part of parts) {
-    const text = (part || "").trim();
-    if (!text) continue;
-    const key = text.toLowerCase().replace(/\s+/g, " ");
-    if (seen.has(key)) continue;
-    seen.add(key);
-    out.push(text);
-  }
-  return out;
-}
-
-function splitLines(text?: string | null): string[] {
-  return uniqueParagraphs((text || "").split(/(?<=\.)\s+/));
+function sentences(text?: string | null, count = 2): string {
+  const parts = (text || "").split(/(?<=\.)\s+/).map((line) => line.trim()).filter(Boolean);
+  return parts.slice(0, count).join(" ");
 }
 
 function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?: Finding[] }) {
   const edu = finding.education as Edu | null | undefined;
   const predicted = finding.source_type === "predicted_risk";
   const name = friendlyBiomarkerName(finding.name);
-  const about = uniqueParagraphs([edu?.what_it_is, edu?.body]);
-  const why = splitLines(edu?.why_it_matters).filter((line) => !about.includes(line));
-  const limits = splitLines(edu?.limitations).filter((line) => !about.includes(line) && !why.includes(line)).slice(0, 2);
+  const calm = finding.status === "within_range" || finding.status === "risk_healthy";
+  const needsSteps = finding.status === "above_range" || finding.status === "below_range" || finding.status === "critical" || finding.status === "risk_raised";
+  const about = sentences(edu?.what_it_is, calm ? 2 : 2);
+  const why = predicted ? sentences(edu?.why_it_matters, 1) : "";
+  const meaning = predicted ? "" : calm ? "Your result is within the expected range." : sentences(resultMeaning(finding, edu), 2);
+  const limit = sentences(edu?.limitations, 1);
+  const factors = (edu?.factors || []).slice(0, 6);
+  const actions = needsSteps ? (edu?.actions || []).slice(0, 3) : [];
   const related = (edu?.related_markers || []).map((code) => code.toLowerCase());
   const linked = siblings.filter((item) => {
     const codeOnRow = ((item as Finding & { marker_code?: string | null }).marker_code || "").toLowerCase();
     return item.id !== finding.id && item.source_type === "measured" && related.some((code) => codeOnRow === code || item.name.toLowerCase().includes(code.split("_").join(" ")));
   });
-  const sameArea = linked.length ? linked : predicted ? siblings.filter((item) => item.id !== finding.id && item.source_type === "measured").slice(0, 2) : [];
+  const alongside = predicted ? (linked.length ? linked : siblings.filter((item) => item.source_type === "measured")).slice(0, 2) : [];
+  const alongsideNames = alongside.map((item) => friendlyBiomarkerName(item.name));
   return (
     <div className="inline-finding">
-      {about.length ? (
+      {about ? (
         <section>
-          <h3>{predicted ? `What exactly is ${name.toLowerCase()}?` : `What is ${name}?`}</h3>
-          {about.map((line) => <MarkdownAnswer key={line} content={line} />)}
+          <h3>What is {name}?</h3>
+          <p>{about}</p>
         </section>
       ) : null}
-      {why.length ? (
+      {why && why !== about ? (
         <section>
-          <h3>{predicted ? "Why should you care about it?" : "Why this test matters"}</h3>
-          <ul>{why.map((line) => <li key={line}>{line}</li>)}</ul>
+          <h3>Why it matters</h3>
+          <p>{why}</p>
         </section>
       ) : null}
       <section>
-        <h3>What your results tell us</h3>
-        {predicted && finding.score != null ? (
-          <p>Your Bio-AI score of <strong>{finding.score}</strong>{finding.classification ? <> is classified by the report as <strong>{cap(finding.classification)}</strong></> : null}. This is a predicted risk, not a diagnosis, and the score is not a percentage chance.</p>
-        ) : null}
-        {finding.value != null ? (
-          <p><strong>{name}</strong> is <strong>{finding.value}{finding.unit ? ` ${finding.unit}` : ""}</strong>{finding.status_label ? `, ${finding.status_label.toLowerCase()}` : ""}.</p>
-        ) : null}
-        {finding.value != null ? <p>{resultMeaning(finding, edu)}</p> : null}
+        <h3>{predicted ? "What this means for you" : "What your result means"}</h3>
+        {predicted ? <p>Your assessment indicates {finding.classification ? <>a <strong>{finding.classification}</strong> predicted risk</> : "a predicted risk"}. This is not a diagnosis.</p> : null}
+        {meaning ? <p>{meaning}</p> : null}
         <RangeNote finding={finding} />
-        {predicted && sameArea.length ? sameArea.map((item) => (
-          <p key={item.id}><strong>{friendlyBiomarkerName(item.name)}</strong>{item.value != null ? <> is <strong>{item.value}{item.unit ? ` ${item.unit}` : ""}</strong></> : null}{item.status_label ? `, ${item.status_label.toLowerCase()}` : ""}. This is a measured result in the same health area, not a confirmed contributor to the score.</p>
-        )) : null}
-        {finding.previous_value != null ? <p className="muted">Earlier result: {finding.previous_value}{finding.previous_on ? ` on ${friendlyDate(finding.previous_on)}` : ""}.</p> : null}
+        {alongsideNames.length ? <p>{alongsideNames.join(" and ")} {alongsideNames.length === 1 ? "is" : "are"} a measured result in this area. {alongsideNames.length === 1 ? "It does" : "They do"} not directly measure this assessment.</p> : null}
       </section>
-      {edu?.factors?.length ? (
+      {factors.length ? (
         <section>
-          <h3>What can influence {predicted ? name.toLowerCase() : "this result"}?</h3>
-          <ul className="factor-list">{edu.factors.map((item) => <li key={item}>{item}</li>)}</ul>
-          <p className="muted">These are general influencing factors from the knowledge library, not confirmed reasons for this individual score.</p>
+          <h3>What can affect {predicted ? "it" : name}?</h3>
+          <ul className="factor-list">{factors.map((item) => <li key={item}>{item}</li>)}</ul>
+          <p className="muted">General influences, not confirmed reasons for this result.</p>
         </section>
       ) : null}
-      {edu?.actions?.length ? (
+      {actions.length ? (
         <section>
-          <h3>Small things you can do for your body</h3>
-          <ul>{edu.actions.map((item) => <li key={item}>{item}</li>)}</ul>
+          <h3>Small changes that can help</h3>
+          <ul>{actions.map((item) => <li key={item}>{item}</li>)}</ul>
         </section>
       ) : null}
-      {limits.map((line) => <p key={line} className="muted">{line}</p>)}
-      {edu?.review_status === "pending_clinical_review" ? <p className="muted">This explanation is educational text awaiting clinical review. It is not marked as clinically approved.</p> : null}
+      {limit && limit !== about && limit !== why ? <p className="muted">{limit}</p> : null}
+      {edu?.review_status === "pending_clinical_review" ? <p className="muted">Awaiting clinical review. Not marked as clinically approved.</p> : null}
     </div>
   );
 }

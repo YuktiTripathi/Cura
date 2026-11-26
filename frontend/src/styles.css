@@ -1369,7 +1369,7 @@ button.health-card[data-risk="very_high"] { background: #FDE8E8; border-color: #
 .health-card-risk { font-size: 0.82rem; color: #6d4a4a; }
 .health-risk-note { margin-top: 12px; }
 .body-at-work { margin: 0 0 16px; padding-left: 1.1rem; }
-.inline-finding { padding: 4px 4px 16px 8px; display: flex; flex-direction: column; gap: 12px; }
+.inline-finding { padding: 2px 4px 10px 8px; display: flex; flex-direction: column; gap: 8px; }
 .inline-finding h3 { margin: 0 0 4px; font-size: 1rem; }
 .inline-finding section { display: flex; flex-direction: column; gap: 6px; }
 .factor-list, .question-row { display: flex; flex-wrap: wrap; gap: 8px; list-style: none; padding: 0; margin: 0; }

@@ -660,6 +660,10 @@ def _select_base(
             stages_used.add(stage_of(text) or "")
         if len(chosen) >= count:
             return chosen
+    # The model already offered on-topic next questions. Do not refill the row with
+    # abnormal-result templates, which pull in unrelated markers.
+    if chosen and model_questions:
+        return chosen
     ranked = sorted(
         _candidates(brief),
         key=lambda c: -(c[2] + _stage_weight(c[1], brief, current_stage)),
