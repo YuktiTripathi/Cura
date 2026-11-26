@@ -25,7 +25,6 @@ def _request(monkeypatch, user: str, question: str) -> str:
         raise LLMUnavailableError("captured for test")
 
     monkeypatch.setattr(settings, "enable_llm", True)
-    monkeypatch.setattr(settings, "medical_library_chat_access", "evaluation")
     monkeypatch.setattr(OpenAICompatibleLLMClient, "complete_structured", fake)
     monkeypatch.setattr(OpenAICompatibleLLMClient, "complete", fake)
     client.post("/api/v1/chat", headers={"X-Cura-User-Id": user}, json={"message": question})

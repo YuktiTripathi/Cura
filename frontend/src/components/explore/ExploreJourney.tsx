@@ -115,7 +115,6 @@ function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?
         </section>
       ) : null}
       {limit && limit !== about && limit !== why ? <p className="muted">{limit}</p> : null}
-      {edu?.review_status === "pending_clinical_review" ? <p className="muted">Awaiting clinical review. Not marked as clinically approved.</p> : null}
     </div>
   );
 }

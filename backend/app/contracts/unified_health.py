@@ -123,7 +123,7 @@ class ActionItem(BaseModel):
     detail: str = ""
     icon: str = "check"
     action_id: str | None = None
-    # Every action comes from the approved library. Until clinical review it says so.
+    # Every action comes from the library; evidence_status records how it was checked.
     evidence_status: str = "rule_based_unreviewed"
 
 
