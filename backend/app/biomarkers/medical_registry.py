@@ -204,6 +204,10 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
             add(f"{name}, limits", limits)
         elif mode == "interpretation":
             add(f"{name}", _clean_lines(row.get("short_description")))
+            if key == "metabolic_age":
+                add(f"{name}, in the body", _clean_lines(row.get("what_happens_inside_my_body")))
+                add(f"{name}, why it matters", _clean_lines(row.get("why_it_matters")))
+                add("MetSights inputs, not a formula", _clean_lines(row.get("product_inputs")))
             if side:
                 add(f"{name}, what a {side} result may reflect", _clean_lines(explanations.get(side)))
             add(f"{name}, limits", limits)

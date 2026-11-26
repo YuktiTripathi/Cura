@@ -1,4 +1,10 @@
+import { useState } from "react";
 import { LineIcon } from "../LineIcon";
+import { BODY_AT_WORK, CATEGORY_PLACEHOLDER, friendlyBiomarkerName } from "./bodyAtWork";
+import type { ChatMessage } from "../../hooks/useCuraChat";
+import { MarkdownAnswer } from "../messages/MarkdownAnswer";
+import { MessageList } from "../MessageList";
+import { Composer } from "../Composer";
 import type { ContextRef } from "../../types/chat";
 import type { CategoryDetail, Finding } from "../../types/unifiedHealth";
 import type { HealthView } from "../../lib/api";
@@ -10,6 +16,11 @@ type Edu = NonNullable<Finding["education"]> & {
   why_it_matters?: string;
   limitations?: string;
   content_source?: string;
+  review_status?: string;
+  factors?: string[];
+  actions?: string[];
+  questions?: string[];
+  related_markers?: string[];
 };
 
 
@@ -31,18 +42,97 @@ function friendlyDate(value?: string | null): string | null {
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 }
 
-function ResultRow({ title, value, note, onOpen }: { title: string; value?: string | null; note?: string | null; onOpen: () => void }) {
+function ResultRow({ title, value, note, open, onOpen }: { title: string; value?: string | null; note?: string | null; open?: boolean; onOpen: () => void }) {
   return (
-    <li className="result-row">
-      <button type="button" className="result-row-button" onClick={onOpen}>
+    <div className="result-row">
+      <button type="button" className="result-row-button" aria-expanded={open} onClick={onOpen}>
         <span className="result-row-main">
           <strong>{title}</strong>
           {note ? <span className="muted">{note}</span> : null}
         </span>
         {value ? <span className="result-row-value">{value}</span> : null}
-        <span className="result-row-chevron" aria-hidden="true">›</span>
+        <span className="result-row-chevron" aria-hidden="true">{open ? "▾" : "›"}</span>
       </button>
-    </li>
+    </div>
+  );
+}
+
+function uniqueParagraphs(parts: Array<string | null | undefined>): string[] {
+  const seen = new Set<string>();
+  const out: string[] = [];
+  for (const part of parts) {
+    const text = (part || "").trim();
+    if (!text) continue;
+    const key = text.toLowerCase().replace(/\s+/g, " ");
+    if (seen.has(key)) continue;
+    seen.add(key);
+    out.push(text);
+  }
+  return out;
+}
+
+function splitLines(text?: string | null): string[] {
+  return uniqueParagraphs((text || "").split(/(?<=\.)\s+/));
+}
+
+function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?: Finding[] }) {
+  const edu = finding.education as Edu | null | undefined;
+  const predicted = finding.source_type === "predicted_risk";
+  const name = friendlyBiomarkerName(finding.name);
+  const about = uniqueParagraphs([edu?.what_it_is, edu?.body]);
+  const why = splitLines(edu?.why_it_matters).filter((line) => !about.includes(line));
+  const limits = splitLines(edu?.limitations).filter((line) => !about.includes(line) && !why.includes(line)).slice(0, 2);
+  const related = (edu?.related_markers || []).map((code) => code.toLowerCase());
+  const linked = siblings.filter((item) => {
+    const codeOnRow = ((item as Finding & { marker_code?: string | null }).marker_code || "").toLowerCase();
+    return item.id !== finding.id && item.source_type === "measured" && related.some((code) => codeOnRow === code || item.name.toLowerCase().includes(code.split("_").join(" ")));
+  });
+  const sameArea = linked.length ? linked : predicted ? siblings.filter((item) => item.id !== finding.id && item.source_type === "measured").slice(0, 2) : [];
+  return (
+    <div className="inline-finding">
+      {about.length ? (
+        <section>
+          <h3>{predicted ? `What exactly is ${name.toLowerCase()}?` : `What is ${name}?`}</h3>
+          {about.map((line) => <MarkdownAnswer key={line} content={line} />)}
+        </section>
+      ) : null}
+      {why.length ? (
+        <section>
+          <h3>{predicted ? "Why should you care about it?" : "Why this test matters"}</h3>
+          <ul>{why.map((line) => <li key={line}>{line}</li>)}</ul>
+        </section>
+      ) : null}
+      <section>
+        <h3>What your results tell us</h3>
+        {predicted && finding.score != null ? (
+          <p>Your Bio-AI score of <strong>{finding.score}</strong>{finding.classification ? <> is classified by the report as <strong>{cap(finding.classification)}</strong></> : null}. This is a predicted risk, not a diagnosis, and the score is not a percentage chance.</p>
+        ) : null}
+        {finding.value != null ? (
+          <p><strong>{name}</strong> is <strong>{finding.value}{finding.unit ? ` ${finding.unit}` : ""}</strong>{finding.status_label ? `, ${finding.status_label.toLowerCase()}` : ""}.</p>
+        ) : null}
+        {finding.value != null ? <p>{resultMeaning(finding, edu)}</p> : null}
+        <RangeNote finding={finding} />
+        {predicted && sameArea.length ? sameArea.map((item) => (
+          <p key={item.id}><strong>{friendlyBiomarkerName(item.name)}</strong>{item.value != null ? <> is <strong>{item.value}{item.unit ? ` ${item.unit}` : ""}</strong></> : null}{item.status_label ? `, ${item.status_label.toLowerCase()}` : ""}. This is a measured result in the same health area, not a confirmed contributor to the score.</p>
+        )) : null}
+        {finding.previous_value != null ? <p className="muted">Earlier result: {finding.previous_value}{finding.previous_on ? ` on ${friendlyDate(finding.previous_on)}` : ""}.</p> : null}
+      </section>
+      {edu?.factors?.length ? (
+        <section>
+          <h3>What can influence {predicted ? name.toLowerCase() : "this result"}?</h3>
+          <ul className="factor-list">{edu.factors.map((item) => <li key={item}>{item}</li>)}</ul>
+          <p className="muted">These are general influencing factors from the knowledge library, not confirmed reasons for this individual score.</p>
+        </section>
+      ) : null}
+      {edu?.actions?.length ? (
+        <section>
+          <h3>Small things you can do for your body</h3>
+          <ul>{edu.actions.map((item) => <li key={item}>{item}</li>)}</ul>
+        </section>
+      ) : null}
+      {limits.map((line) => <p key={line} className="muted">{line}</p>)}
+      {edu?.review_status === "pending_clinical_review" ? <p className="muted">This explanation is educational text awaiting clinical review. It is not marked as clinically approved.</p> : null}
+    </div>
   );
 }
 
@@ -92,6 +182,8 @@ export function ExploreJourney({
   findingId,
   onPlace,
   onAsk,
+  categoryChat,
+  onCategoryAsk,
 }: {
   view: HealthView | null | undefined;
   loading: boolean;
@@ -102,7 +194,10 @@ export function ExploreJourney({
   findingId: string | null;
   onPlace: (place: Place, categoryId?: string | null, findingId?: string | null) => void;
   onAsk: (text: string, contextRef: ContextRef) => void;
+  categoryChat?: { messages: ChatMessage[]; loading: boolean; error: string | null };
+  onCategoryAsk?: (text: string) => void;
 }) {
+  const [openFinding, setOpenFinding] = useState<string | null>(null);
   if (place === "home") {
     return (
       <section className="cura-home">
@@ -141,14 +236,39 @@ export function ExploreJourney({
     return (
       <section className="cura-overview">
         <h1>My health</h1>
+        <p>There's a story behind every health result. Let's explore yours.</p>
         <p className="muted">
           {view.overview?.provenance?.blood_report_date ? `Blood results from ${friendlyDate(view.overview.provenance.blood_report_date)}. ` : ""}
           {view.overview?.provenance?.bio_ai_report_date ? `Bio-AI assessment from ${friendlyDate(view.overview.provenance.bio_ai_report_date)}.` : ""}
         </p>
+        {view.metabolic_age_insight ? (
+          <button
+            type="button"
+            className="metabolic-age-card"
+            onClick={() => onAsk("What does my metabolic age say about my health?", { type: "bio_ai_report", source: "supershyft", entry_point: "health_area" })}
+          >
+            <strong>Your age, beyond birthdays.</strong>
+            <span>There's the age on your birthday cake, and then there's what your health data says about your metabolism.</span>
+            <span className="metabolic-age-values">
+              <span><b>{view.metabolic_age_insight.actual_age_years}</b> Actual age</span>
+              <span><b>{view.metabolic_age_insight.metabolic_age_years}</b> Metabolic age</span>
+            </span>
+            <span className="metabolic-age-bar" aria-hidden="true">
+              <span style={{ width: `${Math.max(8, Math.min(100, (view.metabolic_age_insight.actual_age_years / Math.max(view.metabolic_age_insight.actual_age_years, view.metabolic_age_insight.metabolic_age_years)) * 100))}%` }} />
+              <span style={{ width: `${Math.max(8, Math.min(100, (view.metabolic_age_insight.metabolic_age_years / Math.max(view.metabolic_age_insight.actual_age_years, view.metabolic_age_insight.metabolic_age_years)) * 100))}%` }} />
+            </span>
+            <span>{view.metabolic_age_insight.comparison}</span>
+            <span className="metabolic-age-cta">What's behind my metabolic age?</span>
+            {friendlyDate(view.metabolic_age_insight.assessed_on) ? <span className="muted">Bio-AI assessment from {friendlyDate(view.metabolic_age_insight.assessed_on)}.</span> : null}
+          </button>
+        ) : null}
         {categories.length === 0 ? <p>No blood results or Bio-AI assessments are available yet.</p> : null}
         <div className="health-grid">
-          {categories.map((card) => (
-            <button key={card.id} type="button" className="health-card" onClick={() => onPlace("category", card.id)}>
+          {categories.map((card) => {
+            const highlight = (card as { risk_highlight?: string | null }).risk_highlight;
+            const riskLabel = highlight === "very_high" ? "Very high predicted risk" : highlight === "increased" ? "Increased predicted risk" : "";
+            return (
+            <button key={card.id} type="button" className="health-card" data-risk={highlight || undefined} onClick={() => onPlace("category", card.id)}>
               <span className="health-card-title">
                 {card.icon ? <span className="explore-card-icon"><LineIcon name={card.icon} size={20} /></span> : null}
                 <strong>{card.name}</strong>
@@ -156,12 +276,19 @@ export function ExploreJourney({
               </span>
               <span>{card.description || card.summary}</span>
               <span className="muted">
-                {card.measured?.total ? plural(card.measured.total, "blood test", "blood tests") : "No blood tests"}
-                {card.risks?.assessed ? ` · ${plural(card.risks.assessed, "Bio-AI assessment", "Bio-AI assessments")}` : ""}
+                {[
+                  card.measured?.total ? plural(card.measured.total, "blood test", "blood tests") : "",
+                  card.risks?.assessed ? plural(card.risks.assessed, "Bio-AI assessment", "Bio-AI assessments") : "",
+                ].filter(Boolean).join(" · ")}
               </span>
+              {riskLabel ? <span className="health-card-risk">{riskLabel}</span> : null}
             </button>
-          ))}
+            );
+          })}
         </div>
+        {categories.some((card) => (card as { risk_highlight?: string | null }).risk_highlight) ? (
+          <p className="muted health-risk-note">Highlighted areas have an increased or very high predicted risk in your Bio-AI assessment.</p>
+        ) : null}
       </section>
     );
   }
@@ -169,35 +296,74 @@ export function ExploreJourney({
   if (place === "category" && detail) {
     const measured = (detail.findings || []).filter((item) => item.source_type === "measured");
     const risks = (detail.findings || []).filter((item) => item.source_type === "predicted_risk");
+    const pointers = BODY_AT_WORK[detail.id] || [];
+    const askHere = (text: string) => (onCategoryAsk ? onCategoryAsk(text) : onAsk(text, refFor(view, categoryId)));
+    const summary = detail.insight || detail.summary;
     return (
       <section className="cura-category">
         <h1>{detail.name}</h1>
-        {detail.about ? <p>{detail.about}</p> : null}
-        {measured.length ? <h2>Blood results</h2> : null}
+        {pointers.length ? (
+          <>
+            <h2>Your body at work</h2>
+            <ul className="body-at-work">
+              {pointers.map((line) => <li key={line}>{line}</li>)}
+            </ul>
+          </>
+        ) : null}
+        {summary ? (
+          <>
+            <h2>What your results say</h2>
+            <p>{summary}</p>
+          </>
+        ) : null}
+        {measured.length ? <h2>From your blood report</h2> : null}
         <ul className="finding-list">
           {measured.map((item) => (
-            <ResultRow
-              key={item.id}
-              title={item.name}
-              value={item.value != null ? `${item.value}${item.unit ? " " + item.unit : ""}` : null}
-              note={item.status_label}
-              onOpen={() => onPlace("marker", categoryId, item.id)}
-            />
+            <li key={item.id}>
+              <ResultRow
+                title={friendlyBiomarkerName(item.name)}
+                value={item.value != null ? `${item.value}${item.unit ? " " + item.unit : ""}` : null}
+                note={item.status_label}
+                open={openFinding === item.id}
+                onOpen={() => setOpenFinding(openFinding === item.id ? null : item.id)}
+              />
+              {openFinding === item.id ? <InlineFinding finding={item} siblings={detail.findings || []} /> : null}
+            </li>
           ))}
         </ul>
-        {risks.length ? <h2>Bio-AI assessments</h2> : null}
+        {risks.length ? <h2>From your Bio-AI assessment</h2> : null}
         <ul className="finding-list">
           {risks.map((item) => (
-            <ResultRow
-              key={item.id}
-              title={item.name}
-              value={cap(item.classification) || null}
-              note="Predicted risk"
-              onOpen={() => onPlace("risk", categoryId, item.id)}
-            />
+            <li key={item.id} data-risk={/very high/i.test(item.classification || "") ? "very_high" : /increased/i.test(item.classification || "") ? "increased" : undefined}>
+              <ResultRow
+                title={item.name}
+                value={[item.score != null ? String(item.score) : "", cap(item.classification)].filter(Boolean).join(" · ") || null}
+                note="Predicted risk"
+                open={openFinding === item.id}
+                onOpen={() => setOpenFinding(openFinding === item.id ? null : item.id)}
+              />
+              {openFinding === item.id ? <InlineFinding finding={item} siblings={detail.findings || []} /> : null}
+            </li>
           ))}
         </ul>
-        <QuestionList prompts={questions(view, categoryId)} onAsk={(text) => onAsk(text, refFor(view, categoryId))} />
+        <QuestionList prompts={questions(view, categoryId)} onAsk={askHere} />
+        {categoryChat && onCategoryAsk ? (
+          <div className="category-chat">
+            <MessageList
+              messages={categoryChat.messages}
+              onFollowUp={askHere}
+              onAskContext={(text) => askHere(text)}
+              onFeedback={() => undefined}
+            />
+            {categoryChat.error ? <p role="alert">{categoryChat.error} <button type="button" className="text-button" onClick={() => { const asked = [...categoryChat.messages].reverse().find((item) => item.role === "user"); if (asked) onCategoryAsk(asked.content); }}>Try again</button></p> : null}
+            <Composer
+              disabled={categoryChat.loading}
+              onSend={(text) => onCategoryAsk(text)}
+              placeholder={CATEGORY_PLACEHOLDER[detail.id] || "Ask anything about this part of your health..."}
+              voiceEnabled
+            />
+          </div>
+        ) : null}
       </section>
     );
   }

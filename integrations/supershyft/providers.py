@@ -35,6 +35,7 @@ class SuperShyftUserProvider:
             first_name=first,
             last_name=last,
             age_band=band,
+            age=age if isinstance(age, int) else None,
             sex=row.get("gender"),
         )
 

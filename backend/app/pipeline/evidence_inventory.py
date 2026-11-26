@@ -59,6 +59,7 @@ class EvidencePackage(BaseModel):
     questionnaire: list[dict] = Field(default_factory=list)
     report_counts: dict | None = None
     comparisons: list[dict] = Field(default_factory=list)
+    metabolic_comparison: dict | None = None
 
     def prompt_payload(self) -> dict:
         """Patient facts for the model. Database identifiers stay out."""
@@ -75,12 +76,63 @@ class EvidencePackage(BaseModel):
             payload["report_counts"] = self.report_counts
         if self.comparisons:
             payload["comparisons"] = self.comparisons
+        if self.metabolic_comparison:
+            payload["metabolic_comparison"] = self.metabolic_comparison
         from app.retrieval.relationship_map import group_measurements
 
         groups = group_measurements(self.measurements)
         if groups:
             payload["groups"] = groups
         return payload
+
+
+_METABOLIC_MARKERS = {
+    "hba1c", "fasting_blood_glucose", "glucose", "fasting_sugar", "ldl", "hdl",
+    "triglycerides", "vldl", "cholesterol_total", "sgpt", "sgot", "alt", "ast", "ggt",
+}
+_METABOLIC_RISKS = {"type_2_diabetes", "obesity", "nafld", "dyslipidemia"}
+_LIFESTYLE_FOCUS = {
+    "sleep": ({"hba1c", "fasting_blood_glucose", "glucose", "triglycerides"}, {"type_2_diabetes", "cardiac_health", "hypertension", "oxidative_stress"}),
+    "activity": ({"hba1c", "fasting_blood_glucose", "glucose", "ldl", "hdl", "triglycerides"}, {"obesity", "cardiac_health", "type_2_diabetes", "dyslipidemia"}),
+    "food": ({"ldl", "hdl", "triglycerides", "hba1c", "fasting_blood_glucose", "alt", "ast", "sgpt", "sgot"}, {"dyslipidemia", "nafld", "obesity", "type_2_diabetes"}),
+    "stress": ({"hba1c", "fasting_blood_glucose", "glucose"}, {"hypertension", "cardiac_health", "oxidative_stress"}),
+}
+
+
+def _metabolic_marker(item) -> bool:
+    return _key(getattr(item, "key", None)) in _METABOLIC_MARKERS
+
+
+def _metabolic_risk(item) -> bool:
+    return _key(getattr(item, "code", None)) in _METABOLIC_RISKS
+
+
+def _metabolic_comparison(context: HealthContext) -> dict | None:
+    from app.biomarkers.metabolic_age_insight import build_metabolic_age_insight
+
+    if context.metabolic_age is None:
+        return None
+    insight = build_metabolic_age_insight(
+        actual_age=context.profile_age,
+        metabolic_age=context.metabolic_age,
+        assessed_on=context.bio_report_date,
+    )
+    if insight is None:
+        return {
+            "metabolic_age_years": context.metabolic_age,
+            "assessed_on": str(context.bio_report_date) if context.bio_report_date else None,
+            "actual_age_years": None,
+            "note": "Metabolic age is on the Bio-AI report. A comparable actual age at that date is not available, so no difference is shown.",
+        }
+    return {
+        "metabolic_age_years": insight.metabolic_age_years,
+        "actual_age_years": insight.actual_age_years,
+        "actual_age_basis": "estimated_from_current_profile_age_and_assessment_date",
+        "difference_years": insight.difference_years,
+        "direction": insight.direction,
+        "assessed_on": insight.assessed_on,
+        "note": "Actual age is estimated because no date of birth is stored. A birthday between the assessment and today can move it by one year.",
+    }
 
 
 def _key(value: str | None) -> str:
@@ -128,7 +180,6 @@ def _measurement(marker) -> dict:
         "report_date": str(measured) if measured else None,
         "source": "blood_report",
         "status": "AVAILABLE" if getattr(marker, "value", None) is not None else "NOT_PRESENT",
-        **_gap_field(marker),
     }
 
 
@@ -270,16 +321,38 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
     broad = bool(contract.get("broad_summary")) or getattr(plan.intent, "value", "") in {
         "report_explanation", "broad_health_summary", "health_scenario",
     }
-    measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers, broad=broad)]
+    from app.pipeline.query_planner import _personal_lifestyle_theme
+
+    metabolic_question = bool(re.search(r"\bmetabolic age\b", message or "", re.I))
+    lifestyle_theme = _personal_lifestyle_theme(message)
+    if lifestyle_theme and not metabolic_question:
+        markers, risks_kept = _LIFESTYLE_FOCUS[lifestyle_theme]
+        measurements = [_measurement(item) for item in context.markers or [] if _key(getattr(item, "key", None)) in markers][:8]
+    elif metabolic_question:
+        measurements = [_measurement(item) for item in context.markers or [] if _metabolic_marker(item)][:8]
+    else:
+        measurements = [_measurement(item) for item in _select_measurements(kind, message, context.markers, broad=broad)]
     measurements = _with_history(measurements, context, include=_wants_history(plan, message))
     if (
         getattr(plan.intent, "value", "") == "bio_ai_score"
         and not requested_marker_keys(message)
         and not (contract.get("broad_summary"))
         and not plan.needs_blood  # a question about both reports keeps its blood results
+        and not metabolic_question
+        and not lifestyle_theme
     ):
         measurements = []
     selected_risks = _select_risks(kind, message, context.bio_ai_risks)
+    from app.pipeline.prompt_modules import is_nutrition_overview
+
+    if is_nutrition_overview(message):
+        selected_risks = [item for item in selected_risks if _nutrition_relevant_risk(item)]
+    if metabolic_question:
+        matched_risks = [item for item in selected_risks if _metabolic_risk(item)]
+        selected_risks = matched_risks[:6]
+    elif lifestyle_theme:
+        allowed = _LIFESTYLE_FOCUS[lifestyle_theme][1]
+        selected_risks = [item for item in selected_risks if _key(getattr(item, "code", None)) in allowed][:6]
     if getattr(plan.intent, "value", "") == "bio_ai_score" and not broad:
         asked = message.lower()
         matched = [
@@ -376,6 +449,7 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
         questionnaire=questionnaire,
         report_counts=counts,
         comparisons=comparisons,
+        metabolic_comparison=_metabolic_comparison(context) if metabolic_question else None,
     )
 
 
@@ -500,12 +574,44 @@ def _with_history(measurements: list[dict], context: HealthContext, *, include: 
     return measurements + extra
 
 
+_NUTRITION_RISK = re.compile(
+    r"cardiac|heart|oxidative|diabet|dyslipid|lipid|nafld|fatty.?liver|hypertension|blood pressure|obesity|metabolic",
+    re.I,
+)
+_DIET_QUESTION = re.compile(r"diet|food|fruit|vegetable|breakfast|meal|allerg|eating", re.I)
+
+
+def _nutrition_relevant_risk(item) -> bool:
+    text = f"{getattr(item, 'code', '')} {getattr(item, 'name', '')}"
+    return bool(_NUTRITION_RISK.search(text))
+
+
 def _questionnaire_rows(plan: QueryPlan, context: HealthContext, message: str) -> list[dict]:
-    asked = bool(plan.needs_questionnaire or re.search(r"\bquestionnaire\b", message or "", re.I))
+    from app.pipeline.prompt_modules import is_nutrition_overview
+
+    nutrition = is_nutrition_overview(message)
+    metabolic = bool(re.search(r"\bmetabolic age\b", message or "", re.I))
+    asked = bool(plan.needs_questionnaire or nutrition or metabolic or re.search(r"\bquestionnaire\b", message or "", re.I))
     if not asked:
         return []
     rows = []
     for answer in context.questionnaire or []:
+        label = f"{getattr(answer, 'question_key', '')} {getattr(answer, 'question', '')}"
+        if nutrition and not _DIET_QUESTION.search(label):
+            continue
+        if metabolic and not re.search(r"\b(activity|exercise|sleep|food|diet|meal|vegetable|fruit|grain|alcohol|tobacco|sitting)\b", label, re.I):
+            continue
+        from app.pipeline.query_planner import _personal_lifestyle_theme
+
+        theme = _personal_lifestyle_theme(message)
+        if theme == "sleep" and not re.search(r"\bsleep", label, re.I):
+            continue
+        if theme == "activity" and not re.search(r"\b(activity|exercise|sitting|active)\b", label, re.I):
+            continue
+        if theme == "food" and not re.search(r"\b(food|diet|meal|vegetable|fruit|grain|breakfast)\b", label, re.I):
+            continue
+        if theme == "stress" and not re.search(r"\b(stress|sleep|mood)\b", label, re.I):
+            continue
         value = getattr(answer, "value", None)
         if value in (None, ""):
             continue

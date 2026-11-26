@@ -11,6 +11,7 @@ from typing import Literal
 
 from pydantic import BaseModel, Field
 
+from app.biomarkers.metabolic_age_insight import MetabolicAgeInsight
 from app.contracts.unified_health import CategoryDetail, Finding, UnifiedOverview
 
 SnapshotState = Literal["ready", "partial", "unavailable"]
@@ -42,6 +43,7 @@ class MemberSnapshot(BaseModel):
     latest_bio_ai: ReportRef | None = None
     previous_bio_ai: ReportRef | None = None
     metabolic_age: float | None = None
+    metabolic_age_insight: MetabolicAgeInsight | None = None
     source_ids: list[str] = Field(default_factory=list)
     overview: UnifiedOverview
     categories: dict[str, CategoryDetail] = Field(default_factory=dict)
@@ -67,6 +69,7 @@ class HealthView(BaseModel):
     latest_bio_ai_date: str | None = None
     previous_bio_ai_date: str | None = None
     metabolic_age: float | None = None
+    metabolic_age_insight: MetabolicAgeInsight | None = None
     measured_count: int = 0
     risk_count: int = 0
     overview: UnifiedOverview

@@ -143,6 +143,16 @@ def lifestyle_facts(life: LifestyleContext | None, subject_id: str) -> list[Prov
 
 def profile_identity_facts(profile: UserProfile) -> list[ProvenancedFact]:
     facts: list[ProvenancedFact] = []
+    if profile.age is not None:
+        facts.append(
+            ProvenancedFact(
+                fact="age_years",
+                value=profile.age,
+                source="SuperShyft",
+                fact_type=FactKind.user_provided_data,
+                subject_id=profile.subject_id,
+            )
+        )
     if profile.age_band:
         facts.append(
             ProvenancedFact(

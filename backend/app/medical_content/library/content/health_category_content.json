@@ -2,7 +2,7 @@
   {
     "health_category": "heart_circulation",
     "display_name": "Heart & circulation",
-    "short_description": "Your heart pumps blood to your organs.",
+    "short_description": "Every heartbeat tells a story. Discover what yours can reveal.",
     "what_happens_inside_my_body": [
       "Your heart pumps blood to your organs.",
       "Blood vessels carry oxygen and nutrients to your cells.",
@@ -57,7 +57,7 @@
   {
     "health_category": "liver_health",
     "display_name": "Liver health",
-    "short_description": "Your liver processes nutrients from food.",
+    "short_description": "From the food you eat to the energy you use, your liver does more than you think.",
     "what_happens_inside_my_body": [
       "Your liver processes nutrients from food.",
       "It makes proteins and a fluid called bile that helps digest fats.",
@@ -103,7 +103,7 @@
   {
     "health_category": "blood_sugar_metabolism",
     "display_name": "Blood sugar & metabolism",
-    "short_description": "Food provides energy for your cells.",
+    "short_description": "From your morning meals to your daily energy, there's more going on inside than you think.",
     "what_happens_inside_my_body": [
       "Food provides energy for your cells.",
       "Insulin helps move sugar from your blood into cells.",
@@ -145,7 +145,7 @@
   {
     "health_category": "kidney_urinary",
     "display_name": "Kidney & urinary health",
-    "short_description": "Your kidneys filter waste from your blood.",
+    "short_description": "Your body's natural cleaning system works around the clock to keep things in balance.",
     "what_happens_inside_my_body": [
       "Your kidneys filter waste from your blood.",
       "They balance water, salts and minerals.",
@@ -205,7 +205,7 @@
   {
     "health_category": "blood_iron",
     "display_name": "Blood & iron",
-    "short_description": "Your red cells carry oxygen around your body.",
+    "short_description": "Feeling energetic or running low? Your blood may hold some clues.",
     "what_happens_inside_my_body": [
       "Your red cells carry oxygen around your body.",
       "White cells help defend against germs.",
@@ -261,7 +261,7 @@
   {
     "health_category": "vitamins_nutrition",
     "display_name": "Vitamins & nutrition",
-    "short_description": "Your body needs nutrients to work each day.",
+    "short_description": "Small nutrients make a big difference to the way you feel every day.",
     "what_happens_inside_my_body": [
       "Your body needs nutrients to work each day.",
       "Some help build blood cells, while others support nerves and muscles.",
@@ -293,7 +293,7 @@
   {
     "health_category": "thyroid_health",
     "display_name": "Thyroid health",
-    "short_description": "Your thyroid is a small gland in your neck.",
+    "short_description": "A tiny gland with a big influence on your energy, weight and everyday well-being.",
     "what_happens_inside_my_body": [
       "Your thyroid is a small gland in your neck.",
       "Its hormones help control how cells use energy.",
@@ -340,7 +340,7 @@
   {
     "health_category": "immunity_inflammation",
     "display_name": "Immunity & inflammation",
-    "short_description": "Your immune system helps protect you from germs.",
+    "short_description": "Your body's natural defence system is always at work. Get to know it better.",
     "what_happens_inside_my_body": [
       "Your immune system helps protect you from germs.",
       "It can respond to injury or infection with inflammation.",
@@ -376,8 +376,8 @@
   },
   {
     "health_category": "hormonal_health",
-    "display_name": "Hormonal & reproductive health",
-    "short_description": "Hormones are messages carried in your blood.",
+    "display_name": "Hormonal & Reproductive Health",
+    "short_description": "Your hormones play a bigger role in your periods, skin and overall health than you might realise.",
     "what_happens_inside_my_body": [
       "Hormones are messages carried in your blood.",
       "They help organs communicate about growth, stress and reproduction.",
@@ -411,7 +411,7 @@
     "bio_ai_context": [
       {
         "risk_id": "pcos",
-        "description": "Insulin resistance can also occur, but not everyone with PCOS has it."
+        "description": "PCOS is a common hormone pattern that can make periods less regular."
       }
     ],
     "evidence_status": "pending_claim_verification"
@@ -531,8 +531,8 @@
   },
   {
     "health_category": "other_unmapped",
-    "display_name": "Other results",
-    "short_description": "Some measurements do not fit an existing health category.",
+    "display_name": "Other Health Results",
+    "short_description": "There's more to your health story. Explore the other pieces of the puzzle.",
     "what_happens_inside_my_body": [
       "Some measurements do not fit an existing health category.",
       "Each test may describe a different body process.",

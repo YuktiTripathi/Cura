@@ -54,7 +54,7 @@ _GENERIC = re.compile(
 # A chip is the member asking Cura. Questions Cura would ask the member ("Would you like a
 # plan I can tailor?", "How many minutes can you walk?") belong in the answer, not in chips.
 _CURA_VOICE = re.compile(
-    r"\b(would you like|do you (?:have|want|take|feel|get|eat|drink|exercise|smoke|sleep|know)|have you|"
+    r"\b(would you like|do you\b|have you|"
     r"are you|did you|were you|will you|can you realistically|how (?:much|many|often|long)\b.{0,30}\byou\b|"
     r"you can|I can|I'll|I will|let me|shall I|should I make)\b",
     re.I,
@@ -380,10 +380,40 @@ def on_topic(questions: list[str], message: str, answer: str = "") -> list[str]:
             continue
         if len(_tokens(message)) > 2 and _similar(cleaned, message):
             continue
-        if any(_similar(cleaned, seen) for seen in kept):
+        plain = re.sub(r"[^a-z0-9 ]+", "", cleaned.lower())
+        plain = re.sub(r"\s+", " ", plain).strip()
+        spoken = re.sub(r"\s+", " ", re.sub(r"[^a-z0-9 ]+", "", (answer or "").lower()))
+        if plain and spoken and plain in spoken:
+            continue
+        if any(_similar(cleaned, seen) or _near_duplicate(cleaned, seen) for seen in kept):
             continue
         kept.append(cleaned)
     return kept
+
+
+def stays_on_asked_topic(question: str, message: str) -> bool:
+    """A lifestyle or metabolic-age turn keeps follow-ups on that subject.
+
+    A chip that names a different biomarker is dropped. Other conversations are unchanged.
+    """
+
+    from app.pipeline.query_planner import _personal_lifestyle_theme
+
+    text = message or ""
+    if not _personal_lifestyle_theme(text) and not re.search(r"\bmetabolic age\b", text, re.I):
+        return True
+    from app.pipeline.intent import BIO_ALIASES
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    asked = {item.lower() for item in match_lab_keys(text)}
+    named = {item.lower() for item in match_lab_keys(question or "")}
+    if named - asked:
+        return False
+    for alias, code in BIO_ALIASES.items():
+        if re.search(rf"\b{re.escape(alias)}\b", question or "", re.I) and not re.search(rf"\b{re.escape(alias)}\b", text, re.I):
+            if code not in asked:
+                return False
+    return True
 
 
 def is_member_question(text: str) -> bool:
@@ -741,7 +771,7 @@ def general_follow_ups(
     for raw in model_questions or []:
         q = re.sub(r"\s+", " ", (raw or "").strip())
         words = q.split()
-        if not q.endswith("?") or not 3 <= len(words) <= 14:
+        if not q.endswith("?") or len(words) < 3:
             continue
         if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q):
             continue
@@ -756,14 +786,7 @@ def general_follow_ups(
         out.append(q)
         if len(out) == 4:
             break
-    if len(out) >= 2 and re.match(r"\s*(?:what(?:'s| is| are)|tell me about|explain)\s", message or "", re.I):
-        # Top the row up to four with on-topic questions built from the subject itself.
-        for q in general_continuations(message):
-            if len(out) >= 4:
-                break
-            if not any(_near_duplicate(q, seen_q) for seen_q in [*seen, *out] if seen_q):
-                out.append(q)
-    return out if len(out) >= 2 else []
+    return out
 
 
 def to_suggestions(questions: list[str], *, personal: bool = True) -> list[FollowUpSuggestion]:

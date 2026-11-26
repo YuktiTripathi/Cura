@@ -276,28 +276,7 @@ class PersonalizedFollowUpEngine:
             return out
 
         if plan.intent == IntentType.nutrition_guidance:
-            out.extend(
-                [
-                    FollowUpSuggestion(
-                        text="Which foods could I include more often?",
-                        category="nutrition_include",
-                        intent="nutrition_guidance",
-                        requires_personal_context=True,
-                    ),
-                    FollowUpSuggestion(
-                        text="Which foods should I cut back on?",
-                        category="nutrition_limit",
-                        intent="nutrition_guidance",
-                        requires_personal_context=True,
-                    ),
-                    FollowUpSuggestion(
-                        text="How does this fit with my overall health?",
-                        category="nutrition_scenario",
-                        intent="health_scenario",
-                        requires_personal_context=True,
-                    ),
-                ]
-            )
+            # The model suggests the next food questions. Stock chips repeat the answer.
             return out
 
         if personal and key and context.markers:

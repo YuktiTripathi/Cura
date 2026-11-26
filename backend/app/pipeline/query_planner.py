@@ -21,6 +21,23 @@ from app.pipeline.questionnaire_topics import questionnaire_topic
 from app.pipeline.general_personalization import attach_general_personalization, enforce_general_only_request
 
 
+def _personal_lifestyle_theme(message: str) -> str | None:
+    """This person's sleep, movement, eating or stress. A general question stays general."""
+
+    text = message or ""
+    if not re.search(r"\b(my|me|i)\b", text, re.I):
+        return None
+    if re.search(r"\bsleep\b", text, re.I):
+        return "sleep"
+    if re.search(r"\b(exercise|exercising|activity|active)\b", text, re.I):
+        return "activity"
+    if re.search(r"\b(eating habits|eat|diet|food)\b", text, re.I):
+        return "food"
+    if re.search(r"\bstress\b", text, re.I):
+        return "stress"
+    return None
+
+
 def build_query_plan(
     message: str,
     follow_up_topic: str | None = None,
@@ -64,6 +81,20 @@ def build_query_plan(
         needs_blood = True
         if intent == IntentType.health_scenario:
             needs_bio_ai = True
+    from app.pipeline.prompt_modules import is_nutrition_overview
+
+    broad_nutrition = personal and is_nutrition_overview(message)
+    if broad_nutrition:
+        needs_blood = True
+        needs_bio_ai = True
+        needs_lifestyle = True
+        needs_profile = True
+    metabolic_story = personal and bool(re.search(r"\bmetabolic age\b", message or "", re.I)) and bool(
+        re.search(r"\b(what does|say about|mean|means|health)\b", message or "", re.I)
+    )
+    if metabolic_story:
+        needs_blood = True
+        needs_bio_ai = True
     if personal and intent == IntentType.broad_health_summary:
         text = message.lower()
         if "blood" in text:
@@ -86,12 +117,13 @@ def build_query_plan(
             IntentType.health_goal_progress,
         }
         or (intent == IntentType.broad_health_summary and any(w in message.lower() for w in ("eat", "nutrition", "diet")))
+        or metabolic_story
     )
     needs_profile = personal and intent in {
         IntentType.personal_profile,
         IntentType.health_goal_progress,
         IntentType.nutrition_guidance,
-    }
+    } or metabolic_story
     needs_goals = personal and intent == IntentType.health_goal_progress
     history = intent in {
         IntentType.previous_result,
@@ -107,6 +139,8 @@ def build_query_plan(
         or explicit_questionnaire_request(message)
         or (intent == IntentType.follow_up and is_questionnaire_topic(topic))
         or is_questionnaire_topic(follow_up_topic)
+        or broad_nutrition
+        or metabolic_story
         or bool(re.search(
             r"\b(?:i recorded|how long do you sit|sit continuously|close blood relatives|family history)\b",
             message or "",
@@ -146,6 +180,14 @@ def build_query_plan(
         token in lowered_msg for token in ("changed", "previous", "compare", "latest questionnaire")
     ):
         history = True
+    if _personal_lifestyle_theme(message):
+        scope = KnowledgeScope.personal
+        personal = True
+        needs_blood = True
+        needs_bio_ai = True
+        needs_lifestyle = True
+        needs_profile = True
+        wants_questionnaire = True
     source = QuerySource.general if not personal else QuerySource.none
     if personal:
         if wants_questionnaire and not needs_blood and not needs_bio_ai:

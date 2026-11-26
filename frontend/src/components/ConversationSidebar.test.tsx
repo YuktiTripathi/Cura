@@ -33,6 +33,7 @@ vi.mock("../lib/api", async () => {
     })),
     getHealthView: vi.fn(async () => null),
     listConversations: vi.fn(async () => [...conversations]),
+    listConversationState: vi.fn(async () => ({ ok: true, items: [...conversations] })),
     getConversation: vi.fn(async (id: string) => ({
       id,
       title: conversations.find((c) => c.id === id)?.title || "Cura conversation",
@@ -120,22 +121,21 @@ describe("CuraPage shell", () => {
     await waitFor(() => {
       expect(screen.getByText("Hi Yukti 👋")).toBeTruthy();
     });
-    expect(screen.getByText("How can I help you understand your health better?")).toBeTruthy();
-    expect(screen.getByText("Understand my health better")).toBeTruthy();
+    expect(screen.getByText("Let's get to know your health, together.")).toBeTruthy();
+    expect(screen.getByText("Understand my health")).toBeTruthy();
     expect(screen.queryByText("My Blood Report")).toBeNull();
     expect(screen.queryByText("My Health Scenario")).toBeNull();
-    expect(screen.getByRole("button", { name: /Nutrition/ })).toBeTruthy();
-    const welcome = screen.getByText("How can I help you understand your health better?").closest("section");
-    expect(welcome?.textContent).toContain("Nutrition");
-    expect(screen.getByText("Ask Cura")).toBeTruthy();
-    expect(screen.getByText("Based on your health")).toBeTruthy();
-    expect(screen.getByText("Learn about health")).toBeTruthy();
+    expect(screen.getByRole("button", { name: /Eat better for my body/ })).toBeTruthy();
+    const welcome = screen.getByText("Let's get to know your health, together.").closest("section");
+    expect(welcome?.textContent).toContain("Eat better for my body");
+    expect(screen.getByText("Let's talk about health")).toBeTruthy();
+    expect(screen.getByText("Curious about your health?")).toBeTruthy();
     const sidebar = document.querySelector("aside.sidebar");
     expect(sidebar).toBeTruthy();
     expect(sidebar?.textContent).toContain("Recent conversations");
     expect(document.querySelector(".page")).toBeNull();
-    fireEvent.click(screen.getByRole("button", { name: /Understand my health better/ }));
+    fireEvent.click(screen.getByRole("button", { name: /Understand my health/ }));
     expect(screen.getByRole("heading", { name: "Health information is unavailable" })).toBeTruthy();
-    expect(screen.queryByText("How can I help you understand your health better?")).toBeNull();
+    expect(screen.queryByText("Let's get to know your health, together.")).toBeNull();
   });
 });

@@ -85,8 +85,8 @@ def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
 def test_house_follow_up_instruction_is_natural_and_capped_at_four(house):
     system, _user = _build("What does my HbA1c mean?")
     assert "up to four follow-up questions" in system
-    assert "14 words or fewer" in system
-    assert "unrelated biomarkers" in system
+    assert "FOLLOW-UP BRIEF" in system
+    assert "questions the person would ask" in system
 
 
 def test_house_report_parts_come_in_the_required_order():
@@ -153,7 +153,7 @@ def test_house_prompt_carries_the_safety_and_bio_ai_rules():
 
 
 def test_house_follow_ups_stay_relevant_and_personal():
-    assert "unrelated biomarkers or Bio-AI scores" in HOUSE_CORE
+    assert "FOLLOW-UP BRIEF" in HOUSE_CORE
     assert "never inside the answer" in HOUSE_CORE
 
 
@@ -163,8 +163,57 @@ def test_nutrition_guidance_answers_the_food_question_first_without_prescription
     assert is_nutrition_overview("What should I know about my nutrition?")
     assert not is_nutrition_overview("What can I eat to lower my LDL?")
     assert not is_nutrition_overview("What is a balanced diet?")
-    assert "Answer it first" in NUTRITION_OVERVIEW
-    assert "Do not give exact quantities" in NUTRITION_OVERVIEW
-    assert "Do not add a Bio-AI score" in NUTRITION_OVERVIEW
+    assert "before any food advice" in NUTRITION_OVERVIEW
+    assert "not a diagnosis" in NUTRITION_OVERVIEW
+    assert "will fix a measurement" in NUTRITION_OVERVIEW
+    question = "Based on my health results and eating habits, how can I eat better for my body?"
+    assert is_nutrition_overview(question)
+    from app.contracts.common import AnswerDepth, IntentType, KnowledgeScope
+    from app.contracts.health_context import HealthContext
+    from app.pipeline.prompt_modules import house_system
+
+    context = HealthContext(
+        intent=IntentType.nutrition_guidance,
+        knowledge_scope=KnowledgeScope.personal,
+        answer_depth=AnswerDepth.focused,
+    )
+    system = house_system(context, question)
+    assert "Reason heading" in system
+    assert "exactly this layout" not in system
+    assert "2 to 4 action bullets" not in system
     for old in ("## What your body needs", "## Foods to include", "4 to 6 bullets"):
         assert old not in NUTRITION_OVERVIEW
+
+
+def test_broad_nutrition_sends_food_results_risks_and_habits_together():
+    from app.contracts.bio_ai import BioAIRisk
+    from app.contracts.blood import BloodMarker
+    from app.contracts.common import AnswerDepth, KnowledgeScope, MarkerFlag
+    from app.contracts.health_context import HealthContext
+    from app.contracts.questionnaire import QuestionnaireAnswer
+    from app.pipeline.evidence_inventory import assemble_evidence
+    from app.pipeline.query_planner import build_query_plan
+
+    question = "Based on my health results and eating habits, how can I eat better for my body?"
+    plan = build_query_plan(question)
+    assert plan.needs_blood and plan.needs_bio_ai and plan.needs_questionnaire
+    focused = build_query_plan("What can I eat to lower my LDL?")
+    assert not focused.needs_bio_ai
+    context = HealthContext(
+        intent=plan.intent,
+        answer_depth=AnswerDepth.focused,
+        knowledge_scope=KnowledgeScope.personal,
+        markers=[BloodMarker(id="1", key="vitamin_d", name="Vitamin D", value=12.0, unit="ng/mL", flag=MarkerFlag.low, reference_low=30, reference_high=100)],
+        bio_ai_risks=[
+            BioAIRisk(code="cardiac_health", name="Cardiac Health", score=40, status="Increased"),
+            BioAIRisk(code="thyroid_health", name="Thyroid Health", score=10, status="Healthy"),
+        ],
+        questionnaire=[
+            QuestionnaireAnswer(response_id="r", assessment_instance_id="a", question_id="q", question_key="food_groups", question="Food groups", value="pulses", response_type="text", subject_id="s"),
+            QuestionnaireAnswer(response_id="r2", assessment_instance_id="a", question_id="q2", question_key="sleeping_hours", question="Sleep", value="7", response_type="text", subject_id="s"),
+        ],
+    )
+    payload = assemble_evidence(plan, context).prompt_payload()
+    assert [row["key"] for row in payload["measurements"]] == ["vitamin_d"]
+    assert [row["code"] for row in payload["bio_ai_risks"]] == ["cardiac_health"]
+    assert [row["key"] for row in payload["questionnaire"]] == ["food_groups"]

@@ -236,6 +236,7 @@ class ContextBuilder:
             resolved_topic_name=plan.topic_name,
             turn_kind=resolve_turn_kind(plan.raw_message, plan.entry_point).value,
             display_name=profile.display_name or None,
+            profile_age=getattr(profile, "age", None),
             requested_entity_codes=list(plan.requested_metrics or []),
             operations=list(plan.operations or []),
             question_type=plan.question_type,
@@ -296,6 +297,7 @@ class ContextBuilder:
                 ctx.bio_ai_risks = list(latest_bio.risks)
                 ctx.metabolic_age = latest_bio.metabolic_age
                 ctx.metabolic_score = latest_bio.metabolic_score
+                ctx.bio_report_date = latest_bio.report_date
             ctx.lifestyle = scenario_input.lifestyle
             if scenario_input.lifestyle:
                 ctx.notes.extend(scenario_input.lifestyle.notes)
@@ -892,6 +894,7 @@ class ContextBuilder:
             ctx.bio_ai_risks = [self._stamp_bio_risk(rk, latest) for rk in selected]
             ctx.metabolic_age = latest.metabolic_age
             ctx.metabolic_score = latest.metabolic_score
+            ctx.bio_report_date = latest.report_date
             for rk in ctx.bio_ai_risks:
                 evidence.append(self._ev(latest.report_id, "bio_ai_report", latest.report_date, rk.name, rk.code))
             for code in missing:
@@ -959,6 +962,7 @@ class ContextBuilder:
         ctx.bio_ai_risks = [self._stamp_bio_risk(rk, report) for rk in selected]
         ctx.metabolic_age = report.metabolic_age
         ctx.metabolic_score = report.metabolic_score
+        ctx.bio_report_date = report.report_date
         for rk in ctx.bio_ai_risks:
             evidence.append(self._ev(report.report_id, "bio_ai_report", report.report_date, rk.name, rk.code))
         for code in missing:

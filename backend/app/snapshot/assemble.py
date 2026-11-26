@@ -181,6 +181,7 @@ def assemble_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegis
         latest_bio_ai=_ref(latest_bio) if isinstance(latest_bio, BioAIReport) else None,
         previous_bio_ai=_ref(previous_bio) if isinstance(previous_bio, BioAIReport) else None,
         metabolic_age=metabolic,
+        metabolic_age_insight=_metabolic_insight(profile, profile_err, latest_bio, metabolic),
         source_ids=source_ids,
         overview=overview,
         categories=categories,
@@ -188,6 +189,18 @@ def assemble_snapshot(principal: AuthenticatedPrincipal, registry: ProviderRegis
         related_keys=related,
         questionnaire_count=len(questionnaires or []),
         lifestyle_present=lifestyle is not None and not life_err,
+    )
+
+
+def _metabolic_insight(profile, profile_err, latest_bio, metabolic):
+    from app.biomarkers.metabolic_age_insight import build_metabolic_age_insight
+
+    if profile is None or profile_err or not isinstance(latest_bio, BioAIReport):
+        return None
+    return build_metabolic_age_insight(
+        actual_age=getattr(profile, "age", None),
+        metabolic_age=metabolic,
+        assessed_on=latest_bio.report_date,
     )
 
 
@@ -216,6 +229,7 @@ def to_health_view(snapshot: MemberSnapshot) -> HealthView:
         latest_bio_ai_date=snapshot.latest_bio_ai.report_date if snapshot.latest_bio_ai else None,
         previous_bio_ai_date=snapshot.previous_bio_ai.report_date if snapshot.previous_bio_ai else None,
         metabolic_age=snapshot.metabolic_age,
+        metabolic_age_insight=snapshot.metabolic_age_insight,
         measured_count=measured,
         risk_count=risks,
         overview=snapshot.overview,

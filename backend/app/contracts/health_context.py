@@ -133,6 +133,8 @@ class HealthContext(BaseModel):
     evidence_ids: list[str] = Field(default_factory=list)
     metabolic_age: float | None = None
     metabolic_score: float | None = None
+    profile_age: int | None = None
+    bio_report_date: date | str | None = None
     display_name: str | None = None
     notes: list[str] = Field(default_factory=list)
     medical_passages: list[str] = Field(default_factory=list)

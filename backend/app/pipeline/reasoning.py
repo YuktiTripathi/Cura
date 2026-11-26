@@ -343,6 +343,7 @@ class ReasoningService:
             and context.status != "ambiguous"
             and context.metabolic_age is not None
             and re.search(r"\bmetabolic\s+age\b", message or "", re.I)
+            and not re.search(r"\b(what does|say about|mean|means)\b", message or "", re.I)
         ):
             from app.pipeline.report_explainer import explain_metabolic_age
 

@@ -58,7 +58,14 @@ def _summary(card: CategoryCard, p) -> str:
     if s == "blood_out_risk_ok":
         return f"{_join(out)} {_verb(out)} outside range, even though your predicted {_join(healthy[:2])} risk is in the healthy band."
     if s == "blood_ok_risk_up":
-        return f"Your measured results are within range, but your predicted {_join(raised[:2])} risk is increased."
+        in_range = _names(p.measured, {"within_range"})[:2]
+        measured = _join(in_range) if in_range else "Your measured results"
+        verb = "is" if len(in_range) == 1 else "are"
+        lead = f"{measured} {verb} within range" if in_range else "Your measured results are within range"
+        return (
+            f"{lead}, while your Bio-AI assessment indicates a higher predicted {_join(raised[:2])} risk. "
+            "These findings look at different aspects of your health, so one does not necessarily contradict the other."
+        )
     if s == "both_out":
         return f"{_join(out)} {_verb(out)} outside range, and your predicted {_join(raised[:2])} risk is increased."
     if s == "blood_only":
@@ -121,11 +128,18 @@ def _follow_ups(card: CategoryCard, p) -> list[str]:
         qs.append(f"Why is my {raised[0].name} risk increased?")
     if out and healthy:
         qs.append(f"How can my {healthy[0].name} risk be healthy if my blood results are outside range?")
-    qs.append(f"Which foods can help my {topic}?")
-    if any(r.previous_value is not None for r in p.raw_measured):
+    from app.biomarkers.medical_registry import bio_ai_content
+
+    library = bio_ai_content()
+    for risk in raised + healthy:
+        code = getattr(risk, "marker_code", None) or ""
+        row = library.get(code) or {}
+        for question in row.get("suggested_questions") or []:
+            text = str(question).strip()
+            if text and text not in qs:
+                qs.append(text)
+    if any(r.previous_value is not None for r in p.raw_measured) and len(qs) < 4:
         qs.append(f"Have my {topic} results changed over time?")
-    else:
-        qs.append(f"What can I do to protect my {topic}?")
     seen, final = set(), []
     for q in qs:
         if q not in seen:

@@ -7,4 +7,5 @@ class UserProfile(BaseModel):
     first_name: str | None = None
     last_name: str | None = None
     age_band: str | None = None
+    age: int | None = None
     sex: str | None = None

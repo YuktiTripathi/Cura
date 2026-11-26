@@ -518,15 +518,6 @@ class ResponseComposer:
                 combined = _to_suggestions(on_topic_chips, personal=False)
                 presentation.suggestion_chips = [item.text for item in combined]
                 presentation.follow_up = None
-        if (
-            not combined
-            and not answer_turn
-            and context.status != "ambiguous"
-            and plan.knowledge_scope != KnowledgeScope.personal
-        ):
-            from app.pipeline.followup_generator import general_continuations, to_suggestions
-
-            combined = to_suggestions(general_continuations(plan.raw_message or ""), personal=False)
             presentation.suggestion_chips = [item.text for item in combined]
         definition = bool(re.search(r"\bwhat is\b", plan.raw_message or "", re.I) and not re.search(r"\bmy\b", plan.raw_message or "", re.I))
         if not combined and not answer_turn and context.status != "ambiguous" and not definition:

@@ -133,9 +133,19 @@ export async function getRiskOverview(reportId?: string | null): Promise<RiskOve
   return (await res.json()) as RiskOverview;
 }
 
+export type MetabolicAgeInsight = {
+  actual_age_years: number;
+  metabolic_age_years: number;
+  difference_years: number;
+  direction: "higher" | "lower" | "equal";
+  comparison: string;
+  assessed_on: string;
+};
+
 export type HealthView = {
   state: "ready" | "partial" | "unavailable";
   snapshot_version: string;
+  metabolic_age_insight?: MetabolicAgeInsight | null;
   overview: UnifiedOverview;
   categories: Record<string, CategoryDetail>;
   findings: Record<string, Finding>;
@@ -468,9 +478,19 @@ export async function createConversation(): Promise<ConversationDetail> {
 }
 
 export async function listConversations(): Promise<ConversationSummary[]> {
-  const res = await fetch(`${API}/api/v1/conversations`, { headers: authHeaders() });
-  if (!res.ok) return [];
-  return (await res.json()) as ConversationSummary[];
+  const result = await listConversationState();
+  return result.items;
+}
+
+/** Distinguishes an empty history from a failed request. A failure must not look like a first visit. */
+export async function listConversationState(): Promise<{ ok: boolean; items: ConversationSummary[] }> {
+  try {
+    const res = await fetch(`${API}/api/v1/conversations`, { headers: authHeaders() });
+    if (!res.ok) return { ok: false, items: [] };
+    return { ok: true, items: (await res.json()) as ConversationSummary[] };
+  } catch {
+    return { ok: false, items: [] };
+  }
 }
 
 export async function getConversation(id: string): Promise<ConversationDetail> {

@@ -11,7 +11,7 @@ def test_a_row_without_review_status_is_still_usable():
 def test_library_loads_once_and_keeps_review_status():
     assert library.CONTENT_VERSION == "2.3"
     assert len(library.relationships()) == 219
-    assert len(library.bio_ai_content()) == 11
+    assert len(library.bio_ai_content()) == 12
     rows = library._load("content/biomarker_content.json")
     assert len(rows) == 119
     assert all(row["review_status"] == "pending_clinical_review" for row in rows)

@@ -28,7 +28,7 @@ from app.contracts.unified_health import (
 )
 from app.biomarkers.education import education_for, first_sentence
 from app.contracts.blood import BloodMarker
-from app.contracts.risk_status import risk_status_key
+from app.contracts.risk_status import category_risk_highlight, risk_status_key
 from app.pipeline.clinical_thresholds import clinical_note
 from app.pipeline.gap_words import how_far
 
@@ -87,6 +87,7 @@ def _measured_finding(item: BiomarkerResult) -> Finding:
         previous_value=item.previous_value,
         previous_on=item.previous_on,
         important=status in _OUT,
+        marker_code=item.canonical_id,
     )
 
 
@@ -120,6 +121,7 @@ def _risk_finding(risk: RiskResult) -> Finding:
         previous_score=risk.previous_score,
         previous_on=risk.previous_on,
         important=status == "risk_raised",
+        marker_code=risk.code,
     )
 
 
@@ -306,6 +308,7 @@ def _card(p: _Parts, wording: dict | None) -> CategoryCard:
         count_line=_count_line(m, r),
         detail_line=_detail_line(m, r, p.risks),
         primary_action=PrimaryAction(label=p.meta.action_label, question=f"What do my {p.meta.topic} results mean for me?"),
+        risk_highlight=category_risk_highlight(f.classification for f in p.risks if f.source_type == "predicted_risk"),
     )
 
 

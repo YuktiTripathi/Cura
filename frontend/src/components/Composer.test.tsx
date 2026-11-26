@@ -57,12 +57,12 @@ describe("Composer voice input", () => {
     await waitFor(() => expect(screen.getByLabelText("Stop recording")).toBeTruthy());
     fireEvent.click(screen.getByLabelText("Stop recording"));
     await waitFor(() =>
-      expect((screen.getByPlaceholderText("Ask Cura about your health") as HTMLInputElement).value).toBe(
+      expect((screen.getByPlaceholderText("What's on your mind today?") as HTMLInputElement).value).toBe(
         "मेरा कोलेस्ट्रॉल कितना है?"
       )
     );
     expect(transcribeVoice).toHaveBeenCalled();
-    fireEvent.submit(screen.getByPlaceholderText("Ask Cura about your health").closest("form") as HTMLFormElement);
+    fireEvent.submit(screen.getByPlaceholderText("What's on your mind today?").closest("form") as HTMLFormElement);
     expect(onSend).toHaveBeenCalledWith("मेरा कोलेस्ट्रॉल कितना है?", []);
   });
 

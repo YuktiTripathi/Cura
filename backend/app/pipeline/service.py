@@ -1434,6 +1434,8 @@ class ChatService:
                 from app.pipeline.evidence_inventory import requested_marker_keys
 
                 keys = list(requested_marker_keys(payload.message))
+                if re.search(r"\bmetabolic age\b", payload.message or "", re.I) and "metabolic_age" not in keys:
+                    keys.insert(0, "metabolic_age")
                 keys += [getattr(r, "code", None) for r in (context.bio_ai_risks or []) if getattr(r, "code", None) and not keys][:2]
                 if not keys:
                     keys = [k for k in [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])] if k][:3]
@@ -1673,6 +1675,9 @@ class ChatService:
 
         llm_follow = [q for q in llm_follow if is_member_question(q)]
         llm_follow = on_topic(llm_follow, payload.message, answer)
+        from app.pipeline.followup_generator import stays_on_asked_topic
+
+        llm_follow = [question for question in llm_follow if stays_on_asked_topic(question, payload.message)]
         suggestions = _topic_follow_ups(suggestions, payload.message, answer)
         eval_turn["model_follow_ups"] = [q for q in llm_follow if not _GENERIC_FOLLOW_UP.search(q)]
         from app.contracts.followup import FollowUpSuggestion
@@ -1692,32 +1697,11 @@ class ChatService:
         seen = {item.text for item in model_items}
         suggestions = model_items + [item for item in suggestions if item.text not in seen]
         suggestions = [item for item in suggestions if not _GENERIC_FOLLOW_UP.search(item.text)]
-        if not re.search(r"\b(score|risk|bio-?ai|prediction)\b", payload.message or "", re.I):
-            suggestions = [item for item in suggestions if not re.search(r"\bscore\b", item.text, re.I)]
-        if not suggestions and plan.intent in {IntentType.latest_result, IntentType.blood_marker_explanation} and plan.topic_name:
-            name = plan.topic_name
-            suggestions = [
-                FollowUpSuggestion(
-                    text=question,
-                    category="conversation",
-                    intent=plan.intent.value,
-                    requires_personal_context=False,
-                    source="conversation",
-                    handling_path="generator",
-                )
-                for question in (
-                    f"What does {name} do in the body?",
-                    f"Why does {name} matter?",
-                    f"How is {name} connected to my other results?",
-                    f"What can influence {name}?",
-                )
-            ]
         suggestions = suggestions[:4]
         self._progress.measure("validation")
         self._progress.emit(ProcessingStage.composing_response, plan=plan)
         self._progress.mark("compose")
         pre_compose_answer = answer
-        engine_suggestions = list(suggestions)
         with perf.stage("composition"):
             answer, suggestions, presentation = self.composer.compose(
                     answer,
@@ -1737,33 +1721,13 @@ class ChatService:
                 )
         suggestions = _topic_follow_ups(suggestions, payload.message, pre_compose_answer)
         suggestions = [item for item in suggestions if not _GENERIC_FOLLOW_UP.search(getattr(item, "text", "") or "")]
-        if not re.search(r"\b(score|risk|bio-?ai|prediction)\b", payload.message or "", re.I):
-            suggestions = [item for item in suggestions if not re.search(r"\bscore\b", getattr(item, "text", "") or "", re.I)]
         from app.pipeline.followup_generator import is_cross_source
 
         suggestions = [item for item in suggestions if not is_cross_source(getattr(item, "text", "") or "")]
         from app.pipeline.tone_signals import trim_follow_ups
 
         suggestions = trim_follow_ups(suggestions, tone.tone, bool(rewrite_angle))
-        if not suggestions and plan.intent == IntentType.nutrition_guidance and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
-            # Food questions keep the food questions the engine grounded before the generic journey replaced them.
-            suggestions = [
-                item for item in engine_suggestions
-                if not _GENERIC_FOLLOW_UP.search(getattr(item, "text", "") or "")
-            ][:4]
-        if not suggestions and plan.intent in {IntentType.latest_result, IntentType.blood_marker_explanation} and plan.topic_name and plan.conversation_turn != "ANSWER_TO_ASSISTANT":
-            from app.contracts.followup import FollowUpSuggestion
-
-            name = plan.topic_name
-            suggestions = [
-                FollowUpSuggestion(text=question, category="conversation", intent=plan.intent.value, handling_path="generator")
-                for question in (
-                    f"What does {name} do in the body?",
-                    f"Why does {name} matter?",
-                    f"How is {name} connected to my other results?",
-                    f"What can influence {name}?",
-                )
-            ]
+        suggestions = suggestions[:4]
         if presentation is not None:
             presentation.suggestion_chips = [item.text for item in suggestions if getattr(item, "text", None)]
             if presentation.summary and presentation.summary.strip() != (answer or "").strip():

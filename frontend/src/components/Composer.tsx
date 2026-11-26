@@ -18,6 +18,7 @@ type Props = {
   onReview?: (documentId: string) => void;
   /** False when the server has no speech-to-text configured: the microphone is not offered. */
   voiceEnabled?: boolean;
+  placeholder?: string;
 };
 
 export function Composer({
@@ -30,6 +31,7 @@ export function Composer({
   uploader: sharedUploader,
   onReview,
   voiceEnabled = true,
+  placeholder,
 }: Props) {
   const ownUploader = useDocumentUpload(conversationId, onUploaded);
   const uploader = sharedUploader ?? ownUploader;
@@ -200,7 +202,7 @@ export function Composer({
             ? t("composer.transcribing", "Turning your voice into text…")
             : recording
             ? t("composer.listening", "Listening…")
-            : t("composer.placeholder", "Ask Cura about your health")
+            : placeholder || t("composer.placeholder", "What's on your mind today?")
         }
         disabled={disabled || transcribing}
       />

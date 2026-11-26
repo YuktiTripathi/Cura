@@ -1,15 +1,17 @@
 import { describe, expect, it } from "vitest";
-import { introLine } from "./WelcomeExperience";
+import { homeQuestions } from "../welcome/homeQuestions";
+import type { Finding } from "../types/unifiedHealth";
 
-describe("welcome intro", () => {
-  it("mentions only what exists", () => {
-    expect(introLine({ has_blood_report: true })).toContain("your blood report");
-    expect(introLine({ has_blood_report: true })).not.toMatch(/Bio-AI|nutrition/);
+describe("home questions", () => {
+  it("uses general questions when reports are not confirmed", () => {
+    expect(homeQuestions(false, false, [])).toContain("How does sleep affect my health?");
+    expect(homeQuestions(false, false, [])).toHaveLength(4);
   });
-  it("falls back to general help with no reports", () => {
-    expect(introLine({})).not.toMatch(/report/);
-  });
-  it("joins several items naturally", () => {
-    expect(introLine({ has_blood_report: true, has_bio_ai_report: true, has_nutrition: true })).toContain("your blood report, your Bio-AI report and your nutrition");
+
+  it("adds one question from a real finding and stays within four", () => {
+    const finding = { id: "vitamin_d", name: "Vitamin D" } as Finding;
+    const questions = homeQuestions(true, true, [finding]);
+    expect(questions).toContain("What does my vitamin D result mean?");
+    expect(questions).toHaveLength(4);
   });
 });

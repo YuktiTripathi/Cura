@@ -6,7 +6,12 @@ entry stays empty. Nothing here asks a model to rewrite the text.
 
 from __future__ import annotations
 
+import re
+
 from app.contracts.unified_health import EducationNote
+
+# A line that points at a sentence the reader has not seen cannot open an explanation.
+_FRAGMENT = re.compile(r"^(this|that|it|these|those)\b", re.I)
 
 
 
@@ -14,10 +19,17 @@ def _join(lines: list | None) -> str:
     return " ".join(str(line).strip() for line in lines or [] if str(line).strip())
 
 
+def _factor_labels(row: dict) -> list[str]:
+    chosen = _lines(row.get("influencing_factors"))
+    if not chosen:
+        chosen = _lines(row.get("relevant_lifestyle_factors") or row.get("possible_influencing_factors"))
+    return [line for line in chosen if len(line) <= 48][:6]
+
+
 def _lines(value) -> list[str]:
     if isinstance(value, str):
         value = [value]
-    return [str(line).strip() for line in value or [] if str(line).strip()]
+    return [str(line).strip() for line in value or [] if str(line).strip() and not _FRAGMENT.match(str(line).strip())]
 
 
 def _distinct(lines: list[str], seen: set[str]) -> str:
@@ -52,6 +64,12 @@ def _note(row: dict, canonical_id: str | None) -> EducationNote:
         next_step=_join(explanations.get("normal") or explanations.get("within_range")),
         common_factors=_join(row.get("possible_influencing_factors")),
         limitations=_join(row.get("clinical_limitations")),
+        factors=_factor_labels(row),
+        actions=_lines(row.get("everyday_support"))[:4],
+        questions=[str(q).strip() for group in (row.get("suggested_questions") or {}).values() if isinstance(group, list) for q in group][:4]
+        if isinstance(row.get("suggested_questions"), dict)
+        else _lines(row.get("suggested_questions"))[:4],
+        related_markers=[str(item) for item in row.get("related_biomarkers") or []][:8],
         content_version=str(row.get("content_version") or ""),
         review_status=str(row.get("review_status") or ""),
         content_source="medical_knowledge_v2.3",
@@ -100,6 +118,10 @@ def risk_note(code: str | None) -> EducationNote | None:
         body=body if short else "",
         why_it_matters=why,
         limitations=_distinct(limits, seen),
+        factors=_factor_labels(row),
+        actions=_lines(row.get("everyday_support"))[:4],
+        questions=_lines(row.get("suggested_questions"))[:4],
+        related_markers=[str(item) for item in row.get("relevant_biomarkers") or []][:8],
         content_version=str(row.get("content_version") or "2.3"),
         review_status=str(row.get("review_status") or ""),
         content_source="medical_knowledge_v2.3",

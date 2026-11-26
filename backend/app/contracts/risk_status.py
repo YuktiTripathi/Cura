@@ -13,6 +13,21 @@ def risk_status_key(status: object) -> str:
     return text[: -len(" risk")] if text.endswith(" risk") else text
 
 
+def category_risk_highlight(statuses) -> str | None:
+    """Highest Bio-AI label that changes a category card. Scores are never reclassified here."""
+
+    rank = {"increased": 1, "very_high": 2}
+    best = None
+    best_rank = 0
+    for status in statuses:
+        key = risk_status_key(status)
+        level = "very_high" if key == "very high" else "increased" if key == "increased" else None
+        if level and rank[level] > best_rank:
+            best = level
+            best_rank = rank[level]
+    return best
+
+
 # Bands of the sample report (knowledge base section 3.1). Reference only: the person's own report label wins.
 SAMPLE_BANDS: tuple[tuple[int, int, str], ...] = (
     (0, 25, "Healthy"),

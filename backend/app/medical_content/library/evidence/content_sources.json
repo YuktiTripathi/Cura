@@ -174,6 +174,30 @@
     "verification": "search excerpt inspected; full claim verification pending"
   },
   {
+    "source_id": "metsights_inputs",
+    "title": "MetSights assessment input framework, as known to CURA",
+    "url": "",
+    "verification": "product description only: blood, lifestyle, food, activity, sleep, demographics and questionnaire answers may be inputs; formula, weights and reference population are not documented"
+  },
+  {
+    "source_id": "nia_aging",
+    "title": "National Institute on Aging: what we know about healthy aging",
+    "url": "https://www.nia.nih.gov/health/healthy-aging/what-do-we-know-about-healthy-aging",
+    "verification": "opened as background on ageing and lifestyle; metabolic age formula is not defined here; pending clinical review"
+  },
+  {
+    "source_id": "who_pcos",
+    "title": "WHO polycystic ovary syndrome fact sheet",
+    "url": "https://www.who.int/news-room/fact-sheets/detail/polycystic-ovary-syndrome",
+    "verification": "opened 2026-11-26; educational claims pending clinical review"
+  },
+  {
+    "source_id": "pcos_guideline_2023",
+    "title": "International evidence-based guideline for the assessment and management of PCOS (2023)",
+    "url": "https://www.monash.edu/medicine/mchri/pcos/guideline",
+    "verification": "2023 international guideline remains the current full revision; 2026 educational claims pending clinical review"
+  },
+  {
     "source_id": "life_urine",
     "title": "MedlinePlus urine specific gravity",
     "url": "https://medlineplus.gov/ency/article/003587.htm",

@@ -127,8 +127,8 @@ def test_the_same_gap_always_gets_the_same_word(value, low, high, word):
 
 
 def test_the_word_travels_with_the_evidence():
-    row = _measurement(_marker("ldl", 138, 0, 100))
-    assert row["how_far"] == "moderately"
+    # Distance-from-range labels are not a biomarker-specific clinical basis, so they stay out of model evidence.
+    assert "how_far" not in _measurement(_marker("ldl", 138, 0, 100))
     assert "how_far" not in _measurement(_marker("hdl", 41, 40, 60))
 
 

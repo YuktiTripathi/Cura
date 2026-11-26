@@ -43,6 +43,10 @@ class EducationNote(BaseModel):
     why_it_matters: str = ""
     body: str = ""
     limitations: str = ""
+    factors: list[str] = Field(default_factory=list)
+    actions: list[str] = Field(default_factory=list)
+    questions: list[str] = Field(default_factory=list)
+    related_markers: list[str] = Field(default_factory=list)
     content_version: str = ""
     review_status: str = ""
     content_source: str = ""
@@ -72,6 +76,7 @@ class Finding(BaseModel):
     previous_value: float | None = None
     previous_on: str | None = None
     important: bool = False
+    marker_code: str | None = None
     education: EducationNote | None = None
     # How far this finding can be relied on. It follows from what the report supplied, never from a guess.
     data_quality: Literal["verified", "reference_unavailable", "unavailable"] = "verified"
@@ -138,6 +143,7 @@ class CategoryCard(BaseModel):
     count_line: str = ""
     detail_line: str = ""
     primary_action: PrimaryAction
+    risk_highlight: Literal["increased", "very_high"] | None = None
 
 
 class Relationship(BaseModel):

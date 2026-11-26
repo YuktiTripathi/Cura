@@ -121,11 +121,17 @@ def main() -> int:
             "",
         ]
     if args.contrasting:
+        # This block is not a CURA chat evaluation. It calls the model directly with two profiles.
+        out += [
+            "# Contrasting profiles (direct model call, not the CURA chat pipeline)",
+            "The sections above came from POST /api/v1/chat. The sections below skip routing, retrieval, safety and grounding.",
+            "",
+        ]
         from app.llm.factory import get_llm_client
         from app.pipeline.prompt_builder import PromptBuilder
         from tests.unit.test_answer_quality import _context
 
-        out += ["# Contrasting profiles, identical measurements", ""]
+        out += ["The profiles below use identical measurements and are not passed through POST /api/v1/chat.", ""]
         llm = get_llm_client(personal_health=True)
         for question, profiles in CONTRAST:
             for label, answers in profiles:

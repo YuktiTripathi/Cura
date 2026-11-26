@@ -832,16 +832,18 @@
   {
     "risk_id": "pcos",
     "display_name": "Polycystic ovary syndrome (PCOS)",
-    "short_description": "Insulin resistance can also occur, but not everyone with PCOS has it.",
+    "aliases": ["PCOS", "PCOD", "polycystic ovary syndrome", "polycystic ovarian disease"],
+    "short_description": "PCOS is a common hormone pattern that can make periods less regular.",
     "what_happens_inside_my_body": [
-      "The ovaries make hormones and usually release eggs in a cycle.",
-      "In PCOS, hormone signalling may change and egg release may become less regular.",
-      "Some people produce more hormones called androgens.",
-      "Insulin resistance can also occur, but not everyone with PCOS has it."
+      "The ovaries make hormones and usually release an egg in a cycle.",
+      "With PCOS, that signalling can shift, so egg release becomes less regular.",
+      "The body may make more hormones called androgens, which can show up as acne or extra hair growth.",
+      "Some people also become less sensitive to insulin, the hormone that helps sugar move into cells. Not everyone with PCOS has this."
     ],
     "why_it_matters": [
-      "PCOS can affect periods, fertility and metabolic health.",
-      "Diagnosis needs clinical context; no single blood test confirms it."
+      "Less regular periods, skin changes and trouble getting pregnant are reasons people look into PCOS.",
+      "Over time it can sit alongside higher blood sugar, cholesterol changes and a higher chance of diabetes or heart risk.",
+      "A Bio-AI PCOS score is a predicted risk, not a diagnosis. A doctor uses symptoms, an exam and tests together."
     ],
     "relevant_biomarkers": [
       "total_testosterone",
@@ -850,19 +852,29 @@
       "fasting_sugar",
       "fasting_insulin"
     ],
-    "relevant_lifestyle_factors": [],
+    "relevant_lifestyle_factors": [
+      "Moving more often and including vegetables, pulses, fruit and unsweetened drinks can support insulin sensitivity.",
+      "Sleep and stress matter for hormones, but a habit does not by itself cause a PCOS score.",
+      "Weight can be associated with PCOS. It is not the cause for everyone, and a prediction does not say a person's eating caused it."
+    ],
     "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
+      "A predicted risk does not mean you have PCOS.",
+      "PCOS and PCOD are names for the same conversation here, not two separate conditions.",
+      "No single blood test confirms PCOS, and a missing assessment does not mean there is no risk.",
+      "PCOS is not caused by one food, and it is not only a weight problem."
     ],
     "clinical_limitations": [
-      "Diagnosis needs clinical context; no single blood test confirms it.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
+      "Diagnosis needs a clinician. Irregular periods, androgen signs and ultrasound findings are weighed together.",
+      "This library does not set a score cutoff, and it does not say which inputs produced a member's score.",
+      "Medicines, supplements and doses are a doctor's decision, not something this explanation can set."
     ],
     "suggested_questions": [
-      "What does my polycystic ovary syndrome (pcos) assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "What is PCOS?",
+      "What does my PCOS assessment mean?",
+      "How can periods and blood sugar relate to PCOS?",
+      "When should I talk to a doctor about PCOS?"
     ],
-    "source_ids": [],
+    "source_ids": ["who_pcos", "pcos_guideline_2023"],
     "review_status": "pending_clinical_review",
     "draft_status": "expanded_draft",
     "relevant_biomarker_context": [
@@ -897,16 +909,28 @@
   {
     "risk_id": "oxidative_stress",
     "display_name": "Oxidative stress",
-    "short_description": "This process is called oxidative stress.",
+    "short_description": "Oxidative stress is what happens when substances your cells make as they work build up faster than your body's protective systems can handle them.",
     "what_happens_inside_my_body": [
       "Your cells naturally make some reactive molecules as they use energy.",
       "Your body has protective systems that help keep these molecules in balance.",
-      "When the balance is disturbed, reactive molecules may damage parts of cells.",
-      "This process is called oxidative stress."
+      "When that protection cannot keep up, the extra molecules may damage parts of cells. That imbalance is called oxidative stress."
     ],
     "why_it_matters": [
-      "Oxidative stress is involved in many biological processes.",
-      "Routine blood tests do not directly quantify overall oxidative stress."
+      "Over time, this imbalance can affect the health of cells.",
+      "Research discusses oxidative stress alongside inflammation and some longer-term health conditions. A score does not show that this has happened.",
+      "Everyday habits such as smoking, eating patterns, sleep and physical activity are studied as general influences. They are not confirmed reasons for an individual score."
+    ],
+    "influencing_factors": [
+      "Eating habits",
+      "Sleep",
+      "Physical activity",
+      "Smoking",
+      "Ongoing stress"
+    ],
+    "everyday_support": [
+      "Include a variety of vegetables, fruit, pulses and other minimally processed foods.",
+      "Keep a sleep routine that gives you enough rest.",
+      "Stay physically active in a way that fits your usual day."
     ],
     "relevant_biomarkers": [
       "hs_crp",
@@ -914,15 +938,15 @@
     ],
     "relevant_lifestyle_factors": [],
     "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
+      "A normal blood test in this area does not cancel a higher predicted oxidative stress risk, because routine blood tests do not directly measure it."
     ],
     "clinical_limitations": [
-      "Routine blood tests do not directly quantify overall oxidative stress.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
+      "This score is a risk estimate, not a direct measurement of cell damage and not a diagnosis. A number out of 100 is the provider's score, not a percentage chance."
     ],
     "suggested_questions": [
-      "What does my oxidative stress assessment mean?",
-      "Which measured results help put this prediction in context?"
+      "Why is my oxidative stress risk high when a blood test in this area is normal?",
+      "Which everyday habits are discussed in relation to oxidative stress?",
+      "Which foods are discussed for the body's protective systems?"
     ],
     "source_ids": [],
     "review_status": "pending_clinical_review",
@@ -939,6 +963,52 @@
         "model_contributor_confirmed": false
       }
     ],
+    "evidence_status": "pending_claim_verification"
+  },
+  {
+    "risk_id": "metabolic_age",
+    "display_name": "Metabolic age",
+    "short_description": "Metabolic age is an estimate that compares parts of metabolic health with age-related patterns.",
+    "product_inputs": [
+      "MetSights can look at blood biomarkers, lifestyle, food, activity, sleep, demographics and other questionnaire answers when it builds risk scores and metabolic scores.",
+      "That is the known general input set. The formula, feature weights and reference population are not available, and not every answer feeds every score."
+    ],
+    "what_happens_inside_my_body": [
+      "The body turns food into energy, keeps blood sugar in a workable range and handles fats through the day. That is metabolic health. It is not how quickly someone burns calories or loses weight.",
+      "Your actual age is how many years you have lived. Metabolic age is a Bio-AI estimate related to those processes, not a count of birthdays and not biological age.",
+      "A higher, lower or matching estimate is a way to look at metabolic health. It does not measure lifespan and it is not a diagnosis.",
+      "Favourable blood results and a higher estimate can exist together, because a prediction is not the same thing as a measurement.",
+      "A later assessment can show a different number. No habit is promised to move it by a set number of years."
+    ],
+    "why_it_matters": [
+      "A higher, lower or matching estimate is a starting point for looking at metabolic health, not a judgement of how well someone is ageing.",
+      "It does not measure remaining lifespan, and it does not mean the whole body is that many years older or younger."
+    ],
+    "relevant_biomarkers": ["fasting_sugar", "hba1c", "triglycerides", "hdl"],
+    "relevant_lifestyle_factors": [
+      "Everyday movement, meals built around vegetables, pulses and unsweetened drinks, and regular sleep support metabolic health.",
+      "Those habits are discussed separately from the estimate unless a documented method says they contributed to it."
+    ],
+    "common_misconceptions": [
+      "A higher metabolic age does not mean accelerated ageing or lost years of life.",
+      "A lower metabolic age does not guarantee good health.",
+      "A normal blood result can exist alongside a higher estimate.",
+      "Lifestyle changes are not guaranteed to move the number by a set number of years."
+    ],
+    "clinical_limitations": [
+      "This is not a diagnosis.",
+      "The provider field is a reported estimate. The calculation method and model attribution are not in the supplied assessment schema.",
+      "Do not treat a missing estimate as normal health."
+    ],
+    "suggested_questions": [
+      "What does metabolic age mean?",
+      "How is metabolic age different from biological age?",
+      "Can a metabolic age estimate change over time?",
+      "What should I know before reading my metabolic age?"
+    ],
+    "source_ids": ["metsights_inputs"],
+    "review_status": "pending_clinical_review",
+    "draft_status": "expanded_draft",
     "evidence_status": "pending_claim_verification"
   }
 ]

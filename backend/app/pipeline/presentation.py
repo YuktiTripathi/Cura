@@ -7,6 +7,16 @@ from app.contracts.risk_status import risk_status_key
 import re
 from datetime import date, datetime
 
+
+def _named_in_answer(label: str | None, blob: str) -> bool:
+    text = (label or "").strip().lower()
+    if not text:
+        return False
+    if text in blob:
+        return True
+    parts = [part for part in re.split(r"[^a-z0-9]+", text) if len(part) >= 3]
+    return any(part in blob for part in parts)
+
 from app.core.config import settings
 from app.contracts.common import IntentType, KnowledgeScope, MarkerFlag
 from app.contracts.health_context import HealthContext
@@ -810,7 +820,13 @@ def build_structured_response(
         else:
             summary = prose or None
             interpretation = None
+    asks_table = bool(re.search(r"\b(table|list (?:all|my)|all my results|show my results|full report)\b", message or "", re.I))
+    if mode not in {ResponseMode.result_list, ResponseMode.health_overview} and not asks_table:
+        blob = f"{message or ''}\n{answer or ''}".lower()
+        findings = [item for item in findings if _named_in_answer(item.label, blob)]
     uncertainties = _uncertainties(plan, context)
+    if not asks_table:
+        uncertainties = [item for item in uncertainties if _named_in_answer(item, f"{message or ''}\n{answer or ''}".lower()) or not re.search(r"\b(unavailable|not available|missing)\b", item, re.I)]
     if plan.intent in {IntentType.bio_ai_score, IntentType.bio_ai_explanation} or context.intent in {
         IntentType.bio_ai_score,
         IntentType.bio_ai_explanation,
