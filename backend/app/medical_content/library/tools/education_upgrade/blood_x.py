@@ -121,11 +121,11 @@ X["WB-048"] = dict(
     fx=[
         ("Iron, B12 and folate levels", "The marrow needs iron to build haemoglobin and B12 and folate to make red cells; a shortage of any lowers it."),
         ("Blood loss including heavy periods", "Losing blood, often slowly through heavy periods or the gut, uses up iron and lowers haemoglobin."),
+        ("Inherited haemoglobin traits", "Thalassaemia trait, common in India, can give a mildly low haemoglobin with small red cells, unrelated to iron."),
+        ("Long-term illness", "Kidney disease and ongoing inflammation slow red cell production."),
         ("Hydration", "Dehydration concentrates the blood and makes haemoglobin read higher."),
         ("Smoking", "Carbon monoxide from smoke reduces oxygen delivery, so the body makes more haemoglobin."),
         ("Altitude", "Living high up, where air has less oxygen, raises haemoglobin."),
-        ("Long-term illness", "Kidney disease and ongoing inflammation slow red cell production."),
-        ("Inherited haemoglobin traits", "Thalassaemia trait, common in India, can give a mildly low haemoglobin with small red cells, unrelated to iron."),
     ],
     keep=_IRON_KEEP,
     risk=_IRON_RISK,

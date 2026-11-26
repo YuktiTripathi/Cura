@@ -6826,11 +6826,11 @@
   "possible_influencing_factors": [
    "Iron, B12 and folate levels",
    "Blood loss including heavy periods",
+   "Inherited haemoglobin traits",
+   "Long-term illness",
    "Hydration",
    "Smoking",
-   "Altitude",
-   "Long-term illness",
-   "Inherited haemoglobin traits"
+   "Altitude"
   ],
   "clinical_limitations": [
    "Haemoglobin shows whether anaemia is present, but not its cause. Red cell indices and iron or vitamin tests help with that."
@@ -6897,6 +6897,14 @@
     "how_it_acts": "Losing blood, often slowly through heavy periods or the gut, uses up iron and lowers haemoglobin."
    },
    {
+    "factor": "Inherited haemoglobin traits",
+    "how_it_acts": "Thalassaemia trait, common in India, can give a mildly low haemoglobin with small red cells, unrelated to iron."
+   },
+   {
+    "factor": "Long-term illness",
+    "how_it_acts": "Kidney disease and ongoing inflammation slow red cell production."
+   },
+   {
     "factor": "Hydration",
     "how_it_acts": "Dehydration concentrates the blood and makes haemoglobin read higher."
    },
@@ -6907,14 +6915,6 @@
    {
     "factor": "Altitude",
     "how_it_acts": "Living high up, where air has less oxygen, raises haemoglobin."
-   },
-   {
-    "factor": "Long-term illness",
-    "how_it_acts": "Kidney disease and ongoing inflammation slow red cell production."
-   },
-   {
-    "factor": "Inherited haemoglobin traits",
-    "how_it_acts": "Thalassaemia trait, common in India, can give a mildly low haemoglobin with small red cells, unrelated to iron."
    }
   ],
   "keeping_healthy": [
