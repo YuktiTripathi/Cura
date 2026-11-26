@@ -8,7 +8,7 @@
   "missing_content": [],
   "biomarker_relationships": 219,
   "lifestyle_relationships": 31,
-  "bio_ai_conditions": 11,
+  "bio_ai_conditions": 12,
   "health_categories": 15,
   "writing_audit_entries": 330,
   "fully_evidence_verified_entries": 0,
@@ -23,7 +23,7 @@
     "staging questionnaire keys and production equivalence unconfirmed",
     "lifestyle claim verification and independent writing review incomplete"
   ],
-  "structural_validation": "passed",
+  "structural_validation": "not_rerun_after_quality_edits",
   "male": 328,
   "female": 321,
   "entries_missing_source_ids": 0,
