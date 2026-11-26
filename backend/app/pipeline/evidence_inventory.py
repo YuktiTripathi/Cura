@@ -323,8 +323,12 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
     }
     from app.pipeline.query_planner import _personal_lifestyle_theme
 
+    from app.pipeline.prompt_modules import is_nutrition_overview
+
     metabolic_question = bool(re.search(r"\bmetabolic age\b", message or "", re.I))
-    lifestyle_theme = _personal_lifestyle_theme(message)
+    # A whole-body food question ("how can I eat better for my body?") reads every food-relevant result and
+    # risk; the narrower food theme is for questions about one habit.
+    lifestyle_theme = None if is_nutrition_overview(message) else _personal_lifestyle_theme(message)
     if lifestyle_theme and not metabolic_question:
         markers, risks_kept = _LIFESTYLE_FOCUS[lifestyle_theme]
         measurements = [_measurement(item) for item in context.markers or [] if _key(getattr(item, "key", None)) in markers][:8]
@@ -343,8 +347,6 @@ def assemble_evidence(plan: QueryPlan, context: HealthContext) -> EvidencePackag
     ):
         measurements = []
     selected_risks = _select_risks(kind, message, context.bio_ai_risks)
-    from app.pipeline.prompt_modules import is_nutrition_overview
-
     if is_nutrition_overview(message):
         selected_risks = [item for item in selected_risks if _nutrition_relevant_risk(item)]
     if metabolic_question:

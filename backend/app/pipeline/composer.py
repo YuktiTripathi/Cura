@@ -520,6 +520,15 @@ class ResponseComposer:
                 presentation.follow_up = None
             presentation.suggestion_chips = [item.text for item in combined]
         definition = bool(re.search(r"\bwhat is\b", plan.raw_message or "", re.I) and not re.search(r"\bmy\b", plan.raw_message or "", re.I))
+        if not combined and definition and not answer_turn and context.status != "ambiguous":
+            # The model offered no usable next questions. Stay on this topic rather than offering stock health
+            # questions or an empty row; these are general questions and need no personal data.
+            from app.pipeline.followup_generator import general_continuations, to_suggestions as _general_suggestions
+
+            topical = [q for q in general_continuations(plan.raw_message or "") if q not in (shown_follow_ups or [])][:3]
+            if topical:
+                combined = _general_suggestions(topical, personal=False)
+                presentation.suggestion_chips = [item.text for item in combined]
         if not combined and not answer_turn and context.status != "ambiguous" and not definition:
             # Never an empty row: a few general, clinically safe questions.
             from app.pipeline.followup_generator import FollowUpBrief, fallback_questions, to_suggestions

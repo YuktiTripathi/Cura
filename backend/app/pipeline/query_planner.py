@@ -25,7 +25,9 @@ def _personal_lifestyle_theme(message: str) -> str | None:
     """This person's sleep, movement, eating or stress. A general question stays general."""
 
     text = message or ""
-    if not re.search(r"\b(my|me|i)\b", text, re.I):
+    # "my sleep" or "I sleep five hours" is this person's habit. "Tell me", "explain to me" and "how much
+    # exercise should I get" are general questions.
+    if not re.search(r"\bmy\b|\bi'm\b|\bi've\b|\bi (?:sleep|slept|exercise|walk|run|eat|ate|drink|work out|train|smoke|feel|am|have|usually|only|never|always|don't|do not)\b", text, re.I):
         return None
     if re.search(r"\bsleep\b", text, re.I):
         return "sleep"
@@ -180,11 +182,28 @@ def build_query_plan(
         token in lowered_msg for token in ("changed", "previous", "compare", "latest questionnaire")
     ):
         history = True
-    if _personal_lifestyle_theme(message):
+    explicit_answer_lookup = intent == IntentType.questionnaire_lookup and not named_personal_sources(message) - {"questionnaire"}
+    theme = _personal_lifestyle_theme(message)
+    links_to_results = bool(re.search(
+        r"\b(affect|affects|affecting|impact|results?|health|report|blood|improve|help|helps|risk|score|why|connect|relate|related|levels?)\b",
+        message or "", re.I,
+    ))
+    if theme and not explicit_answer_lookup and not links_to_results and intent != IntentType.nutrition_guidance:
+        # "What is my sleep?" asks about the habit itself: the questionnaire answer is the relevant personal data.
+        scope = KnowledgeScope.personal
+        personal = True
+        wants_questionnaire = True
+        needs_blood = needs_bio_ai = needs_profile = False
+        needs_lifestyle = True
+    elif theme and not explicit_answer_lookup:
+        # "How is my sleep affecting my health?" connects a habit to results. "What did I answer about my
+        # sleep?" asks only for the questionnaire answer, so it stays a questionnaire lookup.
+        # A question about one named result ("What can I eat to lower my LDL?") needs that result and the
+        # person's habits, not every Bio-AI score.
         scope = KnowledgeScope.personal
         personal = True
         needs_blood = True
-        needs_bio_ai = True
+        needs_bio_ai = needs_bio_ai or not match_lab_keys(message)
         needs_lifestyle = True
         needs_profile = True
         wants_questionnaire = True

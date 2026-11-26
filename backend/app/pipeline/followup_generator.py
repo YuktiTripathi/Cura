@@ -638,6 +638,26 @@ def _stage_weight(stage: str, brief: FollowUpBrief, current_stage: str | None) -
     return 10 - idx
 
 
+def _asked_result_questions(current_question: str, brief: FollowUpBrief) -> list[str]:
+    """Library questions for a result the person named that has no abnormal finding in the brief."""
+    from app.biomarkers.medical_registry import canonical_key, entry_for
+    from app.pipeline.lab_parameters import match_lab_keys
+
+    flagged = {f.key for f in brief.findings if f.direction in {"high", "low"}}
+    out: list[str] = []
+    for key in match_lab_keys(current_question):
+        if not key or key in flagged:
+            continue
+        row = entry_for(canonical_key(key))
+        if not row:
+            continue
+        for q in (row.get("suggested_questions") or {}).get("normal") or []:
+            q = q if q.startswith(("What", "How", "Why", "Can", "Is", "Does", "Should", "Which")) else q
+            if q not in out:
+                out.append(q)
+    return out
+
+
 def _select_base(
     brief: FollowUpBrief,
     *,
@@ -660,10 +680,21 @@ def _select_base(
             stages_used.add(stage_of(text) or "")
         if len(chosen) >= count:
             return chosen
-    # The model already offered on-topic next questions. Do not refill the row with
-    # abnormal-result templates, which pull in unrelated markers.
-    if chosen and model_questions:
-        return chosen
+    # When the model already offered usable questions, refill only with next steps about the result being
+    # asked about, never with abnormal-result templates for unrelated markers (the 0b591ae intent). Returning
+    # early left nothing when a later check removed the model's only question.
+    model_led = bool(chosen and model_questions)
+    if not model_led and current_question:
+        # The asked result is in range, so the abnormal-result templates hold nothing about it. Its own library
+        # questions keep the row on the topic the person asked about (CURA 1.0: next steps on this topic).
+        asked = _asked_result_questions(current_question, brief)
+        for text in asked:
+            if len(chosen) >= count:
+                break
+            if valid_question(text, brief, current=current_question, chosen=chosen):
+                chosen.append(text)
+                stages_used.add(stage_of(text) or "")
+        model_led = bool(chosen)
     ranked = sorted(
         _candidates(brief),
         key=lambda c: -(c[2] + _stage_weight(c[1], brief, current_stage)),
@@ -679,6 +710,8 @@ def _select_base(
             if stage in brief.covered and not allow_covered:
                 continue  # earlier steps come back only when nothing new is left
             subject = next((f.name for f in brief.findings if f.name in text), text)
+            if model_led and subject not in focus_names:
+                continue
             if per_test.get(subject, 0) >= (2 if subject in focus_names else 1):
                 continue
             if not valid_question(text, brief, current=current_question, chosen=chosen):
@@ -686,6 +719,8 @@ def _select_base(
             chosen.append(text)
             stages_used.add(stage)
             per_test[subject] = per_test.get(subject, 0) + 1
+    if model_led:
+        return chosen  # up to four, not padded with other areas
     if len(chosen) < count:
         # Pad to the full row with questions about areas not yet offered, then the safe set.
         for tq, _area in theme_questions(brief):

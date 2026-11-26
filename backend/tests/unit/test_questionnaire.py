@@ -96,9 +96,14 @@ def test_explicit_questionnaire_questions_do_query():
     assert "diet_preference" in keys
 
 
-def test_sleep_without_questionnaire_wording_is_not_questionnaire():
+def test_sleep_question_retrieves_only_the_relevant_personal_answer():
+    # Updated: the original assertion expected no questionnaire. The intended behaviour is that a personal
+    # question receives the relevant cached personal data, and sleep is recorded only in the questionnaire.
+    # Blood and Bio-AI are not relevant to "what is my sleep" and must not be fetched.
     plan = build_query_plan("What is my sleep?")
-    assert plan.needs_questionnaire is False
+    assert plan.needs_questionnaire is True
+    assert plan.needs_blood is False
+    assert plan.needs_bio_ai is False
 
 
 def test_blood_and_questionnaire_retrieve_both_sources():
