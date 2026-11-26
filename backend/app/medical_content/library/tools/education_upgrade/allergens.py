@@ -18,7 +18,7 @@ BODY = [
     "When IgE meets that substance again, it can trigger symptoms such as sneezing, itching, rashes, swelling or wheezing.",
 ]
 LIMITS = ["An allergy antibody test cannot confirm an allergy on its own or predict how severe a reaction might be. A doctor reads it alongside what happens when you are exposed."]
-EMERGENCY = "Seek emergency care straight away for swelling of the lips, tongue or throat, trouble breathing, wheezing, feeling faint or collapse after contact with any trigger."
+EMERGENCY = "Seek emergency care straight away for swelling of the face, eyes or tongue, a hoarse or whispered voice, trouble breathing or wheezing, dizziness or collapse after contact with any trigger."
 
 GROUP = {
     "food": dict(

@@ -92,7 +92,7 @@ X["WB-028"] = dict(
     ],
     keep=["Plenty of water, few sugary drinks and little alcohol help keep uric acid healthy."],
     risk=["If you have had gout or kidney stones, keeping uric acid down lowers the chance of another attack."],
-    myth=["Dal and vegetables are not the main problem for most people with high uric acid. Alcohol, sugary drinks, red and organ meat matter more."],
+    myth=["High uric acid does not always cause gout or kidney stones; many people with high levels have no health problems.", "Dal and vegetables are not the main problem for most people with high uric acid. Alcohol, sugary drinks, red and organ meat matter more."],
 )
 
 for _k, _top in [("WB-029", "BUN level"), ("WB-030", "Urea level")]:
@@ -141,9 +141,9 @@ X["WB-032"] = dict(
 X["WB-033"] = dict(
     fx=[
         _KIDNEY_FX,
-        ("Water tablets and some blood pressure medicines", "Some diuretics lower potassium, while some blood pressure medicines raise it."),
+        ("Water tablets and some blood pressure medicines", "Some medicines and supplements raise potassium, and water tablets (diuretics) can push it up or down."),
         ("Vomiting or diarrhoea", "Fluid loss from the gut can lower potassium."),
-        ("Sample handling", "If blood cells burst in the tube, or the fist was clenched hard, potassium leaks out and reads falsely high."),
+        ("Sample handling", "Clenching your fist hard during the blood draw can raise potassium for a while and give an incorrect result."),
         ("Potassium supplements", "Supplements or salt substitutes can raise it, especially with kidney problems."),
     ],
     keep=None,

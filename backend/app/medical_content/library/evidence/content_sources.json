@@ -213,7 +213,7 @@
   "source_id": "mlp_uric",
   "title": "MedlinePlus: uric acid test",
   "url": "https://medlineplus.gov/lab-tests/uric-acid-test/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "mlp_electrolytes",
@@ -255,7 +255,7 @@
   "source_id": "mlp_tsh",
   "title": "MedlinePlus: TSH (thyroid-stimulating hormone) test",
   "url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "niddk_hypothyroid",
@@ -291,7 +291,7 @@
   "source_id": "mlp_homocysteine",
   "title": "MedlinePlus: homocysteine test",
   "url": "https://medlineplus.gov/lab-tests/homocysteine-test/",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "mlp_insulin",
@@ -375,7 +375,7 @@
   "source_id": "mlp_anaphylaxis",
   "title": "MedlinePlus: anaphylaxis",
   "url": "https://medlineplus.gov/ency/article/000844.htm",
-  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  },
  {
   "source_id": "who_cvd",
@@ -555,6 +555,84 @@
   "source_id": "pmc_lean_nafld_south_asia",
   "title": "Non-obese NAFLD in South Asia (PMC10442973)",
   "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10442973",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_cholesterol_levels",
+  "title": "MedlinePlus: Cholesterol levels",
+  "url": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_ferritin_test",
+  "title": "MedlinePlus: Ferritin blood test",
+  "url": "https://medlineplus.gov/lab-tests/ferritin-blood-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_allergy_blood",
+  "title": "MedlinePlus: Allergy blood test",
+  "url": "https://medlineplus.gov/lab-tests/allergy-blood-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_beta_thalassemia",
+  "title": "MedlinePlus Genetics: Beta thalassemia",
+  "url": "https://medlineplus.gov/genetics/condition/beta-thalassemia/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "niddk_nafld_definition",
+  "title": "NIDDK: Definition and facts of NAFLD and NASH",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/definition-facts",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_potassium_test",
+  "title": "MedlinePlus: Potassium blood test",
+  "url": "https://medlineplus.gov/lab-tests/potassium-blood-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_creatinine_test",
+  "title": "MedlinePlus: Creatinine test",
+  "url": "https://medlineplus.gov/lab-tests/creatinine-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_alt_test",
+  "title": "MedlinePlus: ALT blood test",
+  "url": "https://medlineplus.gov/lab-tests/alt-blood-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_ast_test",
+  "title": "MedlinePlus: AST test",
+  "url": "https://medlineplus.gov/lab-tests/ast-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_bun_test",
+  "title": "MedlinePlus: BUN (blood urea nitrogen)",
+  "url": "https://medlineplus.gov/lab-tests/bun-blood-urea-nitrogen/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_hemoglobin_test",
+  "title": "MedlinePlus: Hemoglobin test",
+  "url": "https://medlineplus.gov/lab-tests/hemoglobin-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_albumin_test",
+  "title": "MedlinePlus: Albumin blood test",
+  "url": "https://medlineplus.gov/lab-tests/albumin-blood-test/",
+  "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
+ },
+ {
+  "source_id": "mlp_ggt_test",
+  "title": "MedlinePlus: Gamma-glutamyl transferase (GGT) test",
+  "url": "https://medlineplus.gov/lab-tests/gamma-glutamyl-transferase-ggt-test/",
   "verification": "opened_and_read_2026-11-26; supports the claims mapped to it in evidence/claim_evidence_map.json; not clinical approval"
  }
 ]

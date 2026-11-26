@@ -302,6 +302,6 @@ X["WB-116"] = dict(
     ],
     keep=_IRON_KEEP,
     risk=_IRON_RISK,
-    myth=["A high ferritin does not always mean too much iron. Inflammation, fatty liver and alcohol are more common causes."],
+    myth=["A high ferritin does not always mean too much iron. Inflammation, liver disease, obesity and alcohol can also raise it."],
     thr="Many labs print a lower limit for ferritin that is lower than the level doctors use to diagnose iron deficiency, so a result at the bottom of the range can still mean low stores.",
 )

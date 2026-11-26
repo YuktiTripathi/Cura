@@ -4061,6 +4061,7 @@
    "If you have had gout or kidney stones, keeping uric acid down lowers the chance of another attack."
   ],
   "common_misconceptions": [
+   "High uric acid does not always cause gout or kidney stones; many people with high levels have no health problems.",
    "Dal and vegetables are not the main problem for most people with high uric acid. Alcohol, sugary drinks, red and organ meat matter more."
   ]
  },
@@ -4747,7 +4748,7 @@
    },
    {
     "factor": "Water tablets and some blood pressure medicines",
-    "how_it_acts": "Some diuretics lower potassium, while some blood pressure medicines raise it."
+    "how_it_acts": "Some medicines and supplements raise potassium, and water tablets (diuretics) can push it up or down."
    },
    {
     "factor": "Vomiting or diarrhoea",
@@ -4755,7 +4756,7 @@
    },
    {
     "factor": "Sample handling",
-    "how_it_acts": "If blood cells burst in the tube, or the fist was clenched hard, potassium leaks out and reads falsely high."
+    "how_it_acts": "Clenching your fist hard during the blood draw can raise potassium for a while and give an incorrect result."
    },
    {
     "factor": "Potassium supplements",
@@ -5891,7 +5892,7 @@
    },
    {
     "factor": "Pregnancy",
-    "how_it_acts": "TSH is normally lower in early pregnancy, so pregnancy-specific ranges are used."
+    "how_it_acts": "TSH is often a little low during the first three months of pregnancy, so results in pregnancy are judged differently."
    },
    {
     "factor": "Some medicines",
@@ -5908,7 +5909,7 @@
   "common_misconceptions": [
    "A slightly high TSH does not always need tablets. Mild rises are often rechecked, especially after an illness."
   ],
-  "reference_range_note": "TSH ranges differ between labs, and doctors use different targets in pregnancy and in older adults, so a result just outside the printed range is judged with your symptoms and T4."
+  "reference_range_note": "TSH ranges differ between labs, and TSH is often a little low in the first three months of pregnancy, so a result just outside the printed range is judged with your symptoms, your T4 and whether you are pregnant."
  },
  {
   "content_key": "WB-042",
@@ -12319,7 +12320,7 @@
    "Enough B12 from dairy, eggs or fortified foods and folate from green leafy vegetables and dal help keep homocysteine down."
   ],
   "common_misconceptions": [
-   "Lowering homocysteine with vitamin tablets has not been shown to prevent heart attacks in most studies, though correcting a real B12 shortage still matters."
+   "Lowering homocysteine has not been shown to reduce the risk of heart attack or stroke in most cases, though correcting a real B12 shortage still matters."
   ]
  },
  {
@@ -15547,7 +15548,7 @@
    "Heavy periods are the most common reason Indian women run low on iron. If periods are heavy, tell your doctor."
   ],
   "common_misconceptions": [
-   "A high ferritin does not always mean too much iron. Inflammation, fatty liver and alcohol are more common causes."
+   "A high ferritin does not always mean too much iron. Inflammation, liver disease, obesity and alcohol can also raise it."
   ],
   "reference_range_note": "Many labs print a lower limit for ferritin that is lower than the level doctors use to diagnose iron deficiency, so a result at the bottom of the range can still mean low stores."
  },

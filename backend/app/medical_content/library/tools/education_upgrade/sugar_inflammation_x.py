@@ -94,7 +94,7 @@ X["WB-092"] = dict(
         ("Some medicines", "Metformin and some seizure medicines can raise it by lowering B12 or folate."),
     ],
     keep=["Enough B12 from dairy, eggs or fortified foods and folate from green leafy vegetables and dal help keep homocysteine down."],
-    myth=["Lowering homocysteine with vitamin tablets has not been shown to prevent heart attacks in most studies, though correcting a real B12 shortage still matters."],
+    myth=["Lowering homocysteine has not been shown to reduce the risk of heart attack or stroke in most cases, though correcting a real B12 shortage still matters."],
 )
 
 X["WB-093"] = dict(

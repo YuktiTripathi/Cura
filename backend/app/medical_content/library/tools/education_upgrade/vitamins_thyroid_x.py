@@ -92,11 +92,11 @@ X["WB-041"] = dict(
         ("Thyroid gland activity", "TSH comes from the pituitary gland in the brain. When the thyroid is underactive, TSH rises to push it; when overactive, TSH falls."),
         ("Thyroid tablets", "Too low a dose leaves TSH high and too high a dose pushes it low."),
         ("Recent illness", "TSH can be briefly high or low during and after an illness."),
-        ("Pregnancy", "TSH is normally lower in early pregnancy, so pregnancy-specific ranges are used."),
+        ("Pregnancy", "TSH is often a little low during the first three months of pregnancy, so results in pregnancy are judged differently."),
         ("Some medicines", "Steroids, some heart medicines and others can change TSH."),
         ("Biotin supplements", "Biotin can interfere with the lab test and give misleading results."),
     ],
     keep=_THY_KEEP,
     myth=["A slightly high TSH does not always need tablets. Mild rises are often rechecked, especially after an illness."],
-    thr="TSH ranges differ between labs, and doctors use different targets in pregnancy and in older adults, so a result just outside the printed range is judged with your symptoms and T4.",
+    thr="TSH ranges differ between labs, and TSH is often a little low in the first three months of pregnancy, so a result just outside the printed range is judged with your symptoms, your T4 and whether you are pregnant.",
 )
