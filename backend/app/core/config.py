@@ -191,6 +191,12 @@ class Settings(BaseSettings):
     # including model wording. On builds a deterministic snapshot and serves exploration
     # from that cache. In-process request_controls is the development fallback only.
     member_snapshot_enabled: bool = False
+    # Which Medical Knowledge Library V2.3 rows chat may receive as curated knowledge.
+    #   evaluation     rows pending clinical review are passed as labelled general education, for development
+    #                  and evaluation. Personal statements still come only from verified member data.
+    #   approved_only  only rows a human clinician approved and whose evidence is verified.
+    # Empty: evaluation in development and test, approved_only everywhere else. Rejected rows are never used.
+    medical_library_chat_access: str = ""
     member_snapshot_ttl_seconds: int = 600
     member_snapshot_lock_seconds: int = 20
     member_snapshot_wait_seconds: float = 5.0
@@ -335,6 +341,14 @@ class Settings(BaseSettings):
             self.allow_mock_auth_with_real_health = False
             self.mock_user_id = ""
         return self
+
+    def library_chat_access(self) -> str:
+        raw = (self.medical_library_chat_access or "").strip().lower()
+        if raw in {"evaluation", "approved_only"}:
+            return raw
+        if raw:
+            return "approved_only"  # an unknown value never widens access
+        return "evaluation" if self.is_development else "approved_only"
 
     @property
     def is_development(self) -> bool:

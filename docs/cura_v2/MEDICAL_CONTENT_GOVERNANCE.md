@@ -27,3 +27,26 @@ Medical references, limitations, relationships, assay checks, emergency handling
 ## Limits
 
 Evidence gaps in the library files are unchanged. A missing or ambiguous assay still must not be given an interpretation the library does not support. Release approval is a medical-team process, not a CURA setting.
+
+
+## Chat access to library content (revised 26 Nov 2026)
+
+Commit c09cc7d made chat accept only rows that are clinically approved and evidence-verified, to keep draft
+text from being used as checked evidence for personal reasoning. No row met that rule, so chat received no
+V2.3 content. The prompt then told the model it could answer from general knowledge, which is less safe
+than labelled curated content. The rule also checked `approved` and `clinically_approved`, while this document
+names the approved state `human_clinically_approved`.
+
+Chat access is now an explicit setting, `MEDICAL_LIBRARY_CHAT_ACCESS`:
+
+| Value | Rows chat may receive | Default in |
+|---|---|---|
+| `evaluation` | Clinically released rows, plus rows pending clinical review. When a passage comes from a pending row, the prompt labels the passages as general education pending clinical review and tells the model to take every personal fact from the member's own data. | development, test |
+| `approved_only` | Only rows whose `review_status` is `human_clinically_approved` (older spellings `clinically_approved` and `approved` are accepted) and whose `evidence_status` is `verified`. | every other environment, including production |
+
+Rejected rows are never used. An unknown value falls back to `approved_only`. No row's review or evidence
+metadata is changed by this. A production release that uses pending content needs a decision by the
+SuperShyft medical team; until then production receives no unreviewed library text.
+
+`tests/unit/test_library_reaches_llm_request.py` checks the assembled model request itself: in evaluation the
+V2.3 passages and their draft label are present, and under approved_only they are absent.

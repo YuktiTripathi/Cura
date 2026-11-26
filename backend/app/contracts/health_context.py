@@ -138,6 +138,8 @@ class HealthContext(BaseModel):
     display_name: str | None = None
     notes: list[str] = Field(default_factory=list)
     medical_passages: list[str] = Field(default_factory=list)
+    # True when a passage comes from a library row still pending clinical review (evaluation access only).
+    medical_passages_draft: bool = False
     lifestyle: LifestyleContext | None = None
     questionnaire: list[QuestionnaireAnswer] = Field(default_factory=list)
     questionnaire_instances: list[QuestionnaireInstance] = Field(default_factory=list)

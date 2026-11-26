@@ -550,9 +550,15 @@ def _medical_block(context: HealthContext, user_message: str = "") -> str:
         return base + (
             "You may answer from general knowledge in everyday words.\n"
         )
+    draft = (
+        "These passages are general education pending clinical review: never present them as clinically verified, "
+        "and take every personal fact from the member's own data.\n"
+        if getattr(context, "medical_passages_draft", False) else ""
+    )
     return (
         "CURATED KNOWLEDGE (V2.3), the primary source for the concept. Use what bears on this question, in your own words; "
         "do not quote long passages or name an organisation or source pointer.\n"
+        + draft
         + "\n".join(passages)
         + "\n"
     )

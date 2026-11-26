@@ -100,10 +100,39 @@ def eligible(row: dict | None) -> bool:
     return row.get("review_status") != REJECTED
 
 
+# Review states a human clinician sets. The governance document names the state human_clinically_approved;
+# the older names are accepted so a row approved under either spelling is not silently excluded.
+APPROVED_STATES = {"human_clinically_approved", "clinically_approved", "approved"}
+
+
+def clinically_released(row: dict | None) -> bool:
+    """Approved by a clinician and evidence-verified: usable in any environment."""
+    return bool(eligible(row) and row.get("review_status") in APPROVED_STATES and row.get("evidence_status") == "verified")
+
+
+def eligible_for_chat(row: dict | None) -> bool:
+    """Whether chat may receive this row as curated knowledge, under settings.library_chat_access().
+
+    Production (approved_only) needs clinical approval and verified evidence. Evaluation also allows rows that
+    are pending clinical review; their passages are labelled as draft general education, and personal
+    statements still come only from verified member data. Rejected rows are never used.
+    """
+    if clinically_released(row):
+        return True
+    from app.core.config import settings
+
+    return bool(eligible(row) and settings.library_chat_access() == "evaluation")
+
+
 def eligible_for_personal_interpretation(row: dict | None) -> bool:
-    """Draft educational material is not verified evidence for personalised reasoning."""
-    return bool(eligible(row) and row.get("review_status") in {"approved", "clinically_approved"}
-                and row.get("evidence_status") == "verified")
+    """Kept for callers that name the old rule. Same as eligible_for_chat."""
+    return eligible_for_chat(row)
+
+
+def chat_passages_are_draft(keys: list[str]) -> bool:
+    """True when any passage for these keys comes from a row that is not clinically released."""
+    rows = [biomarker_content().get(canonical_key(k) or "") or bio_ai_content().get(k or "") for k in keys if k]
+    return any(r and not clinically_released(r) for r in rows)
 
 
 def category_about(category_id: str | None) -> str:
@@ -179,7 +208,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
     for position, key in enumerate(keys):
         risk = bio_ai_content().get(key)
         row = entry_for(key) or (risk if eligible(risk) else None)
-        if not eligible_for_personal_interpretation(row):
+        if not eligible_for_chat(row):
             continue
         if position > 0 and mode not in {"definition", "nutrition"}:
             continue  # related results contribute through the relationship lines only
@@ -225,7 +254,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
         for rel in sorted(relationships(), key=lambda r: 0 if r.get("priority") == "primary" else 1):
             if added >= 3:
                 break
-            if not eligible_for_personal_interpretation(rel) or mode not in (rel.get("retrieve_when") or []):
+            if not eligible_for_chat(rel) or mode not in (rel.get("retrieve_when") or []):
                 continue
             left, right = _endpoint(rel, "source"), _endpoint(rel, "related")
             other = right if left in wanted else left if right in wanted else None

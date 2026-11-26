@@ -1456,6 +1456,9 @@ class ChatService:
                     if flag in {"low", "high", "normal"} and m.value is not None:
                         sides[canonical_key(m.key) or m.key] = flag
                 context.medical_passages = chat_passages(payload.message, keys[:8], sides)
+                from app.biomarkers.medical_registry import chat_passages_are_draft
+
+                context.medical_passages_draft = bool(context.medical_passages) and chat_passages_are_draft(keys[:8])
             medical_hits = []
             ContextMerger().merge_into(context, plan, principal.subject_id)
         # Recent user statements ("I now work out 5 days a week") supersede older questionnaire answers.
