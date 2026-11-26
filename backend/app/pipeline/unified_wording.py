@@ -19,7 +19,7 @@ from app.contracts.unified_health import CategoryCard, Priority, Provenance
 from app.health_explanation.safety_validator import safety_problems
 
 logger = logging.getLogger("cura.unified")
-PROMPT_VERSION = "u5"
+PROMPT_VERSION = "u6"
 _TTL = 7 * 24 * 3600
 _DASH = re.compile(r"\s*[—–]\s*")
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
@@ -285,7 +285,9 @@ def _fit(raw: dict, cards: list[CategoryCard], parts: dict, prov: Provenance, al
 def _key(subject_id: str, prov: Provenance, context: list[str]) -> str:
     from app.providers.cache import member_token
 
-    material = json.dumps([prov.blood_report_id, prov.blood_report_date, prov.bio_ai_report_id, prov.bio_ai_report_date, context, REGISTRY_VERSION, PROMPT_VERSION], default=str)
+    from app.biomarkers.medical_registry import library_revision
+
+    material = json.dumps([library_revision(), prov.blood_report_id, prov.blood_report_date, prov.bio_ai_report_id, prov.bio_ai_report_date, context, REGISTRY_VERSION, PROMPT_VERSION], default=str)
     return f"cura:unified:{member_token(subject_id)}:{hashlib.sha256(material.encode()).hexdigest()[:24]}"
 
 
