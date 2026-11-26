@@ -1,206 +1,404 @@
 [
-  {
-    "source_id": "lab_results",
-    "title": "Understanding lab results",
-    "url": "https://medlineplus.gov/lab-tests/how-to-understand-your-lab-results/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "allergy",
-    "title": "Allergy blood test",
-    "url": "https://medlineplus.gov/lab-tests/allergy-blood-test/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "food",
-    "title": "Food allergy testing",
-    "url": "https://medlineplus.gov/lab-tests/food-allergy-testing/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "drug",
-    "title": "Drug allergies",
-    "url": "https://medlineplus.gov/ency/article/000819.htm",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "cmp",
-    "title": "Comprehensive metabolic panel",
-    "url": "https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "cbc",
-    "title": "CBC blood test",
-    "url": "https://medlineplus.gov/ency/article/003642.htm",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "hb",
-    "title": "Hemoglobin test",
-    "url": "https://medlineplus.gov/lab-tests/hemoglobin-test/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "a1c",
-    "title": "Hemoglobin A1c test",
-    "url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "ferritin",
-    "title": "Ferritin blood test",
-    "url": "https://medlineplus.gov/lab-tests/ferritin-blood-test/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "glucose",
-    "title": "Blood glucose test",
-    "url": "https://medlineplus.gov/lab-tests/blood-glucose-test/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "lipids",
-    "title": "Cholesterol levels",
-    "url": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "liver",
-    "title": "Liver function tests",
-    "url": "https://medlineplus.gov/lab-tests/liver-function-tests/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "bilirubin",
-    "title": "Bilirubin blood test",
-    "url": "https://medlineplus.gov/lab-tests/bilirubin-blood-test/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "differential",
-    "title": "Blood differential",
-    "url": "https://medlineplus.gov/lab-tests/blood-differential/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "rbc_indices",
-    "title": "RBC indices",
-    "url": "https://medlineplus.gov/ency/article/003648.htm",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "iron_tests",
-    "title": "Iron tests",
-    "url": "https://medlineplus.gov/lab-tests/iron-tests/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "tumor",
-    "title": "Tumor marker tests",
-    "url": "https://medlineplus.gov/lab-tests/tumor-marker-tests/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "psa_test",
-    "title": "PSA test",
-    "url": "https://www.medlineplus.gov/lab-tests/prostate-specific-antigen-psa-test/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "afp_test",
-    "title": "AFP tumor marker test (serum context only)",
-    "url": "https://www.medlineplus.gov/lab-tests/alpha-fetoprotein-afp-tumor-marker-test/",
-    "verification": "not_reverified_in_revision_2_2"
-  },
-  {
-    "source_id": "creatinine",
-    "title": "Creatinine test",
-    "url": "https://medlineplus.gov/lab-tests/creatinine-test/",
-    "verification": "source_opened_2026-11-24; partial section support only"
-  },
-  {
-    "source_id": "life_activity",
-    "title": "CDC physical activity benefits",
-    "url": "https://www.cdc.gov/physical-activity-basics/health-benefits/adults.html",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_glucose",
-    "title": "CDC activity and diabetes",
-    "url": "https://www.cdc.gov/diabetes/living-with/physical-activity.html",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_liver",
-    "title": "NIDDK fatty liver diagnosis",
-    "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/diagnosis",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_iron",
-    "title": "NIH iron",
-    "url": "https://ods.od.nih.gov/factsheets/iron-consumer/",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_b12",
-    "title": "NIH vitamin B12",
-    "url": "https://ods.od.nih.gov/factsheets/vitaminb12-consumer/",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_c",
-    "title": "NIH vitamin C",
-    "url": "https://ods.od.nih.gov/factsheets/VitaminC-consumer/",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_salt",
-    "title": "AHA blood pressure diet",
-    "url": "https://www.heart.org/en/health-topics/high-blood-pressure/changes-you-can-make-to-manage-high-blood-pressure/managing-blood-pressure-with-a-heart-healthy-diet/",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_fat",
-    "title": "AHA fats",
-    "url": "https://www.heart.org/en/healthy-living/healthy-eating/eat-smart/fats/fats-in-foods",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "life_diet",
-    "title": "AHA dietary guidance",
-    "url": "https://professional.heart.org/en/science-news/2026-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know",
-    "verification": "search excerpt inspected; full claim verification pending"
-  },
-  {
-    "source_id": "metsights_inputs",
-    "title": "MetSights assessment input framework, as known to CURA",
-    "url": "",
-    "verification": "product description only: blood, lifestyle, food, activity, sleep, demographics and questionnaire answers may be inputs; formula, weights and reference population are not documented"
-  },
-  {
-    "source_id": "nia_aging",
-    "title": "National Institute on Aging: what we know about healthy aging",
-    "url": "https://www.nia.nih.gov/health/healthy-aging/what-do-we-know-about-healthy-aging",
-    "verification": "opened as background on ageing and lifestyle; metabolic age formula is not defined here; pending clinical review"
-  },
-  {
-    "source_id": "who_pcos",
-    "title": "WHO polycystic ovary syndrome fact sheet",
-    "url": "https://www.who.int/news-room/fact-sheets/detail/polycystic-ovary-syndrome",
-    "verification": "opened 2026-11-26; educational claims pending clinical review"
-  },
-  {
-    "source_id": "pcos_guideline_2023",
-    "title": "International evidence-based guideline for the assessment and management of PCOS (2023)",
-    "url": "https://www.monash.edu/medicine/mchri/pcos/guideline",
-    "verification": "2023 international guideline remains the current full revision; 2026 educational claims pending clinical review"
-  },
-  {
-    "source_id": "life_urine",
-    "title": "MedlinePlus urine specific gravity",
-    "url": "https://medlineplus.gov/ency/article/003587.htm",
-    "verification": "search excerpt inspected; full claim verification pending"
-  }
+ {
+  "source_id": "lab_results",
+  "title": "Understanding lab results",
+  "url": "https://medlineplus.gov/lab-tests/how-to-understand-your-lab-results/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "allergy",
+  "title": "Allergy blood test",
+  "url": "https://medlineplus.gov/lab-tests/allergy-blood-test/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "food",
+  "title": "Food allergy testing",
+  "url": "https://medlineplus.gov/lab-tests/food-allergy-testing/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "drug",
+  "title": "Drug allergies",
+  "url": "https://medlineplus.gov/ency/article/000819.htm",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "cmp",
+  "title": "Comprehensive metabolic panel",
+  "url": "https://medlineplus.gov/lab-tests/comprehensive-metabolic-panel-cmp/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "cbc",
+  "title": "CBC blood test",
+  "url": "https://medlineplus.gov/ency/article/003642.htm",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "hb",
+  "title": "Hemoglobin test",
+  "url": "https://medlineplus.gov/lab-tests/hemoglobin-test/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "a1c",
+  "title": "Hemoglobin A1c test",
+  "url": "https://medlineplus.gov/lab-tests/hemoglobin-a1c-hba1c-test/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "ferritin",
+  "title": "Ferritin blood test",
+  "url": "https://medlineplus.gov/lab-tests/ferritin-blood-test/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "glucose",
+  "title": "Blood glucose test",
+  "url": "https://medlineplus.gov/lab-tests/blood-glucose-test/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "lipids",
+  "title": "Cholesterol levels",
+  "url": "https://medlineplus.gov/lab-tests/cholesterol-levels/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "liver",
+  "title": "Liver function tests",
+  "url": "https://medlineplus.gov/lab-tests/liver-function-tests/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "bilirubin",
+  "title": "Bilirubin blood test",
+  "url": "https://medlineplus.gov/lab-tests/bilirubin-blood-test/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "differential",
+  "title": "Blood differential",
+  "url": "https://medlineplus.gov/lab-tests/blood-differential/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "rbc_indices",
+  "title": "RBC indices",
+  "url": "https://medlineplus.gov/ency/article/003648.htm",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "iron_tests",
+  "title": "Iron tests",
+  "url": "https://medlineplus.gov/lab-tests/iron-tests/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "tumor",
+  "title": "Tumor marker tests",
+  "url": "https://medlineplus.gov/lab-tests/tumor-marker-tests/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "psa_test",
+  "title": "PSA test",
+  "url": "https://www.medlineplus.gov/lab-tests/prostate-specific-antigen-psa-test/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "afp_test",
+  "title": "AFP tumor marker test (serum context only)",
+  "url": "https://www.medlineplus.gov/lab-tests/alpha-fetoprotein-afp-tumor-marker-test/",
+  "verification": "not_reverified_in_revision_2_2"
+ },
+ {
+  "source_id": "creatinine",
+  "title": "Creatinine test",
+  "url": "https://medlineplus.gov/lab-tests/creatinine-test/",
+  "verification": "source_opened_2026-11-24; partial section support only"
+ },
+ {
+  "source_id": "life_activity",
+  "title": "CDC physical activity benefits",
+  "url": "https://www.cdc.gov/physical-activity-basics/health-benefits/adults.html",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_glucose",
+  "title": "CDC activity and diabetes",
+  "url": "https://www.cdc.gov/diabetes/living-with/physical-activity.html",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_liver",
+  "title": "NIDDK fatty liver diagnosis",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash/diagnosis",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_iron",
+  "title": "NIH iron",
+  "url": "https://ods.od.nih.gov/factsheets/iron-consumer/",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_b12",
+  "title": "NIH vitamin B12",
+  "url": "https://ods.od.nih.gov/factsheets/vitaminb12-consumer/",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_c",
+  "title": "NIH vitamin C",
+  "url": "https://ods.od.nih.gov/factsheets/VitaminC-consumer/",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_salt",
+  "title": "AHA blood pressure diet",
+  "url": "https://www.heart.org/en/health-topics/high-blood-pressure/changes-you-can-make-to-manage-high-blood-pressure/managing-blood-pressure-with-a-heart-healthy-diet/",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_fat",
+  "title": "AHA fats",
+  "url": "https://www.heart.org/en/healthy-living/healthy-eating/eat-smart/fats/fats-in-foods",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "life_diet",
+  "title": "AHA dietary guidance",
+  "url": "https://professional.heart.org/en/science-news/2026-dietary-guidance-to-improve-cardiovascular-health/top-things-to-know",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "metsights_inputs",
+  "title": "MetSights assessment input framework, as known to CURA",
+  "url": "",
+  "verification": "product description only: blood, lifestyle, food, activity, sleep, demographics and questionnaire answers may be inputs; formula, weights and reference population are not documented"
+ },
+ {
+  "source_id": "nia_aging",
+  "title": "National Institute on Aging: what we know about healthy aging",
+  "url": "https://www.nia.nih.gov/health/healthy-aging/what-do-we-know-about-healthy-aging",
+  "verification": "opened as background on ageing and lifestyle; metabolic age formula is not defined here; pending clinical review"
+ },
+ {
+  "source_id": "who_pcos",
+  "title": "WHO polycystic ovary syndrome fact sheet",
+  "url": "https://www.who.int/news-room/fact-sheets/detail/polycystic-ovary-syndrome",
+  "verification": "opened 2026-11-26; educational claims pending clinical review"
+ },
+ {
+  "source_id": "pcos_guideline_2023",
+  "title": "International evidence-based guideline for the assessment and management of PCOS (2023)",
+  "url": "https://www.monash.edu/medicine/mchri/pcos/guideline",
+  "verification": "2023 international guideline remains the current full revision; 2026 educational claims pending clinical review"
+ },
+ {
+  "source_id": "life_urine",
+  "title": "MedlinePlus urine specific gravity",
+  "url": "https://medlineplus.gov/ency/article/003587.htm",
+  "verification": "search excerpt inspected; full claim verification pending"
+ },
+ {
+  "source_id": "mlp_egfr",
+  "title": "MedlinePlus: glomerular filtration rate (GFR) test",
+  "url": "https://medlineplus.gov/lab-tests/glomerular-filtration-rate-gfr-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_uric",
+  "title": "MedlinePlus: uric acid test",
+  "url": "https://medlineplus.gov/lab-tests/uric-acid-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_electrolytes",
+  "title": "MedlinePlus: electrolyte panel",
+  "url": "https://medlineplus.gov/lab-tests/electrolyte-panel/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_calcium",
+  "title": "MedlinePlus: calcium blood test",
+  "url": "https://medlineplus.gov/lab-tests/calcium-blood-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_phosphate",
+  "title": "MedlinePlus: phosphate in blood",
+  "url": "https://medlineplus.gov/lab-tests/phosphate-in-blood/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "ods_magnesium",
+  "title": "NIH Office of Dietary Supplements: magnesium consumer fact sheet",
+  "url": "https://ods.od.nih.gov/factsheets/Magnesium-Consumer/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "ods_zinc",
+  "title": "NIH Office of Dietary Supplements: zinc consumer fact sheet",
+  "url": "https://ods.od.nih.gov/factsheets/Zinc-Consumer/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "ods_vitd",
+  "title": "NIH Office of Dietary Supplements: vitamin D consumer fact sheet",
+  "url": "https://ods.od.nih.gov/factsheets/VitaminD-Consumer/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_tsh",
+  "title": "MedlinePlus: TSH (thyroid-stimulating hormone) test",
+  "url": "https://medlineplus.gov/lab-tests/tsh-thyroid-stimulating-hormone-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "niddk_hypothyroid",
+  "title": "NIDDK: hypothyroidism (underactive thyroid)",
+  "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hypothyroidism",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "niddk_hyperthyroid",
+  "title": "NIDDK: hyperthyroidism (overactive thyroid)",
+  "url": "https://www.niddk.nih.gov/health-information/endocrine-diseases/hyperthyroidism",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "niddk_nafld",
+  "title": "NIDDK: NAFLD and NASH",
+  "url": "https://www.niddk.nih.gov/health-information/liver-disease/nafld-nash",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_esr",
+  "title": "MedlinePlus: erythrocyte sedimentation rate (ESR)",
+  "url": "https://medlineplus.gov/lab-tests/erythrocyte-sedimentation-rate-esr/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_crp",
+  "title": "MedlinePlus: C-reactive protein (CRP) test",
+  "url": "https://medlineplus.gov/lab-tests/c-reactive-protein-crp-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_homocysteine",
+  "title": "MedlinePlus: homocysteine test",
+  "url": "https://medlineplus.gov/lab-tests/homocysteine-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_insulin",
+  "title": "MedlinePlus: insulin in blood",
+  "url": "https://medlineplus.gov/lab-tests/insulin-in-blood/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_urinalysis",
+  "title": "MedlinePlus: urinalysis",
+  "url": "https://medlineplus.gov/lab-tests/urinalysis/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_testosterone",
+  "title": "MedlinePlus: testosterone levels test",
+  "url": "https://medlineplus.gov/lab-tests/testosterone-levels-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_cortisol",
+  "title": "MedlinePlus: cortisol test",
+  "url": "https://medlineplus.gov/lab-tests/cortisol-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_pth",
+  "title": "MedlinePlus: parathyroid hormone (PTH) blood test",
+  "url": "https://medlineplus.gov/lab-tests/parathyroid-hormone-pth-blood-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_prolactin",
+  "title": "MedlinePlus: prolactin levels",
+  "url": "https://medlineplus.gov/lab-tests/prolactin-levels/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_lh",
+  "title": "MedlinePlus: luteinizing hormone (LH) levels test",
+  "url": "https://medlineplus.gov/lab-tests/luteinizing-hormone-lh-levels-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_fsh",
+  "title": "MedlinePlus: follicle-stimulating hormone (FSH) levels test",
+  "url": "https://medlineplus.gov/lab-tests/follicle-stimulating-hormone-fsh-levels-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_dheas",
+  "title": "MedlinePlus: DHEA sulfate test",
+  "url": "https://medlineplus.gov/lab-tests/dhea-sulfate-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_cea",
+  "title": "MedlinePlus: carcinoembryonic antigen (CEA) test",
+  "url": "https://medlineplus.gov/lab-tests/carcinoembryonic-antigen-cea-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_ca125",
+  "title": "MedlinePlus: CA-125 blood test",
+  "url": "https://medlineplus.gov/lab-tests/ca-125-blood-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_ck",
+  "title": "MedlinePlus: creatine kinase",
+  "url": "https://medlineplus.gov/lab-tests/creatine-kinase/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_ldh",
+  "title": "MedlinePlus: lactate dehydrogenase (LDH) test",
+  "url": "https://medlineplus.gov/lab-tests/lactate-dehydrogenase-ldh-test/",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "mlp_anaphylaxis",
+  "title": "MedlinePlus: anaphylaxis",
+  "url": "https://medlineplus.gov/ency/article/000844.htm",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "who_cvd",
+  "title": "WHO fact sheet: cardiovascular diseases",
+  "url": "https://www.who.int/news-room/fact-sheets/detail/cardiovascular-diseases-(cvds)",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "who_hypertension",
+  "title": "WHO fact sheet: hypertension",
+  "url": "https://www.who.int/news-room/fact-sheets/detail/hypertension",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "who_diabetes",
+  "title": "WHO fact sheet: diabetes",
+  "url": "https://www.who.int/news-room/fact-sheets/detail/diabetes",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ },
+ {
+  "source_id": "who_obesity",
+  "title": "WHO fact sheet: obesity and overweight",
+  "url": "https://www.who.int/news-room/fact-sheets/detail/obesity-and-overweight",
+  "verification": "proposed_2026-11-26_not_opened; URL and claim-level support require verification before clinical approval"
+ }
 ]

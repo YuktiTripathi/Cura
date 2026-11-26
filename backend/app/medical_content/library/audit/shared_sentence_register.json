@@ -1,0 +1,176 @@
+{
+ "revision": "2.4",
+ "note": "Deliberately shared sentences. The audit flags any other sentence used by more than three entries.",
+ "sentences": [
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "White blood cells are made in the bone marrow, the soft tissue inside bones."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "There are five main types, and each has a different job in protecting your body."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "A blood count shows how many of each type are present."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "This result shows what share of your white cells are this type, as a percentage."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "Changes in this cell type can point to infection, allergy, inflammation or, less often, a bone marrow condition."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "Percentages depend on the other white cell types, so the absolute count is usually more useful."
+  },
+  {
+   "family": "white_cell_types",
+   "reason": "The five white cell types share the same background and the same reason for testing.",
+   "sentence": "One result can change with a recent infection or stress, so a single mild change is often rechecked."
+  },
+  {
+   "family": "urine_method_unconfirmed",
+   "reason": "Urine items whose lab method is not confirmed carry the same method notice.",
+   "sentence": "The lab's method and reporting format for this item are not confirmed, so CURA does not label the result. Use the wording on your report and ask the lab or your doctor if it is unclear."
+  },
+  {
+   "family": "urine_method_unconfirmed",
+   "reason": "Urine items whose lab method is not confirmed carry the same method notice.",
+   "sentence": "See a doctor if you have burning when passing urine, needing to go often, cloudy or smelly urine, lower tummy pain, fever or pain in your back or side."
+  },
+  {
+   "family": "urine_method_unconfirmed",
+   "reason": "Urine items whose lab method is not confirmed carry the same method notice.",
+   "sentence": "Urine results can change with how the sample was collected, how concentrated it was and how long it waited before testing."
+  },
+  {
+   "family": "tumour_markers",
+   "reason": "Tumour markers share the same purpose, limitation and advice.",
+   "sentence": "This marker is not a cancer screening test on its own. Many non-cancer conditions raise it, and a normal result does not rule out cancer."
+  },
+  {
+   "family": "tumour_markers",
+   "reason": "Tumour markers share the same purpose, limitation and advice.",
+   "sentence": "Talk to a doctor about any raised result, so it can be put in context and, if needed, repeated or followed up with other tests. Most raised results are not caused by cancer."
+  },
+  {
+   "family": "tumour_markers",
+   "reason": "Tumour markers share the same purpose, limitation and advice.",
+   "sentence": "This marker is mainly used to follow people already being treated for certain cancers, and sometimes to help investigate symptoms."
+  },
+  {
+   "family": "tumour_markers",
+   "reason": "Tumour markers share the same purpose, limitation and advice.",
+   "sentence": "A low result is expected and is not a concern."
+  },
+  {
+   "family": "kidney_hydration",
+   "reason": "Kidney and salt results share the same hydration guidance and referral advice.",
+   "sentence": "Drink water regularly through the day, more in hot weather or after sweating. Good hydration helps your kidneys and keeps results reliable."
+  },
+  {
+   "family": "kidney_hydration",
+   "reason": "Kidney and salt results share the same hydration guidance and referral advice.",
+   "sentence": "Talk to a doctor if kidney results are abnormal, especially with diabetes, high blood pressure, swelling, foamy urine or passing much less urine."
+  },
+  {
+   "family": "liver_enzymes",
+   "reason": "Liver enzyme results share liver-support guidance.",
+   "sentence": "Keep alcohol low or avoid it. Your liver has to break down every drink, and alcohol is a common cause of liver strain."
+  },
+  {
+   "family": "liver_enzymes",
+   "reason": "Liver enzyme results share liver-support guidance.",
+   "sentence": "Cut back on sugary drinks, sweets and fried foods. Extra sugar and fat can build up in the liver."
+  },
+  {
+   "family": "liver_enzymes",
+   "reason": "Liver enzyme results share liver-support guidance.",
+   "sentence": "Stay active and work towards a healthy waist size. Losing even a little extra weight can reduce fat in the liver."
+  },
+  {
+   "family": "liver_enzymes",
+   "reason": "Liver enzyme results share liver-support guidance.",
+   "sentence": "Do not start herbal or bodybuilding supplements without advice. Some can harm the liver."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Fill half your plate with vegetables and pair rice or roti with dal, curd, paneer, eggs or other protein. This slows how quickly sugar enters your blood."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Swap sugary drinks, sweets and refined flour for water, whole fruit and whole grains like millets or brown rice. These cause smaller sugar spikes."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Take a 10 to 15 minute walk after main meals. Physical activity helps your body manage blood sugar, and sugar after a walk is often lower than before."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Aim for enough sleep. A healthy weight, regular activity and enough sleep are part of the lifestyle that may help prevent insulin resistance."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Talk to a doctor if your blood sugar results are above range, so they can check for prediabetes or diabetes. Both are common and often have no symptoms."
+  },
+  {
+   "family": "blood_sugar",
+   "reason": "Blood sugar results share the same guidance and referral advice.",
+   "sentence": "Seek care promptly if you have extreme thirst, passing a lot of urine, unexplained weight loss, blurred vision, or feel shaky, sweaty or confused from low sugar."
+  },
+  {
+   "family": "iron",
+   "reason": "Iron results share iron guidance.",
+   "sentence": "Include iron-rich foods such as dal, chana, rajma, green leafy vegetables, jaggery in moderation, eggs, fish or meat. Your body needs iron to make haemoglobin."
+  },
+  {
+   "family": "iron",
+   "reason": "Iron results share iron guidance.",
+   "sentence": "Have a vitamin C food with iron-rich meals, such as lemon, amla, guava or tomato. Vitamin C helps you absorb iron from plant foods."
+  },
+  {
+   "family": "iron",
+   "reason": "Iron results share iron guidance.",
+   "sentence": "Keep tea and coffee away from meals by about an hour. They reduce how much iron you absorb."
+  },
+  {
+   "family": "iron",
+   "reason": "Iron results share iron guidance.",
+   "sentence": "Talk to a doctor if iron results are low, so they can find the cause, such as heavy periods or blood loss from the gut, before starting tablets."
+  },
+  {
+   "family": "iron",
+   "reason": "Iron results share iron guidance.",
+   "sentence": "Talk to a doctor if iron results are high, as iron overload can harm the liver and heart."
+  },
+  {
+   "family": "bio_ai_risk_meaning",
+   "reason": "Every Bio-AI prediction carries the same explanation of what a predicted score means.",
+   "sentence": "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers."
+  },
+  {
+   "family": "bio_ai_risk_meaning",
+   "reason": "Every Bio-AI prediction carries the same explanation of what a predicted score means.",
+   "sentence": "It is not a diagnosis and does not measure the condition directly."
+  },
+  {
+   "family": "bio_ai_risk_meaning",
+   "reason": "Every Bio-AI prediction carries the same explanation of what a predicted score means.",
+   "sentence": "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  }
+ ]
+}

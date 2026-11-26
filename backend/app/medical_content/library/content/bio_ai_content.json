@@ -1,1063 +1,1837 @@
 [
-  {
-    "risk_id": "cardiac_health",
-    "display_name": "Heart health",
-    "short_description": "Heart health describes how well your heart and blood vessels support blood flow.",
-    "what_happens_inside_my_body": [
-      "Your heart pumps blood around your body.",
-      "Blood carries oxygen and nutrients to your cells.",
-      "Your blood vessels need to stay open and flexible.",
-      "Over time, high pressure or cholesterol buildup can strain this system."
-    ],
-    "why_it_matters": [
-      "Blood flow supports every organ.",
-      "Some heart problems develop without early symptoms."
-    ],
-    "relevant_biomarkers": [
-      "cholesterol_total",
-      "hdl_cholesterol_direct",
-      "ldl_cholesterol_calculated",
-      "apo_b_apolipoprotein_b"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 13,
-        "relationship_id": "Q13-1",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 14,
-        "relationship_id": "Q14-2",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 15,
-        "relationship_id": "Q15-3",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 16,
-        "relationship_id": "Q16-4",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 17,
-        "relationship_id": "Q17-5",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 41,
-        "relationship_id": "Q41-6",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 19,
-        "relationship_id": "Q19-8",
-        "association": "Alcohol can affect how your liver processes fats and may influence liver tests.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 20,
-        "relationship_id": "Q20-9",
-        "association": "Tobacco smoke can harm your blood vessels and heart.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 34,
-        "relationship_id": "Q34-21",
-        "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 35,
-        "relationship_id": "Q35-22",
-        "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 38,
-        "relationship_id": "Q38-27",
-        "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 39,
-        "relationship_id": "Q39-28",
-        "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Some heart problems develop without early symptoms.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "What do my cholesterol results say about my heart?",
-      "Can I have heart risk without symptoms?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-001",
-        "reason": "Shows the combined cholesterol carried in your blood.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-002",
-        "reason": "Shows how much cholesterol is carried by HDL particles.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-006",
-        "reason": "Estimates how much cholesterol is carried by LDL particles.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-111",
-        "reason": "Measures apolipoprotein B, which helps estimate the number of particles that can form artery plaque.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose beans, vegetables and whole grains to support heart health.",
-      "Move regularly as your health allows; activity supports circulation."
-    ]
+ {
+  "risk_id": "cardiac_health",
+  "display_name": "Heart health",
+  "short_description": "Heart health describes how well your heart and blood vessels are likely to keep working over time. This assessment estimates your risk of heart and blood vessel disease.",
+  "what_happens_inside_my_body": [
+   "Your heart pumps blood through a network of blood vessels to every part of your body.",
+   "Over years, cholesterol can build up as plaque inside artery walls, and high blood pressure can stiffen them.",
+   "Narrowed or blocked arteries can reduce blood flow to the heart or brain, which can lead to a heart attack or stroke."
+  ],
+  "why_it_matters": [
+   "Heart disease is one of the leading causes of illness and death, and it often develops silently for years.",
+   "Many of its main drivers, such as blood pressure, cholesterol, blood sugar and smoking, can be checked and managed."
+  ],
+  "relevant_biomarkers": [
+   "cholesterol_total",
+   "hdl_cholesterol_direct",
+   "ldl_cholesterol_calculated",
+   "apo_b_apolipoprotein_b"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 13,
+    "relationship_id": "Q13-1",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 14,
+    "relationship_id": "Q14-2",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 15,
+    "relationship_id": "Q15-3",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 16,
+    "relationship_id": "Q16-4",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 17,
+    "relationship_id": "Q17-5",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 41,
+    "relationship_id": "Q41-6",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 19,
+    "relationship_id": "Q19-8",
+    "association": "Alcohol can affect how your liver processes fats and may influence liver tests.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 20,
+    "relationship_id": "Q20-9",
+    "association": "Tobacco smoke can harm your blood vessels and heart.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 34,
+    "relationship_id": "Q34-21",
+    "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 35,
+    "relationship_id": "Q35-22",
+    "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 38,
+    "relationship_id": "Q38-27",
+    "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 39,
+    "relationship_id": "Q39-28",
+    "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "A predicted heart risk does not mean you have heart disease.",
+   "Normal cholesterol does not rule out heart risk, because blood pressure, blood sugar, smoking and family history also matter."
+  ],
+  "clinical_limitations": [
+   "The assessment does not show which of your inputs most affected the score."
+  ],
+  "suggested_questions": [
+   "What does my heart health score mean?",
+   "What does my cholesterol say about my heart health?",
+   "What can I do to protect my heart?",
+   "Should I see a doctor about my heart risk?"
+  ],
+  "source_ids": [
+   "lipids",
+   "life_activity",
+   "life_salt",
+   "life_fat",
+   "life_diet",
+   "who_cvd"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-001",
+    "reason": "Shows the full amount of cholesterol in your blood.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-002",
+    "reason": "Shows your good cholesterol, which helps clear cholesterol away.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-006",
+    "reason": "Shows your bad cholesterol, the main type that builds up in arteries.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-111",
+    "reason": "Counts the particles that can carry cholesterol into artery walls.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Aim for about 150 minutes of brisk walking or similar activity each week. Regular movement helps blood pressure, cholesterol and blood sugar.",
+   "Cut back on salt, fried foods and packaged snacks, and add vegetables, dal and whole grains. This eating pattern is linked with healthier arteries.",
+   "If you smoke, ask for help to stop. Stopping smoking is one of the biggest single steps for heart health.",
+   "Know your blood pressure and get it checked regularly. High blood pressure often has no symptoms."
+  ],
+  "common_symptoms": [
+   "Early heart disease often has no symptoms.",
+   "Warning signs can include chest pain or pressure, breathlessness, or unusual tiredness on exertion."
+  ],
+  "influencing_factors": [
+   "Blood pressure",
+   "Cholesterol",
+   "Blood sugar and diabetes",
+   "Smoking",
+   "Physical activity",
+   "Family history"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Diets high in salt, saturated fat and processed foods, smoking, inactivity, heavy alcohol use and long-term stress are linked with higher heart risk.",
+   "Diets rich in vegetables, fruit, pulses, whole grains and nuts are linked with lower risk."
+  ],
+  "long_term_implications": [
+   "Untreated risk factors can lead to heart attack, stroke, heart failure and kidney disease over time."
+  ],
+  "when_to_seek_medical_advice": [
+   "Call emergency services for chest pain, pressure or tightness, especially with breathlessness, sweating or pain spreading to the arm, jaw or back.",
+   "Talk to a doctor about an increased or very high predicted risk, especially with high blood pressure, diabetes, high cholesterol or early heart disease in your family."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Blood pressure",
+    "how_it_acts": "High pressure strains artery walls and the heart muscle over years."
+   },
+   {
+    "factor": "Cholesterol",
+    "how_it_acts": "LDL and other plaque-forming particles build up in artery walls and narrow them."
+   },
+   {
+    "factor": "Blood sugar and diabetes",
+    "how_it_acts": "High blood sugar damages blood vessels and speeds up artery narrowing."
+   },
+   {
+    "factor": "Smoking",
+    "how_it_acts": "Smoking damages artery linings, makes blood more likely to clot and lowers HDL."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Regular activity lowers blood pressure, improves cholesterol and helps the heart pump efficiently."
+   },
+   {
+    "factor": "Family history",
+    "how_it_acts": "Heart disease in a parent or sibling at a young age raises your own risk."
+   }
+  ],
+  "keeping_healthy": [
+   "Keep doing what protects your heart and blood vessels: regular movement, not smoking, meals built around vegetables, dal and whole grains, and checks of blood pressure, sugar and cholesterol at the interval your doctor suggests."
+  ]
+ },
+ {
+  "risk_id": "dyslipidemia",
+  "display_name": "Cholesterol imbalance",
+  "short_description": "Cholesterol imbalance, also called dyslipidaemia, means the fats in your blood, such as cholesterol and triglycerides, are at unhealthy levels.",
+  "what_happens_inside_my_body": [
+   "Your blood carries fats inside particles such as LDL, HDL and VLDL.",
+   "Too much LDL or triglycerides, or too little HDL, makes it easier for fatty plaque to build up in arteries.",
+   "The build-up happens slowly and usually without symptoms."
+  ],
+  "why_it_matters": [
+   "Unhealthy blood fats are one of the main causes of heart attacks and strokes.",
+   "Unhealthy blood fats can be found with a simple blood test and are often improved with lifestyle and, when needed, treatment."
+  ],
+  "relevant_biomarkers": [
+   "cholesterol_total",
+   "hdl_cholesterol_direct",
+   "triglycerides",
+   "non_hdl_cholesterol",
+   "ldl_cholesterol_calculated"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 34,
+    "relationship_id": "Q34-21",
+    "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 35,
+    "relationship_id": "Q35-22",
+    "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "Slim people can have unhealthy cholesterol too, often because of genes.",
+   "A normal total cholesterol does not mean every blood fat is healthy."
+  ],
+  "clinical_limitations": [
+   "A predicted risk does not replace your measured cholesterol results, which show your actual levels."
+  ],
+  "suggested_questions": [
+   "What does my cholesterol imbalance score mean?",
+   "My cholesterol is normal, so why is my predicted risk high?",
+   "Which foods help balance cholesterol?",
+   "Do I need medicine for my cholesterol?"
+  ],
+  "source_ids": [
+   "lipids",
+   "life_fat",
+   "life_diet",
+   "life_activity"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-001",
+    "reason": "Shows the full amount of cholesterol in your blood.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-002",
+    "reason": "Shows your good cholesterol.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-003",
+    "reason": "Shows triglycerides, the main fat your body stores for energy.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-004",
+    "reason": "Adds up all the cholesterol in particles that can build up in arteries.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-006",
+    "reason": "Shows your bad cholesterol.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Use small amounts of plant oils instead of ghee, butter or vanaspati. This lowers the fats that raise LDL.",
+   "Eat oats, dal, beans, vegetables and fruit daily. Their fibre helps remove cholesterol.",
+   "Cut back on sweets, sugary drinks and alcohol. These raise triglycerides.",
+   "Move for about 30 minutes on most days. Activity lowers triglycerides and can raise HDL."
+  ],
+  "common_symptoms": [
+   "Unhealthy blood fats usually cause no symptoms. Very high triglycerides can occasionally cause tummy pain from an inflamed pancreas."
+  ],
+  "influencing_factors": [
+   "Foods high in saturated fat",
+   "Sugar and refined carbohydrates",
+   "Body weight",
+   "Physical activity",
+   "Inherited patterns",
+   "Thyroid function"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Saturated fat and trans fat raise LDL. Sugar, refined flour and alcohol raise triglycerides.",
+   "Regular activity, soluble fibre and unsaturated plant oils support healthier blood fats."
+  ],
+  "long_term_implications": [
+   "Over years, it raises the chance of heart attack, stroke and narrowed leg arteries."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor about an increased or very high predicted risk, or if your measured LDL or triglycerides are high. Some people need medicine as well as lifestyle changes."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Foods high in saturated fat",
+    "how_it_acts": "Ghee, butter, cream, fatty meat and fried snacks lead the liver to clear less LDL."
+   },
+   {
+    "factor": "Sugar and refined carbohydrates",
+    "how_it_acts": "Extra sugar and refined flour are turned into triglycerides by the liver."
+   },
+   {
+    "factor": "Body weight",
+    "how_it_acts": "Extra weight, especially around the waist, raises triglycerides and lowers HDL."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Activity raises HDL and lowers triglycerides."
+   },
+   {
+    "factor": "Inherited patterns",
+    "how_it_acts": "Genes shape how your liver makes and clears cholesterol."
+   },
+   {
+    "factor": "Thyroid function",
+    "how_it_acts": "An underactive thyroid slows cholesterol clearance."
+   }
+  ],
+  "keeping_healthy": [
+   "Keep doing what protects your heart and blood vessels: regular movement, not smoking, meals built around vegetables, dal and whole grains, and checks of blood pressure, sugar and cholesterol at the interval your doctor suggests."
+  ]
+ },
+ {
+  "risk_id": "hypertension",
+  "display_name": "High blood pressure",
+  "short_description": "High blood pressure, or hypertension, means blood is pushing too hard against the walls of your arteries for a long time.",
+  "what_happens_inside_my_body": [
+   "Blood pressure is the force of blood on artery walls as your heart pumps.",
+   "When it stays high, the heart works harder and artery walls become strained and stiff.",
+   "Over time this damages blood vessels in the heart, brain, kidneys and eyes."
+  ],
+  "why_it_matters": [
+   "High blood pressure is very common and is a leading cause of stroke, heart attack and kidney disease.",
+   "High blood pressure usually has no symptoms, so measuring it is the only way to know."
+  ],
+  "relevant_biomarkers": [
+   "creatinine",
+   "egfr",
+   "potassium"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 13,
+    "relationship_id": "Q13-1",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 14,
+    "relationship_id": "Q14-2",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 15,
+    "relationship_id": "Q15-3",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 16,
+    "relationship_id": "Q16-4",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 17,
+    "relationship_id": "Q17-5",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 41,
+    "relationship_id": "Q41-6",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 31,
+    "relationship_id": "Q31-20",
+    "association": "Too much sodium in food can raise blood pressure.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 38,
+    "relationship_id": "Q38-27",
+    "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 39,
+    "relationship_id": "Q39-28",
+    "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "You cannot tell your blood pressure by how you feel.",
+   "Normal kidney blood tests do not rule out high blood pressure."
+  ],
+  "clinical_limitations": [
+   "This assessment is a prediction. Only a blood pressure measurement can confirm high blood pressure."
+  ],
+  "suggested_questions": [
+   "What does my blood pressure risk mean?",
+   "Do I need to check my blood pressure?",
+   "How much salt is too much?",
+   "Can I lower my blood pressure without medicine?"
+  ],
+  "source_ids": [
+   "life_salt",
+   "life_activity",
+   "life_diet",
+   "who_hypertension"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-025",
+    "reason": "Shows how well your kidneys clear waste. Kidneys and blood pressure affect each other.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-031",
+    "reason": "Estimates how much blood your kidneys filter, which high blood pressure can reduce.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-033",
+    "reason": "Shows potassium, a mineral that helps balance the effect of salt.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Use less salt in cooking and at the table, and cut down on pickles, papads, chips and packaged foods. Less salt is one of the most reliable ways to lower blood pressure.",
+   "Eat more vegetables, fruit and dal. Their potassium helps balance the effect of salt.",
+   "Walk briskly for 30 minutes on most days. Regular activity lowers blood pressure.",
+   "Check your blood pressure at a pharmacy, clinic or at home every few months. It is the only way to know your numbers."
+  ],
+  "common_symptoms": [
+   "Most people have no symptoms.",
+   "Very high blood pressure can cause severe headache, chest pain, breathlessness, vision changes or confusion."
+  ],
+  "influencing_factors": [
+   "Salt intake",
+   "Body weight",
+   "Physical activity",
+   "Alcohol",
+   "Stress and sleep",
+   "Age and family history"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Eating a lot of salt, carrying extra weight, low activity, heavy alcohol use and poor sleep are linked with higher blood pressure.",
+   "Diets rich in vegetables, fruit, pulses and low-fat dairy, with less salt, can lower it."
+  ],
+  "long_term_implications": [
+   "Untreated high blood pressure raises the chance of stroke, heart attack, heart failure, kidney disease and vision problems."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or if home or clinic readings are often 140/90 or higher.",
+   "Seek emergency care for a very high reading with severe headache, chest pain, weakness on one side, or difficulty speaking."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Salt intake",
+    "how_it_acts": "Salt makes the body hold extra water, which raises pressure; pickles, papad, namkeen and processed foods add a lot."
+   },
+   {
+    "factor": "Body weight",
+    "how_it_acts": "Extra weight makes the heart pump harder."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Regular activity lowers blood pressure over weeks."
+   },
+   {
+    "factor": "Alcohol",
+    "how_it_acts": "Regular drinking raises blood pressure."
+   },
+   {
+    "factor": "Stress and sleep",
+    "how_it_acts": "Ongoing stress and poor sleep keep pressure-raising hormones high."
+   },
+   {
+    "factor": "Age and family history",
+    "how_it_acts": "Arteries stiffen with age, and high blood pressure runs in families."
+   }
+  ],
+  "keeping_healthy": [
+   "Keep salt modest, stay active and check your blood pressure from time to time, because high blood pressure usually causes no symptoms."
+  ]
+ },
+ {
+  "risk_id": "nafld",
+  "display_name": "Fatty liver",
+  "short_description": "Fatty liver means extra fat has built up inside your liver cells. The common form is now called MASLD, metabolic dysfunction-associated steatotic liver disease, which replaced the older name NAFLD.",
+  "what_happens_inside_my_body": [
+   "Your liver stores some fat, but too much can build up when the body takes in more energy than it uses.",
+   "Doctors call it MASLD when there is fat in the liver together with at least one metabolic risk factor, such as a large waist or extra weight, high blood sugar, high blood pressure, high triglycerides or low HDL, and little or no alcohol.",
+   "When fat in the liver comes with inflammation and liver cell damage, it is called MASH, which replaced the older name NASH. Over years this can lead to scarring."
+  ],
+  "why_it_matters": [
+   "Fatty liver is very common and often silent.",
+   "Fatty liver is closely linked with type 2 diabetes, high triglycerides and heart disease, and early stages can improve with lifestyle change."
+  ],
+  "relevant_biomarkers": [
+   "sgpt_alt",
+   "sgot_ast",
+   "triglycerides",
+   "hba1c"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 27,
+    "relationship_id": "Q27-16",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 29,
+    "relationship_id": "Q29-17",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 33,
+    "relationship_id": "Q33-18",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 2,
+    "relationship_id": "Q2-24",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 3,
+    "relationship_id": "Q3-25",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 5,
+    "relationship_id": "Q5-26",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "Fatty liver is not only caused by alcohol. The common form, MASLD, is linked with metabolism, not drinking.",
+   "Normal liver enzymes do not rule out fatty liver.",
+   "Slim people can have fatty liver too, and this is common in South Asians.",
+   "A Healthy band on this prediction does not cancel abnormal liver results you have actually measured."
+  ],
+  "clinical_limitations": [
+   "A predicted risk cannot show how much fat is in your liver or whether there is scarring. Imaging or other tests are needed."
+  ],
+  "suggested_questions": [
+   "What does my fatty liver score mean?",
+   "Can I have fatty liver with normal liver tests?",
+   "What can I do to support my liver health?",
+   "Can fatty liver be reversed?"
+  ],
+  "source_ids": [
+   "life_liver",
+   "niddk_nafld",
+   "liver"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-017",
+    "reason": "Shows an enzyme that rises when liver cells are under strain.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-016",
+    "reason": "Shows an enzyme from liver and muscle that rises with liver strain.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-003",
+    "reason": "Shows triglycerides, the blood fat that often goes with fatty liver.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-068",
+    "reason": "Shows your average blood sugar, which is closely linked with liver fat.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Cut down on sugary drinks, sweets and maida-based snacks. NIDDK advises limiting simple sugars for fatty liver.",
+   "Aim for gradual weight loss if you carry extra weight. Losing 3 to 5% of body weight can reduce liver fat, and larger losses help more.",
+   "Stay physically active. Activity helps the liver even when weight does not change.",
+   "Keep alcohol low or avoid it. Alcohol adds extra strain on a fatty liver."
+  ],
+  "common_symptoms": [
+   "Most people have no symptoms. Some notice tiredness or discomfort in the upper right tummy."
+  ],
+  "influencing_factors": [
+   "Body weight, especially around the waist",
+   "Insulin resistance or diabetes",
+   "Sugar and refined carbohydrates",
+   "Alcohol",
+   "Physical activity",
+   "High triglycerides"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Sugary drinks, sweets, refined flour and large portions increase liver fat. Alcohol adds further strain.",
+   "Regular activity and gradual weight loss reduce liver fat."
+  ],
+  "long_term_implications": [
+   "In some people, it can progress to liver scarring (fibrosis or cirrhosis) and raises the risk of diabetes and heart disease."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or if liver enzymes are raised. They may suggest an ultrasound or other checks.",
+   "Seek care for yellow eyes or skin, swelling of the tummy or legs, or vomiting blood."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Body weight, especially around the waist",
+    "how_it_acts": "Extra fat around the waist goes with fat building up in the liver."
+   },
+   {
+    "factor": "Insulin resistance or diabetes",
+    "how_it_acts": "When insulin works poorly, the liver stores more fat."
+   },
+   {
+    "factor": "Sugar and refined carbohydrates",
+    "how_it_acts": "NIDDK advises limiting simple sugars and sugary drinks, because extra sugar is turned into fat."
+   },
+   {
+    "factor": "Alcohol",
+    "how_it_acts": "Alcohol adds to liver fat and strain; drinking above low amounts changes how doctors classify fatty liver."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Activity reduces liver fat even when weight does not change."
+   },
+   {
+    "factor": "High triglycerides",
+    "how_it_acts": "High blood triglycerides often go with fat in the liver."
+   }
+  ],
+  "keeping_healthy": [
+   "Keep sugary drinks and alcohol low, stay active and keep a steady waist size. These protect the liver even when results look good."
+  ]
+ },
+ {
+  "risk_id": "type_2_diabetes",
+  "display_name": "Type 2 diabetes",
+  "short_description": "Type 2 diabetes is a long-term condition where blood sugar stays too high, because the body does not respond well to insulin or does not make enough of it.",
+  "what_happens_inside_my_body": [
+   "Insulin is a hormone that moves sugar from your blood into your cells for energy.",
+   "In type 2 diabetes, cells respond less to insulin. This is called insulin resistance.",
+   "The pancreas works harder to make more insulin, and over time it may not keep up, so blood sugar rises."
+  ],
+  "why_it_matters": [
+   "Type 2 diabetes is very common, especially in South Asia, and can develop silently for years.",
+   "Finding risk early allows changes that can delay or prevent it."
+  ],
+  "relevant_biomarkers": [
+   "fasting_sugar",
+   "hba1c",
+   "fasting_insulin"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 13,
+    "relationship_id": "Q13-1",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 14,
+    "relationship_id": "Q14-2",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 15,
+    "relationship_id": "Q15-3",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 16,
+    "relationship_id": "Q16-4",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 17,
+    "relationship_id": "Q17-5",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 41,
+    "relationship_id": "Q41-6",
+    "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 18,
+    "relationship_id": "Q18-7",
+    "association": "Sleep gives your body time to recover and can affect how it manages sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 27,
+    "relationship_id": "Q27-16",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 29,
+    "relationship_id": "Q29-17",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 33,
+    "relationship_id": "Q33-18",
+    "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 2,
+    "relationship_id": "Q2-24",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 3,
+    "relationship_id": "Q3-25",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 5,
+    "relationship_id": "Q5-26",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "Diabetes is not caused by eating sugar alone.",
+   "A normal fasting sugar does not rule out raised risk, as HbA1c and insulin can change earlier.",
+   "A low predicted risk and normal blood sugar results do not rule out diabetes for good; risk changes with age and weight, so checks continue."
+  ],
+  "clinical_limitations": [
+   "A predicted risk cannot diagnose diabetes. Blood tests such as fasting sugar or HbA1c are needed."
+  ],
+  "suggested_questions": [
+   "What does my diabetes risk score mean?",
+   "Can I lower my diabetes risk?",
+   "My sugar is normal, so why is my risk raised?",
+   "What should I eat to prevent diabetes?"
+  ],
+  "source_ids": [
+   "glucose",
+   "a1c",
+   "life_glucose",
+   "life_activity",
+   "who_diabetes"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-067",
+    "reason": "Shows your blood sugar after fasting.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-068",
+    "reason": "Shows your average blood sugar over about three months.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-069",
+    "reason": "Shows how much insulin your body needs to keep sugar steady.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Fill half your plate with vegetables and add a protein such as dal, curd, eggs or paneer. This slows the rise in blood sugar after meals.",
+   "Choose whole grains such as millets, brown rice or whole wheat in sensible portions. They release sugar more slowly than white rice or maida.",
+   "Walk for 10 to 15 minutes after main meals and aim for 150 minutes of activity a week. Muscles use sugar when they work.",
+   "Aim for 7 to 8 hours of sleep. Poor sleep makes insulin work less well."
+  ],
+  "common_symptoms": [
+   "Early stages often have no symptoms.",
+   "Later signs include thirst, passing a lot of urine, tiredness, blurred vision, slow-healing wounds and frequent infections."
+  ],
+  "influencing_factors": [
+   "Body weight, especially around the waist",
+   "Physical activity",
+   "Diet",
+   "Sleep",
+   "Family history",
+   "Age"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Low activity, extra weight around the waist, diets high in refined carbohydrates and sugary drinks, and poor sleep are linked with higher risk.",
+   "Regular activity and modest weight loss lower the risk."
+  ],
+  "long_term_implications": [
+   "Over time, high blood sugar can damage the heart, kidneys, eyes, nerves and feet."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, so they can check your blood sugar or HbA1c.",
+   "See a doctor soon if you have extreme thirst, frequent urination, unexplained weight loss or blurred vision."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Body weight, especially around the waist",
+    "how_it_acts": "Fat around the waist makes insulin work less well; Indians develop diabetes at lower weights than many groups."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Not being active is a risk factor for insulin resistance; activity helps manage blood sugar."
+   },
+   {
+    "factor": "Diet",
+    "how_it_acts": "Sugary drinks, sweets and large portions of refined grains raise blood sugar and, over time, the load on insulin."
+   },
+   {
+    "factor": "Sleep",
+    "how_it_acts": "Enough sleep is part of the lifestyle that may help prevent insulin resistance."
+   },
+   {
+    "factor": "Family history",
+    "how_it_acts": "Diabetes in a parent or sibling raises your risk."
+   },
+   {
+    "factor": "Age",
+    "how_it_acts": "Risk rises with age, though in India it often starts in the thirties and forties."
+   }
+  ],
+  "keeping_healthy": [
+   "Regular activity, meals built around vegetables, dal and whole grains, few sugary drinks and a steady waist size help keep blood sugar healthy."
+  ]
+ },
+ {
+  "risk_id": "obesity",
+  "display_name": "Weight and metabolic health",
+  "short_description": "This assessment looks at weight and metabolic health: whether your body may be carrying extra fat in a way that strains your health, especially around the waist.",
+  "what_happens_inside_my_body": [
+   "Your body stores spare energy as fat.",
+   "Fat stored deep in the tummy around organs is more active and affects blood sugar, blood fats and blood pressure more than fat elsewhere.",
+   "Deep tummy fat can lead to insulin resistance and inflammation."
+  ],
+  "why_it_matters": [
+   "Extra weight around the waist raises the chance of type 2 diabetes, high blood pressure, fatty liver, heart disease and joint problems."
+  ],
+  "relevant_biomarkers": [
+   "fasting_sugar",
+   "hba1c",
+   "triglycerides"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 2,
+    "relationship_id": "Q2-24",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 3,
+    "relationship_id": "Q3-25",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   },
+   {
+    "question_id": 5,
+    "relationship_id": "Q5-26",
+    "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "Weight is not only about willpower. Genes, sleep, stress, medicines and hormones all play a part.",
+   "A normal BMI does not always mean healthy metabolism, especially for South Asians."
+  ],
+  "clinical_limitations": [
+   "A predicted risk does not measure body fat directly. Waist size and other checks help."
+  ],
+  "suggested_questions": [
+   "What does my weight and metabolic health score mean?",
+   "Why does belly fat matter more?",
+   "How can I lose weight in a healthy way?",
+   "Can I be at risk even if my weight is normal?"
+  ],
+  "source_ids": [
+   "life_activity",
+   "life_diet",
+   "who_obesity"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-067",
+    "reason": "Shows your blood sugar after fasting.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-068",
+    "reason": "Shows your average blood sugar over about three months.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-003",
+    "reason": "Shows triglycerides, a blood fat that often rises with extra weight.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Use a smaller plate and fill half with vegetables. This lowers calories without leaving you hungry.",
+   "Replace sugary drinks and juices with water, buttermilk or unsweetened tea. Liquid sugar adds calories without filling you up.",
+   "Add movement through the day and some strength exercise twice a week. Muscle helps your body use sugar.",
+   "Keep a regular sleep routine. Short sleep is linked with weight gain and cravings."
+  ],
+  "common_symptoms": [
+   "There are usually no symptoms apart from weight or waist change. Some people notice snoring, tiredness or joint pain."
+  ],
+  "influencing_factors": [
+   "Diet and portion size",
+   "Physical activity",
+   "Sleep",
+   "Stress",
+   "Some medicines",
+   "Hormone conditions such as an underactive thyroid"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Large portions, sugary drinks, fried and processed foods, low activity, short sleep and ongoing stress are linked with weight gain.",
+   "Many South Asians develop metabolic problems at lower body weights."
+  ],
+  "long_term_implications": [
+   "Over time, it raises the risk of diabetes, heart disease, fatty liver, sleep apnoea and some cancers."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, if your waist is growing, or if you have snoring with daytime sleepiness."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Diet and portion size",
+    "how_it_acts": "Eating more energy than you use, especially from sugary, fried and refined foods, is stored as fat."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Activity uses energy and protects muscle, which helps weight and blood sugar."
+   },
+   {
+    "factor": "Sleep",
+    "how_it_acts": "Short sleep is linked with weight gain, partly through appetite hormones."
+   },
+   {
+    "factor": "Stress",
+    "how_it_acts": "Ongoing stress can change eating patterns and fat storage."
+   },
+   {
+    "factor": "Some medicines",
+    "how_it_acts": "Steroids, some antidepressants and some diabetes medicines can cause weight gain."
+   },
+   {
+    "factor": "Hormone conditions such as an underactive thyroid",
+    "how_it_acts": "An underactive thyroid slows metabolism a little and can add some weight."
+   }
+  ],
+  "keeping_healthy": [
+   "Regular movement, regular meals with plenty of vegetables and protein, and enough sleep help keep weight steady."
+  ]
+ },
+ {
+  "risk_id": "thyroid",
+  "display_name": "Thyroid health",
+  "short_description": "Thyroid health describes how well your thyroid gland, a small butterfly-shaped gland in your neck, is making the hormones that set your body's pace.",
+  "what_happens_inside_my_body": [
+   "Your thyroid makes hormones called T4 and T3 that control how fast your body uses energy.",
+   "A signal from your brain, called TSH, tells the thyroid how much to make.",
+   "If the thyroid makes too little or too much, many body systems slow down or speed up."
+  ],
+  "why_it_matters": [
+   "Thyroid problems are common, especially in women, and can affect energy, weight, mood, periods, fertility and the heart.",
+   "Thyroid problems are easy to check with a blood test and usually treatable."
+  ],
+  "relevant_biomarkers": [
+   "t3",
+   "t4",
+   "tsh"
+  ],
+  "relevant_lifestyle_factors": [
+   {
+    "question_id": 30,
+    "relationship_id": "Q30-19",
+    "association": "Your thyroid needs iodine to make its hormones. Iodised salt can supply iodine.",
+    "model_contributor_confirmed": false,
+    "production_field_status": "staging_id_only"
+   }
+  ],
+  "common_misconceptions": [
+   "Thyroid problems are not usually caused by diet.",
+   "A predicted thyroid risk does not mean your thyroid is not working."
+  ],
+  "clinical_limitations": [
+   "A predicted risk does not measure your thyroid hormones. Only blood tests can show how your thyroid is working."
+  ],
+  "suggested_questions": [
+   "What does my thyroid health score mean?",
+   "Do I need a thyroid blood test?",
+   "What are the signs of a thyroid problem?",
+   "Can thyroid problems cause weight gain?"
+  ],
+  "source_ids": [
+   "niddk_hypothyroid",
+   "niddk_hyperthyroid"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-039",
+    "reason": "Shows T3, the active thyroid hormone.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-040",
+    "reason": "Shows T4, the main hormone made by your thyroid.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-041",
+    "reason": "Shows TSH, the brain's signal that tells your thyroid how hard to work.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Use iodised salt in normal amounts. Iodine is needed to make thyroid hormones."
+  ],
+  "common_symptoms": [
+   "An underactive thyroid can cause tiredness, weight gain, feeling cold and constipation.",
+   "An overactive thyroid can cause weight loss, a racing heart, feeling hot, shakiness and anxiety."
+  ],
+  "influencing_factors": [
+   "Autoimmune thyroid conditions",
+   "Family history",
+   "Iodine intake",
+   "Pregnancy and after childbirth",
+   "Some medicines",
+   "Age and sex"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Most thyroid problems are caused by the immune system, not by lifestyle. Using iodised salt helps prevent iodine shortage."
+  ],
+  "long_term_implications": [
+   "Untreated thyroid problems can affect the heart, bones, fertility and pregnancy."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or you have symptoms such as unusual tiredness, weight change, a racing heart or changes in periods. A TSH blood test can check."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Autoimmune thyroid conditions",
+    "how_it_acts": "The immune system can attack the thyroid, making it underactive (Hashimoto) or overactive (Graves)."
+   },
+   {
+    "factor": "Family history",
+    "how_it_acts": "Thyroid conditions often run in families."
+   },
+   {
+    "factor": "Iodine intake",
+    "how_it_acts": "The thyroid needs iodine; iodised salt prevents deficiency, while very large amounts can also upset the gland."
+   },
+   {
+    "factor": "Pregnancy and after childbirth",
+    "how_it_acts": "Pregnancy changes thyroid needs, and some women develop thyroid inflammation after childbirth."
+   },
+   {
+    "factor": "Some medicines",
+    "how_it_acts": "Medicines such as lithium and amiodarone can affect the thyroid."
+   },
+   {
+    "factor": "Age and sex",
+    "how_it_acts": "Thyroid conditions are much more common in women and become more common with age."
+   }
+  ],
+  "keeping_healthy": [
+   "Thyroid conditions are not usually prevented by habits. Knowing the symptoms and having thyroid tests when advised, especially in pregnancy or with a family history, is what helps."
+  ]
+ },
+ {
+  "risk_id": "hypothyroidism",
+  "display_name": "Underactive thyroid",
+  "short_description": "An underactive thyroid, or hypothyroidism, means your thyroid gland is not making enough hormone, so many body processes slow down.",
+  "what_happens_inside_my_body": [
+   "Thyroid hormones set how fast your cells use energy.",
+   "When there is too little hormone, the brain sends more TSH to push the thyroid harder.",
+   "The most common cause is Hashimoto's thyroiditis, where the immune system slowly damages the thyroid."
+  ],
+  "why_it_matters": [
+   "An underactive thyroid is common, especially in women, and can affect energy, weight, mood, cholesterol, periods and pregnancy."
+  ],
+  "relevant_biomarkers": [
+   "t3",
+   "t4",
+   "tsh"
+  ],
+  "relevant_lifestyle_factors": [],
+  "common_misconceptions": [
+   "Weight gain from an underactive thyroid is usually modest.",
+   "Eating cabbage or soya in normal amounts does not cause thyroid disease."
+  ],
+  "clinical_limitations": [
+   "A predicted risk does not measure your thyroid hormones. Blood tests are needed."
+  ],
+  "suggested_questions": [
+   "What does my underactive thyroid risk mean?",
+   "What are the signs of an underactive thyroid?",
+   "Can my thyroid make me tired or gain weight?",
+   "Should I get my TSH checked?"
+  ],
+  "source_ids": [
+   "niddk_hypothyroid"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-039",
+    "reason": "Shows T3, the active thyroid hormone.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-040",
+    "reason": "Shows T4, which is often low when the thyroid is underactive.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-041",
+    "reason": "Shows TSH, which usually rises when the thyroid is underactive.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Use iodised salt in normal amounts. Iodine is needed to make thyroid hormones."
+  ],
+  "common_symptoms": [
+   "Tiredness, weight gain, feeling cold, constipation, dry skin, hair thinning, low mood and heavy or irregular periods."
+  ],
+  "influencing_factors": [
+   "Autoimmune thyroiditis (Hashimoto)",
+   "Iodine deficiency",
+   "Thyroid surgery or radioactive iodine",
+   "Some medicines",
+   "After childbirth",
+   "Age and sex"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "An underactive thyroid is mainly caused by the immune system rather than habits. Iodine shortage is a cause in some areas, so iodised salt helps."
+  ],
+  "long_term_implications": [
+   "Untreated, it can raise cholesterol, affect the heart, and cause problems with fertility and pregnancy."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or if you have symptoms. A TSH test is the main check. Treatment, if needed, is a daily tablet decided by a doctor."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Autoimmune thyroiditis (Hashimoto)",
+    "how_it_acts": "The commonest cause: the immune system slowly damages the thyroid so it makes less hormone."
+   },
+   {
+    "factor": "Iodine deficiency",
+    "how_it_acts": "Without enough iodine the gland cannot make hormone; iodised salt prevents this."
+   },
+   {
+    "factor": "Thyroid surgery or radioactive iodine",
+    "how_it_acts": "Treatments that remove or reduce the thyroid can leave it underactive."
+   },
+   {
+    "factor": "Some medicines",
+    "how_it_acts": "Lithium and amiodarone can make the thyroid underactive."
+   },
+   {
+    "factor": "After childbirth",
+    "how_it_acts": "Thyroid inflammation after childbirth can cause a temporary or lasting underactive phase."
+   },
+   {
+    "factor": "Age and sex",
+    "how_it_acts": "Women and older adults are affected far more often."
+   }
+  ],
+  "keeping_healthy": [
+   "Thyroid conditions are not usually prevented by habits. Knowing the symptoms and having thyroid tests when advised, especially in pregnancy or with a family history, is what helps."
+  ]
+ },
+ {
+  "risk_id": "hyperthyroidism",
+  "display_name": "Overactive thyroid",
+  "short_description": "An overactive thyroid, or hyperthyroidism, means your thyroid gland is making too much hormone, so many body processes speed up.",
+  "what_happens_inside_my_body": [
+   "Too much thyroid hormone makes cells use energy faster.",
+   "The brain's TSH signal falls in response.",
+   "The most common cause is Graves' disease, where the immune system pushes the thyroid to overwork."
+  ],
+  "why_it_matters": [
+   "An overactive thyroid can strain the heart, thin the bones and cause pregnancy problems if not treated."
+  ],
+  "relevant_biomarkers": [
+   "t3",
+   "t4",
+   "tsh"
+  ],
+  "relevant_lifestyle_factors": [],
+  "common_misconceptions": [
+   "Weight loss from an overactive thyroid is not healthy weight loss."
+  ],
+  "clinical_limitations": [
+   "A predicted risk does not measure your thyroid hormones. Blood tests are needed."
+  ],
+  "suggested_questions": [
+   "What does my overactive thyroid risk mean?",
+   "What are the signs of an overactive thyroid?",
+   "Can my thyroid cause a racing heart?",
+   "Should I get my thyroid checked?"
+  ],
+  "source_ids": [
+   "niddk_hyperthyroid"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-039",
+    "reason": "Shows T3, which is often high when the thyroid is overactive.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-040",
+    "reason": "Shows T4, which is often high when the thyroid is overactive.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-041",
+    "reason": "Shows TSH, which usually falls when the thyroid is overactive.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [],
+  "common_symptoms": [
+   "Weight loss, a fast or irregular heartbeat, feeling hot, sweating, shaky hands, anxiety, poor sleep and frequent bowel movements."
+  ],
+  "influencing_factors": [
+   "Graves disease",
+   "Thyroid nodules",
+   "Too much thyroid medicine",
+   "Thyroid inflammation",
+   "Large amounts of iodine",
+   "Sex and family history"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "An overactive thyroid is mainly caused by the immune system rather than habits. Very high iodine intake, for example from some supplements, can trigger it in some people."
+  ],
+  "long_term_implications": [
+   "Untreated, it can cause an irregular heart rhythm, heart strain and thinning bones."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or you have symptoms. Seek care promptly for a racing or irregular heartbeat, chest pain or severe shakiness."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {
+   "practical_guidance": "An overactive thyroid needs medical treatment; no everyday habit reliably helps it."
   },
-  {
-    "risk_id": "dyslipidemia",
-    "display_name": "Cholesterol imbalance",
-    "short_description": "Dyslipidemia means that levels of cholesterol or other fats in your blood are out of balance.",
-    "what_happens_inside_my_body": [
-      "Your body needs fats and cholesterol to function.",
-      "They travel through blood inside tiny particles.",
-      "Some particles can leave cholesterol in artery walls.",
-      "An imbalance in these blood fats may raise the risk of artery disease."
-    ],
-    "why_it_matters": [
-      "Cholesterol buildup can narrow arteries over time.",
-      "Different blood fat measurements help assess this risk."
-    ],
-    "relevant_biomarkers": [
-      "cholesterol_total",
-      "hdl_cholesterol_direct",
-      "triglycerides",
-      "non_hdl_cholesterol",
-      "ldl_cholesterol_calculated"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 34,
-        "relationship_id": "Q34-21",
-        "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 35,
-        "relationship_id": "Q35-22",
-        "association": "Foods high in saturated fat can raise LDL cholesterol in your blood.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Different blood fat measurements help assess this risk.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Which of my cholesterol results matters most?",
-      "Can cholesterol be high even if I feel well?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-001",
-        "reason": "Shows the combined cholesterol carried in your blood.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-002",
-        "reason": "Shows how much cholesterol is carried by HDL particles.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-003",
-        "reason": "Shows the amount of a fat your body uses for energy.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-004",
-        "reason": "Shows cholesterol carried outside HDL, including particles that can form artery plaque.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-006",
-        "reason": "Estimates how much cholesterol is carried by LDL particles.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose unsaturated oils instead of butter or ghee more often to support healthy LDL levels.",
-      "Discuss your individual cholesterol targets with a clinician."
-    ]
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Graves disease",
+    "how_it_acts": "The commonest cause: antibodies stimulate the thyroid to make too much hormone."
+   },
+   {
+    "factor": "Thyroid nodules",
+    "how_it_acts": "Lumps in the thyroid can make hormone on their own."
+   },
+   {
+    "factor": "Too much thyroid medicine",
+    "how_it_acts": "Taking more levothyroxine than you need has the same effect as an overactive gland."
+   },
+   {
+    "factor": "Thyroid inflammation",
+    "how_it_acts": "Inflammation, including after childbirth or a viral illness, can release stored hormone for a while."
+   },
+   {
+    "factor": "Large amounts of iodine",
+    "how_it_acts": "Iodine-rich medicines or contrast dye can trigger an overactive thyroid in some people."
+   },
+   {
+    "factor": "Sex and family history",
+    "how_it_acts": "It is more common in women and runs in families."
+   }
+  ],
+  "keeping_healthy": [
+   "Thyroid conditions are not usually prevented by habits. Knowing the symptoms and having thyroid tests when advised, especially in pregnancy or with a family history, is what helps."
+  ]
+ },
+ {
+  "risk_id": "pcos",
+  "display_name": "Polycystic ovary syndrome (PCOS)",
+  "aliases": [
+   "PCOS",
+   "PCOD",
+   "polycystic ovary syndrome",
+   "polycystic ovarian disease"
+  ],
+  "short_description": "Polycystic ovary syndrome, or PCOS, is a common hormone condition that can make periods irregular, raise male-type hormones and affect how the body handles sugar.",
+  "what_happens_inside_my_body": [
+   "Normally the ovaries release an egg each month.",
+   "In PCOS, hormone signals shift, so eggs may not be released regularly and periods become irregular.",
+   "The ovaries may make more androgens, male-type hormones that can cause acne or extra hair growth.",
+   "Many people with PCOS also have insulin resistance, which can raise blood sugar and weight."
+  ],
+  "why_it_matters": [
+   "PCOS is one of the most common hormone conditions in women of reproductive age.",
+   "PCOS can affect periods, fertility, skin, mood and long-term metabolic health."
+  ],
+  "relevant_biomarkers": [
+   "total_testosterone",
+   "lh",
+   "fsh",
+   "fasting_sugar",
+   "fasting_insulin"
+  ],
+  "relevant_lifestyle_factors": [
+   "Moving more often and including vegetables, pulses, fruit and unsweetened drinks can support insulin sensitivity.",
+   "Sleep and stress matter for hormones, but a habit does not by itself cause a PCOS score.",
+   "Weight can be associated with PCOS. It is not the cause for everyone, and a prediction does not say a person's eating caused it."
+  ],
+  "common_misconceptions": [
+   "You can have PCOS even if your weight is normal.",
+   "Not everyone with PCOS has cysts on the ovaries, and ovarian cysts alone do not mean PCOS.",
+   "PCOS and PCOD are commonly used names for the same condition.",
+   "No single blood test confirms PCOS.",
+   "A predicted PCOS band is not a diagnosis. Only a doctor can diagnose PCOS, using your periods, signs of high androgens, blood tests and sometimes an ultrasound."
+  ],
+  "clinical_limitations": [
+   "A doctor diagnoses PCOS from your periods, signs of high androgens, blood tests and sometimes an ultrasound."
+  ],
+  "suggested_questions": [
+   "What does my PCOS score mean?",
+   "Can I have PCOS even if my weight is normal?",
+   "How are PCOS and blood sugar connected?",
+   "When should I see a doctor about PCOS?"
+  ],
+  "source_ids": [
+   "who_pcos",
+   "pcos_guideline_2023"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-095",
+    "reason": "Shows testosterone, a male-type hormone that is often higher in PCOS.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-101",
+    "reason": "Shows LH, a hormone that controls egg release and can be raised in PCOS.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-102",
+    "reason": "Shows FSH, which helps eggs develop and is read with LH.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-067",
+    "reason": "Shows your fasting blood sugar, which PCOS can affect.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-069",
+    "reason": "Shows fasting insulin, which is often high with insulin resistance in PCOS.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Build regular movement into your week, including some strength exercise. Activity helps your body respond to insulin.",
+   "Base meals on vegetables, protein and whole grains, and limit sugary drinks and sweets. Steadier blood sugar can help hormone balance.",
+   "Keep a regular sleep routine and find ways to manage stress. Both affect hormones and insulin.",
+   "Track your periods in a calendar or app. It helps your doctor understand your pattern."
+  ],
+  "common_symptoms": [
+   "Irregular, infrequent or missed periods.",
+   "Acne, oily skin, extra facial or body hair, or hair thinning on the scalp.",
+   "Weight gain or difficulty losing weight, and difficulty getting pregnant."
+  ],
+  "influencing_factors": [
+   "Family history",
+   "Insulin resistance",
+   "Body weight",
+   "Physical activity",
+   "Sleep and stress"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Regular activity, balanced meals and healthy sleep help insulin work better, which can improve PCOS symptoms.",
+   "PCOS also occurs in people of normal weight."
+  ],
+  "long_term_implications": [
+   "PCOS is linked with a higher risk of type 2 diabetes, high cholesterol, fatty liver, sleep apnoea, low mood and, with very infrequent periods, thickening of the womb lining."
+  ],
+  "when_to_seek_medical_advice": [
+   "Talk to a doctor if your predicted risk is increased or very high, or if you have irregular periods, acne or extra hair growth, or difficulty getting pregnant.",
+   "See a doctor if you go three months or more without a period and are not pregnant."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Family history",
+    "how_it_acts": "PCOS runs in families, and a mother or sister with PCOS or type 2 diabetes raises the chance."
+   },
+   {
+    "factor": "Insulin resistance",
+    "how_it_acts": "High insulin pushes the ovaries to make more androgens, which disturbs ovulation."
+   },
+   {
+    "factor": "Body weight",
+    "how_it_acts": "Extra weight worsens insulin resistance and symptoms, though PCOS also occurs at normal weight."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Activity helps the body respond to insulin, which can ease symptoms."
+   },
+   {
+    "factor": "Sleep and stress",
+    "how_it_acts": "Poor sleep and ongoing stress can worsen insulin resistance and cycle regularity."
+   }
+  ],
+  "keeping_healthy": [
+   "Regular activity, meals that keep blood sugar steady and regular sleep support hormone and insulin balance, whatever your weight."
+  ]
+ },
+ {
+  "risk_id": "oxidative_stress",
+  "display_name": "Oxidative stress",
+  "short_description": "Oxidative stress is what happens when substances your cells make as they work build up faster than your body's protective systems can handle them.",
+  "what_happens_inside_my_body": [
+   "Your cells naturally make some reactive molecules, often called free radicals, as they use energy.",
+   "Your body has protective systems, including antioxidants from food, that keep these molecules in balance.",
+   "When that protection cannot keep up, the extra molecules may damage parts of cells. That imbalance is called oxidative stress."
+  ],
+  "why_it_matters": [
+   "Over time, this imbalance can affect the health of cells.",
+   "Research discusses oxidative stress alongside inflammation and some longer-term health conditions."
+  ],
+  "influencing_factors": [
+   "Eating habits",
+   "Sleep",
+   "Physical activity",
+   "Smoking",
+   "Ongoing stress",
+   "Alcohol",
+   "Air pollution and strong sunlight"
+  ],
+  "everyday_support": [
+   "Include a variety of vegetables, fruit, pulses and other minimally processed foods. They provide natural antioxidants.",
+   "Keep a sleep routine that gives you enough rest. Sleep supports your body's repair processes.",
+   "Stay physically active in a way that fits your usual day. Regular moderate activity strengthens the body's own protective systems.",
+   "If you smoke, ask for help to stop. Smoking is a strong source of oxidative stress."
+  ],
+  "relevant_biomarkers": [
+   "hs_crp",
+   "vitamin_c"
+  ],
+  "relevant_lifestyle_factors": [],
+  "common_misconceptions": [
+   "A normal blood report does not contradict a higher oxidative stress band, because routine blood tests do not measure it.",
+   "Antioxidant supplements have not been shown to prevent disease, and high-dose beta-carotene raised lung cancer risk in smokers.",
+   "This band is not a measurement of damage to your cells."
+  ],
+  "clinical_limitations": [
+   "This score is a risk estimate, not a direct measurement of cell damage."
+  ],
+  "suggested_questions": [
+   "Why is my oxidative stress risk high when a blood test in this area is normal?",
+   "Which everyday habits are linked with oxidative stress?",
+   "Which foods support the body's protective systems?",
+   "Do I need antioxidant supplements?"
+  ],
+  "source_ids": [
+   "life_c",
+   "life_diet",
+   "life_activity"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "relevant_biomarker_context": [
+   {
+    "content_key": "WB-093",
+    "reason": "Shows hs-CRP, a sign of inflammation, which often goes alongside oxidative stress.",
+    "model_contributor_confirmed": false
+   },
+   {
+    "content_key": "WB-038",
+    "reason": "Shows vitamin C, one of the body's antioxidants from food.",
+    "model_contributor_confirmed": false
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "common_symptoms": [
+   "Oxidative stress does not cause symptoms you can feel."
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Smoking, heavy alcohol use, diets low in fruit and vegetables, and poor sleep are studied as general influences on oxidative stress."
+  ],
+  "long_term_implications": [
+   "Research links long-term oxidative stress with inflammation and some conditions such as heart disease, but a score does not show that this has happened."
+  ],
+  "when_to_seek_medical_advice": [
+   "There is no specific medical test or treatment for oxidative stress. Talk to a doctor if you have other raised risks or symptoms that worry you."
+  ],
+  "risk_meaning": [
+   "Your Bio-AI result is a risk band from MetSights' prediction model, built from your blood results and other information such as lifestyle answers.",
+   "It is not a diagnosis and does not measure the condition directly.",
+   "MetSights has not published the exact outcome each score predicts, over what time, or how the band is calculated, so CURA does not turn it into a percentage chance.",
+   "Routine blood tests do not measure oxidative stress directly, and MetSights has not said exactly what this score predicts."
+  ],
+  "not_applicable": {},
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Eating habits",
+    "how_it_acts": "Vegetables, fruit, pulses and whole grains provide antioxidants that support the body's own protection."
+   },
+   {
+    "factor": "Sleep",
+    "how_it_acts": "Sleep supports the body's repair processes."
+   },
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Exercise makes some free radicals, but regular moderate activity strengthens the body's own protective systems."
+   },
+   {
+    "factor": "Smoking",
+    "how_it_acts": "Smoke is one of the strongest outside sources of free radicals."
+   },
+   {
+    "factor": "Ongoing stress",
+    "how_it_acts": "Long-term stress is linked with more oxidative strain."
+   },
+   {
+    "factor": "Alcohol",
+    "how_it_acts": "Breaking down alcohol produces reactive molecules in the liver."
+   },
+   {
+    "factor": "Air pollution and strong sunlight",
+    "how_it_acts": "Pollution and ultraviolet light create free radicals in the lungs and skin."
+   }
+  ],
+  "keeping_healthy": [
+   "Not smoking, a varied diet with plenty of vegetables, fruit and dal, regular moderate activity and enough sleep support the body's own protective systems."
+  ]
+ },
+ {
+  "risk_id": "metabolic_age",
+  "display_name": "Metabolic age",
+  "short_description": "Metabolic age is a Bio-AI estimate that MetSights presents as an age, to sum up parts of your metabolic health such as how your body handles sugar and fats. MetSights has not published how the number is calculated or what it is compared against.",
+  "product_inputs": [
+   "MetSights can look at blood biomarkers, lifestyle, food, activity, sleep, demographics and other questionnaire answers when it builds risk scores and metabolic scores.",
+   "That is the known general input set. The formula, feature weights and reference population are not available, and not every answer feeds every score."
+  ],
+  "what_happens_inside_my_body": [
+   "Metabolic health is how well your body turns food into energy, keeps blood sugar steady and handles fats.",
+   "Your actual age is how many years you have lived. Metabolic age is an estimate based on health information, not a count of birthdays.",
+   "MetSights has not shared the formula, the weight given to each input or the group it compares you with, so the gap between your metabolic age and your real age cannot be read as a precise measure of anything."
+  ],
+  "why_it_matters": [
+   "Metabolic age is a simple way to start a conversation about blood sugar, blood fats, weight, activity and sleep.",
+   "The estimate does not measure how long you will live or how fast your whole body is ageing."
+  ],
+  "relevant_biomarkers": [
+   "fasting_sugar",
+   "hba1c",
+   "triglycerides",
+   "hdl_cholesterol_direct"
+  ],
+  "relevant_lifestyle_factors": [
+   "Everyday movement, meals built around vegetables, pulses and unsweetened drinks, and regular sleep support metabolic health.",
+   "Those habits are discussed separately from the estimate unless a documented method says they contributed to it."
+  ],
+  "common_misconceptions": [
+   "A higher metabolic age does not mean you have lost years of life.",
+   "A lower metabolic age does not guarantee good health.",
+   "Normal blood results can sit alongside a higher estimate, because a prediction is not a measurement.",
+   "No habit is promised to change the number by a set number of years.",
+   "Your measured results, such as HbA1c, fasting sugar and cholesterol, are a more reliable guide to where to focus than the metabolic age number."
+  ],
+  "clinical_limitations": [
+   "The calculation method, inputs and reference group are not available, so CURA cannot say what produced your estimate."
+  ],
+  "suggested_questions": [
+   "What does my metabolic age mean?",
+   "Can my metabolic age change over time?",
+   "How is metabolic age different from biological age?",
+   "What habits support my metabolic health?"
+  ],
+  "source_ids": [
+   "metsights_inputs",
+   "nia_aging"
+  ],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "evidence_status": "pending_claim_verification",
+  "everyday_support": [
+   "Move regularly and include some strength exercise. Activity helps your body use sugar and fats.",
+   "Base meals on vegetables, pulses, whole grains and protein, with fewer sugary and fried foods. This supports steadier blood sugar and blood fats.",
+   "Keep a regular sleep routine. Enough sleep is part of the lifestyle that may help prevent insulin resistance."
+  ],
+  "common_symptoms": [],
+  "influencing_factors": [
+   "Physical activity",
+   "Eating habits",
+   "Sleep",
+   "Body weight",
+   "Blood sugar and blood fats"
+  ],
+  "influencing_factors_note": "These are known general influences on this area of health. They are not confirmed inputs to, or reasons for, your own score.",
+  "diet_and_lifestyle": [
+   "Activity, eating habits, sleep and weight are general influences on metabolic health. The provider has not said which inputs or weights it uses."
+  ],
+  "long_term_implications": [
+   "Metabolic age is not linked to a specific disease. Metabolic health in general is linked with the risk of diabetes, fatty liver and heart disease."
+  ],
+  "when_to_seek_medical_advice": [
+   "There is no medical treatment for metabolic age itself. Talk to a doctor about any raised blood sugar, cholesterol or other risks shown alongside it."
+  ],
+  "risk_meaning": [
+   "Metabolic age is an estimate from your Bio-AI assessment, not a measurement or diagnosis.",
+   "A different estimate on a later assessment can reflect changes in your health or in the information used."
+  ],
+  "not_applicable": {
+   "symptoms": "A prediction about metabolic patterns; it has no symptoms of its own.",
+   "blood_test_relationships": "The provider has not published which blood tests feed this estimate."
   },
-  {
-    "risk_id": "hypertension",
-    "display_name": "High blood pressure",
-    "short_description": "Hypertension means blood pressure stays higher than it should over time.",
-    "what_happens_inside_my_body": [
-      "Your heart pushes blood through your blood vessels.",
-      "Blood pressure is the force of blood against their walls.",
-      "When pressure stays high, the heart has to work harder.",
-      "Over time, high pressure can damage blood vessels and organs."
-    ],
-    "why_it_matters": [
-      "High blood pressure often causes no symptoms.",
-      "A blood pressure measurement is needed to assess it directly."
-    ],
-    "relevant_biomarkers": [
-      "creatinine",
-      "egfr",
-      "potassium"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 13,
-        "relationship_id": "Q13-1",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 14,
-        "relationship_id": "Q14-2",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 15,
-        "relationship_id": "Q15-3",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 16,
-        "relationship_id": "Q16-4",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 17,
-        "relationship_id": "Q17-5",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 41,
-        "relationship_id": "Q41-6",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 31,
-        "relationship_id": "Q31-20",
-        "association": "Too much sodium in food can raise blood pressure.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 38,
-        "relationship_id": "Q38-27",
-        "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 39,
-        "relationship_id": "Q39-28",
-        "association": "Blood pressure tells us how strongly blood pushes against the walls of your blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "A blood pressure measurement is needed to assess it directly.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Can my blood pressure be high without symptoms?",
-      "How can I check my blood pressure at home?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-025",
-        "reason": "Measures a muscle waste product that your kidneys normally remove from blood.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-031",
-        "reason": "Estimates how much blood your kidneys can filter over a period of time.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-033",
-        "reason": "Measures potassium, a mineral your nerves, muscles and heart need for electrical signals.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose less salty packaged foods to help manage blood pressure.",
-      "Ask about home blood pressure measurements to understand your actual readings."
-    ]
-  },
-  {
-    "risk_id": "nafld",
-    "display_name": "Fatty liver",
-    "short_description": "Fatty liver means excess fat has collected inside liver cells.",
-    "what_happens_inside_my_body": [
-      "Your liver processes nutrients and stores some energy.",
-      "Sometimes more fat builds up inside liver cells than they can handle.",
-      "Many people have no symptoms at this stage.",
-      "In some people, ongoing fat buildup can lead to irritation and scarring."
-    ],
-    "why_it_matters": [
-      "Fatty liver can progress in some people.",
-      "Normal liver enzymes do not rule it out."
-    ],
-    "relevant_biomarkers": [
-      "sgpt_alt",
-      "sgot_ast",
-      "triglycerides",
-      "hba1c"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 27,
-        "relationship_id": "Q27-16",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 29,
-        "relationship_id": "Q29-17",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 33,
-        "relationship_id": "Q33-18",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 2,
-        "relationship_id": "Q2-24",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 3,
-        "relationship_id": "Q3-25",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 5,
-        "relationship_id": "Q5-26",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Normal liver enzymes do not rule it out.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Can I have fatty liver with normal liver tests?",
-      "What tests can check for fat in my liver?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-017",
-        "reason": "Measures an enzyme that can enter your blood when liver cells are affected.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-016",
-        "reason": "Measures an enzyme that can enter blood from injured liver or muscle cells.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-003",
-        "reason": "Shows the amount of a fat your body uses for energy.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-068",
-        "reason": "Shows your average blood sugar pattern over roughly the past two to three months.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose whole grains and water instead of sugary drinks to support metabolic health.",
-      "Build regular movement into your day as your health allows."
-    ]
-  },
-  {
-    "risk_id": "type_2_diabetes",
-    "display_name": "Type 2 diabetes",
-    "short_description": "Type 2 diabetes develops when the body cannot use insulin effectively enough to keep blood sugar in a healthy range.",
-    "what_happens_inside_my_body": [
-      "Your food provides sugar that travels through your blood.",
-      "Insulin helps sugar move into cells for energy.",
-      "Sometimes cells respond less well to insulin.",
-      "If your body cannot make enough extra insulin, sugar stays high in blood."
-    ],
-    "why_it_matters": [
-      "High blood sugar over time can harm blood vessels, nerves and kidneys.",
-      "Measured blood sugar helps assess this condition."
-    ],
-    "relevant_biomarkers": [
-      "fasting_sugar",
-      "hba1c",
-      "fasting_insulin"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 13,
-        "relationship_id": "Q13-1",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 14,
-        "relationship_id": "Q14-2",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 15,
-        "relationship_id": "Q15-3",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 16,
-        "relationship_id": "Q16-4",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 17,
-        "relationship_id": "Q17-5",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 41,
-        "relationship_id": "Q41-6",
-        "association": "Moving regularly helps your muscles use sugar and supports your heart and blood vessels.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 18,
-        "relationship_id": "Q18-7",
-        "association": "Sleep gives your body time to recover and can affect how it manages sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 27,
-        "relationship_id": "Q27-16",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 29,
-        "relationship_id": "Q29-17",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 33,
-        "relationship_id": "Q33-18",
-        "association": "Foods and drinks with added sugar can add to the sugar and energy your body needs to handle.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 2,
-        "relationship_id": "Q2-24",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 3,
-        "relationship_id": "Q3-25",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 5,
-        "relationship_id": "Q5-26",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Measured blood sugar helps assess this condition.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "What does my HbA1c tell me about blood sugar?",
-      "Can I have high blood sugar without symptoms?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-067",
-        "reason": "Measures the amount of sugar in your blood after a period without food.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-068",
-        "reason": "Shows your average blood sugar pattern over roughly the past two to three months.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-069",
-        "reason": "Measures insulin, the hormone that helps sugar enter your cells, after fasting.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose fibre-rich meals with pulses and vegetables to support blood sugar management.",
-      "Move regularly as your health allows to help muscles use glucose."
-    ]
-  },
-  {
-    "risk_id": "obesity",
-    "display_name": "Weight and metabolic health",
-    "short_description": "Obesity is a complex health condition involving excess body fat that can affect health.",
-    "what_happens_inside_my_body": [
-      "Your body uses food for energy.",
-      "It can store unused energy as body fat.",
-      "Body weight is influenced by genes, hormones, surroundings and daily habits.",
-      "Extra body fat, especially around internal organs, can affect how the body handles sugar and fats."
-    ],
-    "why_it_matters": [
-      "Body fat distribution can matter for metabolic health.",
-      "Weight alone does not describe every aspect of health."
-    ],
-    "relevant_biomarkers": [
-      "fasting_sugar",
-      "hba1c",
-      "triglycerides"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 2,
-        "relationship_id": "Q2-24",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 3,
-        "relationship_id": "Q3-25",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      },
-      {
-        "question_id": 5,
-        "relationship_id": "Q5-26",
-        "association": "Body size and fat distribution can provide context for how your body handles energy and sugar.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Weight alone does not describe every aspect of health.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Can my metabolic health improve without a large weight change?",
-      "How does fat around organs affect health?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-067",
-        "reason": "Measures the amount of sugar in your blood after a period without food.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-068",
-        "reason": "Shows your average blood sugar pattern over roughly the past two to three months.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-003",
-        "reason": "Shows the amount of a fat your body uses for energy.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose satisfying, balanced meals and activity you enjoy rather than crash diets.",
-      "Discuss suitable weight and health goals with a clinician if needed."
-    ]
-  },
-  {
-    "risk_id": "thyroid",
-    "display_name": "Thyroid health",
-    "short_description": "Thyroid health describes how well the gland in your neck makes hormones that regulate energy use.",
-    "what_happens_inside_my_body": [
-      "Your thyroid is a small gland in your neck.",
-      "It makes hormones that help control how your cells use energy.",
-      "A gland near your brain sends signals to regulate thyroid activity.",
-      "Too much or too little thyroid hormone can affect many parts of your body."
-    ],
-    "why_it_matters": [
-      "Thyroid changes can affect heart rate, temperature and energy.",
-      "Different thyroid tests help distinguish possible patterns."
-    ],
-    "relevant_biomarkers": [
-      "t3",
-      "t4",
-      "tsh"
-    ],
-    "relevant_lifestyle_factors": [
-      {
-        "question_id": 30,
-        "relationship_id": "Q30-19",
-        "association": "Your thyroid needs iodine to make its hormones. Iodised salt can supply iodine.",
-        "model_contributor_confirmed": false,
-        "production_field_status": "staging_id_only"
-      }
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Different thyroid tests help distinguish possible patterns.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "What do TSH and thyroid hormones tell me?",
-      "Can thyroid problems affect my energy?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-039",
-        "reason": "Measures T3, a thyroid hormone that helps control how quickly your body uses energy.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-040",
-        "reason": "Measures T4, a thyroid hormone that your body can turn into active T3.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-041",
-        "reason": "Measures the hormone that tells your thyroid how much hormone to make.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Discuss persistent symptoms and thyroid blood tests with a clinician; diet alone cannot establish or correct a hormone disorder."
-    ]
-  },
-  {
-    "risk_id": "hypothyroidism",
-    "display_name": "Underactive thyroid",
-    "short_description": "Hypothyroidism means your thyroid does not supply enough thyroid hormone for your body's needs.",
-    "what_happens_inside_my_body": [
-      "Your thyroid makes hormones that help your cells use energy.",
-      "When it makes too little, many body processes may slow down.",
-      "Your brain may send more TSH to ask the thyroid to work harder.",
-      "Some people notice tiredness, feeling cold or changes in bowel habits."
-    ],
-    "why_it_matters": [
-      "Thyroid hormone affects many organs.",
-      "Blood tests help assess whether thyroid hormone is too low."
-    ],
-    "relevant_biomarkers": [
-      "t3",
-      "t4",
-      "tsh"
-    ],
-    "relevant_lifestyle_factors": [],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Blood tests help assess whether thyroid hormone is too low.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Can low thyroid hormone explain my tiredness?",
-      "How are TSH and T4 connected?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-039",
-        "reason": "Measures T3, a thyroid hormone that helps control how quickly your body uses energy.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-040",
-        "reason": "Measures T4, a thyroid hormone that your body can turn into active T3.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-041",
-        "reason": "Measures the hormone that tells your thyroid how much hormone to make.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Discuss persistent tiredness, cold sensitivity or abnormal thyroid tests with a clinician; food alone may not correct low hormone levels."
-    ]
-  },
-  {
-    "risk_id": "hyperthyroidism",
-    "display_name": "Overactive thyroid",
-    "short_description": "Hyperthyroidism means your thyroid makes more hormone than your body needs.",
-    "what_happens_inside_my_body": [
-      "Your thyroid releases hormones that help set the pace of body processes.",
-      "When too much hormone circulates, some processes speed up.",
-      "Your brain usually reduces its TSH signal in response.",
-      "Some people notice a fast heartbeat, feeling hot or weight changes."
-    ],
-    "why_it_matters": [
-      "Too much thyroid hormone can strain your heart and bones.",
-      "Symptoms alone cannot confirm the condition."
-    ],
-    "relevant_biomarkers": [
-      "t3",
-      "t4",
-      "tsh"
-    ],
-    "relevant_lifestyle_factors": [],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have this condition."
-    ],
-    "clinical_limitations": [
-      "Symptoms alone cannot confirm the condition.",
-      "Model features, calibration and prediction time horizon are not confirmed here."
-    ],
-    "suggested_questions": [
-      "Can an overactive thyroid affect my heartbeat?",
-      "What blood tests check for an overactive thyroid?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-039",
-        "reason": "Measures T3, a thyroid hormone that helps control how quickly your body uses energy.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-040",
-        "reason": "Measures T4, a thyroid hormone that your body can turn into active T3.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-041",
-        "reason": "Measures the hormone that tells your thyroid how much hormone to make.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Seek medical assessment for persistent racing heartbeat, heat intolerance or unexplained weight loss; lifestyle changes alone cannot treat excess thyroid hormone."
-    ]
-  },
-  {
-    "risk_id": "pcos",
-    "display_name": "Polycystic ovary syndrome (PCOS)",
-    "aliases": [
-      "PCOS",
-      "PCOD",
-      "polycystic ovary syndrome",
-      "polycystic ovarian disease"
-    ],
-    "short_description": "PCOS is a common hormonal condition that can affect ovulation, periods and metabolic health.",
-    "what_happens_inside_my_body": [
-      "The ovaries make hormones and usually release an egg in a cycle.",
-      "With PCOS, that signalling can shift, so egg release becomes less regular.",
-      "The body may make more hormones called androgens, which can show up as acne or extra hair growth.",
-      "Some people also become less sensitive to insulin, the hormone that helps sugar move into cells. Not everyone with PCOS has this."
-    ],
-    "why_it_matters": [
-      "Less regular periods, skin changes and trouble getting pregnant are reasons people look into PCOS.",
-      "Over time it can sit alongside higher blood sugar, cholesterol changes and a higher chance of diabetes or heart risk.",
-      "A Bio-AI PCOS score is a predicted risk, not a diagnosis. A doctor uses symptoms, an exam and tests together."
-    ],
-    "relevant_biomarkers": [
-      "total_testosterone",
-      "lh",
-      "fsh",
-      "fasting_sugar",
-      "fasting_insulin"
-    ],
-    "relevant_lifestyle_factors": [
-      "Moving more often and including vegetables, pulses, fruit and unsweetened drinks can support insulin sensitivity.",
-      "Sleep and stress matter for hormones, but a habit does not by itself cause a PCOS score.",
-      "Weight can be associated with PCOS. It is not the cause for everyone, and a prediction does not say a person's eating caused it."
-    ],
-    "common_misconceptions": [
-      "A predicted risk does not mean you have PCOS.",
-      "PCOS and PCOD are names for the same conversation here, not two separate conditions.",
-      "No single blood test confirms PCOS, and a missing assessment does not mean there is no risk.",
-      "PCOS is not caused by one food, and it is not only a weight problem."
-    ],
-    "clinical_limitations": [
-      "Diagnosis needs a clinician. Irregular periods, androgen signs and ultrasound findings are weighed together.",
-      "This library does not set a score cutoff, and it does not say which inputs produced a member's score.",
-      "Medicines, supplements and doses are a doctor's decision, not something this explanation can set."
-    ],
-    "suggested_questions": [
-      "Can I have PCOS even if my weight is normal?",
-      "Can PCOS affect blood sugar?"
-    ],
-    "source_ids": [
-      "who_pcos",
-      "pcos_guideline_2023"
-    ],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-095",
-        "reason": "Measures testosterone in blood, including hormone attached to proteins and hormone that is free.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-101",
-        "reason": "Measures LH, a hormone that sends signals to the ovaries or testes.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-102",
-        "reason": "Measures FSH, a hormone that supports egg development and sperm production.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-067",
-        "reason": "Measures the amount of sugar in your blood after a period without food.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-069",
-        "reason": "Measures insulin, the hormone that helps sugar enter your cells, after fasting.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose enjoyable regular activity and balanced meals to support metabolic health, regardless of body size.",
-      "Discuss irregular periods or troublesome symptoms with a clinician."
-    ]
-  },
-  {
-    "risk_id": "oxidative_stress",
-    "display_name": "Oxidative stress",
-    "short_description": "Oxidative stress is what happens when substances your cells make as they work build up faster than your body's protective systems can handle them.",
-    "what_happens_inside_my_body": [
-      "Your cells naturally make some reactive molecules as they use energy.",
-      "Your body has protective systems that help keep these molecules in balance.",
-      "When that protection cannot keep up, the extra molecules may damage parts of cells. That imbalance is called oxidative stress."
-    ],
-    "why_it_matters": [
-      "Over time, this imbalance can affect the health of cells.",
-      "Research discusses oxidative stress alongside inflammation and some longer-term health conditions. A score does not show that this has happened.",
-      "Everyday habits such as smoking, eating patterns, sleep and physical activity are studied as general influences. They are not confirmed reasons for an individual score."
-    ],
-    "influencing_factors": [
-      "Eating habits",
-      "Sleep",
-      "Physical activity",
-      "Smoking",
-      "Ongoing stress"
-    ],
-    "everyday_support": [
-      "Eat varied vegetables, fruit and pulses to support general health.",
-      "Move regularly as your health allows; this supports overall health, not a guaranteed score change."
-    ],
-    "relevant_biomarkers": [
-      "hs_crp",
-      "vitamin_c"
-    ],
-    "relevant_lifestyle_factors": [],
-    "common_misconceptions": [
-      "A normal blood test in this area does not cancel a higher predicted oxidative stress risk, because routine blood tests do not directly measure it."
-    ],
-    "clinical_limitations": [
-      "This score is a risk estimate, not a direct measurement of cell damage and not a diagnosis. A number out of 100 is the provider's score, not a percentage chance."
-    ],
-    "suggested_questions": [
-      "Does this score directly measure cell damage?",
-      "Can my blood tests be normal with an increased predicted risk?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "relevant_biomarker_context": [
-      {
-        "content_key": "WB-093",
-        "reason": "Measures small amounts of a protein your liver makes in response to inflammation.",
-        "model_contributor_confirmed": false
-      },
-      {
-        "content_key": "WB-038",
-        "reason": "Measures vitamin C, a nutrient needed for tissue repair and iron absorption.",
-        "model_contributor_confirmed": false
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "risk_id": "metabolic_age",
-    "display_name": "Metabolic age",
-    "short_description": "Metabolic age is a provider-reported estimate comparing aspects of metabolic health with age-related patterns.",
-    "product_inputs": [
-      "MetSights can look at blood biomarkers, lifestyle, food, activity, sleep, demographics and other questionnaire answers when it builds risk scores and metabolic scores.",
-      "That is the known general input set. The formula, feature weights and reference population are not available, and not every answer feeds every score."
-    ],
-    "what_happens_inside_my_body": [
-      "The body turns food into energy, keeps blood sugar in a workable range and handles fats through the day. That is metabolic health. It is not how quickly someone burns calories or loses weight.",
-      "Your actual age is how many years you have lived. Metabolic age is a Bio-AI estimate related to those processes, not a count of birthdays and not biological age.",
-      "The estimate does not measure lifespan or establish a diagnosis. A prediction can differ from measured blood results.",
-      "A later assessment may change, but no habit guarantees a specific score change."
-    ],
-    "why_it_matters": [
-      "A higher, lower or matching estimate is a starting point for looking at metabolic health, not a judgement of how well someone is ageing.",
-      "It does not measure remaining lifespan, and it does not mean the whole body is that many years older or younger."
-    ],
-    "relevant_biomarkers": [
-      "fasting_sugar",
-      "hba1c",
-      "triglycerides",
-      "hdl"
-    ],
-    "relevant_lifestyle_factors": [
-      "Everyday movement, meals built around vegetables, pulses and unsweetened drinks, and regular sleep support metabolic health.",
-      "Those habits are discussed separately from the estimate unless a documented method says they contributed to it."
-    ],
-    "common_misconceptions": [
-      "A higher metabolic age does not mean accelerated ageing or lost years of life.",
-      "A lower metabolic age does not guarantee good health.",
-      "A normal blood result can exist alongside a higher estimate.",
-      "Lifestyle changes are not guaranteed to move the number by a set number of years."
-    ],
-    "clinical_limitations": [
-      "This is not a diagnosis.",
-      "The provider field is a reported estimate. The calculation method and model attribution are not in the supplied assessment schema.",
-      "Do not treat a missing estimate as normal health."
-    ],
-    "suggested_questions": [
-      "Can my metabolic age change over time?",
-      "Why can my metabolic age differ from my actual age?"
-    ],
-    "source_ids": [
-      "metsights_inputs"
-    ],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "evidence_status": "pending_claim_verification",
-    "everyday_support": [
-      "Choose sustainable activity and balanced meals to support metabolic health rather than trying to achieve a particular age score.",
-      "Compare future assessments alongside actual blood results and discuss unexpected findings with a clinician."
-    ]
-  }
+  "content_version": "2.3",
+  "content_revision": "2.4",
+  "factor_explanations": [
+   {
+    "factor": "Physical activity",
+    "how_it_acts": "Activity helps the body use sugar and fats well."
+   },
+   {
+    "factor": "Eating habits",
+    "how_it_acts": "Meals built around vegetables, pulses and whole grains support steadier blood sugar and blood fats."
+   },
+   {
+    "factor": "Sleep",
+    "how_it_acts": "Enough sleep is part of the lifestyle that may help prevent insulin resistance."
+   },
+   {
+    "factor": "Body weight",
+    "how_it_acts": "Extra weight, especially around the waist, makes insulin and fat handling less efficient."
+   },
+   {
+    "factor": "Blood sugar and blood fats",
+    "how_it_acts": "These are the measured parts of metabolic health that blood tests can show."
+   }
+  ],
+  "keeping_healthy": [
+   "Regular activity, balanced meals and enough sleep support metabolic health. Your measured results show where attention will help most."
+  ]
+ }
 ]

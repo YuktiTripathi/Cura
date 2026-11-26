@@ -1,584 +1,690 @@
 [
-  {
-    "health_category": "heart_circulation",
-    "display_name": "Heart & circulation",
-    "short_description": "Every heartbeat tells a story. Discover what yours can reveal.",
-    "what_happens_inside_my_body": [
-      "Your heart pumps blood to your organs.",
-      "Blood vessels carry oxygen and nutrients to your cells.",
-      "Cholesterol and other fats travel through these vessels.",
-      "Blood fat tests can help assess the chance of artery buildup."
-    ],
-    "why_it_matters": [
-      "Blood vessels carry oxygen and nutrients to your cells.",
-      "Blood fat tests can help assess the chance of artery buildup."
-    ],
-    "associated_biomarkers": [
-      "cholesterol_total",
-      "hdl_cholesterol_direct",
-      "triglycerides",
-      "non_hdl_cholesterol",
-      "chol_hdl_ratio",
-      "ldl_cholesterol_calculated",
-      "vldl_cholesterol",
-      "ldl_hdl_cholesterol",
-      "hdl_ldl_cholesterol_ratio",
-      "lipo_a_lipoprotein_a",
-      "apo_b_apolipoprotein_b"
-    ],
-    "associated_bio_ai_risks": [
-      "cardiac_health",
-      "dyslipidemia",
-      "hypertension"
-    ],
-    "suggested_questions": [
-      "What do my heart & circulation results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "cardiac_health",
-        "description": "Over time, high pressure or cholesterol buildup can strain this system."
-      },
-      {
-        "risk_id": "dyslipidemia",
-        "description": "An imbalance in these blood fats may raise the risk of artery disease."
-      },
-      {
-        "risk_id": "hypertension",
-        "description": "Over time, high pressure can damage blood vessels and organs."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
+ {
+  "health_category": "heart_circulation",
+  "display_name": "Heart & circulation",
+  "short_description": "Every heartbeat tells a story. Discover what yours can reveal.",
+  "what_happens_inside_my_body": [
+   "Your heart is a muscle about the size of a fist that pumps blood around your body all day and night.",
+   "Arteries carry oxygen-rich blood out to every organ, and veins bring it back.",
+   "Cholesterol and other fats travel in the blood inside tiny particles. Some kinds, such as LDL, can slowly build up in artery walls and narrow them.",
+   "Narrowed arteries can reduce blood flow to the heart or brain, which is what causes most heart attacks and strokes."
+  ],
+  "why_it_matters": [
+   "Heart disease is a leading cause of death in India and often starts years before any symptom.",
+   "Blood fat tests, blood pressure and blood sugar together show how much strain your arteries are under."
+  ],
+  "associated_biomarkers": [
+   "cholesterol_total",
+   "hdl_cholesterol_direct",
+   "triglycerides",
+   "non_hdl_cholesterol",
+   "chol_hdl_ratio",
+   "ldl_cholesterol_calculated",
+   "vldl_cholesterol",
+   "ldl_hdl_cholesterol",
+   "hdl_ldl_cholesterol_ratio",
+   "lipo_a_lipoprotein_a",
+   "apo_b_apolipoprotein_b"
+  ],
+  "associated_bio_ai_risks": [
+   "cardiac_health",
+   "dyslipidemia",
+   "hypertension"
+  ],
+  "suggested_questions": [
+   "What do my heart & circulation results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "cardiac_health",
+    "description": "Over time, high pressure or cholesterol buildup can strain this system."
+   },
+   {
+    "risk_id": "dyslipidemia",
+    "description": "An imbalance in these blood fats may raise the risk of artery disease."
+   },
+   {
+    "risk_id": "hypertension",
+    "description": "Over time, high pressure can damage blood vessels and organs."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Regular movement, not smoking, meals built around vegetables, dal, whole grains and nuts, and modest salt protect your heart and arteries."
+  ],
+  "lowering_risk": [
+   "Blood pressure, blood sugar, cholesterol and smoking add to each other, so improving any one of them lowers overall risk.",
+   "Heart disease in a parent or sibling at a young age is worth telling your doctor about."
+  ],
+  "common_misconceptions": [
+   "Feeling fit does not mean arteries are healthy. High cholesterol and blood pressure usually cause no symptoms."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "liver_health",
+  "display_name": "Liver health",
+  "short_description": "From the food you eat to the energy you use, your liver does more than you think.",
+  "what_happens_inside_my_body": [
+   "Your liver sits under your right ribs and is one of the busiest organs in the body.",
+   "Blood from your stomach and intestines passes through it, so it is the first stop for nutrients, medicines and alcohol.",
+   "It stores energy, makes proteins such as albumin, clears old red cells and breaks down medicines and alcohol.",
+   "It also makes bile, a fluid that drains through small tubes called bile ducts into the gut to help digest fat."
+  ],
+  "why_it_matters": [
+   "Liver problems are often silent until late, so blood tests are one of the few early signs.",
+   "About one in three Indian adults has fat in the liver, often without being overweight."
+  ],
+  "associated_biomarkers": [
+   "albumin",
+   "alkaline_phosphatase",
+   "bilirubin_direct",
+   "bilirubin_total",
+   "ggtp",
+   "proteins_serum",
+   "sgot_ast",
+   "sgpt_alt",
+   "bilirubin_indirect",
+   "globulin",
+   "a_g_ratio",
+   "sgot_sgpt_ratio"
+  ],
+  "associated_bio_ai_risks": [
+   "nafld"
+  ],
+  "suggested_questions": [
+   "What do my liver health results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "nafld",
+    "description": "In some people, ongoing fat buildup can lead to irritation and scarring."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Little or no alcohol, few sugary drinks and sweets, regular activity and a steady weight protect the liver.",
+   "Ask before starting herbal, weight-loss or bodybuilding supplements, because some can injure the liver."
+  ],
+  "lowering_risk": [
+   "Losing 3 to 5% of body weight can reduce liver fat, and activity helps even when weight does not change."
+  ],
+  "common_misconceptions": [
+   "Normal liver tests do not rule out fatty liver.",
+   "Fatty liver is not only caused by alcohol."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "blood_sugar_metabolism",
+  "display_name": "Blood sugar & metabolism",
+  "short_description": "From your morning meals to your daily energy, there's more going on inside than you think.",
+  "what_happens_inside_my_body": [
+   "When you eat, carbohydrates such as rice, roti and sugar are broken down into glucose, a sugar your cells use for energy.",
+   "Insulin, a hormone from the pancreas, moves glucose from the blood into muscle, fat and liver cells.",
+   "When these cells stop responding well to insulin, called insulin resistance, the pancreas has to make more, and blood sugar slowly rises.",
+   "Over years this can lead to prediabetes and type 2 diabetes."
+  ],
+  "why_it_matters": [
+   "Indians tend to develop type 2 diabetes at younger ages and lower weights than many other groups.",
+   "Prediabetes is common and usually silent, and lifestyle change can delay or prevent diabetes."
+  ],
+  "associated_biomarkers": [
+   "fasting_sugar",
+   "hba1c",
+   "fasting_insulin"
+  ],
+  "associated_bio_ai_risks": [
+   "type_2_diabetes",
+   "obesity"
+  ],
+  "suggested_questions": [
+   "What do my blood sugar & metabolism results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "type_2_diabetes",
+    "description": "If your body cannot make enough extra insulin, sugar stays high in blood."
+   },
+   {
+    "risk_id": "obesity",
+    "description": "Extra body fat, especially around internal organs, can affect how the body handles sugar and fats."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Regular activity, meals built around vegetables, dal and whole grains, few sugary drinks and enough sleep help keep blood sugar healthy."
+  ],
+  "lowering_risk": [
+   "Waist size matters even if your weight looks normal.",
+   "If a parent or sibling has diabetes, regular blood sugar checks are worth it."
+  ],
+  "common_misconceptions": [
+   "You do not have to eat a lot of sweets to get diabetes. Genes, waist size, inactivity and refined grains all play a part."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "kidney_urinary",
+  "display_name": "Kidney & urinary health",
+  "short_description": "Your body's natural cleaning system works around the clock to keep things in balance.",
+  "what_happens_inside_my_body": [
+   "You have two kidneys, each about the size of a fist, in your lower back.",
+   "Together they filter all your blood many times a day through about a million tiny filters, removing waste and extra water as urine.",
+   "They also balance salt, potassium and acid in the blood, help control blood pressure and help make red blood cells and keep bones strong.",
+   "Urine tests show what the kidneys let through, and blood tests such as creatinine and eGFR show how well they filter."
+  ],
+  "why_it_matters": [
+   "Kidney disease is often silent until a lot of function is lost.",
+   "Diabetes and high blood pressure are the commonest causes, so people with either need regular kidney checks."
+  ],
+  "associated_biomarkers": [
+   "bun_urea_nitrogen",
+   "calcium_total",
+   "chlorides",
+   "creatinine",
+   "sodium",
+   "urea",
+   "uric_acid",
+   "bun_creatinine_ratio",
+   "urea_creatinine_ratio",
+   "egfr",
+   "phosphorus_inorganic",
+   "potassium",
+   "urine_ph_urine",
+   "urine_urobilinogen",
+   "urine_colour",
+   "urine_transparency",
+   "urine_sugar",
+   "urine_blood_urine",
+   "urine_rbc",
+   "urine_pus_cells",
+   "urine_epithelial_cells",
+   "urine_crystals",
+   "urine_cast",
+   "urine_bacteria",
+   "urine_yeast_cells",
+   "urine_nitrate",
+   "urine_urine_ketone",
+   "urine_urine_protein",
+   "urine_leukocyte_esterase",
+   "urine_bile_pigments",
+   "urine_specific_gravity",
+   "urine_volume_urine",
+   "urine_others_urine"
+  ],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my kidney & urinary health results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Keep blood pressure and blood sugar healthy, drink water through the day and use painkillers such as ibuprofen only as advised."
+  ],
+  "lowering_risk": [
+   "Keeping salt low helps blood pressure and protects the kidney filters."
+  ],
+  "common_misconceptions": [
+   "Drinking huge amounts of water does not clean the kidneys. Enough to keep urine pale yellow is what helps."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "blood_iron",
+  "display_name": "Blood & iron",
+  "short_description": "Feeling energetic or running low? Your blood may hold some clues.",
+  "what_happens_inside_my_body": [
+   "Blood is made of red cells, white cells and platelets floating in a fluid called plasma.",
+   "Red cells carry oxygen using haemoglobin, which needs iron, vitamin B12 and folate to be made.",
+   "White cells fight infection, and platelets help blood clot.",
+   "All three are made in the bone marrow, the soft tissue inside bones, and a blood count shows how many of each you have."
+  ],
+  "why_it_matters": [
+   "Anaemia is very common in India, especially in women, and can cause tiredness and breathlessness.",
+   "Blood counts also help spot infection, inflammation and, less often, bone marrow problems."
+  ],
+  "associated_biomarkers": [
+   "absolute_basophils_count",
+   "absolute_eosinophils_count",
+   "absolute_lymphocyte_count",
+   "absolute_monocyte_count",
+   "absolute_neutrophil_count",
+   "esr_automated",
+   "hemoglobin_hb",
+   "mch",
+   "mchc",
+   "mcv",
+   "mpv_mean_platelet_count",
+   "pcv_hematocrit",
+   "platelet_count",
+   "wbc",
+   "rdw",
+   "neutrophils",
+   "eosinophils",
+   "lymphocytes",
+   "monocytes",
+   "basophils",
+   "rdw_cv",
+   "mentzer_index_mcv_rcc",
+   "red_blood_cells",
+   "gk_index",
+   "rdwi",
+   "iron_serum",
+   "tibc",
+   "ubic",
+   "transferrin_saturation"
+  ],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my blood & iron results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Iron-rich foods such as dal, chana, green leafy vegetables, eggs or meat, eaten with a vitamin C food, help keep iron up."
+  ],
+  "lowering_risk": [
+   "Heavy periods are the commonest reason women run low on iron and are worth mentioning to a doctor."
+  ],
+  "common_misconceptions": [
+   "Not every anaemia is from low iron. Thalassaemia trait, B12 shortage and long-term illness are common causes too."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "vitamins_nutrition",
+  "display_name": "Vitamins & nutrition",
+  "short_description": "Small nutrients make a big difference to the way you feel every day.",
+  "what_happens_inside_my_body": [
+   "Vitamins and minerals are nutrients your body needs in small amounts to make blood, keep nerves and bones healthy and run chemical reactions.",
+   "Most come from food; vitamin D is mainly made in your skin in sunlight.",
+   "Some are stored in the body for months, such as B12 and vitamin D, so shortages build slowly.",
+   "Blood tests show the level in your blood, which does not always match stores inside cells."
+  ],
+  "why_it_matters": [
+   "Low vitamin D and low B12 are very common in India, including in people who eat well.",
+   "Shortages can cause tiredness, weak bones, tingling or anaemia."
+  ],
+  "associated_biomarkers": [
+   "magnesium",
+   "zinc",
+   "vitamin_b12",
+   "vitamin_d_total_25_hydroxy",
+   "vitamin_c"
+  ],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my vitamins & nutrition results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "A varied diet with vegetables, fruit, dal, whole grains and dairy or eggs if you eat them, plus some daylight, covers most needs."
+  ],
+  "common_misconceptions": [
+   "More is not always better. Large doses of vitamin D, for example, can raise calcium and harm the kidneys."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "thyroid_health",
+  "display_name": "Thyroid health",
+  "short_description": "A tiny gland with a big influence on your energy, weight and everyday well-being.",
+  "what_happens_inside_my_body": [
+   "Your thyroid is a small butterfly-shaped gland at the front of your neck.",
+   "It makes hormones, T4 and T3, that set how fast your body uses energy, affecting heart rate, temperature, weight, mood and periods.",
+   "The pituitary gland in the brain controls it by releasing TSH: more TSH when thyroid hormone is low, less when it is high.",
+   "The thyroid needs iodine, which iodised salt provides."
+  ],
+  "why_it_matters": [
+   "Thyroid conditions are common, especially in women, and are easy to test for and treat.",
+   "Untreated thyroid problems in pregnancy can affect the baby, so testing in pregnancy matters."
+  ],
+  "associated_biomarkers": [
+   "t3",
+   "t4",
+   "tsh"
+  ],
+  "associated_bio_ai_risks": [
+   "thyroid",
+   "hypothyroidism",
+   "hyperthyroidism"
+  ],
+  "suggested_questions": [
+   "What do my thyroid health results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "thyroid",
+    "description": "Too much or too little thyroid hormone can affect many parts of your body."
+   },
+   {
+    "risk_id": "hypothyroidism",
+    "description": "Some people notice tiredness, feeling cold or changes in bowel habits."
+   },
+   {
+    "risk_id": "hyperthyroidism",
+    "description": "Some people notice a fast heartbeat, feeling hot or weight changes."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Thyroid conditions are not usually prevented by habits. Using iodised salt and having tests when you have symptoms, a family history or are pregnant is what helps."
+  ],
+  "common_misconceptions": [
+   "Thyroid problems are not only about weight. Tiredness, feeling cold or hot, hair, mood and periods can all change."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "immunity_inflammation",
+  "display_name": "Immunity & inflammation",
+  "short_description": "Your body's natural defence system is always at work. Get to know it better.",
+  "what_happens_inside_my_body": [
+   "Your immune system defends you against germs using white blood cells, antibodies and chemical signals.",
+   "Inflammation is part of that defence: blood flow, white cells and repair proteins rush to an injured or infected area.",
+   "Short-term inflammation helps healing, but low-grade inflammation that lasts for months is linked with heart disease and other long-term conditions.",
+   "Tests such as CRP and ESR show that inflammation may be present, but not where or why."
+  ],
+  "why_it_matters": [
+   "Inflammation markers help doctors follow infections and inflammatory conditions such as arthritis.",
+   "A raised marker during a recent cold is common and usually settles."
+  ],
+  "associated_biomarkers": [
+   "homocysteine",
+   "hs_crp",
+   "esr"
+  ],
+  "associated_bio_ai_risks": [
+   "oxidative_stress"
+  ],
+  "suggested_questions": [
+   "What do my immunity & inflammation results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "oxidative_stress",
+    "description": "This process is called oxidative stress."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Regular activity, not smoking, a healthy weight and a diet rich in vegetables, fruit, pulses and whole grains are linked with lower long-term inflammation."
+  ],
+  "common_misconceptions": [
+   "A normal ESR or CRP does not rule out every infection or inflammation."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "hormonal_health",
+  "display_name": "Hormonal & Reproductive Health",
+  "short_description": "Your hormones play a bigger role in your periods, skin and overall health than you might realise.",
+  "what_happens_inside_my_body": [
+   "Hormones are chemical messengers released into the blood that control growth, periods, fertility, energy and stress responses.",
+   "The pituitary gland in the brain directs many of them, including the ovaries, testes, thyroid and adrenal glands.",
+   "In women, LH and FSH from the pituitary drive the monthly cycle; in men, they drive testosterone and sperm production.",
+   "Hormone levels change with the time of day, the menstrual cycle, age and pregnancy, so timing matters for many tests."
+  ],
+  "why_it_matters": [
+   "Hormone tests help explain irregular periods, fertility problems, acne or extra hair, and low energy.",
+   "PCOS is one of the most common hormone conditions in Indian women."
+  ],
+  "associated_biomarkers": [
+   "total_testosterone",
+   "dheas",
+   "igf_1",
+   "cortisol",
+   "pth",
+   "prolactin",
+   "lh",
+   "fsh"
+  ],
+  "associated_bio_ai_risks": [
+   "pcos"
+  ],
+  "suggested_questions": [
+   "What do my hormonal & reproductive health results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [
+   {
+    "risk_id": "pcos",
+    "description": "PCOS is a common hormone pattern that can make periods less regular."
+   }
+  ],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Regular sleep, activity and a steady weight support hormone balance."
+  ],
+  "common_misconceptions": [
+   "One hormone result rarely gives a diagnosis on its own; timing and symptoms matter."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "bone_mineral",
+  "display_name": "Bone & mineral health",
+  "short_description": "Your bones support your body and store minerals.",
+  "what_happens_inside_my_body": [
+   "Bones are living tissue that is constantly broken down and rebuilt.",
+   "They store most of the body's calcium and phosphate and release them when the blood needs more.",
+   "Vitamin D helps your gut absorb calcium, and parathyroid hormone keeps blood calcium steady.",
+   "Bone strength builds until about age 30, then slowly falls, faster in women after menopause."
+  ],
+  "why_it_matters": [
+   "Blood calcium shows the body's balance, not bone strength; a bone density scan measures strength."
+  ],
+  "associated_biomarkers": [
+   "calcium"
+  ],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my bone & mineral health results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "Calcium from milk, curd, ragi, sesame and green vegetables, enough vitamin D, and weight-bearing activity such as walking and strength exercise support bones."
+  ],
+  "common_misconceptions": [
+   "A normal blood calcium does not mean bones are strong."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "cancer_related",
+  "display_name": "Cancer-related markers",
+  "short_description": "Cells in your body make many different substances.",
+  "what_happens_inside_my_body": [
+   "Some cells, including some cancer cells, release substances into the blood that labs can measure, called tumour markers.",
+   "Many non-cancer conditions, such as inflammation, infection and liver disease, raise these markers too.",
+   "They are mainly used to follow people already being treated for certain cancers, and sometimes to help investigate symptoms."
+  ],
+  "why_it_matters": [
+   "A raised tumour marker needs a doctor's assessment, but it does not mean cancer on its own."
+  ],
+  "associated_biomarkers": [
+   "psa",
+   "cea",
+   "afp_alpha_feto_protein_amniotic_fluid",
+   "ca_19_9",
+   "ca_125",
+   "ca_15_3"
+  ],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my cancer-related markers results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "lowering_risk": [
+   "Not smoking, limiting alcohol, staying active, a healthy weight and recommended cancer screening, such as cervical and breast checks, lower cancer risk more than marker tests do."
+  ],
+  "common_misconceptions": [
+   "Tumour markers are not screening tests for most people. A normal result does not rule out cancer."
+  ],
+  "not_applicable": {
+   "keeping_healthy": "Results in this area follow illness, treatment or sample details rather than everyday habits."
   },
-  {
-    "health_category": "liver_health",
-    "display_name": "Liver health",
-    "short_description": "From the food you eat to the energy you use, your liver does more than you think.",
-    "what_happens_inside_my_body": [
-      "Your liver processes nutrients from food.",
-      "It makes proteins and a fluid called bile that helps digest fats.",
-      "It also helps process medicines and waste.",
-      "Liver tests look for clues about cell injury, bile drainage and protein production."
-    ],
-    "why_it_matters": [
-      "It makes proteins and a fluid called bile that helps digest fats.",
-      "Liver tests look for clues about cell injury, bile drainage and protein production."
-    ],
-    "associated_biomarkers": [
-      "albumin",
-      "alkaline_phosphatase",
-      "bilirubin_direct",
-      "bilirubin_total",
-      "ggtp",
-      "proteins_serum",
-      "sgot_ast",
-      "sgpt_alt",
-      "bilirubin_indirect",
-      "globulin",
-      "a_g_ratio",
-      "sgot_sgpt_ratio"
-    ],
-    "associated_bio_ai_risks": [
-      "nafld"
-    ],
-    "suggested_questions": [
-      "What do my liver health results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "nafld",
-        "description": "In some people, ongoing fat buildup can lead to irritation and scarring."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "sleep_recovery",
+  "display_name": "Sleep & recovery",
+  "short_description": "Sleep supports many everyday body processes.",
+  "what_happens_inside_my_body": [
+   "During sleep your body repairs tissue, balances hormones and stores memories.",
+   "Short or poor sleep affects appetite hormones, blood sugar control, mood and blood pressure.",
+   "Blood tests do not measure sleep directly; questionnaire answers about sleep give context."
+  ],
+  "why_it_matters": [
+   "Enough sleep is part of the lifestyle that may help prevent insulin resistance and supports overall health."
+  ],
+  "associated_biomarkers": [],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my sleep & recovery results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "keeping_healthy": [
+   "A regular bedtime and wake time, a dark quiet room and less screen time before bed help sleep."
+  ],
+  "common_misconceptions": [
+   "Catching up on sleep at weekends does not fully undo short sleep during the week."
+  ],
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "allergy",
+  "display_name": "Allergy & sensitivity",
+  "short_description": "Your immune system usually protects you from harmful things.",
+  "what_happens_inside_my_body": [
+   "Your immune system usually ignores harmless things such as food, dust and pollen.",
+   "In allergy, it makes an antibody called IgE against one of these, which can trigger sneezing, itching, rashes, swelling or wheezing on contact.",
+   "Having IgE to something, called sensitisation, does not always mean you react to it."
+  ],
+  "why_it_matters": [
+   "Allergy tests help a doctor link symptoms to triggers, but they are read with what actually happens when you are exposed."
+  ],
+  "associated_biomarkers": [],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my allergy & sensitivity results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "common_misconceptions": [
+   "A positive allergy test is not proof of allergy, and cutting foods based on tests alone can harm nutrition, especially in children."
+  ],
+  "not_applicable": {
+   "keeping_healthy": "Results in this area follow illness, treatment or sample details rather than everyday habits."
   },
-  {
-    "health_category": "blood_sugar_metabolism",
-    "display_name": "Blood sugar & metabolism",
-    "short_description": "From your morning meals to your daily energy, there's more going on inside than you think.",
-    "what_happens_inside_my_body": [
-      "Food provides energy for your cells.",
-      "Insulin helps move sugar from your blood into cells.",
-      "Your liver stores and releases sugar between meals.",
-      "Glucose, HbA1c and insulin give different views of sugar control."
-    ],
-    "why_it_matters": [
-      "Insulin helps move sugar from your blood into cells.",
-      "Glucose, HbA1c and insulin give different views of sugar control."
-    ],
-    "associated_biomarkers": [
-      "fasting_sugar",
-      "hba1c",
-      "fasting_insulin"
-    ],
-    "associated_bio_ai_risks": [
-      "type_2_diabetes",
-      "obesity"
-    ],
-    "suggested_questions": [
-      "What do my blood sugar & metabolism results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "type_2_diabetes",
-        "description": "If your body cannot make enough extra insulin, sugar stays high in blood."
-      },
-      {
-        "risk_id": "obesity",
-        "description": "Extra body fat, especially around internal organs, can affect how the body handles sugar and fats."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "other_unmapped",
+  "display_name": "Other Health Results",
+  "short_description": "There's more to your health story. Explore the other pieces of the puzzle.",
+  "what_happens_inside_my_body": [
+   "These are results on your report that do not fit one of the main health areas, such as sample details or lab notes."
+  ],
+  "why_it_matters": [
+   "They are shown so nothing on your report is hidden, but most need no action on their own."
+  ],
+  "associated_biomarkers": [],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my other results results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "not_applicable": {
+   "keeping_healthy": "Results in this area follow illness, treatment or sample details rather than everyday habits."
   },
-  {
-    "health_category": "kidney_urinary",
-    "display_name": "Kidney & urinary health",
-    "short_description": "Your body's natural cleaning system works around the clock to keep things in balance.",
-    "what_happens_inside_my_body": [
-      "Your kidneys filter waste from your blood.",
-      "They balance water, salts and minerals.",
-      "Waste leaves your body in urine.",
-      "Blood and urine tests can help assess filtering, mineral balance and urinary findings."
-    ],
-    "why_it_matters": [
-      "They balance water, salts and minerals.",
-      "Blood and urine tests can help assess filtering, mineral balance and urinary findings."
-    ],
-    "associated_biomarkers": [
-      "bun_urea_nitrogen",
-      "calcium_total",
-      "chlorides",
-      "creatinine",
-      "sodium",
-      "urea",
-      "uric_acid",
-      "bun_creatinine_ratio",
-      "urea_creatinine_ratio",
-      "egfr",
-      "phosphorus_inorganic",
-      "potassium",
-      "urine_ph_urine",
-      "urine_urobilinogen",
-      "urine_colour",
-      "urine_transparency",
-      "urine_sugar",
-      "urine_blood_urine",
-      "urine_rbc",
-      "urine_pus_cells",
-      "urine_epithelial_cells",
-      "urine_crystals",
-      "urine_cast",
-      "urine_bacteria",
-      "urine_yeast_cells",
-      "urine_nitrate",
-      "urine_urine_ketone",
-      "urine_urine_protein",
-      "urine_leukocyte_esterase",
-      "urine_bile_pigments",
-      "urine_specific_gravity",
-      "urine_volume_urine",
-      "urine_others_urine"
-    ],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my kidney & urinary health results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
+  "content_revision": "2.4"
+ },
+ {
+  "health_category": "other_risks",
+  "display_name": "Other predicted risks",
+  "short_description": "Some predictions may not fit an existing health category.",
+  "what_happens_inside_my_body": [
+   "These are Bio-AI predictions that do not fit one of the main health areas."
+  ],
+  "why_it_matters": [
+   "Like every Bio-AI result, they are estimates from a prediction model, not diagnoses."
+  ],
+  "associated_biomarkers": [],
+  "associated_bio_ai_risks": [],
+  "suggested_questions": [
+   "What do my other predicted risks results tell me?",
+   "Which tests are most useful to understand this area?"
+  ],
+  "source_ids": [],
+  "review_status": "pending_clinical_review",
+  "draft_status": "education_upgrade_2_4",
+  "bio_ai_context": [],
+  "evidence_status": "pending_claim_verification",
+  "not_applicable": {
+   "keeping_healthy": "Results in this area follow illness, treatment or sample details rather than everyday habits."
   },
-  {
-    "health_category": "blood_iron",
-    "display_name": "Blood & iron",
-    "short_description": "Feeling energetic or running low? Your blood may hold some clues.",
-    "what_happens_inside_my_body": [
-      "Your red cells carry oxygen around your body.",
-      "White cells help defend against germs.",
-      "Platelets help stop bleeding.",
-      "Blood counts and iron tests help assess these different jobs."
-    ],
-    "why_it_matters": [
-      "White cells help defend against germs.",
-      "Blood counts and iron tests help assess these different jobs."
-    ],
-    "associated_biomarkers": [
-      "absolute_basophils_count",
-      "absolute_eosinophils_count",
-      "absolute_lymphocyte_count",
-      "absolute_monocyte_count",
-      "absolute_neutrophil_count",
-      "esr_automated",
-      "hemoglobin_hb",
-      "mch",
-      "mchc",
-      "mcv",
-      "mpv_mean_platelet_count",
-      "pcv_hematocrit",
-      "platelet_count",
-      "wbc",
-      "rdw",
-      "neutrophils",
-      "eosinophils",
-      "lymphocytes",
-      "monocytes",
-      "basophils",
-      "rdw_cv",
-      "mentzer_index_mcv_rcc",
-      "red_blood_cells",
-      "gk_index",
-      "rdwi",
-      "iron_serum",
-      "tibc",
-      "ubic",
-      "transferrin_saturation"
-    ],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my blood & iron results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "vitamins_nutrition",
-    "display_name": "Vitamins & nutrition",
-    "short_description": "Small nutrients make a big difference to the way you feel every day.",
-    "what_happens_inside_my_body": [
-      "Your body needs nutrients to work each day.",
-      "Some help build blood cells, while others support nerves and muscles.",
-      "You get many nutrients from food, and your body makes some vitamin D with sunlight.",
-      "Blood tests provide clues about selected nutrients, not your entire diet."
-    ],
-    "why_it_matters": [
-      "Some help build blood cells, while others support nerves and muscles.",
-      "Blood tests provide clues about selected nutrients, not your entire diet."
-    ],
-    "associated_biomarkers": [
-      "magnesium",
-      "zinc",
-      "vitamin_b12",
-      "vitamin_d_total_25_hydroxy",
-      "vitamin_c"
-    ],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my vitamins & nutrition results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "thyroid_health",
-    "display_name": "Thyroid health",
-    "short_description": "A tiny gland with a big influence on your energy, weight and everyday well-being.",
-    "what_happens_inside_my_body": [
-      "Your thyroid is a small gland in your neck.",
-      "Its hormones help control how cells use energy.",
-      "Signals from your brain help regulate the gland.",
-      "TSH, T3 and T4 help assess this system."
-    ],
-    "why_it_matters": [
-      "Its hormones help control how cells use energy.",
-      "TSH, T3 and T4 help assess this system."
-    ],
-    "associated_biomarkers": [
-      "t3",
-      "t4",
-      "tsh"
-    ],
-    "associated_bio_ai_risks": [
-      "thyroid",
-      "hypothyroidism",
-      "hyperthyroidism"
-    ],
-    "suggested_questions": [
-      "What do my thyroid health results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "thyroid",
-        "description": "Too much or too little thyroid hormone can affect many parts of your body."
-      },
-      {
-        "risk_id": "hypothyroidism",
-        "description": "Some people notice tiredness, feeling cold or changes in bowel habits."
-      },
-      {
-        "risk_id": "hyperthyroidism",
-        "description": "Some people notice a fast heartbeat, feeling hot or weight changes."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "immunity_inflammation",
-    "display_name": "Immunity & inflammation",
-    "short_description": "Your body's natural defence system is always at work. Get to know it better.",
-    "what_happens_inside_my_body": [
-      "Your immune system helps protect you from germs.",
-      "It can respond to injury or infection with inflammation.",
-      "Inflammation can help healing but may also persist.",
-      "CRP and ESR provide clues about inflammation without identifying its exact cause."
-    ],
-    "why_it_matters": [
-      "It can respond to injury or infection with inflammation.",
-      "CRP and ESR provide clues about inflammation without identifying its exact cause."
-    ],
-    "associated_biomarkers": [
-      "homocysteine",
-      "hs_crp",
-      "esr"
-    ],
-    "associated_bio_ai_risks": [
-      "oxidative_stress"
-    ],
-    "suggested_questions": [
-      "What do my immunity & inflammation results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "oxidative_stress",
-        "description": "This process is called oxidative stress."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "hormonal_health",
-    "display_name": "Hormonal & Reproductive Health",
-    "short_description": "Your hormones play a bigger role in your periods, skin and overall health than you might realise.",
-    "what_happens_inside_my_body": [
-      "Hormones are messages carried in your blood.",
-      "They help organs communicate about growth, stress and reproduction.",
-      "Hormone levels can change with age, time of day and life stage.",
-      "Blood tests measure selected hormones and need context to interpret."
-    ],
-    "why_it_matters": [
-      "They help organs communicate about growth, stress and reproduction.",
-      "Blood tests measure selected hormones and need context to interpret."
-    ],
-    "associated_biomarkers": [
-      "total_testosterone",
-      "dheas",
-      "igf_1",
-      "cortisol",
-      "pth",
-      "prolactin",
-      "lh",
-      "fsh"
-    ],
-    "associated_bio_ai_risks": [
-      "pcos"
-    ],
-    "suggested_questions": [
-      "What do my hormonal & reproductive health results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [
-      {
-        "risk_id": "pcos",
-        "description": "PCOS is a common hormone pattern that can make periods less regular."
-      }
-    ],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "bone_mineral",
-    "display_name": "Bone & mineral health",
-    "short_description": "Your bones support your body and store minerals.",
-    "what_happens_inside_my_body": [
-      "Your bones support your body and store minerals.",
-      "Your muscles and nerves also use minerals such as calcium.",
-      "Hormones and kidneys help maintain mineral balance.",
-      "Blood mineral tests do not directly measure bone strength."
-    ],
-    "why_it_matters": [
-      "Your muscles and nerves also use minerals such as calcium.",
-      "Blood mineral tests do not directly measure bone strength."
-    ],
-    "associated_biomarkers": [
-      "calcium"
-    ],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my bone & mineral health results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "cancer_related",
-    "display_name": "Cancer-related markers",
-    "short_description": "Cells in your body make many different substances.",
-    "what_happens_inside_my_body": [
-      "Cells in your body make many different substances.",
-      "Some substances can be measured as tumour markers.",
-      "Cancer and non-cancer conditions can affect these markers.",
-      "Doctors may use them with other information, often to follow an existing condition."
-    ],
-    "why_it_matters": [
-      "Some substances can be measured as tumour markers.",
-      "Doctors may use them with other information, often to follow an existing condition."
-    ],
-    "associated_biomarkers": [
-      "psa",
-      "cea",
-      "afp_alpha_feto_protein_amniotic_fluid",
-      "ca_19_9",
-      "ca_125",
-      "ca_15_3"
-    ],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my cancer-related markers results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "sleep_recovery",
-    "display_name": "Sleep & recovery",
-    "short_description": "Sleep supports many everyday body processes.",
-    "what_happens_inside_my_body": [
-      "Sleep supports many everyday body processes.",
-      "Your body follows daily rhythms that affect hormones such as cortisol.",
-      "Nutrients help muscles and nerves function.",
-      "These blood tests provide limited context and do not directly measure sleep quality."
-    ],
-    "why_it_matters": [
-      "Your body follows daily rhythms that affect hormones such as cortisol.",
-      "These blood tests provide limited context and do not directly measure sleep quality."
-    ],
-    "associated_biomarkers": [],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my sleep & recovery results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "allergy",
-    "display_name": "Allergy & sensitivity",
-    "short_description": "Your immune system usually protects you from harmful things.",
-    "what_happens_inside_my_body": [
-      "Your immune system usually protects you from harmful things.",
-      "Sometimes it reacts to substances that are usually harmless.",
-      "Some allergy tests look for antibodies that recognise these substances.",
-      "A laboratory result must be interpreted with symptoms and the test method."
-    ],
-    "why_it_matters": [
-      "Sometimes it reacts to substances that are usually harmless.",
-      "A laboratory result must be interpreted with symptoms and the test method."
-    ],
-    "associated_biomarkers": [],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my allergy & sensitivity results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "other_unmapped",
-    "display_name": "Other Health Results",
-    "short_description": "There's more to your health story. Explore the other pieces of the puzzle.",
-    "what_happens_inside_my_body": [
-      "Some measurements do not fit an existing health category.",
-      "Each test may describe a different body process.",
-      "Its meaning depends on what the laboratory measured.",
-      "The exact test name and method help guide interpretation."
-    ],
-    "why_it_matters": [
-      "Each test may describe a different body process.",
-      "The exact test name and method help guide interpretation."
-    ],
-    "associated_biomarkers": [],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my other results results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  },
-  {
-    "health_category": "other_risks",
-    "display_name": "Other predicted risks",
-    "short_description": "Some predictions may not fit an existing health category.",
-    "what_happens_inside_my_body": [
-      "Some predictions may not fit an existing health category.",
-      "They are generated from available assessment information.",
-      "A prediction is different from a measured blood result.",
-      "The exact risk name and approved model documentation determine what it means."
-    ],
-    "why_it_matters": [
-      "They are generated from available assessment information.",
-      "The exact risk name and approved model documentation determine what it means."
-    ],
-    "associated_biomarkers": [],
-    "associated_bio_ai_risks": [],
-    "suggested_questions": [
-      "What do my other predicted risks results tell me?",
-      "Which tests are most useful to understand this area?"
-    ],
-    "source_ids": [],
-    "review_status": "pending_clinical_review",
-    "draft_status": "expanded_draft",
-    "bio_ai_context": [],
-    "evidence_status": "pending_claim_verification"
-  }
+  "content_revision": "2.4"
+ }
 ]
