@@ -13,14 +13,11 @@ def test_insulin_resistance_is_not_a_medication_refusal():
     assert settings.cura_test_suggestions_enabled is True
 
 
-def test_modular_prompt_is_smaller_and_selects_the_bio_ai_module(monkeypatch):
+def test_house_prompt_keeps_bio_ai_safety_and_numeric_grounding():
     from app.contracts.common import AnswerDepth, KnowledgeScope
     from app.contracts.health_context import HealthContext
-    from app.core.config import settings
-    from app.pipeline.prompt_builder import PromptBuilder, _system_for_mode, SAFETY_INSTRUCTIONS
-    from app.pipeline.prompt_modules import CORE, modules_for
+    from app.pipeline.prompt_builder import PromptBuilder
 
-    monkeypatch.setattr(settings, "cura_prompt_variant", "modular")
     context = HealthContext(
         intent=build_query_plan("Why is my diabetes risk high?").intent,
         answer_depth=AnswerDepth.focused,
@@ -30,15 +27,9 @@ def test_modular_prompt_is_smaller_and_selects_the_bio_ai_module(monkeypatch):
     )
     messages = PromptBuilder().build(context, "", "Why is my diabetes risk high?")
     system = messages[0]["content"]
-    assert "BIO-AI" in system.upper() or "Bio-AI" in system
-    assert "75" in system
-    assert len(system) < len(_system_for_mode(SAFETY_INSTRUCTIONS))
-    assert len(CORE) < 3200
-    assert "BIO_AI_EXPLANATION" in modules_for(context, "Why is my diabetes risk high?") or "forecast" in system
+    assert "Bio-AI" in system
     assert "Type 2 diabetes" not in system
-    legacy = _system_for_mode(SAFETY_INSTRUCTIONS)
     assert "answer" in system and "claims" in system
-    assert len(legacy) > len(system)
     from app.pipeline.numeric_grounding import unsupported_adjacent_numbers
 
     package = {"measurements": [{"name": "HDL", "value": 42, "unit": "mg/dL", "reference_low": 40, "reference_high": 60}]}
@@ -54,83 +45,6 @@ def test_modular_prompt_is_smaller_and_selects_the_bio_ai_module(monkeypatch):
     assert not plan.needs_user_uploaded
     assert plan.knowledge_scope.value == "personal"
     assert "ABNORMAL" in {item.upper() for item in plan.selectors}
-
-
-def test_modular_modules_prefer_typed_semantic_goals(monkeypatch):
-    from app.contracts.blood import BloodMarker
-    from app.contracts.common import AnswerDepth, KnowledgeScope, MarkerFlag
-    from app.contracts.health_context import HealthContext
-    from app.core.config import settings
-    from app.pipeline.prompt_modules import modules_for
-
-    monkeypatch.setattr(settings, "cura_response_mode", "rich")
-    context = HealthContext(
-        intent=IntentType.latest_result,
-        answer_depth=AnswerDepth.focused,
-        knowledge_scope=KnowledgeScope.personal,
-        markers=[BloodMarker(id="1", key="hba1c", name="HbA1c", value=5.9, unit="%", flag=MarkerFlag.high)],
-        semantic_plan={
-            "primary_goal": "CAUSES",
-            "secondary_goals": ["ACTION"],
-            "response_shape": "POSSIBLE_EXPLANATIONS",
-        },
-    )
-
-    modules = modules_for(context, "yeh kyun badha aur main kya karun?")
-
-    assert "BIOMARKER_LOOKUP" in modules
-    assert "HEALTH_ACTION_PLANNING" in modules
-    assert "RICH_RESPONSE" in modules
-
-
-def test_modular_general_personalization_teaches_before_bridging(monkeypatch):
-    from app.contracts.common import AnswerDepth, KnowledgeScope
-    from app.contracts.health_context import HealthContext
-    from app.core.config import settings
-    from app.pipeline.prompt_modules import compose_system, modules_for
-
-    monkeypatch.setattr(settings, "cura_response_mode", "rich")
-    context = HealthContext(
-        intent=IntentType.general_health_question,
-        answer_depth=AnswerDepth.focused,
-        knowledge_scope=KnowledgeScope.general,
-        general_personalization=True,
-        semantic_plan={
-            "primary_goal": "GENERAL_EDUCATION",
-            "secondary_goals": [],
-            "response_shape": "GENERAL_EDUCATION",
-        },
-    )
-
-    modules = modules_for(context, "What is heart health?")
-    system = compose_system(context, "What is heart health?")
-
-    assert "GENERAL_HEALTH_EDUCATION" in modules
-    assert "PERSONAL_CONTEXT_BRIDGE" in modules
-    assert system.index("Explain the concept before") < system.index("The main task is still general education")
-    assert "5.9" not in system  # the cacheable system prefix never contains patient data
-
-
-def test_modular_follow_up_uses_conversation_contract(monkeypatch):
-    from app.contracts.common import AnswerDepth, KnowledgeScope
-    from app.contracts.health_context import HealthContext
-    from app.core.config import settings
-    from app.pipeline.prompt_modules import modules_for
-
-    monkeypatch.setattr(settings, "cura_response_mode", "plain")
-    context = HealthContext(
-        intent=IntentType.general_health_question,
-        answer_depth=AnswerDepth.simple,
-        knowledge_scope=KnowledgeScope.general,
-        conversation_turn="FOLLOW_UP_QUESTION",
-        semantic_plan={
-            "primary_goal": "FOLLOW_UP",
-            "secondary_goals": [],
-            "response_shape": "EXPLANATION",
-        },
-    )
-
-    assert "CONVERSATIONAL_FOLLOW_UP" in modules_for(context, "aur iska kya matlab hai?")
 
 
 def test_modular_core_preserves_safety_and_structured_contract():

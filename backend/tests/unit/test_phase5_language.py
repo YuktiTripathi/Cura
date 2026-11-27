@@ -125,6 +125,5 @@ def test_prompt_is_english():
     )
     msgs = PromptBuilder().build(ctx, "", "Vitamin D क्या है?", "hi")
     blob = " ".join(m["content"] for m in msgs)
-    assert "Write the entire answer in English" in blob
     assert "RESPONSE LANGUAGE" not in blob
-    assert "HbA1c" in blob
+    assert "Vitamin D क्या है?" in blob

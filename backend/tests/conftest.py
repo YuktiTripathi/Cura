@@ -10,10 +10,8 @@ settings.allow_mock_auth_with_real_health = True
 settings.mock_user_id = ""
 settings.allow_mock_header_override = False
 settings.enable_llm = False
-# The shipped defaults are the house prompt and plain responses. The older suites assert the
-# legacy prompt text and rich presentation, so they pin those. tests/unit/test_house_prompt.py
-# switches to the defaults explicitly.
-settings.cura_prompt_variant = "legacy"
+# Responses stay in the rich presentation mode the existing suites render.
+# The system prompt is always the house prompt.
 settings.cura_response_mode = "rich"
 # Unit tests stub the model. This is not a production approval.
 # The process default remains not_approved, so real patient prompts stay local.

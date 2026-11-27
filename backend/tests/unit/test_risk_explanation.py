@@ -84,15 +84,11 @@ def test_only_the_explicit_entry_point_makes_an_explanation():
 
 
 def test_risk_explainer_prompt_is_added_only_for_the_explainer():
-    from app.pipeline.prompt_modules import RISK_EXPLAINER, house_system
+    from app.pipeline.prompt_modules import HOUSE_CORE, house_system
 
-    assert "—" not in RISK_EXPLAINER and "–" not in RISK_EXPLAINER
-    for heading in ("## What does this mean for you?", "Button: Check my", "## What can you do?", "## More to explore"):
-        assert heading in RISK_EXPLAINER
     on = house_system(_ctx(), "What does my Type 2 diabetes risk result mean?")
     off_ctx = HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=list(AnswerDepth)[0])
-    assert RISK_EXPLAINER not in on
-    assert RISK_EXPLAINER not in house_system(off_ctx, "What can I do about my Type 2 diabetes risk?")
+    assert on == HOUSE_CORE.strip()
     assert on == house_system(off_ctx, "What can I do about my Type 2 diabetes risk?")
 
 
@@ -140,13 +136,13 @@ def test_overview_questions_load_blood_results_and_habits_together():
 
 def test_overview_context_sees_the_whole_panel_and_gets_the_area_prompt():
     from app.pipeline.prompt_builder import _relevant_markers
-    from app.pipeline.prompt_modules import HEALTH_AREA, house_system
+    from app.pipeline.prompt_modules import HOUSE_CORE, house_system
 
     marker = BloodMarker(id="1", key="ldl", name="LDL", value=120, unit="mg/dL", reference_low=0, reference_high=100)
     ctx = HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=list(AnswerDepth)[0], turn_kind="health_area", markers=[marker])
     assert _relevant_markers(ctx) == [marker]
-    assert HEALTH_AREA not in house_system(ctx, "What do my blood tests say about my heart health?")
-    assert "—" not in HEALTH_AREA and "–" not in HEALTH_AREA
+    assert house_system(ctx, "What do my blood tests say about my heart health?") == HOUSE_CORE.strip()
+    assert "—" not in HOUSE_CORE and "–" not in HOUSE_CORE
 
 
 def test_missing_item_note_is_a_sentence_not_a_reason_code():

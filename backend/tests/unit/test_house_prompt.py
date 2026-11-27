@@ -6,7 +6,7 @@ import pytest
 
 from app.core.config import Settings, settings
 from app.pipeline.prompt_builder import PromptBuilder
-from app.pipeline.prompt_modules import HOUSE_CORE, REPORT_SHAPES
+from app.pipeline.prompt_modules import HOUSE_CORE
 from tests.unit.test_answer_quality import _context
 
 QUESTIONS = [
@@ -31,11 +31,10 @@ HIDDEN_HINTS = (
 
 @pytest.fixture
 def house():
-    old = (settings.cura_prompt_variant, settings.cura_response_mode)
-    settings.cura_prompt_variant = "house"
+    old = settings.cura_response_mode
     settings.cura_response_mode = "plain"
     yield
-    settings.cura_prompt_variant, settings.cura_response_mode = old
+    settings.cura_response_mode = old
 
 
 def _build(message):
@@ -46,7 +45,6 @@ def _build(message):
 
 def test_shipped_defaults_are_house_and_plain():
     fields = Settings.model_fields
-    assert fields["cura_prompt_variant"].default == "house"
     assert fields["cura_response_mode"].default == "plain"
     assert fields["llm_max_output_tokens"].default >= 1200
 
@@ -56,14 +54,6 @@ def test_house_core_has_no_dashes_and_one_json_contract():
     assert HOUSE_CORE.count("valid JSON object") == 1
     for field in ("answer", "claims", "recommendation_candidates", "follow_up_questions", "safety_flags", "escalation"):
         assert field in HOUSE_CORE
-
-
-def test_house_core_is_smaller_than_the_legacy_system_prompt():
-    from app.pipeline.prompt_builder import SAFETY_INSTRUCTIONS
-
-    # The default prompt is the CURA conversational behaviour text plus a short contract.
-    assert SAFETY_INSTRUCTIONS.startswith("CURA: Conversational Behaviour")
-    assert len(SAFETY_INSTRUCTIONS) < 4500
 
 
 @pytest.mark.parametrize("message", QUESTIONS)
@@ -84,25 +74,6 @@ def test_house_follow_up_instruction_is_natural_and_capped_at_four(house):
     assert "user's perspective" in system
 
 
-def test_house_report_parts_come_in_the_required_order():
-    order = ["SHAPE 1A", "One opening bullet", "First bullet, what is going on", "Second bullet, the meaning", "## What to do next", "SHAPE 1B, a Bio-AI report"]
-    positions = [REPORT_SHAPES.index(part) for part in order]
-    assert positions == sorted(positions)
-    assert "**What the numbers show:**" not in REPORT_SHAPES and "**What it means:**" not in REPORT_SHAPES
-    assert "SHAPE 1A" not in HOUSE_CORE
-
-
-def test_legacy_variant_is_unchanged_and_still_available():
-    old = settings.cura_prompt_variant
-    settings.cura_prompt_variant = "legacy"
-    try:
-        system, user = _build("What does my HbA1c mean?")
-    finally:
-        settings.cura_prompt_variant = old
-    assert system.startswith("CURA: Conversational Behaviour")
-    assert "NARRATIVE LENGTH" not in user
-
-
 def test_house_variant_raises_the_structured_answer_temperature(house):
     from app.llm.openai_compatible import OpenAICompatibleLLMClient
 
@@ -111,9 +82,6 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
     client.personal_health = False
     payload = client._build_payload([{"role": "user", "content": "hi"}], "json_object")
     assert payload["temperature"] == settings.answer_temperature > 0
-    settings.cura_prompt_variant = "legacy"
-    payload = client._build_payload([{"role": "user", "content": "hi"}], "json_object")
-    assert payload["temperature"] == 0
 
 
 def test_house_prompt_forbids_report_templates_and_unrelated_bio_ai():
@@ -150,14 +118,11 @@ def test_house_follow_ups_stay_relevant_and_personal():
 
 
 def test_nutrition_guidance_answers_the_food_question_first_without_prescriptions():
-    from app.pipeline.prompt_modules import NUTRITION_OVERVIEW, is_nutrition_overview
+    from app.pipeline.prompt_modules import is_nutrition_overview
 
     assert is_nutrition_overview("What should I know about my nutrition?")
     assert not is_nutrition_overview("What can I eat to lower my LDL?")
     assert not is_nutrition_overview("What is a balanced diet?")
-    assert "before any food advice" in NUTRITION_OVERVIEW
-    assert "not a diagnosis" in NUTRITION_OVERVIEW
-    assert "will fix a measurement" in NUTRITION_OVERVIEW
     question = "Based on my health results and eating habits, how can I eat better for my body?"
     assert is_nutrition_overview(question)
     from app.contracts.common import AnswerDepth, IntentType, KnowledgeScope
@@ -175,7 +140,7 @@ def test_nutrition_guidance_answers_the_food_question_first_without_prescription
     assert "exactly this layout" not in system
     assert "2 to 4 action bullets" not in system
     for old in ("## What your body needs", "## Foods to include", "4 to 6 bullets"):
-        assert old not in NUTRITION_OVERVIEW
+        assert old not in system
 
 
 def test_broad_nutrition_sends_food_results_risks_and_habits_together():

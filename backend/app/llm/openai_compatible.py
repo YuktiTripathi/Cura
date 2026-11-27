@@ -190,7 +190,7 @@ class OpenAICompatibleLLMClient:
 
     def _build_payload(self, messages: list[dict[str, str]], fmt: str) -> dict:
         payload = self._build_payload_base(messages, fmt)
-        if settings.cura_prompt_variant == "house" and "response_format" in payload:
+        if "response_format" in payload:
             # Structured answers were pinned to temperature 0, which makes the prose flat.
             # A little variation reads more naturally; facts are still checked after generation.
             payload["temperature"] = float(settings.answer_temperature)

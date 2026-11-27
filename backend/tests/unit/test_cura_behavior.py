@@ -65,7 +65,6 @@ def _codes(facts) -> set[str]:
 
 
 def test_personalized_single_marker_answer_uses_report_range_and_explains(monkeypatch):
-    monkeypatch.setattr(settings, "cura_prompt_variant", "house")
     _, evidence, prompt = _evidence("What does my HbA1c mean?")
     fact = next(f for f in evidence.primary_facts if f["code"] == "hba1c")
     assert fact["value"] == 6.1 and fact["unit"] == "%"

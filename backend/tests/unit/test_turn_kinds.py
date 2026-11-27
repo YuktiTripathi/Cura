@@ -20,11 +20,9 @@ def _ctx(kind="general"):
     return HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=list(AnswerDepth)[0], turn_kind=kind)
 
 
-def test_every_kind_has_a_spec_and_every_named_module_exists():
+def test_every_kind_has_a_spec_and_shares_the_house_prompt():
     assert set(REGISTRY) == set(TurnKind)
-    for spec in REGISTRY.values():
-        if spec.prompt_module:
-            assert isinstance(getattr(prompt_modules, spec.prompt_module), str)
+    assert house_system(_ctx("general"), "a question") == prompt_modules.HOUSE_CORE.strip()
 
 
 @pytest.mark.parametrize(
@@ -52,10 +50,10 @@ def test_typed_text_only_matches_the_nutrition_overview():
     assert resolve_turn_kind("What does my Hypertension risk mean?") == TurnKind.general
 
 
-@pytest.mark.parametrize("kind,module", [(TurnKind.bio_ai_risk, "RISK_EXPLAINER"), (TurnKind.health_area, "HEALTH_AREA"), (TurnKind.nutrition_overview, "NUTRITION_OVERVIEW")])
-def test_each_kind_adds_its_own_prompt_module_and_no_other(kind, module):
+@pytest.mark.parametrize("kind", [TurnKind.bio_ai_risk, TurnKind.health_area, TurnKind.nutrition_overview])
+def test_each_kind_uses_the_same_house_prompt(kind):
     system = house_system(_ctx(kind.value), "a question")
-    assert getattr(prompt_modules, module) not in system
+    assert system == prompt_modules.HOUSE_CORE.strip()
     assert "valid JSON object" in system
 
 

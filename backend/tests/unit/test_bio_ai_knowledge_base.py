@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from app.pipeline.prompt_modules import BIO_AI_RULES, house_system
+from app.pipeline.prompt_modules import house_system
 from app.retrieval.hybrid import HybridMedicalKnowledgeProvider
 from app.retrieval.medical import (
     BIO_AI_EXPLAINER,
@@ -79,7 +79,6 @@ def test_bio_ai_rules_only_for_bio_ai_questions():
     ldl = house_system(context, "What is my LDL?")
     assert score == ldl
     assert "predicted risks, not confirmed diagnoses" in score
-    assert BIO_AI_RULES not in score
 
 
 def test_response_never_shows_reviewer_or_review_date():

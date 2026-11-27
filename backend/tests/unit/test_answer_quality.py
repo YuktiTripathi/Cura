@@ -234,10 +234,8 @@ def test_evidence_never_changes_measured_values():
 def test_system_prompt_has_editing_and_questionnaire_rules():
     ctx = _context("Why is my HDL low?")
     system = PromptBuilder().build(ctx, "", "Why is my HDL low?")[0]["content"]
-    assert "do not restart explanations" in system.lower()
-    assert "personalise intelligently" in system.lower()
-    assert "never confirm a possible cause" in system.lower()
-    assert "questionnaire answers are self-reported" in system.lower()
+    assert "do not diagnose, prescribe" in system.lower()
+    assert "never invent personal information" in system.lower()
 
 
 # ------------------------------------------------------------ presentation policy

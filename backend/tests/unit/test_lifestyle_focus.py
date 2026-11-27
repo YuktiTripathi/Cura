@@ -1,6 +1,6 @@
 import pytest
 
-from app.pipeline.prompt_modules import is_lifestyle_topic_question, RESULT_WALKTHROUGH, LIFESTYLE_FOCUS
+from app.pipeline.prompt_modules import is_lifestyle_topic_question
 
 
 @pytest.mark.parametrize("message", [
@@ -21,24 +21,6 @@ def test_habit_questions_are_lifestyle_focused(message):
 ])
 def test_lab_questions_are_not_lifestyle_focused(message):
     assert not is_lifestyle_topic_question(message)
-
-
-def test_walkthrough_is_flexible_and_not_a_fixed_six_part_template():
-    for rigid in ("What the test is", "How far outside", "Should you worry"):
-        assert rigid not in RESULT_WALKTHROUGH
-    assert "Answer the exact question asked" in RESULT_WALKTHROUGH
-    assert "sections_already_shown" in RESULT_WALKTHROUGH
-    assert "—" not in RESULT_WALKTHROUGH and "–" not in RESULT_WALKTHROUGH and "—" not in LIFESTYLE_FOCUS
-
-
-def test_food_follow_up_does_not_get_the_result_walkthrough():
-    from types import SimpleNamespace
-    from app.pipeline.prompt_modules import is_result_walkthrough
-
-    ctx = SimpleNamespace(task_contract={"response_type": "MARKER_LOOKUP", "goal": "interpret"}, intent=SimpleNamespace(value="blood_marker_explanation"), markers=[object()])
-    assert is_result_walkthrough(ctx, "What does my Urea result mean?")
-    assert not is_result_walkthrough(ctx, "Which protein foods fit my usual vegetarian meals to raise urea?")
-    assert not is_result_walkthrough(ctx, "How can I improve my vitamin D?")
 
 
 def test_marker_after_my_must_be_what_my_points_at():

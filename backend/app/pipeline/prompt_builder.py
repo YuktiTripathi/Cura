@@ -252,27 +252,9 @@ class PromptBuilder:
                 + f"{_presentation_line(context, user_message)}"
                 + f"{_asked_task(user_message, context)}User question: {user_message}\n"
             )
-        system = GENERAL_HEALTH_INSTRUCTIONS if not personal else _system_for_mode(SAFETY_INSTRUCTIONS)
-        from app.core.config import settings
+        from app.pipeline.prompt_modules import house_system
 
-        if settings.cura_prompt_variant == "house":
-            from app.pipeline.prompt_modules import house_system
-
-            system = house_system(context, user_message)
-        elif settings.cura_prompt_variant == "modular":
-            from app.pipeline.prompt_modules import compose_system, length_note, modules_for
-
-            system = compose_system(context, user_message)
-            note = length_note(user_message, modules_for(context, user_message))
-            if note:
-                user = note + user
-        elif personal and context.evidence_package and settings.answer_prompt_compact:
-                system = (
-                    "You are Cura. Answer in English using only VERIFIED PATIENT EVIDENCE. "
-                    "Do not invent values, units, dates, or risk categories. Do not diagnose or prescribe. "
-                    "Begin by answering the question. Do not print a heading such as Direct answer or Measured results. If a source is missing, say it is not on file. "
-                    "Return JSON with answer, claims, recommendation_candidates, follow_up_questions, safety_flags, escalation."
-                )
+        system = house_system(context, user_message)
         return [
             {"role": "system", "content": system},
             {"role": "user", "content": user},
@@ -280,10 +262,8 @@ class PromptBuilder:
 
 
 def _house() -> bool:
-    """The house variant removes the per-question brevity and no-advice hints that fight its voice."""
-    from app.core.config import settings
-
-    return settings.cura_prompt_variant == "house"
+    """The shipped prompt is the house prompt. Brevity hints that fight that voice stay off."""
+    return True
 
 
 _ASKS_ACTION = re.compile(

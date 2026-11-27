@@ -42,7 +42,6 @@ Failed tests:
 - `tests/unit/test_eval_dose_and_answer_shape.py`: `test_report_range_instruction_is_in_the_personal_prompt`
 - `tests/unit/test_explanation_path.py`: `test_omitted_bio_ai_score_is_added_from_the_record`
 - `tests/unit/test_followup_and_pageindex.py`: `test_prompt_package_keeps_history_and_questionnaire`
-- `tests/unit/test_langchain_orchestration.py`: `test_langchain_engine_really_runs_the_sequence`, `test_tracing_is_off_and_no_callbacks_see_the_state`
 - `tests/unit/test_narrative_summary.py`: `test_chat_health_summary_does_not_dump_the_full_report`
 - `tests/unit/test_pr10_completeness.py`: `test_follow_up_keeps_the_retrieved_value`
 - `tests/unit/test_presentation_policy.py`: `test_personal_prompt_uses_the_same_plain_language_policy`

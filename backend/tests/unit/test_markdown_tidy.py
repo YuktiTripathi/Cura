@@ -62,14 +62,9 @@ def test_plain_answer_keeps_report_headings_but_strips_them_for_narrow_questions
     from app.core.config import settings
     from app.pipeline.response_mode import plain_answer
 
-    old = settings.cura_prompt_variant
-    settings.cura_prompt_variant = "house"
-    try:
-        text = "## Overall Health Summary\n\n- a\n\n## Important Findings\n\n- b"
-        assert "## Important Findings" in plain_answer(text, None, None, whole_report=True)
-        assert "##" not in plain_answer(text, None, None, whole_report=False)
-    finally:
-        settings.cura_prompt_variant = old
+    text = "## Overall Health Summary\n\n- a\n\n## Important Findings\n\n- b"
+    assert "## Important Findings" in plain_answer(text, None, None, whole_report=True)
+    assert "##" not in plain_answer(text, None, None, whole_report=False)
 
 
 def test_whole_report_bullets_are_capped_in_total():

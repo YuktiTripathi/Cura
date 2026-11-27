@@ -78,7 +78,6 @@ def test_goal_guidance_states_purpose_without_format(mode):
 
 
 def test_system_prompt_plans_format_dynamically(monkeypatch):
-    monkeypatch.setattr(settings, "cura_prompt_variant", "house")
     monkeypatch.setattr(settings, "cura_response_mode", "plain")
     ctx, _ = _evidence(COMPANION, "Why are my triglycerides high?")
     system = PromptBuilder().build(ctx, "", "Why are my triglycerides high?")[0]["content"]
@@ -92,7 +91,7 @@ def test_rich_mode_keeps_theme_contract(monkeypatch):
     monkeypatch.setattr(settings, "cura_response_mode", "rich")
     ctx, _ = _evidence(COMPANION, "How am I doing overall?")
     system = PromptBuilder().build(ctx, "", "How am I doing overall?")[0]["content"]
-    assert "overall_summary" in system and "themes" in system
+    assert "answer" in system and "follow_up_questions" in system
 
 
 FORMAT_DIVERSITY = [

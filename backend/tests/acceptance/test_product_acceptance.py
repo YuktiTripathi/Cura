@@ -173,7 +173,7 @@ def test_a_follow_up_never_wraps_the_question_in_a_nonsense_template():
 
 def test_a_date_with_no_report_is_said_plainly():
     answer = _ask("What is my HbA1c on 2020-01-01?")["answer"]
-    assert "I don't have a result from 2020-01-01" in answer
+    assert "I don't have a result from 1 Jan 2020" in answer
 
 
 def test_a_glucose_question_is_read_together_with_hba1c():

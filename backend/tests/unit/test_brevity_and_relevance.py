@@ -90,18 +90,6 @@ def test_no_visible_em_dash_in_any_mode(model, monkeypatch, mode):
 # ------------------------------------------------------------ prompts ask for brevity
 
 
-def test_length_notes_match_question_complexity():
-    from app.pipeline.prompt_modules import length_note
-
-    simple = length_note("What is cholesterol?", [])
-    marker = length_note("Why is my HbA1c high?", ["BIOMARKER_LOOKUP"])
-    report = length_note("Explain my blood report", ["REPORT_INTERPRETATION"])
-    assert "1 or 2 short bullets" in simple
-    assert "2 or 3 short bullets" in marker
-    assert "3 to 5 grouped bullets" in report
-    assert "do not pad" in simple.lower() or "Do not pad" in simple
-
-
 def test_prompts_ask_for_the_shortest_complete_answer(monkeypatch):
     for mode in ("rich", "plain", "semantic"):
         monkeypatch.setattr(settings, "cura_response_mode", mode)

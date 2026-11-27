@@ -9,7 +9,6 @@ from app.contracts.health_context import HealthContext
 from app.pipeline.context_builder import ContextBuilder
 from app.pipeline.evidence_inventory import assemble_evidence
 from app.pipeline.prompt_builder import PromptBuilder
-from app.pipeline.prompt_modules import modules_for
 from app.pipeline.query_planner import build_query_plan
 
 BUTTON = "Help me understand my latest blood report"
@@ -140,10 +139,6 @@ def test_overview_prompt_is_added_without_replacing_safety():
     )
     messages = PromptBuilder().build(context, "", BUTTON)
     system = messages[0]["content"]
-    assert "Do not diagnose or prescribe" in system  # the safety rules are not replaced
+    assert "Do not diagnose, prescribe" in system
     user = messages[1]["content"]
     assert "latest blood report" in user.lower()
-
-    ldl_plan = build_query_plan("What does my LDL mean?")
-    ldl_context = context.model_copy(update={"task_contract": ldl_plan.task_contract, "intent": ldl_plan.intent})
-    assert "BLOOD_REPORT_OVERVIEW" not in modules_for(ldl_context, "What does my LDL mean?")

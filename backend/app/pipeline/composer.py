@@ -181,7 +181,7 @@ def _diet_on_record(context) -> str | None:
 
 def _staged_follow_ups(llm_questions, plan, context, history, shown, answer_text="") -> list[FollowUpSuggestion]:
     """The four questions the house prompt asks for (understanding, personal relevance, action, explore), on whole report answers."""
-    if settings.cura_prompt_variant != "house" or not (plan.intent in _OVERVIEW_INTENTS or kind_of(context, plan.raw_message) == TurnKind.nutrition_overview):
+    if not (plan.intent in _OVERVIEW_INTENTS or kind_of(context, plan.raw_message) == TurnKind.nutrition_overview):
         return []
     if plan.knowledge_scope != KnowledgeScope.personal or not (context.markers or context.bio_ai_risks):
         return []
@@ -331,14 +331,14 @@ class ResponseComposer:
         )
         from app.pipeline.prompt_modules import is_lifestyle_topic_question
 
-        if settings.cura_prompt_variant == "house" and is_lifestyle_topic_question(plan.raw_message):
+        if is_lifestyle_topic_question(plan.raw_message):
             # A habit question (sleep, stress, exercise) must not carry a table of unrelated lab results.
             presentation.findings = []
             presentation.raw_findings = []
             presentation.themes = []
             if presentation.headline in _CARD_TITLES:
                 presentation.headline = None
-        if settings.cura_prompt_variant == "house" and plan.intent in _OVERVIEW_INTENTS and presentation.headline:
+        if plan.intent in _OVERVIEW_INTENTS and presentation.headline:
             # One result's name must not title a card that holds several results.
             shown = list(presentation.findings or [])
             if plan.intent.value.startswith("bio_ai") and shown and all(f.source_type == "bio_ai_report" for f in shown):
@@ -348,20 +348,19 @@ class ResponseComposer:
                 presentation.headline = None
             elif sum(1 for m in (context.markers or []) if _marker_out_of_range(m)) > 1:
                 presentation.headline = "Results outside your range"
-        if settings.cura_prompt_variant == "house" and kind_of(context, plan.raw_message) == TurnKind.nutrition_overview and presentation.headline:
+        if kind_of(context, plan.raw_message) == TurnKind.nutrition_overview and presentation.headline:
             presentation.headline = "Results linked to your diet"
-        if settings.cura_prompt_variant == "house" and not plan.intent.value.startswith("bio_ai") and not _asks_for_bio_ai(plan.raw_message):
+        if not plan.intent.value.startswith("bio_ai") and not _asks_for_bio_ai(plan.raw_message):
             # A blood result or food question carries no Bio-AI card unless the person asked for one.
             presentation.findings = [f for f in presentation.findings if f.source_type != "bio_ai_report"]
             presentation.raw_findings = [f for f in presentation.raw_findings if f.source_type != "bio_ai_report"]
             if presentation.headline == "Your Bio-AI scores":
                 presentation.headline = None
-        if settings.cura_prompt_variant == "house" and presentation.headline in _CARD_TITLES and not presentation.findings:
+        if presentation.headline in _CARD_TITLES and not presentation.findings:
             # A card title with no card under it is just a stray heading.
             presentation.headline = None
         if (
-            settings.cura_prompt_variant == "house"
-            and plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
+            plan.intent in {IntentType.health_scenario, IntentType.broad_health_summary}
             and llm_result is not None
             and (llm_result.answer or "").strip()
         ):
@@ -418,17 +417,16 @@ class ResponseComposer:
         if presentation.overall_summary:
             presentation.overall_summary = separate_answer_layout(presentation.overall_summary)
         presentation.blocks = [item.model_dump(mode="json") for item in experience_blocks_from_answer(text, experience, context)]
-        if settings.cura_prompt_variant == "house":
-            # No "missing information" notes, and no change banners unless the person asked about change.
-            presentation.blocks = [b for b in presentation.blocks if b.get("kind") != "missing_info"]
-            from app.pipeline.markdown_tidy import friendly_text
+        # No "missing information" notes, and no change banners unless the person asked about change.
+        presentation.blocks = [b for b in presentation.blocks if b.get("kind") != "missing_info"]
+        from app.pipeline.markdown_tidy import friendly_text
 
-            for group in (presentation.findings, getattr(presentation, "raw_findings", None)):
-                for finding in group or []:
-                    if getattr(finding, "label", None):
-                        finding.label = friendly_text(finding.label)
-            if plan.intent not in {IntentType.trend, IntentType.previous_result, IntentType.bio_ai_comparison}:
-                presentation.proactive_insights = []
+        for group in (presentation.findings, getattr(presentation, "raw_findings", None)):
+            for finding in group or []:
+                if getattr(finding, "label", None):
+                    finding.label = friendly_text(finding.label)
+        if plan.intent not in {IntentType.trend, IntentType.previous_result, IntentType.bio_ai_comparison}:
+            presentation.proactive_insights = []
         presentation.suggestion_chips = [item.text for item in chips]
         if experience.topic_summary and not is_explicit_catalog_lookup(plan.raw_message or ""):
             presentation.topic_summary = experience.topic_summary.model_dump(mode="json")
@@ -505,8 +503,7 @@ class ResponseComposer:
             combined = [item for item in combined if item.text not in shown_follow_ups]
             presentation.suggestion_chips = [t for t in presentation.suggestion_chips if t not in shown_follow_ups]
         if (
-            settings.cura_prompt_variant == "house"
-            and plan.knowledge_scope != KnowledgeScope.personal
+            plan.knowledge_scope != KnowledgeScope.personal
             and context.status != "ambiguous"
             and (not answer_turn or (plan.raw_message or "").strip().endswith("?"))
         ):

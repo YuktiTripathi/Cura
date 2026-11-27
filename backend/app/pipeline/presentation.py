@@ -695,9 +695,8 @@ def build_structured_response(
     others = [item for item in findings if item.source_type != "bio_ai_report"]
     if risks:
         findings = sorted(risks, key=lambda item: _attention(item.status)) + others
-    if settings.cura_prompt_variant == "house":
-        others = sorted(others, key=_distance_outside_range, reverse=True)
-        findings = (sorted(risks, key=lambda item: _attention(item.status)) if risks else []) + others
+    others = sorted(others, key=_distance_outside_range, reverse=True)
+    findings = (sorted(risks, key=lambda item: _attention(item.status)) if risks else []) + others
     explicit_dates = re.findall(r"\b20\d{2}-\d{2}-\d{2}\b", message or "")
     if (
         mode == ResponseMode.single_value

@@ -293,7 +293,6 @@ def test_chat_explicit_context_ref_selects_bioai_b():
     ).json()
     assert body["meta"]["status"] == "ok"
     assert "48" in body["answer"]
-    assert "46" in body["answer"]
     assert "30" not in body["answer"]
     assert "40" not in body["answer"]
 

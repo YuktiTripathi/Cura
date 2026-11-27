@@ -240,15 +240,6 @@ _NARROW_INTENTS = frozenset({
 })
 
 
-def _use_langchain() -> bool:
-    """LangChain sequence when configured and installed; otherwise the native path, never an error."""
-    if (settings.orchestration_engine or "native").strip().lower() != "langchain":
-        return False
-    from app.orchestration.chain import langchain_available
-
-    return langchain_available()
-
-
 class ChatService:
     def __init__(self, db: Session, registry: ProviderRegistry):
         self.db = db
@@ -367,10 +358,6 @@ class ChatService:
         self._progress = progress or ProgressEmitter()
         request_perf = perf.begin(request_id)
         try:
-            if _use_langchain():
-                from app.orchestration.chain import run_chat_chain
-
-                return run_chat_chain(self, principal, payload, request_id, eval_turn, request_perf)
             response = self._step_execute(principal, payload, request_id, eval_turn)
             response = self._step_shape(response, request_id, eval_turn)
             response = self._step_finalize(response, payload, eval_turn)
@@ -1822,7 +1809,7 @@ class ChatService:
             whole_report=plan.intent not in _NARROW_INTENTS or turn_kind == TurnKind.nutrition_overview,
             keep_layout=kind_spec.keep_layout,
         )
-        if presentation is not None and settings.cura_prompt_variant == "house":
+        if presentation is not None:
             answer, suggestions = attach_card(
                 kind_spec, answer=answer, context=context, plan=plan, presentation=presentation, suggestions=suggestions
             )
@@ -2096,7 +2083,7 @@ class ChatService:
             evidence=evidence,
             follow_ups=suggestions,
             # The house answer already carries advice tied to the findings; separate cards would repeat it.
-            recommendations=[] if (settings.cura_prompt_variant == "house" and plan.knowledge_scope == KnowledgeScope.personal) else approved_recommendations,
+            recommendations=[] if plan.knowledge_scope == KnowledgeScope.personal else approved_recommendations,
             presentation=presentation,
             experience=turn_experience,
             testing_option=testing_option,

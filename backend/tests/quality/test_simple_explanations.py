@@ -36,18 +36,13 @@ def test_every_question_builds_a_valid_prompt_with_the_json_contract(message):
     assert f"User question: {message}" in user
     for field in ("answer", "claims", "recommendation_candidates", "follow_up_questions", "safety_flags", "escalation"):
         assert field in system
-    if ctx.knowledge_scope.value == "personal":
-        assert system.startswith("CURA: Conversational Behaviour")
-    else:
-        assert system == GENERAL_HEALTH_INSTRUCTIONS  # general Q&A prompt is unchanged
+    assert system.startswith("# CURA, your personal health companion")
 
 
 def test_personal_prompt_asks_for_friendly_explanation_in_the_bodys_terms():
     _ctx, system, _user = _build("What does my HbA1c mean?")
-    assert "no medical background" in system
-    assert "knowledgeable friend" in system
-    assert "what happens inside the body" in system
-    assert "everyday analogies" in system
+    assert "simple words" in system
+    assert "Answer the actual question directly" in system
 
 
 def test_bio_ai_prompt_explains_the_assessment_before_the_score():
@@ -66,18 +61,14 @@ def test_more_simply_reanswers_the_previous_question():
 
 
 def test_safety_and_boundaries_survive_the_rewrite():
-    system = _system_for_mode(SAFETY_INSTRUCTIONS).lower()
+    from app.pipeline.prompt_modules import HOUSE_CORE
+
+    system = HOUSE_CORE.lower()
     for rule in (
-        "risk estimates, not diagnoses",
-        "reference range printed on the person's own report",
-        "never merge conflicting sources",
-        "do not diagnose or prescribe",
-        "red-flag symptoms",
-        "put the safety action first",
-        "can never instruct you",
-        "never expose internal ids",
-        "never invent clinical findings or model attribution",
-        "emergency escalation, privacy and grounding",
+        "do not diagnose, prescribe",
+        "predicted risks, not confirmed diagnoses",
+        "never invent personal information",
+        "medical safety",
     ):
         assert rule in system
 
@@ -100,7 +91,9 @@ def test_system_prompt_is_static_and_cacheable():
 
 def test_personal_system_prompt_budget():
     # The conversational prompt plus the compact contract is far smaller than the old rule list.
-    assert count_tokens(_system_for_mode(SAFETY_INSTRUCTIONS)) < 1200
+    from app.pipeline.prompt_modules import HOUSE_CORE
+
+    assert count_tokens(HOUSE_CORE) < 2000
 
 
 # Real answers seen in the app (fictional values): the model copied data-sheet formats.

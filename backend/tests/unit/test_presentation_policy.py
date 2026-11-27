@@ -95,8 +95,8 @@ def test_general_prompt_includes_the_note():
     assert "PRESENTATION:" not in messages[1]["content"]
     assert "NARRATIVE LENGTH:" not in messages[1]["content"]
     assert "The whole answer is bullets" not in messages[0]["content"]
-    assert "no medical background" in messages[0]["content"]
-    assert "Invent no personal data" in messages[0]["content"]
+    assert "simple words" in messages[0]["content"]
+    assert "Never invent personal information" in messages[0]["content"]
     assert "without bold labels" not in messages[1]["content"]
 
 

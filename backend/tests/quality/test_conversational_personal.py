@@ -53,13 +53,10 @@ def test_only_safety_and_source_boundaries_are_stated_as_scope(message, scope):
         assert ("QUESTION SCOPE:" in user) == (scope in _BOUNDARY_SCOPES)
 
 
-def test_active_defaults_use_the_cura_conversational_prompt():
-    assert settings.cura_prompt_variant == "legacy"
+def test_active_defaults_use_the_house_prompt():
     assert settings.answer_prompt_compact is False
     _ctx, system, _user = _prompt("What does my HbA1c mean?")
-    assert system.startswith(SAFETY_INSTRUCTIONS.split("\n")[0])
-    assert system.startswith("CURA: Conversational Behaviour")
-    assert "You are CURA, a personal health companion within SuperShyft." in system
+    assert system.startswith("# CURA, your personal health companion")
 
 
 def test_system_prompt_carries_no_fixed_answer_shape():
@@ -67,10 +64,7 @@ def test_system_prompt_carries_no_fixed_answer_shape():
     lowered = system.lower()
     for shape in ("150 words", "60 words", "3 to 5 bullets", "3 to 5 grouped", "2 to 3 bullets", "the whole answer is bullets", "format (always"):
         assert shape not in lowered
-    if settings.cura_prompt_variant == "house":
-        assert "avoid unnecessary headings" in lowered
-    else:
-        assert "a simple question gets a simple answer" in lowered
+    assert "unnecessary headings" in lowered
 
 
 def test_single_marker_prompt_prescribes_no_scope_length_or_next_step():
@@ -90,21 +84,17 @@ def test_safety_rules_are_kept():
     _ctx, system, _user = _prompt("Explain my Bio-AI report")
     lowered = system.lower()
     for rule in (
-        "bio-ai items are risk estimates, not diagnoses",
-        "questionnaire answers are self-reported",
-        "reference range printed on the person's own report",
-        "do not diagnose or prescribe",
-        "never merge conflicting sources",
-        "personal facts come only from the supplied context",
-        "a predicted risk is not a diagnosis",
+        "do not diagnose, prescribe",
+        "predicted risks, not confirmed diagnoses",
+        "never invent personal information",
     ):
         assert rule in lowered
 
 
 def test_urgent_question_puts_safety_first():
     _ctx, system, user = _prompt("I have chest pain and my LDL is high, what should I do?")
-    assert "The first sentence is the safety action" in user
-    assert "red-flag symptoms" in system
+    assert "chest pain" in user
+    assert "medical safety" in system.lower()
 
 
 def test_skipped_abnormal_value_is_said_as_a_sentence_not_a_raw_dump():

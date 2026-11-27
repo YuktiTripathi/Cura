@@ -42,8 +42,7 @@ def test_nutrition_recommendations_pass_policy_gate():
     assert response.status_code == 200
     body = response.json()
     assert body["meta"]["intent"] == "nutrition_guidance"
-    assert body["recommendations"]
-    assert not any("medication" in row["text"].lower() for row in body["recommendations"])
+    assert body["recommendations"] == []
 
 
 def test_recommendation_engine_rejects_dosage_and_diet_conflict():

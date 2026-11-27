@@ -51,11 +51,6 @@ class Settings(BaseSettings):
     # Reuse an identical prompt's answer. Turn off for cold-latency measurement and evals.
     answer_cache_enabled: bool = True
     answer_prompt_compact: bool = False
-    # house (default): the SuperShyft Health Assistant voice, warm and complete, no hidden
-    # brevity hints. legacy keeps the old system text. modular uses the compact core plus task modules.
-    cura_prompt_variant: str = "house"
-    # Adaptive answer plan: "off", "shadow" (build and log the plan only) or "on" (the model also gets the plan).
-    answer_plan_mode: str = "on"
     # Diagnostic package cards and retest suggestions. Clinical policy still decides
     # whether a card is allowed; this only turns the feature off.
     cura_test_suggestions_enabled: bool = True
@@ -76,9 +71,6 @@ class Settings(BaseSettings):
     # Blood and Bio-AI report answers use only the person's own results unless this is turned on.
     report_use_knowledge_base: bool = False
     llm_reasoning_effort: str = "low"
-    # "langchain": the chat turn runs as a langchain-core sequence (app/orchestration/chain.py).
-    # "native": the same four steps called in order. Same answers either way. CURA_ORCHESTRATION=native is the kill switch.
-    orchestration_engine: str = Field("native", validation_alias=AliasChoices("CURA_ORCHESTRATION", "orchestration_engine"))
     llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False
     # Explanations of an uploaded document only. Does not turn on chat, routing, or fact extraction.
