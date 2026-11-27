@@ -48,7 +48,6 @@ def test_personal_prompt_asks_for_friendly_explanation_in_the_bodys_terms():
     assert "knowledgeable friend" in system
     assert "what happens inside the body" in system
     assert "everyday analogies" in system
-    assert "no mandatory template" in system.lower()
 
 
 def test_bio_ai_prompt_explains_the_assessment_before_the_score():

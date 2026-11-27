@@ -67,8 +67,10 @@ def test_system_prompt_carries_no_fixed_answer_shape():
     lowered = system.lower()
     for shape in ("150 words", "60 words", "3 to 5 bullets", "3 to 5 grouped", "2 to 3 bullets", "the whole answer is bullets", "format (always"):
         assert shape not in lowered
-    assert "no mandatory template" in lowered
-    assert "a simple question gets a simple answer" in lowered
+    if settings.cura_prompt_variant == "house":
+        assert "avoid unnecessary headings" in lowered
+    else:
+        assert "a simple question gets a simple answer" in lowered
 
 
 def test_single_marker_prompt_prescribes_no_scope_length_or_next_step():

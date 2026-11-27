@@ -40,7 +40,7 @@
     }
    ]
   },
-  "short_description": "Total cholesterol is the full amount of cholesterol travelling in your blood, counting both the helpful and the less helpful kinds together.",
+  "short_description": "Cholesterol is a waxy substance that your body needs to build healthy cells and make certain hormones. Your liver makes cholesterol, and some also comes from the food you eat. This test measures the total amount of cholesterol travelling in your blood.",
   "what_happens_inside_my_body": [
    "Cholesterol is a waxy fat your body needs to build cells and make some hormones and vitamin D.",
    "Your liver makes most of it, and the rest comes from food.",
@@ -167,7 +167,12 @@
    "A normal total does not always mean a healthy pattern. A high HDL can hide a raised LDL inside a normal-looking total, so the separate results matter more.",
    "Thin people can have high cholesterol too, because genes play a large part."
   ],
-  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+  "definition_points": [
+   "Cholesterol is a waxy substance that your body needs to build healthy cells and make certain hormones.",
+   "Your liver makes cholesterol, and some also comes from the food you eat.",
+   "This test measures the total amount of cholesterol travelling in your blood."
+  ]
  },
  {
   "content_key": "WB-002",
@@ -213,7 +218,7 @@
     }
    ]
   },
-  "short_description": "HDL is often called good cholesterol. This test measures how much cholesterol is carried by HDL particles, which help remove extra cholesterol from your body.",
+  "short_description": "Your body needs a way to carry extra cholesterol away from its tissues. HDL helps transport some of this cholesterol back to your liver, where it can be processed and removed. This is why HDL is often called good cholesterol.",
   "what_happens_inside_my_body": [
    "HDL particles pick up spare cholesterol from tissues and artery walls.",
    "HDL carries it back to your liver, which clears it from your body.",
@@ -341,7 +346,12 @@
    "More HDL is not always better. Raising HDL with medicines has not lowered heart attacks, so doctors do not treat HDL as a target on its own.",
    "HDL concentration is not the same as HDL working well. Two people with the same HDL number can have particles that clear cholesterol differently."
   ],
-  "reference_range_note": "Healthy HDL is usually above 40 mg/dL for men and above 50 mg/dL for women. Some reports print one cut-off for everyone, so check which applies to you."
+  "reference_range_note": "Healthy HDL is usually above 40 mg/dL for men and above 50 mg/dL for women. Some reports print one cut-off for everyone, so check which applies to you.",
+  "definition_points": [
+   "Your body needs a way to carry extra cholesterol away from its tissues.",
+   "HDL helps transport some of this cholesterol back to your liver, where it can be processed and removed.",
+   "This is why HDL is often called good cholesterol."
+  ]
  },
  {
   "content_key": "WB-003",
@@ -382,7 +392,7 @@
     }
    ]
   },
-  "short_description": "Triglycerides are the most common type of fat in your blood. Your body stores spare energy from food as triglycerides and uses them as fuel between meals.",
+  "short_description": "When you eat more energy than your body immediately needs, some of it is stored as fat. Triglycerides are a form of fat that your body can use for energy later. This test measures how much of this fat is travelling in your blood.",
   "what_happens_inside_my_body": [
    "When you eat more energy than you need right away, your body turns the extra into triglycerides.",
    "Triglycerides are stored in fat cells and released later when you need energy.",
@@ -507,7 +517,12 @@
   "common_misconceptions": [
    "Triglycerides are not only about fatty food. Sugar, refined carbohydrates and alcohol often raise them more."
   ],
-  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+  "definition_points": [
+   "When you eat more energy than your body immediately needs, some of it is stored as fat.",
+   "Triglycerides are a form of fat that your body can use for energy later.",
+   "This test measures how much of this fat is travelling in your blood."
+  ]
  },
  {
   "content_key": "WB-004",
@@ -549,7 +564,7 @@
     }
    ]
   },
-  "short_description": "Non-HDL cholesterol is your total cholesterol minus your HDL. It shows all the cholesterol carried in particles that can build up in artery walls.",
+  "short_description": "Cholesterol travels through your blood inside tiny carrying particles. Some of these particles can contribute to cholesterol building up inside your blood vessels. Non-HDL cholesterol measures the cholesterol carried by all particles other than HDL.",
   "what_happens_inside_my_body": [
    "Several kinds of carrier particles, including LDL and VLDL, can leave cholesterol in artery walls.",
    "Non-HDL adds all of these together into one number.",
@@ -663,7 +678,12 @@
   "common_misconceptions": [
    "Non-HDL does not need a fasting sample to be useful, which is one reason doctors like it."
   ],
-  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+  "definition_points": [
+   "Cholesterol travels through your blood inside tiny carrying particles.",
+   "Some of these particles can contribute to cholesterol building up inside your blood vessels.",
+   "Non-HDL cholesterol measures the cholesterol carried by all particles other than HDL."
+  ]
  },
  {
   "content_key": "WB-005",
@@ -701,7 +721,7 @@
     }
    ]
   },
-  "short_description": "This ratio divides your total cholesterol by your HDL (good cholesterol). It gives a quick sense of how much of your cholesterol is the helpful kind.",
+  "short_description": "Your total cholesterol includes cholesterol carried by different types of particles. HDL helps carry extra cholesterol back to your liver. This ratio compares your total cholesterol with your HDL cholesterol to help assess heart health.",
   "what_happens_inside_my_body": [
    "A smaller number means a larger share of your cholesterol is HDL.",
    "A bigger number means less HDL compared with the total.",
@@ -794,6 +814,11 @@
   ],
   "common_misconceptions": [
    "A ratio cannot replace the separate results. Two very different cholesterol patterns can give the same ratio."
+  ],
+  "definition_points": [
+   "Your total cholesterol includes cholesterol carried by different types of particles.",
+   "HDL helps carry extra cholesterol back to your liver.",
+   "This ratio compares your total cholesterol with your HDL cholesterol to help assess heart health."
   ]
  },
  {
@@ -839,7 +864,7 @@
     }
    ]
   },
-  "short_description": "LDL is often called bad cholesterol. This result estimates how much cholesterol is carried by LDL particles, the main type that builds up in artery walls.",
+  "short_description": "LDL carries cholesterol from your liver to different parts of your body. When too much LDL cholesterol circulates in your blood, cholesterol can build up inside your blood vessels over time. This is why LDL is often called bad cholesterol, even though your body needs some of it.",
   "what_happens_inside_my_body": [
    "LDL particles deliver cholesterol to cells around your body.",
    "When there are too many, some get trapped in artery walls and form fatty deposits called plaque.",
@@ -970,7 +995,12 @@
    "Feeling well does not mean LDL is fine. High LDL causes no symptoms while it builds up in arteries.",
    "This LDL is usually calculated from other results, not measured directly, so it can be less accurate when triglycerides are very high."
   ],
-  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+  "definition_points": [
+   "LDL carries cholesterol from your liver to different parts of your body.",
+   "When too much LDL cholesterol circulates in your blood, cholesterol can build up inside your blood vessels over time.",
+   "This is why LDL is often called bad cholesterol, even though your body needs some of it."
+  ]
  },
  {
   "content_key": "WB-007",
@@ -1010,7 +1040,7 @@
     }
    ]
   },
-  "short_description": "VLDL cholesterol is the cholesterol carried in very low-density lipoprotein, a particle your liver makes to carry triglycerides (blood fats) around your body.",
+  "short_description": "Your liver sends fats to different parts of your body so they can be used or stored for energy. VLDL is one of the tiny particles that carries these fats through your blood. Cholesterol carried by these particles can also contribute to build-up inside blood vessels.",
   "what_happens_inside_my_body": [
    "Your liver packs triglycerides into VLDL particles and sends them into your blood.",
    "As they release fat to your tissues, VLDL particles shrink and can turn into LDL.",
@@ -1120,6 +1150,11 @@
   ],
   "common_misconceptions": [
    "VLDL on most reports is calculated from triglycerides, so it adds little new information on its own."
+  ],
+  "definition_points": [
+   "Your liver sends fats to different parts of your body so they can be used or stored for energy.",
+   "VLDL is one of the tiny particles that carries these fats through your blood.",
+   "Cholesterol carried by these particles can also contribute to build-up inside blood vessels."
   ]
  },
  {
@@ -1158,7 +1193,7 @@
     }
    ]
   },
-  "short_description": "This ratio compares your LDL (bad cholesterol) with your HDL (good cholesterol). It shows how much plaque-forming cholesterol you have for each unit of the helpful kind.",
+  "short_description": "LDL carries cholesterol towards different parts of your body. HDL helps carry extra cholesterol back to your liver. This ratio compares the cholesterol carried by LDL with the cholesterol carried by HDL.",
   "what_happens_inside_my_body": [
    "A higher number means more LDL compared with HDL.",
    "The ratio is calculated from your two cholesterol results, not measured separately."
@@ -1249,6 +1284,11 @@
   ],
   "common_misconceptions": [
    "A ratio cannot replace the separate results. Two very different cholesterol patterns can give the same ratio."
+  ],
+  "definition_points": [
+   "LDL carries cholesterol towards different parts of your body.",
+   "HDL helps carry extra cholesterol back to your liver.",
+   "This ratio compares the cholesterol carried by LDL with the cholesterol carried by HDL."
   ]
  },
  {
@@ -1287,7 +1327,7 @@
     }
    ]
   },
-  "short_description": "This ratio compares your HDL (good cholesterol) with your LDL (bad cholesterol). It is the LDL to HDL ratio turned the other way up, so here a higher number is better.",
+  "short_description": "HDL and LDL are two different types of cholesterol-carrying particles. HDL helps carry cholesterol back to your liver, while LDL delivers it to body tissues. This ratio shows how much HDL cholesterol you have compared with LDL cholesterol.",
   "what_happens_inside_my_body": [
    "A higher number means you have more HDL for each unit of LDL.",
    "The ratio is calculated from your two cholesterol results."
@@ -1378,6 +1418,11 @@
   ],
   "common_misconceptions": [
    "A ratio cannot replace the separate results. Two very different cholesterol patterns can give the same ratio."
+  ],
+  "definition_points": [
+   "HDL and LDL are two different types of cholesterol-carrying particles.",
+   "HDL helps carry cholesterol back to your liver, while LDL delivers it to body tissues.",
+   "This ratio shows how much HDL cholesterol you have compared with LDL cholesterol."
   ]
  },
  {
@@ -1418,7 +1463,7 @@
     }
    ]
   },
-  "short_description": "Albumin is the main protein in your blood. It is made by your liver and helps keep fluid in your blood vessels.",
+  "short_description": "Your blood contains water that needs to stay inside your blood vessels. Albumin is a protein made by your liver that helps keep this water inside your blood vessels. Without enough albumin, fluid can collect in other parts of your body, sometimes causing swelling.",
   "what_happens_inside_my_body": [
    "Albumin acts like a sponge that holds water inside your blood vessels, so it does not leak into tissues.",
    "Albumin also carries hormones, vitamins, calcium and some medicines around your body.",
@@ -1524,6 +1569,11 @@
   ],
   "common_misconceptions": [
    "Low albumin is not usually fixed by protein powder. It more often reflects illness, liver or kidney problems that need a doctor to find."
+  ],
+  "definition_points": [
+   "Your blood contains water that needs to stay inside your blood vessels.",
+   "Albumin is a protein made by your liver that helps keep this water inside your blood vessels.",
+   "Without enough albumin, fluid can collect in other parts of your body, sometimes causing swelling."
   ]
  },
  {
@@ -1563,7 +1613,7 @@
     }
    ]
   },
-  "short_description": "Alkaline phosphatase, or ALP, is an enzyme found mainly in your liver, bile ducts and bones. An enzyme is a protein that helps chemical reactions happen.",
+  "short_description": "Your body makes special proteins called enzymes that help different processes happen smoothly. ALP is one of these proteins and is found mainly in your liver and bones. Measuring ALP can give doctors clues about your bone health and how well bile, a liquid that helps digest fat, is flowing from your liver.",
   "what_happens_inside_my_body": [
    "ALP is an enzyme, a protein that speeds up chemical reactions. It is found mainly in the liver, the bile ducts and bone.",
    "Small amounts leak into your blood all the time.",
@@ -1670,6 +1720,11 @@
   ],
   "common_misconceptions": [
    "A high ALP does not always mean a liver problem. In children, teenagers and pregnant women it is often expected, and in adults it may come from bone."
+  ],
+  "definition_points": [
+   "Your body makes special proteins called enzymes that help different processes happen smoothly.",
+   "ALP is one of these proteins and is found mainly in your liver and bones.",
+   "Measuring ALP can give doctors clues about your bone health and how well bile, a liquid that helps digest fat, is flowing from your liver."
   ]
  },
  {
@@ -1712,7 +1767,7 @@
     }
    ]
   },
-  "short_description": "Direct bilirubin is the part of bilirubin that your liver has already processed and is ready to send out of your body in bile.",
+  "short_description": "Your body regularly breaks down old red blood cells and replaces them with new ones. This leaves behind a yellow waste substance called bilirubin, which your liver processes so it can be removed. Direct bilirubin measures mainly the bilirubin that your liver has already processed.",
   "what_happens_inside_my_body": [
    "When old red blood cells break down, they release a yellow pigment called bilirubin.",
    "Your liver changes it into a water-friendly form called direct bilirubin.",
@@ -1805,6 +1860,11 @@
   ],
   "common_misconceptions": [
    "Yellow eyes are not always from eating too much oily food. When direct bilirubin is high, a doctor needs to check the bile ducts and liver."
+  ],
+  "definition_points": [
+   "Your body regularly breaks down old red blood cells and replaces them with new ones.",
+   "This leaves behind a yellow waste substance called bilirubin, which your liver processes so it can be removed.",
+   "Direct bilirubin measures mainly the bilirubin that your liver has already processed."
   ]
  },
  {
@@ -1846,7 +1906,7 @@
     }
    ]
   },
-  "short_description": "Total bilirubin measures all the bilirubin in your blood. Bilirubin is a yellow pigment made when old red blood cells are broken down.",
+  "short_description": "When old red blood cells break down, they leave behind a yellow substance called bilirubin. Your liver processes this substance and helps your body remove it. Total bilirubin measures all the bilirubin present in your blood.",
   "what_happens_inside_my_body": [
    "Your body replaces red blood cells every few months, and the old ones are broken down.",
    "Breaking them down releases bilirubin, which your liver processes and sends out in bile.",
@@ -1949,6 +2009,11 @@
   ],
   "common_misconceptions": [
    "Gilbert syndrome is not liver disease. It is a common inherited pattern that does not damage the liver."
+  ],
+  "definition_points": [
+   "When old red blood cells break down, they leave behind a yellow substance called bilirubin.",
+   "Your liver processes this substance and helps your body remove it.",
+   "Total bilirubin measures all the bilirubin present in your blood."
   ]
  },
  {
@@ -1987,7 +2052,7 @@
     }
    ]
   },
-  "short_description": "Gamma-glutamyl transferase, or GGT, is an enzyme found mostly in the liver and bile ducts. It rises when the liver or bile ducts are under strain.",
+  "short_description": "Your liver makes a liquid called bile that helps your body digest fats. Bile travels through tiny tubes called bile ducts. GGT is a protein whose level can give doctors clues about problems affecting your liver or these tubes.",
   "what_happens_inside_my_body": [
    "GGT helps your cells move substances in and out and handle protective molecules.",
    "When liver cells or bile ducts are irritated, more GGT spills into your blood.",
@@ -2096,6 +2161,11 @@
   ],
   "common_misconceptions": [
    "GGT is not only an alcohol test. Fatty liver, bile duct problems and medicines raise it too."
+  ],
+  "definition_points": [
+   "Your liver makes a liquid called bile that helps your body digest fats.",
+   "Bile travels through tiny tubes called bile ducts.",
+   "GGT is a protein whose level can give doctors clues about problems affecting your liver or these tubes."
   ]
  },
  {
@@ -2135,7 +2205,7 @@
     }
    ]
   },
-  "short_description": "Total protein measures all the protein in the liquid part of your blood. It is mainly made up of albumin and globulins.",
+  "short_description": "Your blood contains different proteins that help transport substances, fight infections and keep fluid inside blood vessels. Your liver makes many of these proteins, while others are made by your body's defence cells. This test measures the total amount of these proteins in your blood.",
   "what_happens_inside_my_body": [
    "Albumin keeps fluid in your blood vessels and carries substances around your body.",
    "Globulins include antibodies that fight infection, as well as carrier and clotting proteins.",
@@ -2238,6 +2308,11 @@
   ],
   "common_misconceptions": [
    "Total protein does not show how much protein you eat. It mostly reflects albumin and antibodies made by your body."
+  ],
+  "definition_points": [
+   "Your blood contains different proteins that help transport substances, fight infections and keep fluid inside blood vessels.",
+   "Your liver makes many of these proteins, while others are made by your body's defence cells.",
+   "This test measures the total amount of these proteins in your blood."
   ]
  },
  {
@@ -2278,7 +2353,7 @@
     }
    ]
   },
-  "short_description": "Aspartate aminotransferase, or AST, is an enzyme found in the liver and also in muscles, including the heart. It leaks into the blood when these cells are damaged.",
+  "short_description": "Your liver, muscles and other body parts contain tiny proteins called enzymes that help cells work. AST is one of these proteins, and it can enter your blood when certain cells are damaged. Measuring AST can help doctors look for signs of injury in the liver, muscles or other tissues.",
   "what_happens_inside_my_body": [
    "AST helps your cells turn food into energy.",
    "Healthy cells keep most of it inside. When liver or muscle cells are hurt, more AST spills into your blood.",
@@ -2395,6 +2470,11 @@
   "common_misconceptions": [
    "Normal liver enzymes do not rule out fatty liver. A good share of people with fat in the liver have normal ALT and AST.",
    "A high AST is not always the liver. Muscles contain AST too, so a recent hard workout can raise it."
+  ],
+  "definition_points": [
+   "Your liver, muscles and other body parts contain tiny proteins called enzymes that help cells work.",
+   "AST is one of these proteins, and it can enter your blood when certain cells are damaged.",
+   "Measuring AST can help doctors look for signs of injury in the liver, muscles or other tissues."
   ]
  },
  {
@@ -2438,7 +2518,7 @@
     }
    ]
   },
-  "short_description": "Alanine aminotransferase, or ALT, is an enzyme found mainly in the liver. A high level in the blood is one of the clearest signs that liver cells are under strain.",
+  "short_description": "Your liver contains special proteins that help it process nutrients from your food. ALT is one of these proteins and is found mainly inside liver cells. When liver cells are injured, more ALT can enter your blood, making it a useful clue about liver health.",
   "what_happens_inside_my_body": [
    "ALT helps liver cells turn food into energy.",
    "When liver cells are irritated or damaged, ALT leaks into the blood.",
@@ -2553,6 +2633,11 @@
   "common_misconceptions": [
    "Normal liver enzymes do not rule out fatty liver. A good share of people with fat in the liver have normal ALT and AST.",
    "The size of the ALT rise does not show how serious liver disease is."
+  ],
+  "definition_points": [
+   "Your liver contains special proteins that help it process nutrients from your food.",
+   "ALT is one of these proteins and is found mainly inside liver cells.",
+   "When liver cells are injured, more ALT can enter your blood, making it a useful clue about liver health."
   ]
  },
  {
@@ -2592,7 +2677,7 @@
     }
    ]
   },
-  "short_description": "Indirect bilirubin is the part of bilirubin that has not yet been processed by your liver. It is worked out by subtracting direct bilirubin from total bilirubin.",
+  "short_description": "Your body produces bilirubin when it breaks down old red blood cells. Before your liver processes this waste, it travels through your blood in an unprocessed form. This is called indirect bilirubin.",
   "what_happens_inside_my_body": [
    "When red blood cells break down, they release bilirubin into the blood first in this unprocessed form.",
    "The liver then picks it up and changes it so it can leave the body."
@@ -2681,6 +2766,11 @@
   ],
   "common_misconceptions": [
    "A mildly high indirect bilirubin with normal liver enzymes is often Gilbert syndrome, which is not dangerous."
+  ],
+  "definition_points": [
+   "Your body produces bilirubin when it breaks down old red blood cells.",
+   "Before your liver processes this waste, it travels through your blood in an unprocessed form.",
+   "This is called indirect bilirubin."
   ]
  },
  {
@@ -2720,7 +2810,7 @@
     }
    ]
   },
-  "short_description": "Globulins are a group of blood proteins that include antibodies, which fight infection, as well as proteins that carry substances and help blood clot.",
+  "short_description": "Your blood contains a group of proteins called globulins that perform different jobs. Some help your body fight infections, while others carry important substances through your blood. Measuring globulin helps doctors learn more about these blood proteins.",
   "what_happens_inside_my_body": [
    "Immune cells make antibodies, a major type of globulin.",
    "The liver makes many other globulins.",
@@ -2815,6 +2905,11 @@
   ],
   "common_misconceptions": [
    "Globulin is not one protein. It is a group, including antibodies, so a high result needs more tests to see which part is raised."
+  ],
+  "definition_points": [
+   "Your blood contains a group of proteins called globulins that perform different jobs.",
+   "Some help your body fight infections, while others carry important substances through your blood.",
+   "Measuring globulin helps doctors learn more about these blood proteins."
   ]
  },
  {
@@ -2854,7 +2949,7 @@
     }
    ]
   },
-  "short_description": "The albumin to globulin ratio compares the two main groups of blood proteins. It is worked out from your albumin and globulin results.",
+  "short_description": "Albumin and globulin are two major groups of proteins in your blood. Albumin helps keep fluid inside blood vessels, while globulins help with transport and your body's defence system. This ratio compares the amount of albumin with the amount of globulin in your blood.",
   "what_happens_inside_my_body": [
    "Usually there is a little more albumin than globulin in the blood.",
    "The ratio changes if one group rises or falls more than the other."
@@ -2935,6 +3030,11 @@
   ],
   "common_misconceptions": [
    "The ratio adds little when albumin and globulin are both normal."
+  ],
+  "definition_points": [
+   "Albumin and globulin are two major groups of proteins in your blood.",
+   "Albumin helps keep fluid inside blood vessels, while globulins help with transport and your body's defence system.",
+   "This ratio compares the amount of albumin with the amount of globulin in your blood."
   ]
  },
  {
@@ -2973,7 +3073,7 @@
     }
    ]
   },
-  "short_description": "The AST to ALT ratio compares two liver enzymes. The pattern can give clues about what is affecting the liver.",
+  "short_description": "AST and ALT are proteins that can enter your blood when certain cells are injured. ALT is found mainly in the liver, while AST is also found in muscles and other body parts. Comparing them can help doctors understand patterns in your liver-related results.",
   "what_happens_inside_my_body": [
    "AST is found in the liver and in muscle, while ALT is found mainly in the liver.",
    "The ratio is worked out from your two results."
@@ -3055,6 +3155,11 @@
   ],
   "common_misconceptions": [
    "The ratio is not a diagnosis. It only hints at a pattern when AST or ALT is raised."
+  ],
+  "definition_points": [
+   "AST and ALT are proteins that can enter your blood when certain cells are injured.",
+   "ALT is found mainly in the liver, while AST is also found in muscles and other body parts.",
+   "Comparing them can help doctors understand patterns in your liver-related results."
   ]
  },
  {
@@ -3094,7 +3199,7 @@
     }
    ]
   },
-  "short_description": "Blood urea nitrogen, or BUN, measures urea in your blood. Urea is a waste product made when your body breaks down protein, and your kidneys remove it.",
+  "short_description": "When your body uses proteins from food, it produces a waste substance called urea. Your kidneys help remove urea from your blood through urine. BUN measures the nitrogen contained in this waste and helps doctors assess kidney health.",
   "what_happens_inside_my_body": [
    "When your body uses protein, it makes ammonia, which the liver turns into urea.",
    "Urea travels in the blood to the kidneys, which filter it out into urine.",
@@ -3204,6 +3309,11 @@
   ],
   "common_misconceptions": [
    "A high BUN on its own does not mean kidney failure. Dehydration is a very common reason, which is why it is read with creatinine."
+  ],
+  "definition_points": [
+   "When your body uses proteins from food, it produces a waste substance called urea.",
+   "Your kidneys help remove urea from your blood through urine.",
+   "BUN measures the nitrogen contained in this waste and helps doctors assess kidney health."
   ]
  },
  {
@@ -3245,7 +3355,7 @@
     }
    ]
   },
-  "short_description": "Total calcium measures all the calcium in your blood. Calcium keeps bones strong and helps nerves, muscles and the heart work properly.",
+  "short_description": "Calcium is a mineral that helps build strong bones and teeth. Your muscles, nerves and heart also need calcium to work properly. This test measures the total amount of calcium travelling in your blood.",
   "what_happens_inside_my_body": [
    "Most of your calcium is stored in your bones and teeth.",
    "A small amount in the blood helps muscles contract, nerves send signals and blood clot.",
@@ -3357,6 +3467,11 @@
   ],
   "common_misconceptions": [
    "Blood calcium does not show how strong your bones are. The body keeps blood calcium steady by taking it from bone if needed."
+  ],
+  "definition_points": [
+   "Calcium is a mineral that helps build strong bones and teeth.",
+   "Your muscles, nerves and heart also need calcium to work properly.",
+   "This test measures the total amount of calcium travelling in your blood."
   ]
  },
  {
@@ -3388,7 +3503,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Chloride is a salt mineral in your blood. It works with sodium to keep the right amount of fluid in your body and the right acid balance in your blood.",
+  "short_description": "Chloride is a mineral found in your body fluids and in common salt. It helps your body maintain the right amount of water and the right chemical balance. Measuring chloride helps doctors understand how well this balance is being maintained.",
   "what_happens_inside_my_body": [
    "Chloride mostly comes from salt in food.",
    "Chloride moves with sodium and water, helping balance fluid inside and outside your cells.",
@@ -3485,6 +3600,11 @@
   ],
   "common_misconceptions": [
    "Chloride is rarely a problem on its own. It is read with sodium and bicarbonate to understand fluid and acid balance."
+  ],
+  "definition_points": [
+   "Chloride is a mineral found in your body fluids and in common salt.",
+   "It helps your body maintain the right amount of water and the right chemical balance.",
+   "Measuring chloride helps doctors understand how well this balance is being maintained."
   ]
  },
  {
@@ -3527,7 +3647,7 @@
     }
    ]
   },
-  "short_description": "Creatinine is a waste product made by your muscles as they work. Your kidneys filter it out, so its level in blood is a good guide to how well your kidneys are working.",
+  "short_description": "Your muscles produce a small amount of waste as part of their everyday activity. This waste is called creatinine, and your kidneys normally remove it through urine. Measuring creatinine helps doctors understand how well your kidneys are filtering your blood.",
   "what_happens_inside_my_body": [
    "Your muscles make creatinine at a fairly steady rate every day.",
    "Healthy kidneys filter it out of your blood and into your urine.",
@@ -3646,6 +3766,11 @@
   ],
   "common_misconceptions": [
    "A high creatinine in a muscular person or someone taking creatine may not mean kidney damage. Doctors may use other tests to check."
+  ],
+  "definition_points": [
+   "Your muscles produce a small amount of waste as part of their everyday activity.",
+   "This waste is called creatinine, and your kidneys normally remove it through urine.",
+   "Measuring creatinine helps doctors understand how well your kidneys are filtering your blood."
   ]
  },
  {
@@ -3678,7 +3803,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Sodium is the main salt mineral in your blood. It controls how much water your body holds and helps nerves and muscles work.",
+  "short_description": "Sodium is a mineral that helps control how much water stays inside and outside your body's cells. It also helps your nerves send messages and your muscles move. This test measures the amount of sodium in your blood.",
   "what_happens_inside_my_body": [
    "Sodium mostly comes from salt in food.",
    "Sodium pulls water with it, so it helps decide how much fluid is in your blood and around your cells.",
@@ -3779,6 +3904,11 @@
   ],
   "common_misconceptions": [
    "Blood sodium is not a measure of how much salt you eat. Healthy kidneys keep it steady whatever your intake, though salt still affects blood pressure."
+  ],
+  "definition_points": [
+   "Sodium is a mineral that helps control how much water stays inside and outside your body's cells.",
+   "It also helps your nerves send messages and your muscles move.",
+   "This test measures the amount of sodium in your blood."
   ]
  },
  {
@@ -3818,7 +3948,7 @@
     }
    ]
   },
-  "short_description": "Urea is a waste product made when your body breaks down protein. Your kidneys filter it out into urine.",
+  "short_description": "Your body produces waste when it breaks down proteins from food. Your liver turns some of this waste into a substance called urea. Your kidneys remove urea through urine, so measuring it gives clues about how your body handles this waste.",
   "what_happens_inside_my_body": [
    "Your liver turns waste from protein into urea.",
    "Urea travels in the blood to the kidneys, which filter it into urine.",
@@ -3922,6 +4052,11 @@
   ],
   "common_misconceptions": [
    "Urea and BUN measure the same waste in different units, so they move together."
+  ],
+  "definition_points": [
+   "Your body produces waste when it breaks down proteins from food.",
+   "Your liver turns some of this waste into a substance called urea.",
+   "Your kidneys remove urea through urine, so measuring it gives clues about how your body handles this waste."
   ]
  },
  {
@@ -3951,7 +4086,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Uric acid is a waste product made when your body breaks down purines, natural substances found in your cells and in some foods.",
+  "short_description": "Your body regularly breaks down certain substances found in its own cells and in food. This process creates a waste substance called uric acid, which is mainly removed by your kidneys. Too much uric acid can sometimes form tiny crystals in your joints or kidneys.",
   "what_happens_inside_my_body": [
    "Purines are found in all body cells and in foods like red meat, organ meat, some seafood and beer.",
    "When purines break down, uric acid forms and is mostly removed by the kidneys.",
@@ -4063,6 +4198,11 @@
   "common_misconceptions": [
    "High uric acid does not always cause gout or kidney stones; many people with high levels have no health problems.",
    "Dal and vegetables are not the main problem for most people with high uric acid. Alcohol, sugary drinks, red and organ meat matter more."
+  ],
+  "definition_points": [
+   "Your body regularly breaks down certain substances found in its own cells and in food.",
+   "This process creates a waste substance called uric acid, which is mainly removed by your kidneys.",
+   "Too much uric acid can sometimes form tiny crystals in your joints or kidneys."
   ]
  },
  {
@@ -4101,7 +4241,7 @@
     }
    ]
   },
-  "short_description": "The BUN to creatinine ratio compares two kidney waste products. The pattern can help show whether a kidney result is linked to hydration or to the kidneys themselves.",
+  "short_description": "BUN and creatinine are two measurements related to waste products removed by your kidneys. They can also change depending on things such as hydration and how much waste your body produces. Comparing them can help doctors better understand changes in your kidney-related results.",
   "what_happens_inside_my_body": [
    "BUN changes with hydration and protein, while creatinine is steadier.",
    "The ratio is calculated from your two results."
@@ -4192,6 +4332,11 @@
   ],
   "common_misconceptions": [
    "The ratio does not measure kidney function by itself. It helps a doctor think about dehydration or bleeding when urea is raised."
+  ],
+  "definition_points": [
+   "BUN and creatinine are two measurements related to waste products removed by your kidneys.",
+   "They can also change depending on things such as hydration and how much waste your body produces.",
+   "Comparing them can help doctors better understand changes in your kidney-related results."
   ]
  },
  {
@@ -4230,7 +4375,7 @@
     }
    ]
   },
-  "short_description": "The urea to creatinine ratio compares two kidney waste products. It works like the BUN to creatinine ratio, using urea instead of BUN.",
+  "short_description": "Urea is produced when your body uses proteins, while creatinine comes mainly from your muscles. Your kidneys help remove both substances from your blood. This ratio compares their levels to provide additional information about kidney function and hydration.",
   "what_happens_inside_my_body": [
    "Urea changes with hydration and diet, while creatinine is steadier.",
    "The ratio is calculated from your two results."
@@ -4320,6 +4465,11 @@
   ],
   "common_misconceptions": [
    "The ratio does not measure kidney function by itself. It helps a doctor think about dehydration or bleeding when urea is raised."
+  ],
+  "definition_points": [
+   "Urea is produced when your body uses proteins, while creatinine comes mainly from your muscles.",
+   "Your kidneys help remove both substances from your blood.",
+   "This ratio compares their levels to provide additional information about kidney function and hydration."
   ]
  },
  {
@@ -4362,7 +4512,7 @@
     }
    ]
   },
-  "short_description": "eGFR estimates how much blood your kidneys clean each minute. The name stands for estimated glomerular (kidney filter) filtration rate.",
+  "short_description": "Your kidneys work like filters that clean waste from your blood. eGFR is an estimate of how much blood your kidneys can filter in a certain amount of time. It helps doctors understand how well your kidneys are performing their filtering job.",
   "what_happens_inside_my_body": [
    "Each kidney has around a million tiny filters that clean waste and extra water from your blood.",
    "eGFR is calculated from your creatinine, age and sex.",
@@ -4482,7 +4632,12 @@
   "common_misconceptions": [
    "One low eGFR is not a diagnosis. Doctors repeat the test and look at urine results before deciding."
   ],
-  "reference_range_note": "Lab ranges for eGFR vary. NIDDK notes that an eGFR below 60 may mean kidney disease, whatever the printed range, so a result under 60 is worth discussing with a doctor."
+  "reference_range_note": "Lab ranges for eGFR vary. NIDDK notes that an eGFR below 60 may mean kidney disease, whatever the printed range, so a result under 60 is worth discussing with a doctor.",
+  "definition_points": [
+   "Your kidneys work like filters that clean waste from your blood.",
+   "eGFR is an estimate of how much blood your kidneys can filter in a certain amount of time.",
+   "It helps doctors understand how well your kidneys are performing their filtering job."
+  ]
  },
  {
   "content_key": "WB-032",
@@ -4520,7 +4675,7 @@
     }
    ]
   },
-  "short_description": "Phosphate is a mineral that works with calcium to build bones and teeth. It also helps your cells store and use energy.",
+  "short_description": "Phosphorus is a mineral that works with calcium to build strong bones and teeth. Your body also needs it to store and use energy. Your kidneys help control its level, so measuring phosphate gives clues about mineral balance and kidney health.",
   "what_happens_inside_my_body": [
    "Most phosphate is stored in your bones.",
    "The rest helps every cell make energy and build its outer wall.",
@@ -4624,6 +4779,11 @@
   ],
   "common_misconceptions": [
    "Phosphate is rarely about diet alone in healthy people. It mainly reflects kidney and hormone balance."
+  ],
+  "definition_points": [
+   "Phosphorus is a mineral that works with calcium to build strong bones and teeth.",
+   "Your body also needs it to store and use energy.",
+   "Your kidneys help control its level, so measuring phosphate gives clues about mineral balance and kidney health."
   ]
  },
  {
@@ -4663,7 +4823,7 @@
     }
    ]
   },
-  "short_description": "Potassium is a mineral in your blood that helps your nerves, muscles and especially your heart beat steadily.",
+  "short_description": "Potassium is a mineral that helps your muscles move and your nerves send messages. Your heart also needs the right amount of potassium to beat properly. Your kidneys help maintain the right amount of potassium in your blood.",
   "what_happens_inside_my_body": [
    "Potassium mostly lives inside your cells, with a small amount in the blood.",
    "Potassium helps nerves send signals and muscles, including the heart, contract.",
@@ -4765,6 +4925,11 @@
   ],
   "common_misconceptions": [
    "A single high potassium is often a sample problem, but it is still repeated quickly because a truly high level can affect the heart."
+  ],
+  "definition_points": [
+   "Potassium is a mineral that helps your muscles move and your nerves send messages.",
+   "Your heart also needs the right amount of potassium to beat properly.",
+   "Your kidneys help maintain the right amount of potassium in your blood."
   ]
  },
  {
@@ -4803,7 +4968,7 @@
     }
    ]
   },
-  "short_description": "Magnesium is a mineral your body uses for hundreds of processes, including muscle and nerve work, energy production and keeping a steady heartbeat.",
+  "short_description": "Magnesium is a mineral that helps your muscles and nerves work properly. It also helps your body use energy from food and maintain a steady heartbeat. This test measures how much magnesium is present in your blood.",
   "what_happens_inside_my_body": [
    "Most magnesium is stored in your bones and inside cells. Only a small amount is in the blood.",
    "Magnesium helps muscles relax after they contract and helps nerves send signals.",
@@ -4913,6 +5078,11 @@
   ],
   "common_misconceptions": [
    "Blood magnesium can look normal even when body stores are a little low, because most magnesium sits inside cells and bone."
+  ],
+  "definition_points": [
+   "Magnesium is a mineral that helps your muscles and nerves work properly.",
+   "It also helps your body use energy from food and maintain a steady heartbeat.",
+   "This test measures how much magnesium is present in your blood."
   ]
  },
  {
@@ -4940,7 +5110,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Zinc is a trace mineral your body needs in small amounts for immunity, wound healing, taste and smell, and growth.",
+  "short_description": "Zinc is a mineral your body needs to grow, repair itself and stay protected from infections. It also helps wounds heal and supports your sense of taste and smell. Measuring zinc gives clues about the amount of this important mineral in your blood.",
   "what_happens_inside_my_body": [
    "Zinc helps your immune cells fight infection.",
    "Zinc is needed to heal wounds and to make new cells and proteins.",
@@ -5047,6 +5217,11 @@
   ],
   "common_misconceptions": [
    "A low zinc during an illness may not mean you need supplements. The level often recovers once the illness settles."
+  ],
+  "definition_points": [
+   "Zinc is a mineral your body needs to grow, repair itself and stay protected from infections.",
+   "It also helps wounds heal and supports your sense of taste and smell.",
+   "Measuring zinc gives clues about the amount of this important mineral in your blood."
   ]
  },
  {
@@ -5085,7 +5260,7 @@
     }
    ]
   },
-  "short_description": "Vitamin B12 is a vitamin your body needs to make healthy red blood cells, keep nerves working and make DNA, the genetic material in your cells.",
+  "short_description": "Your body needs Vitamin B12 to make healthy red blood cells that carry oxygen. It also helps keep your nerves healthy so messages can travel between your brain and body. You get B12 from foods such as milk, eggs, meat, fish and foods with added B12.",
   "what_happens_inside_my_body": [
    "B12 comes naturally from animal foods such as milk, curd, paneer, eggs, fish and meat. Fortified foods, such as some breakfast cereals and plant milks, also supply it.",
    "Your stomach needs acid and a protein called intrinsic factor to absorb B12.",
@@ -5200,6 +5375,11 @@
   "common_misconceptions": [
    "Eating dairy every day does not guarantee enough B12. Absorption problems can cause a shortage whatever you eat.",
    "A B12 shortage is not the only reason red cells become large. Folate, alcohol, thyroid and liver problems can do it too, so a doctor checks the cause."
+  ],
+  "definition_points": [
+   "Your body needs Vitamin B12 to make healthy red blood cells that carry oxygen.",
+   "It also helps keep your nerves healthy so messages can travel between your brain and body.",
+   "You get B12 from foods such as milk, eggs, meat, fish and foods with added B12."
   ]
  },
  {
@@ -5239,7 +5419,7 @@
     }
    ]
   },
-  "short_description": "This test measures 25-hydroxy vitamin D, the main form of vitamin D stored in your blood. It is the best guide to your vitamin D levels.",
+  "short_description": "Vitamin D helps your body take in calcium from the food you eat. Calcium helps build strong bones and teeth, and Vitamin D also supports your muscles. Your body can make Vitamin D when your skin receives sunlight, and you can also get some from food.",
   "what_happens_inside_my_body": [
    "Your skin makes vitamin D when exposed to sunlight. Some also comes from food.",
    "Your liver turns it into 25-hydroxy vitamin D, the form this test measures.",
@@ -5354,7 +5534,12 @@
    "Living in a sunny country does not prevent low vitamin D. Low levels are very common in India.",
    "More is not better. NIH describes levels above 50 ng/mL as too high, and very large doses can cause nausea, kidney stones and kidney damage."
   ],
-  "reference_range_note": "NIH describes 20 ng/mL or above as adequate for most people and below 12 ng/mL as too low. Many labs print a higher lower limit, such as 30 ng/mL, so a result between 20 and 30 may be flagged low; a doctor decides whether treatment is needed."
+  "reference_range_note": "NIH describes 20 ng/mL or above as adequate for most people and below 12 ng/mL as too low. Many labs print a higher lower limit, such as 30 ng/mL, so a result between 20 and 30 may be flagged low; a doctor decides whether treatment is needed.",
+  "definition_points": [
+   "Vitamin D helps your body take in calcium from the food you eat.",
+   "Calcium helps build strong bones and teeth, and Vitamin D also supports your muscles.",
+   "Your body can make Vitamin D when your skin receives sunlight, and you can also get some from food."
+  ]
  },
  {
   "content_key": "WB-038",
@@ -5381,7 +5566,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Vitamin C is a vitamin your body uses to heal wounds, build healthy skin and blood vessels, and absorb iron from plant foods.",
+  "short_description": "Vitamin C helps your body make a material called collagen that keeps your skin and other tissues strong. It also helps wounds heal and supports your body's defence against infections. Vitamin C helps your body absorb iron from plant foods.",
   "what_happens_inside_my_body": [
    "Your body cannot make or store much vitamin C, so it needs a regular supply from food.",
    "Vitamin C helps make collagen, a protein that holds skin, gums and blood vessels together.",
@@ -5488,6 +5673,11 @@
   ],
   "common_misconceptions": [
    "Vitamin C supplements have not been shown to prevent colds in most people."
+  ],
+  "definition_points": [
+   "Vitamin C helps your body make a material called collagen that keeps your skin and other tissues strong.",
+   "It also helps wounds heal and supports your body's defence against infections.",
+   "Vitamin C helps your body absorb iron from plant foods."
   ]
  },
  {
@@ -5527,7 +5717,7 @@
     }
    ]
   },
-  "short_description": "T3 is one of the two main thyroid hormones. It is the active form that tells your cells how fast to use energy.",
+  "short_description": "Your thyroid is a small gland in the front of your neck that helps control how your body uses energy. T3 is one of the chemical messages, called hormones, made using thyroid hormones in your body. It helps control processes such as your heartbeat, body temperature and energy use.",
   "what_happens_inside_my_body": [
    "Your thyroid gland in the neck makes mostly T4 and a smaller amount of T3.",
    "Much of the T3 in your body is made by converting T4 in other tissues.",
@@ -5624,6 +5814,11 @@
   ],
   "common_misconceptions": [
    "T3 is not usually the first test for thyroid problems. TSH is, and T3 helps mainly when an overactive thyroid is suspected."
+  ],
+  "definition_points": [
+   "Your thyroid is a small gland in the front of your neck that helps control how your body uses energy.",
+   "T3 is one of the chemical messages, called hormones, made using thyroid hormones in your body.",
+   "It helps control processes such as your heartbeat, body temperature and energy use."
   ]
  },
  {
@@ -5663,7 +5858,7 @@
     }
    ]
   },
-  "short_description": "T4 is the main hormone made by your thyroid gland. Your body turns it into T3, the active form that controls how fast your cells use energy.",
+  "short_description": "Your thyroid produces chemical messages that help control how quickly different parts of your body work. T4 is the main hormone released by your thyroid. Your body changes some T4 into T3, which helps control energy use and other important functions.",
   "what_happens_inside_my_body": [
    "Your thyroid makes T4 when it receives a signal called TSH from the brain.",
    "T4 travels in the blood and is converted into T3 in tissues like the liver.",
@@ -5759,6 +5954,11 @@
   ],
   "common_misconceptions": [
    "Thyroid problems are not only about weight. Tiredness, feeling cold or hot, periods, mood and heart rate can all change."
+  ],
+  "definition_points": [
+   "Your thyroid produces chemical messages that help control how quickly different parts of your body work.",
+   "T4 is the main hormone released by your thyroid.",
+   "Your body changes some T4 into T3, which helps control energy use and other important functions."
   ]
  },
  {
@@ -5798,7 +5998,7 @@
     }
    ]
   },
-  "short_description": "Thyroid-stimulating hormone, or TSH, is a signal from your brain that tells your thyroid gland how much hormone to make. It is the main first test of thyroid health.",
+  "short_description": "Your brain helps control how much hormone your thyroid makes. It does this using a chemical message called thyroid-stimulating hormone, or TSH, released by a small gland beneath the brain. Measuring TSH helps doctors understand whether your thyroid is being asked to work harder or less.",
   "what_happens_inside_my_body": [
    "The pituitary gland in your brain watches your thyroid hormone levels.",
    "If thyroid hormones are low, it sends out more TSH to push the thyroid to work harder.",
@@ -5909,7 +6109,12 @@
   "common_misconceptions": [
    "A slightly high TSH does not always need tablets. Mild rises are often rechecked, especially after an illness."
   ],
-  "reference_range_note": "TSH ranges differ between labs, and TSH is often a little low in the first three months of pregnancy, so a result just outside the printed range is judged with your symptoms, your T4 and whether you are pregnant."
+  "reference_range_note": "TSH ranges differ between labs, and TSH is often a little low in the first three months of pregnancy, so a result just outside the printed range is judged with your symptoms, your T4 and whether you are pregnant.",
+  "definition_points": [
+   "Your brain helps control how much hormone your thyroid makes.",
+   "It does this using a chemical message called thyroid-stimulating hormone, or TSH, released by a small gland beneath the brain.",
+   "Measuring TSH helps doctors understand whether your thyroid is being asked to work harder or less."
+  ]
  },
  {
   "content_key": "WB-042",
@@ -5948,7 +6153,7 @@
     }
    ]
   },
-  "short_description": "Basophils are a type of white blood cell. They are the least common type and are involved in allergic reactions and inflammation.",
+  "short_description": "Your body has different types of white blood cells that help protect you from illness. Basophils are one type that releases substances involved in allergic reactions and inflammation. This test counts how many basophils are present in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Basophils are the rarest white cell. They release histamine and other chemicals during allergic reactions and inflammation.",
@@ -6040,6 +6245,11 @@
   ],
   "common_misconceptions": [
    "A low basophil count is not a problem. They are normally so few that zero is a common result."
+  ],
+  "definition_points": [
+   "Your body has different types of white blood cells that help protect you from illness.",
+   "Basophils are one type that releases substances involved in allergic reactions and inflammation.",
+   "This test counts how many basophils are present in a certain amount of your blood."
   ]
  },
  {
@@ -6079,7 +6289,7 @@
     }
    ]
   },
-  "short_description": "Eosinophils are a type of white blood cell. They help fight parasites and take part in allergic reactions such as asthma and hay fever.",
+  "short_description": "Eosinophils are white blood cells that help your body fight certain parasites, such as worms. They are also involved in allergic reactions and conditions such as asthma. This test measures the actual number of eosinophils in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Eosinophils fight parasites, such as worms, and take part in allergic reactions such as asthma, hay fever and eczema.",
@@ -6172,6 +6382,11 @@
   ],
   "common_misconceptions": [
    "High eosinophils are not always allergy. Worm infections are a common cause in India, so a doctor may check stool or treat for worms."
+  ],
+  "definition_points": [
+   "Eosinophils are white blood cells that help your body fight certain parasites, such as worms.",
+   "They are also involved in allergic reactions and conditions such as asthma.",
+   "This test measures the actual number of eosinophils in a certain amount of your blood."
   ]
  },
  {
@@ -6211,7 +6426,7 @@
     }
    ]
   },
-  "short_description": "Lymphocytes are a type of white blood cell. They include cells that make antibodies and cells that fight viruses.",
+  "short_description": "Lymphocytes are white blood cells that help your body recognise and fight harmful germs. Some make protective substances called antibodies, while others help destroy infected cells. This test measures how many lymphocytes are present in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Lymphocytes include the cells that make antibodies and the cells that kill virus-infected cells. They also remember past infections.",
@@ -6314,6 +6529,11 @@
   ],
   "common_misconceptions": [
    "A raised lymphocyte count after a cold or fever is usually the immune system doing its job."
+  ],
+  "definition_points": [
+   "Lymphocytes are white blood cells that help your body recognise and fight harmful germs.",
+   "Some make protective substances called antibodies, while others help destroy infected cells.",
+   "This test measures how many lymphocytes are present in a certain amount of your blood."
   ]
  },
  {
@@ -6353,7 +6573,7 @@
     }
    ]
   },
-  "short_description": "Monocytes are a type of white blood cell. They clean up germs and damaged cells and help with healing.",
+  "short_description": "Monocytes are white blood cells that help clean up germs, damaged cells and unwanted material. They can move from your blood into tissues and continue helping your body's defence system. This test measures how many monocytes are present in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Monocytes travel to tissues, where they become clean-up cells that swallow germs and dead cells and help healing.",
@@ -6450,6 +6670,11 @@
   ],
   "common_misconceptions": [
    "A mildly high monocyte count after an infection is common and often settles on its own."
+  ],
+  "definition_points": [
+   "Monocytes are white blood cells that help clean up germs, damaged cells and unwanted material.",
+   "They can move from your blood into tissues and continue helping your body's defence system.",
+   "This test measures how many monocytes are present in a certain amount of your blood."
   ]
  },
  {
@@ -6489,7 +6714,7 @@
     }
    ]
   },
-  "short_description": "Neutrophils are a type of white blood cell. They are the most common type and the first responders to bacterial infections.",
+  "short_description": "Neutrophils are white blood cells that act as some of your body's first defenders against infections. They move towards harmful germs, especially bacteria, and help destroy them. This test measures how many neutrophils are available in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Neutrophils are the most common white cell. They are the first to arrive at a bacterial infection or injury and swallow germs.",
@@ -6602,6 +6827,11 @@
   ],
   "common_misconceptions": [
    "A slightly low neutrophil count in a well person is often a normal variation, especially in people of South Asian descent, but it is still worth a doctor's view if it persists."
+  ],
+  "definition_points": [
+   "Neutrophils are white blood cells that act as some of your body's first defenders against infections.",
+   "They move towards harmful germs, especially bacteria, and help destroy them.",
+   "This test measures how many neutrophils are available in a certain amount of your blood."
   ]
  },
  {
@@ -6640,7 +6870,7 @@
     }
    ]
   },
-  "short_description": "The erythrocyte (red blood cell) sedimentation rate, or ESR, measures how quickly red blood cells settle to the bottom of a tube. Faster settling is a general sign of inflammation.",
+  "short_description": "When your body responds to illness or injury, certain changes can happen in your blood. These changes can make red blood cells settle faster when placed in a testing tube. ESR measures how quickly they settle and gives doctors clues about inflammation in your body.",
   "what_happens_inside_my_body": [
    "During inflammation, the liver releases proteins that make red cells clump together.",
    "Clumped cells are heavier and settle faster.",
@@ -6757,6 +6987,11 @@
   ],
   "common_misconceptions": [
    "A normal ESR does not rule out inflammation, and a raised ESR does not show where it is. CRP is often checked alongside it."
+  ],
+  "definition_points": [
+   "When your body responds to illness or injury, certain changes can happen in your blood.",
+   "These changes can make red blood cells settle faster when placed in a testing tube.",
+   "ESR measures how quickly they settle and gives doctors clues about inflammation in your body."
   ]
  },
  {
@@ -6801,7 +7036,7 @@
     }
    ]
   },
-  "short_description": "Haemoglobin is the protein inside red blood cells that carries oxygen from your lungs to the rest of your body. It also gives blood its red colour.",
+  "short_description": "Every part of your body needs oxygen to work properly. Haemoglobin is a protein inside your red blood cells that picks up oxygen from your lungs and carries it throughout your body. Without enough haemoglobin, your body may not receive the oxygen it needs, making you feel tired or weak.",
   "what_happens_inside_my_body": [
    "Each red blood cell is packed with haemoglobin.",
    "Haemoglobin picks up oxygen in the lungs and releases it in your tissues.",
@@ -6927,6 +7162,11 @@
   ],
   "common_misconceptions": [
    "Not every low haemoglobin is from low iron. Thalassaemia trait, B12 or folate shortage and long-term illness can cause it, so iron tablets should not be started without finding the cause."
+  ],
+  "definition_points": [
+   "Every part of your body needs oxygen to work properly.",
+   "Haemoglobin is a protein inside your red blood cells that picks up oxygen from your lungs and carries it throughout your body.",
+   "Without enough haemoglobin, your body may not receive the oxygen it needs, making you feel tired or weak."
   ]
  },
  {
@@ -6965,7 +7205,7 @@
     }
    ]
   },
-  "short_description": "MCH, or mean corpuscular haemoglobin, shows the average amount of haemoglobin inside each red blood cell.",
+  "short_description": "Each red blood cell contains haemoglobin, the protein that carries oxygen. Different red blood cells can contain different amounts of haemoglobin. MCH measures how much haemoglobin each red blood cell contains on average.",
   "what_happens_inside_my_body": [
    "Haemoglobin is the oxygen-carrying protein in red cells.",
    "MCH tells you how much of it, on average, each cell contains."
@@ -7058,6 +7298,11 @@
   ],
   "common_misconceptions": [
    "MCH rarely needs separate action. It follows MCV and is read with it."
+  ],
+  "definition_points": [
+   "Each red blood cell contains haemoglobin, the protein that carries oxygen.",
+   "Different red blood cells can contain different amounts of haemoglobin.",
+   "MCH measures how much haemoglobin each red blood cell contains on average."
   ]
  },
  {
@@ -7096,7 +7341,7 @@
     }
    ]
   },
-  "short_description": "MCHC, or mean corpuscular haemoglobin concentration, shows how concentrated the haemoglobin is inside your red blood cells.",
+  "short_description": "Your red blood cells contain haemoglobin to carry oxygen. MCHC tells us how concentrated this haemoglobin is inside your red blood cells. It helps doctors understand certain changes in your red blood cells.",
   "what_happens_inside_my_body": [
    "MCHC compares the amount of haemoglobin with the size of the red cells.",
    "MCHC helps describe how well each cell is filled with haemoglobin."
@@ -7181,6 +7426,11 @@
   ],
   "common_misconceptions": [
    "A slightly unusual MCHC with otherwise normal results is often a lab variation."
+  ],
+  "definition_points": [
+   "Your red blood cells contain haemoglobin to carry oxygen.",
+   "MCHC tells us how concentrated this haemoglobin is inside your red blood cells.",
+   "It helps doctors understand certain changes in your red blood cells."
   ]
  },
  {
@@ -7224,7 +7474,7 @@
     }
    ]
   },
-  "short_description": "MCV, or mean corpuscular volume, shows the average size of your red blood cells.",
+  "short_description": "Your red blood cells are tiny cells that carry oxygen throughout your body. These cells can become larger or smaller because of different health conditions or nutrient shortages. MCV measures the average size of your red blood cells.",
   "what_happens_inside_my_body": [
    "Red cells are normally a fairly even size.",
    "Low iron tends to make them smaller, while low B12 or folate tends to make them larger."
@@ -7332,6 +7582,11 @@
   ],
   "common_misconceptions": [
    "Small red cells do not always mean low iron. Thalassaemia trait is common in India and needs different advice."
+  ],
+  "definition_points": [
+   "Your red blood cells are tiny cells that carry oxygen throughout your body.",
+   "These cells can become larger or smaller because of different health conditions or nutrient shortages.",
+   "MCV measures the average size of your red blood cells."
   ]
  },
  {
@@ -7370,7 +7625,7 @@
     }
    ]
   },
-  "short_description": "MPV, or mean platelet volume, shows the average size of your platelets. Platelets are tiny blood cells that help your blood clot.",
+  "short_description": "Platelets are tiny pieces in your blood that help stop bleeding when you get injured. They can differ in size depending on how your body makes and uses them. MPV measures the average size of your platelets.",
   "what_happens_inside_my_body": [
    "Platelets are made in the bone marrow.",
    "Young platelets are usually larger, so MPV can hint at how quickly new platelets are being made."
@@ -7454,6 +7709,11 @@
   ],
   "common_misconceptions": [
    "MPV on its own is rarely meaningful. It helps a doctor read an abnormal platelet count."
+  ],
+  "definition_points": [
+   "Platelets are tiny pieces in your blood that help stop bleeding when you get injured.",
+   "They can differ in size depending on how your body makes and uses them.",
+   "MPV measures the average size of your platelets."
   ]
  },
  {
@@ -7492,7 +7752,7 @@
     }
    ]
   },
-  "short_description": "Haematocrit, also called PCV, shows what share of your blood is made up of red blood cells.",
+  "short_description": "Your blood contains red blood cells along with water, proteins and other substances. Haematocrit tells us how much of your blood is made up of red blood cells. This helps doctors understand your red blood cell levels and the balance between blood cells and fluid.",
   "what_happens_inside_my_body": [
    "Blood is made of red cells, white cells, platelets and a liquid called plasma.",
    "Haematocrit is the percentage taken up by red cells."
@@ -7583,6 +7843,11 @@
   ],
   "common_misconceptions": [
    "Haematocrit tells the same story as haemoglobin in most people, so they are read together."
+  ],
+  "definition_points": [
+   "Your blood contains red blood cells along with water, proteins and other substances.",
+   "Haematocrit tells us how much of your blood is made up of red blood cells.",
+   "This helps doctors understand your red blood cell levels and the balance between blood cells and fluid."
   ]
  },
  {
@@ -7620,7 +7885,7 @@
     }
    ]
   },
-  "short_description": "Platelets are tiny blood cells that help stop bleeding by forming clots. The platelet count shows how many you have.",
+  "short_description": "When you get a cut, your body needs to stop the bleeding. Platelets gather around the injured area and help form a plug that slows or stops blood loss. This test measures how many platelets are present in your blood.",
   "what_happens_inside_my_body": [
    "Platelets are made in the bone marrow and live for about a week to ten days.",
    "When a blood vessel is damaged, they stick together to plug the gap."
@@ -7723,6 +7988,11 @@
   ],
   "common_misconceptions": [
    "Papaya leaf juice is not a proven treatment for low platelets in dengue. Dengue needs medical monitoring."
+  ],
+  "definition_points": [
+   "When you get a cut, your body needs to stop the bleeding.",
+   "Platelets gather around the injured area and help form a plug that slows or stops blood loss.",
+   "This test measures how many platelets are present in your blood."
   ]
  },
  {
@@ -7765,7 +8035,7 @@
     }
    ]
   },
-  "short_description": "The white blood cell count, or WBC, shows how many infection-fighting cells are in your blood.",
+  "short_description": "Your body has its own defence system that protects you from harmful germs. White blood cells are important members of this defence system. This test measures the total number of white blood cells in your blood.",
   "what_happens_inside_my_body": [
    "White blood cells are part of your immune system.",
    "Your body sends more of them into the blood when fighting infection or inflammation.",
@@ -7872,6 +8142,11 @@
   ],
   "common_misconceptions": [
    "A slightly high white count during a cold is normal and usually settles."
+  ],
+  "definition_points": [
+   "Your body has its own defence system that protects you from harmful germs.",
+   "White blood cells are important members of this defence system.",
+   "This test measures the total number of white blood cells in your blood."
   ]
  },
  {
@@ -7912,7 +8187,7 @@
     }
    ]
   },
-  "short_description": "RDW, or red cell distribution width, shows how much your red blood cells vary in size.",
+  "short_description": "Your red blood cells are usually fairly similar in size. Sometimes your body produces cells that are more different in size than usual. RDW measures how much the sizes of your red blood cells vary.",
   "what_happens_inside_my_body": [
    "Healthy red cells are mostly a similar size.",
    "When new cells are made under strain, for example with low iron or B12, sizes become more mixed."
@@ -7999,6 +8274,11 @@
   ],
   "common_misconceptions": [
    "A high RDW is a clue, not a diagnosis. It helps tell early iron shortage from thalassaemia trait."
+  ],
+  "definition_points": [
+   "Your red blood cells are usually fairly similar in size.",
+   "Sometimes your body produces cells that are more different in size than usual.",
+   "RDW measures how much the sizes of your red blood cells vary."
   ]
  },
  {
@@ -8037,7 +8317,7 @@
     }
    ]
   },
-  "short_description": "This result shows what share of your white blood cells are neutrophils. They are the most common type and the first responders to bacterial infections.",
+  "short_description": "Neutrophils are white blood cells that quickly respond when harmful germs enter your body. They are especially important for fighting bacterial infections. This test shows what percentage of your white blood cells are neutrophils.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Neutrophils are the most common white cell. They are the first to arrive at a bacterial infection or injury and swallow germs.",
@@ -8151,6 +8431,11 @@
   ],
   "common_misconceptions": [
    "A slightly low neutrophil count in a well person is often a normal variation, especially in people of South Asian descent, but it is still worth a doctor's view if it persists."
+  ],
+  "definition_points": [
+   "Neutrophils are white blood cells that quickly respond when harmful germs enter your body.",
+   "They are especially important for fighting bacterial infections.",
+   "This test shows what percentage of your white blood cells are neutrophils."
   ]
  },
  {
@@ -8189,7 +8474,7 @@
     }
    ]
   },
-  "short_description": "This result shows what share of your white blood cells are eosinophils. They help fight parasites and take part in allergic reactions such as asthma and hay fever.",
+  "short_description": "Eosinophils are white blood cells that help fight certain parasites, such as worms. They are also involved in allergies and asthma. This test shows what percentage of your white blood cells are eosinophils.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Eosinophils fight parasites, such as worms, and take part in allergic reactions such as asthma, hay fever and eczema.",
@@ -8283,6 +8568,11 @@
   ],
   "common_misconceptions": [
    "High eosinophils are not always allergy. Worm infections are a common cause in India, so a doctor may check stool or treat for worms."
+  ],
+  "definition_points": [
+   "Eosinophils are white blood cells that help fight certain parasites, such as worms.",
+   "They are also involved in allergies and asthma.",
+   "This test shows what percentage of your white blood cells are eosinophils."
   ]
  },
  {
@@ -8321,7 +8611,7 @@
     }
    ]
   },
-  "short_description": "This result shows what share of your white blood cells are lymphocytes. They include cells that make antibodies and cells that fight viruses.",
+  "short_description": "Lymphocytes help your body recognise harmful germs and fight infections. Some also help your body remember germs it has encountered before. This test shows what percentage of your white blood cells are lymphocytes.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Lymphocytes include the cells that make antibodies and the cells that kill virus-infected cells. They also remember past infections.",
@@ -8425,6 +8715,11 @@
   ],
   "common_misconceptions": [
    "A raised lymphocyte count after a cold or fever is usually the immune system doing its job."
+  ],
+  "definition_points": [
+   "Lymphocytes help your body recognise harmful germs and fight infections.",
+   "Some also help your body remember germs it has encountered before.",
+   "This test shows what percentage of your white blood cells are lymphocytes."
   ]
  },
  {
@@ -8463,7 +8758,7 @@
     }
    ]
   },
-  "short_description": "This result shows what share of your white blood cells are monocytes. They clean up germs and damaged cells and help with healing.",
+  "short_description": "Monocytes help your body remove germs, damaged cells and unwanted material. They also help organise your body's response to infections and injuries. This test shows what percentage of your white blood cells are monocytes.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Monocytes travel to tissues, where they become clean-up cells that swallow germs and dead cells and help healing.",
@@ -8561,6 +8856,11 @@
   ],
   "common_misconceptions": [
    "A mildly high monocyte count after an infection is common and often settles on its own."
+  ],
+  "definition_points": [
+   "Monocytes help your body remove germs, damaged cells and unwanted material.",
+   "They also help organise your body's response to infections and injuries.",
+   "This test shows what percentage of your white blood cells are monocytes."
   ]
  },
  {
@@ -8599,7 +8899,7 @@
     }
    ]
   },
-  "short_description": "This result shows what share of your white blood cells are basophils. They are the least common type and are involved in allergic reactions and inflammation.",
+  "short_description": "Basophils are white blood cells involved in allergic reactions and inflammation. They release substances that help your body respond to certain threats. This test shows what percentage of your white blood cells are basophils.",
   "what_happens_inside_my_body": [
    "White blood cells are made in the bone marrow, the soft tissue inside bones.",
    "Basophils are the rarest white cell. They release histamine and other chemicals during allergic reactions and inflammation.",
@@ -8692,6 +8992,11 @@
   ],
   "common_misconceptions": [
    "A low basophil count is not a problem. They are normally so few that zero is a common result."
+  ],
+  "definition_points": [
+   "Basophils are white blood cells involved in allergic reactions and inflammation.",
+   "They release substances that help your body respond to certain threats.",
+   "This test shows what percentage of your white blood cells are basophils."
   ]
  },
  {
@@ -8730,7 +9035,7 @@
     }
    ]
   },
-  "short_description": "RDW-CV shows how much your red blood cells vary in size, expressed as a percentage of their average size.",
+  "short_description": "Your red blood cells can vary in size. RDW-CV shows how different their sizes are compared with their average size. Doctors use this measurement alongside other blood results to understand changes in red blood cells.",
   "what_happens_inside_my_body": [
    "Healthy red cells are mostly a similar size.",
    "When new cells are made under strain, for example with low iron or B12, sizes become more mixed."
@@ -8815,6 +9120,11 @@
   ],
   "common_misconceptions": [
    "A high RDW is a clue, not a diagnosis. It helps tell early iron shortage from thalassaemia trait."
+  ],
+  "definition_points": [
+   "Your red blood cells can vary in size.",
+   "RDW-CV shows how different their sizes are compared with their average size.",
+   "Doctors use this measurement alongside other blood results to understand changes in red blood cells."
   ]
  },
  {
@@ -8854,7 +9164,7 @@
     }
    ]
   },
-  "short_description": "The Mentzer index is a calculation that divides your red cell size (MCV) by your red cell count. Doctors use it as a rough first clue when red cells are small.",
+  "short_description": "Different health conditions can cause red blood cells to become smaller than usual. The Mentzer Index is a number calculated using the size and number of your red blood cells. It helps doctors explore whether small red blood cells may be related to iron deficiency or certain inherited blood conditions.",
   "what_happens_inside_my_body": [
    "Both low iron and thalassaemia trait make red cells small.",
    "Thalassaemia trait tends to give many small cells, while low iron tends to give fewer."
@@ -8935,7 +9245,12 @@
      "Your index falls in the lab's range. It is only meaningful when your red cells are small."
     ]
    }
-  }
+  },
+  "definition_points": [
+   "Different health conditions can cause red blood cells to become smaller than usual.",
+   "The Mentzer Index is a number calculated using the size and number of your red blood cells.",
+   "It helps doctors explore whether small red blood cells may be related to iron deficiency or certain inherited blood conditions."
+  ]
  },
  {
   "content_key": "WB-064",
@@ -8974,7 +9289,7 @@
     }
    ]
   },
-  "short_description": "The red blood cell count shows how many red blood cells are in a small amount of your blood. Red cells carry oxygen around your body.",
+  "short_description": "Red blood cells carry oxygen from your lungs to different parts of your body. Your body continuously makes new red blood cells to replace old ones. This test measures how many red blood cells are present in a certain amount of your blood.",
   "what_happens_inside_my_body": [
    "Red cells are made in the bone marrow and live about four months.",
    "Your body needs iron, B12 and folate to make them."
@@ -9071,6 +9386,11 @@
   ],
   "common_misconceptions": [
    "A high red cell count with small cells is a classic clue to thalassaemia trait, not to having too much blood."
+  ],
+  "definition_points": [
+   "Red blood cells carry oxygen from your lungs to different parts of your body.",
+   "Your body continuously makes new red blood cells to replace old ones.",
+   "This test measures how many red blood cells are present in a certain amount of your blood."
   ]
  },
  {
@@ -9109,7 +9429,7 @@
     }
    ]
   },
-  "short_description": "The GK index is a calculation from your red cell results. Like the Mentzer index, doctors sometimes use it to tell low iron apart from thalassaemia trait when red cells are small.",
+  "short_description": "Different conditions can change the size and oxygen-carrying protein of your red blood cells. The GK Index is a number calculated using several red blood cell measurements. It helps doctors explore possible reasons for unusually small red blood cells, but cannot confirm the cause alone.",
   "what_happens_inside_my_body": [
    "The GK index combines red cell size, haemoglobin and red cell count into one number.",
    "The GK index is only meaningful when red cells are small."
@@ -9188,7 +9508,12 @@
      "Your index falls in the lab's range. It matters only if your red cells are small."
     ]
    }
-  }
+  },
+  "definition_points": [
+   "Different conditions can change the size and oxygen-carrying protein of your red blood cells.",
+   "The GK Index is a number calculated using several red blood cell measurements.",
+   "It helps doctors explore possible reasons for unusually small red blood cells, but cannot confirm the cause alone."
+  ]
  },
  {
   "content_key": "WB-066",
@@ -9226,7 +9551,7 @@
     }
    ]
   },
-  "short_description": "RDWI is a calculation that combines red cell size, size variation and red cell count. It is another screening clue used when red cells are small.",
+  "short_description": "Your red blood cells can differ in their number and size because of different health conditions. RDWI combines several red blood cell measurements into one calculated number. It provides additional clues when doctors investigate iron deficiency and certain inherited blood conditions.",
   "what_happens_inside_my_body": [
    "RDWI uses MCV, RDW and the red cell count.",
    "Like the Mentzer and GK indices, it helps compare low iron with thalassaemia trait."
@@ -9305,7 +9630,12 @@
      "Your RDWI falls in the lab's range. It matters only if your red cells are small."
     ]
    }
-  }
+  },
+  "definition_points": [
+   "Your red blood cells can differ in their number and size because of different health conditions.",
+   "RDWI combines several red blood cell measurements into one calculated number.",
+   "It provides additional clues when doctors investigate iron deficiency and certain inherited blood conditions."
+  ]
  },
  {
   "content_key": "WB-067",
@@ -9346,7 +9676,7 @@
     }
    ]
   },
-  "short_description": "Fasting blood sugar measures the amount of glucose, a type of sugar, in your blood after at least 8 hours without food.",
+  "short_description": "Your body changes much of the food you eat into a sugar called glucose, which provides energy. Even when you are not eating, your body needs to maintain enough sugar in your blood. This test measures your blood sugar after you have gone without food for a specified period.",
   "what_happens_inside_my_body": [
    "Food is broken down into glucose, which your cells use for energy.",
    "Insulin, a hormone from the pancreas, moves glucose from the blood into your cells.",
@@ -9467,7 +9797,12 @@
   "common_misconceptions": [
    "Feeling well does not mean blood sugar is normal. Prediabetes and early diabetes usually cause no symptoms."
   ],
-  "reference_range_note": "The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above for diabetes, and usually confirm diabetes with a second test."
+  "reference_range_note": "The lab range for fasting sugar is not the same as the diagnostic thresholds. Doctors use 100 to 125 mg/dL for prediabetes and 126 mg/dL or above for diabetes, and usually confirm diabetes with a second test.",
+  "definition_points": [
+   "Your body changes much of the food you eat into a sugar called glucose, which provides energy.",
+   "Even when you are not eating, your body needs to maintain enough sugar in your blood.",
+   "This test measures your blood sugar after you have gone without food for a specified period."
+  ]
  },
  {
   "content_key": "WB-068",
@@ -9506,7 +9841,7 @@
     }
    ]
   },
-  "short_description": "HbA1c shows your average blood sugar over roughly the past two to three months. It measures how much sugar has stuck to the haemoglobin in your red blood cells.",
+  "short_description": "Sugar travelling through your blood can stick to haemoglobin, the protein inside red blood cells. The more sugar circulating over time, the more can become attached. HbA1c helps us understand your average blood sugar over approximately the past two to three months.",
   "what_happens_inside_my_body": [
    "Glucose in your blood naturally sticks to haemoglobin, the oxygen-carrying protein in red cells.",
    "The more sugar in your blood over time, the more sticks.",
@@ -9631,7 +9966,12 @@
    "A normal HbA1c does not mean nothing else needs attention. It says nothing about cholesterol, blood pressure, weight or liver fat.",
    "HbA1c is an average. It cannot show sugar spikes after meals or drops in between."
   ],
-  "reference_range_note": "Labs often print 4.0 to 5.6% as the normal range. Doctors use separate diagnostic thresholds: 5.7 to 6.4% suggests prediabetes and 6.5% or above suggests diabetes, usually confirmed with a repeat test."
+  "reference_range_note": "Labs often print 4.0 to 5.6% as the normal range. Doctors use separate diagnostic thresholds: 5.7 to 6.4% suggests prediabetes and 6.5% or above suggests diabetes, usually confirmed with a repeat test.",
+  "definition_points": [
+   "Sugar travelling through your blood can stick to haemoglobin, the protein inside red blood cells.",
+   "The more sugar circulating over time, the more can become attached.",
+   "HbA1c helps us understand your average blood sugar over approximately the past two to three months."
+  ]
  },
  {
   "content_key": "WB-069",
@@ -9669,7 +10009,7 @@
     }
    ]
   },
-  "short_description": "Fasting insulin measures how much insulin is in your blood after not eating. Insulin is the hormone that moves sugar from your blood into your cells.",
+  "short_description": "Your body makes a hormone called insulin that helps move sugar from your blood into many of your cells. Your body continues making some insulin even when you have not eaten. This test measures how much insulin is present in your blood after fasting.",
   "what_happens_inside_my_body": [
    "Your pancreas releases insulin even between meals to keep sugar steady.",
    "If your cells respond poorly to insulin, the pancreas makes more to keep sugar normal. This is called insulin resistance.",
@@ -9784,6 +10124,11 @@
   ],
   "common_misconceptions": [
    "There is no agreed cut-off for fasting insulin. It is a clue to insulin resistance, not a diagnosis."
+  ],
+  "definition_points": [
+   "Your body makes a hormone called insulin that helps move sugar from your blood into many of your cells.",
+   "Your body continues making some insulin even when you have not eaten.",
+   "This test measures how much insulin is present in your blood after fasting."
   ]
  },
  {
@@ -9821,7 +10166,7 @@
     }
    ]
   },
-  "short_description": "Average blood sugar is a blood sugar value that represents an average over time, rather than one moment. Many labs calculate it from your HbA1c.",
+  "short_description": "Your blood sugar changes throughout the day depending on food, activity and other factors. Average blood sugar combines or estimates these changing levels over a period of time. It helps us understand your usual blood sugar rather than only a single reading.",
   "what_happens_inside_my_body": [
    "Blood sugar rises and falls through the day.",
    "When worked out from HbA1c, this value turns your HbA1c into everyday glucose units, covering roughly the past two to three months."
@@ -9883,6 +10228,11 @@
   ],
   "common_misconceptions": [
    "This number is not a measured sugar reading. It is HbA1c converted into sugar units."
+  ],
+  "definition_points": [
+   "Your blood sugar changes throughout the day depending on food, activity and other factors.",
+   "Average blood sugar combines or estimates these changing levels over a period of time.",
+   "It helps us understand your usual blood sugar rather than only a single reading."
   ]
  },
  {
@@ -9920,7 +10270,7 @@
     }
    ]
   },
-  "short_description": "Urine pH shows how acidic or alkaline your urine is. Your kidneys adjust it to keep your blood's acid balance steady.",
+  "short_description": "Your body needs to maintain the right chemical balance while removing waste. Urine can be more acidic or less acidic depending on food, health and how your kidneys work. Urine pH measures this acidity.",
   "what_happens_inside_my_body": [
    "A lower number means more acidic urine, and a higher number means more alkaline urine.",
    "Diet changes urine pH: meat tends to make it more acidic, while vegetables and fruit make it more alkaline."
@@ -10019,6 +10369,11 @@
   ],
   "common_misconceptions": [
    "Urine pH does not show the acidity of your blood or body. Blood pH stays tightly controlled whatever the urine shows."
+  ],
+  "definition_points": [
+   "Your body needs to maintain the right chemical balance while removing waste.",
+   "Urine can be more acidic or less acidic depending on food, health and how your kidneys work.",
+   "Urine pH measures this acidity."
   ]
  },
  {
@@ -10056,7 +10411,7 @@
     }
    ]
   },
-  "short_description": "Urobilinogen is a substance made in the gut from bilirubin, the yellow pigment from old red blood cells. A small amount normally appears in urine.",
+  "short_description": "When old red blood cells break down, your body produces a yellow waste substance called bilirubin. After your liver processes it, bacteria in your intestines change some of it into urobilinogen. A small amount can leave through urine, giving doctors clues about certain liver and blood-related processes.",
   "what_happens_inside_my_body": [
    "Bilirubin from the liver passes into the gut, where bacteria turn it into urobilinogen.",
    "Some is reabsorbed into the blood and passes out in urine."
@@ -10127,6 +10482,11 @@
   ],
   "common_misconceptions": [
    "Small amounts of urobilinogen in urine are normal."
+  ],
+  "definition_points": [
+   "When old red blood cells break down, your body produces a yellow waste substance called bilirubin.",
+   "After your liver processes it, bacteria in your intestines change some of it into urobilinogen.",
+   "A small amount can leave through urine, giving doctors clues about certain liver and blood-related processes."
   ]
  },
  {
@@ -10157,7 +10517,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Urine colour describes how your urine sample looked. Pale yellow is typical.",
+  "short_description": "Your kidneys remove waste and extra water from your body through urine. Natural waste pigments give urine its usual yellow colour. Its colour can change depending on hydration, food, medicines and certain health conditions.",
   "what_happens_inside_my_body": [
    "Urine gets its colour from a pigment called urochrome.",
    "Drinking less makes urine darker, and drinking more makes it paler."
@@ -10229,6 +10589,11 @@
   ],
   "common_misconceptions": [
    "Dark urine is not always dehydration. Dark brown urine with yellow eyes can mean a liver or bile problem."
+  ],
+  "definition_points": [
+   "Your kidneys remove waste and extra water from your body through urine.",
+   "Natural waste pigments give urine its usual yellow colour.",
+   "Its colour can change depending on hydration, food, medicines and certain health conditions."
   ]
  },
  {
@@ -10260,7 +10625,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Urine clarity describes whether your urine sample was clear or cloudy.",
+  "short_description": "Urine is usually clear because most of the waste in it is dissolved in water. Cells, tiny crystals or other substances can sometimes make urine look cloudy. Checking its clarity can provide additional information about what is present in the sample.",
   "what_happens_inside_my_body": [
    "Fresh urine is usually clear.",
    "Cloudiness can come from crystals, cells, bacteria, mucus or simply from the sample cooling."
@@ -10334,6 +10699,11 @@
   ],
   "common_misconceptions": [
    "Cloudy urine is not always infection. Crystals and standing time are common reasons."
+  ],
+  "definition_points": [
+   "Urine is usually clear because most of the waste in it is dissolved in water.",
+   "Cells, tiny crystals or other substances can sometimes make urine look cloudy.",
+   "Checking its clarity can provide additional information about what is present in the sample."
   ]
  },
  {
@@ -10371,7 +10741,7 @@
     }
    ]
   },
-  "short_description": "This checks whether sugar (glucose) is present in your urine. Normally there is little or none.",
+  "short_description": "Your kidneys filter your blood but normally return most of the useful sugar back to your body. Sometimes sugar passes into your urine instead. This test checks whether sugar is present in your urine.",
   "what_happens_inside_my_body": [
    "Your kidneys filter sugar but usually reabsorb all of it.",
    "When blood sugar is very high, the kidneys cannot keep up and sugar spills into urine."
@@ -10452,6 +10822,11 @@
   ],
   "common_misconceptions": [
    "No sugar in urine does not mean blood sugar is normal. It only appears once blood sugar is quite high."
+  ],
+  "definition_points": [
+   "Your kidneys filter your blood but normally return most of the useful sugar back to your body.",
+   "Sometimes sugar passes into your urine instead.",
+   "This test checks whether sugar is present in your urine."
   ]
  },
  {
@@ -10489,7 +10864,7 @@
     }
    ]
   },
-  "short_description": "This dipstick test looks for traces of blood in your urine, which may not be visible to the eye.",
+  "short_description": "Your kidneys normally keep blood cells inside your bloodstream while removing waste. Sometimes blood cells or blood-related substances can enter urine. This test checks for signs of blood in the urine sample.",
   "what_happens_inside_my_body": [
    "The test reacts with haemoglobin from red blood cells.",
    "The test can also react with myoglobin, a muscle protein released after muscle injury."
@@ -10575,6 +10950,11 @@
   ],
   "common_misconceptions": [
    "A positive strip without red cells under the microscope may be myoglobin, a protein released from damaged muscle, not blood."
+  ],
+  "definition_points": [
+   "Your kidneys normally keep blood cells inside your bloodstream while removing waste.",
+   "Sometimes blood cells or blood-related substances can enter urine.",
+   "This test checks for signs of blood in the urine sample."
   ]
  },
  {
@@ -10612,7 +10992,7 @@
     }
    ]
   },
-  "short_description": "This counts red blood cells seen under a microscope in your urine sample. A few can be normal.",
+  "short_description": "Red blood cells normally carry oxygen through your bloodstream. Sometimes these cells can enter urine from the kidneys or other parts of the system that carries urine out of your body. This test checks for red blood cells in your urine under a microscope.",
   "what_happens_inside_my_body": [
    "Red cells can enter urine anywhere from the kidneys to the bladder.",
    "Microscopy confirms what a dipstick blood test suggests."
@@ -10688,6 +11068,11 @@
   ],
   "common_misconceptions": [
    "Blood in urine that you cannot see still needs a repeat test, especially in people over 40 or smokers."
+  ],
+  "definition_points": [
+   "Red blood cells normally carry oxygen through your bloodstream.",
+   "Sometimes these cells can enter urine from the kidneys or other parts of the system that carries urine out of your body.",
+   "This test checks for red blood cells in your urine under a microscope."
   ]
  },
  {
@@ -10726,7 +11111,7 @@
     }
    ]
   },
-  "short_description": "This counts white blood cells, sometimes called pus cells, seen in your urine sample. A few can be normal.",
+  "short_description": "White blood cells help your body fight infections. They can sometimes enter urine when your urinary system is irritated or responding to an infection. This test checks how many of these cells are present in the urine sample.",
   "what_happens_inside_my_body": [
    "White cells fight infection.",
    "Many white cells in urine usually mean there is inflammation or infection in the urinary tract."
@@ -10798,6 +11183,11 @@
   ],
   "common_misconceptions": [
    "Pus cells without symptoms are often contamination, and do not always need antibiotics."
+  ],
+  "definition_points": [
+   "White blood cells help your body fight infections.",
+   "They can sometimes enter urine when your urinary system is irritated or responding to an infection.",
+   "This test checks how many of these cells are present in the urine sample."
   ]
  },
  {
@@ -10825,7 +11215,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Epithelial cells are cells from the lining of the urinary tract or skin, seen in your urine sample.",
+  "short_description": "The inside surfaces of your urinary system are covered with protective cells. Some of these cells naturally come off and leave your body through urine. This test checks for these cells in your urine sample.",
   "what_happens_inside_my_body": [
    "Small numbers are normal as linings shed old cells.",
    "Many cells usually mean the sample picked up skin cells during collection."
@@ -10885,6 +11275,11 @@
   ],
   "common_misconceptions": [
    "A few lining cells are normal and usually reflect how the sample was collected."
+  ],
+  "definition_points": [
+   "The inside surfaces of your urinary system are covered with protective cells.",
+   "Some of these cells naturally come off and leave your body through urine.",
+   "This test checks for these cells in your urine sample."
   ]
  },
  {
@@ -10923,7 +11318,7 @@
     }
    ]
   },
-  "short_description": "Crystals are tiny solid particles that can form in urine from minerals and salts.",
+  "short_description": "Your urine contains minerals and other waste substances dissolved in water. Sometimes these substances join together and form tiny crystals. This test checks for crystals, some of which may be related to kidney stone formation.",
   "what_happens_inside_my_body": [
    "Crystals form when urine is concentrated or its acid balance favours them.",
    "Many types are harmless and appear when the sample cools."
@@ -10998,6 +11393,11 @@
   ],
   "common_misconceptions": [
    "Crystals in a sample are not kidney stones. Many form only after the urine has cooled."
+  ],
+  "definition_points": [
+   "Your urine contains minerals and other waste substances dissolved in water.",
+   "Sometimes these substances join together and form tiny crystals.",
+   "This test checks for crystals, some of which may be related to kidney stone formation."
   ]
  },
  {
@@ -11028,7 +11428,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Casts are tiny tube-shaped particles formed in the kidney's small tubes and washed out in urine.",
+  "short_description": "Inside your kidneys are very small tubes that help process the fluid that becomes urine. Sometimes proteins and other substances collect inside these tubes and form tiny tube-shaped structures. These structures are called casts and can provide clues about what is happening inside your kidneys.",
   "what_happens_inside_my_body": [
    "Casts take the shape of the tubes they form in.",
    "Clear (hyaline) casts can appear after exercise or dehydration. Other types can point to kidney problems."
@@ -11092,6 +11492,11 @@
   ],
   "common_misconceptions": [
    "A few clear casts are often harmless; casts containing cells need a doctor's view."
+  ],
+  "definition_points": [
+   "Inside your kidneys are very small tubes that help process the fluid that becomes urine.",
+   "Sometimes proteins and other substances collect inside these tubes and form tiny tube-shaped structures.",
+   "These structures are called casts and can provide clues about what is happening inside your kidneys."
   ]
  },
  {
@@ -11129,7 +11534,7 @@
     }
    ]
   },
-  "short_description": "This reports whether bacteria were seen in your urine sample.",
+  "short_description": "Bacteria are tiny living organisms, some of which can cause infections. Finding bacteria in urine may indicate an infection, although bacteria can also enter during sample collection. This test checks whether bacteria are visible in the urine sample.",
   "what_happens_inside_my_body": [
    "Urine in the bladder is normally free of bacteria.",
    "Bacteria can come from a urine infection or from skin during collection."
@@ -11195,6 +11600,11 @@
   ],
   "common_misconceptions": [
    "Bacteria in urine without symptoms usually do not need antibiotics, except in pregnancy or before some procedures."
+  ],
+  "definition_points": [
+   "Bacteria are tiny living organisms, some of which can cause infections.",
+   "Finding bacteria in urine may indicate an infection, although bacteria can also enter during sample collection.",
+   "This test checks whether bacteria are visible in the urine sample."
   ]
  },
  {
@@ -11224,7 +11634,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "This reports whether yeast, a type of fungus, was seen in your urine sample.",
+  "short_description": "Yeast is a type of tiny fungus that can live in different parts of the body. It may sometimes be found in urine because of an infection or contamination during sample collection. This test checks whether yeast cells are present in the sample.",
   "what_happens_inside_my_body": [
    "Yeast can live harmlessly on skin and in the vagina.",
    "Yeast can enter a sample during collection or, less often, cause infection."
@@ -11293,6 +11703,11 @@
   ],
   "common_misconceptions": [
    "Yeast in a sample is often from the skin or vagina rather than the bladder."
+  ],
+  "definition_points": [
+   "Yeast is a type of tiny fungus that can live in different parts of the body.",
+   "It may sometimes be found in urine because of an infection or contamination during sample collection.",
+   "This test checks whether yeast cells are present in the sample."
   ]
  },
  {
@@ -11323,7 +11738,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "This item is labelled nitrate on your report. The standard urine dipstick test checks for nitrite, which some bacteria make. The lab needs to confirm which test was done.",
+  "short_description": "Nitrate and nitrite are related substances that can be found in urine. Some bacteria can change nitrate into nitrite, which is why certain urine tests check for nitrite when looking for infections. Your laboratory's exact test method needs to be confirmed before this result can be explained more specifically.",
   "what_happens_inside_my_body": [
    "Some bacteria that cause urine infections turn nitrate from food into nitrite.",
    "A positive nitrite test can support a urine infection."
@@ -11387,6 +11802,11 @@
   ],
   "common_misconceptions": [
    "A negative nitrite does not rule out infection. Some bacteria do not make it."
+  ],
+  "definition_points": [
+   "Nitrate and nitrite are related substances that can be found in urine.",
+   "Some bacteria can change nitrate into nitrite, which is why certain urine tests check for nitrite when looking for infections.",
+   "Your laboratory's exact test method needs to be confirmed before this result can be explained more specifically."
   ]
  },
  {
@@ -11424,7 +11844,7 @@
     }
    ]
   },
-  "short_description": "This checks for ketones in your urine. Ketones are made when your body burns fat for energy instead of sugar.",
+  "short_description": "Your body usually uses sugar from food for energy. When it starts using more fat for energy, it can produce substances called ketones. This test checks whether these substances are passing out through your urine.",
   "what_happens_inside_my_body": [
    "When you fast, eat very few carbohydrates or are unwell, your body burns more fat and makes ketones.",
    "In diabetes, a lack of insulin can make ketones build up dangerously."
@@ -11510,6 +11930,11 @@
   ],
   "common_misconceptions": [
    "Ketones after fasting are expected, but ketones with high blood sugar in diabetes need urgent care."
+  ],
+  "definition_points": [
+   "Your body usually uses sugar from food for energy.",
+   "When it starts using more fat for energy, it can produce substances called ketones.",
+   "This test checks whether these substances are passing out through your urine."
   ]
  },
  {
@@ -11547,7 +11972,7 @@
     }
    ]
   },
-  "short_description": "This checks for protein in your urine. Healthy kidneys keep almost all protein in the blood.",
+  "short_description": "Your body needs proteins for growth, repair and many other important jobs. Your kidneys normally keep most blood proteins inside your bloodstream while removing waste. This test checks whether protein is passing into your urine.",
   "what_happens_inside_my_body": [
    "Kidney filters hold back protein while letting waste pass.",
    "When filters are damaged, protein leaks into urine."
@@ -11633,6 +12058,11 @@
   ],
   "common_misconceptions": [
    "One positive protein strip after exercise or fever is often temporary, so it is repeated before drawing conclusions."
+  ],
+  "definition_points": [
+   "Your body needs proteins for growth, repair and many other important jobs.",
+   "Your kidneys normally keep most blood proteins inside your bloodstream while removing waste.",
+   "This test checks whether protein is passing into your urine."
   ]
  },
  {
@@ -11670,7 +12100,7 @@
     }
    ]
   },
-  "short_description": "Leukocyte esterase is a substance released by white blood cells. A positive test suggests white cells, and possibly infection, in the urine.",
+  "short_description": "White blood cells help your body respond to infections and irritation. These cells contain a substance called leukocyte esterase that can sometimes be detected in urine. Finding this substance can be a clue that white blood cells are present in your urine.",
   "what_happens_inside_my_body": [
    "White cells fight infection and release this enzyme.",
    "The dipstick changes colour when it detects the enzyme."
@@ -11746,6 +12176,11 @@
   ],
   "common_misconceptions": [
    "A positive strip alone does not confirm infection; symptoms and culture matter."
+  ],
+  "definition_points": [
+   "White blood cells help your body respond to infections and irritation.",
+   "These cells contain a substance called leukocyte esterase that can sometimes be detected in urine.",
+   "Finding this substance can be a clue that white blood cells are present in your urine."
   ]
  },
  {
@@ -11783,7 +12218,7 @@
     }
    ]
   },
-  "short_description": "This checks for bile pigments, mainly bilirubin, in your urine. Normally none is found.",
+  "short_description": "Your liver processes a yellow waste substance called bilirubin. Your body normally removes most of this substance through a liquid called bile, which flows into your intestines. This test checks for bile-related pigments in your urine.",
   "what_happens_inside_my_body": [
    "Bilirubin is a yellow pigment processed by the liver.",
    "When the liver or bile ducts are not working well, processed bilirubin can spill into urine and make it dark."
@@ -11859,6 +12294,11 @@
   ],
   "common_misconceptions": [
    "Bile in urine is never normal. Dark urine with yellow eyes needs prompt medical advice."
+  ],
+  "definition_points": [
+   "Your liver processes a yellow waste substance called bilirubin.",
+   "Your body normally removes most of this substance through a liquid called bile, which flows into your intestines.",
+   "This test checks for bile-related pigments in your urine."
   ]
  },
  {
@@ -11897,7 +12337,7 @@
     }
    ]
   },
-  "short_description": "Urine specific gravity shows how concentrated your urine is. It is a quick guide to how well hydrated you are and how well your kidneys concentrate urine.",
+  "short_description": "Your kidneys control how much water and waste leave your body through urine. Sometimes urine contains more water, while at other times it contains more dissolved substances. Specific gravity measures how concentrated your urine is.",
   "what_happens_inside_my_body": [
    "When you drink less, your kidneys hold on to water and urine becomes more concentrated.",
    "When you drink more, urine becomes more dilute."
@@ -11994,6 +12434,11 @@
   ],
   "common_misconceptions": [
    "Very pale urine all the time is not always healthier. Drinking far more than you need can dilute body salts."
+  ],
+  "definition_points": [
+   "Your kidneys control how much water and waste leave your body through urine.",
+   "Sometimes urine contains more water, while at other times it contains more dissolved substances.",
+   "Specific gravity measures how concentrated your urine is."
   ]
  },
  {
@@ -12021,7 +12466,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "This records the volume of the urine sample that was tested. It describes the sample, not how much urine you pass in a day.",
+  "short_description": "Your kidneys remove waste and extra water by making urine. Urine volume tells us how much urine was collected. Its meaning depends on whether it was collected once or over a longer period.",
   "what_happens_inside_my_body": [
    "Labs note the sample volume to check there was enough to test."
   ],
@@ -12093,6 +12538,11 @@
     "factor": "Amount collected",
     "how_it_acts": "This only records how much urine was in the container."
    }
+  ],
+  "definition_points": [
+   "Your kidneys remove waste and extra water by making urine.",
+   "Urine volume tells us how much urine was collected.",
+   "Its meaning depends on whether it was collected once or over a longer period."
   ]
  },
  {
@@ -12120,7 +12570,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "This section lists any other findings the lab noted in your urine sample, such as mucus or sperm cells.",
+  "short_description": "A urine sample can sometimes contain substances or tiny particles that are not covered by the usual tests. Laboratories record these additional observations under other findings. Their meaning depends on exactly what was found.",
   "what_happens_inside_my_body": [
    "Labs record anything else they see under the microscope."
   ],
@@ -12176,6 +12626,11 @@
     "factor": "Lab notes",
     "how_it_acts": "These are free-text remarks, so their meaning depends on what was written."
    }
+  ],
+  "definition_points": [
+   "A urine sample can sometimes contain substances or tiny particles that are not covered by the usual tests.",
+   "Laboratories record these additional observations under other findings.",
+   "Their meaning depends on exactly what was found."
   ]
  },
  {
@@ -12214,7 +12669,7 @@
     }
    ]
   },
-  "short_description": "Homocysteine is a substance your body makes when it breaks down protein. Vitamins B12, B6 and folate help clear it.",
+  "short_description": "Your body breaks down proteins from food into smaller building blocks that it can use. During this process, it produces a substance called homocysteine, which certain B vitamins help process. Measuring homocysteine gives clues about how your body handles this substance.",
   "what_happens_inside_my_body": [
    "Homocysteine forms naturally when your body processes an amino acid called methionine.",
    "B vitamins turn it into other useful substances.",
@@ -12321,6 +12776,11 @@
   ],
   "common_misconceptions": [
    "Lowering homocysteine has not been shown to reduce the risk of heart attack or stroke in most cases, though correcting a real B12 shortage still matters."
+  ],
+  "definition_points": [
+   "Your body breaks down proteins from food into smaller building blocks that it can use.",
+   "During this process, it produces a substance called homocysteine, which certain B vitamins help process.",
+   "Measuring homocysteine gives clues about how your body handles this substance."
   ]
  },
  {
@@ -12359,7 +12819,7 @@
     }
    ]
   },
-  "short_description": "High-sensitivity C-reactive protein, or hs-CRP, measures small amounts of CRP, a protein your liver makes when there is inflammation in the body.",
+  "short_description": "When your body responds to injury, illness or certain other stresses, it may produce more of a protein called CRP. Your liver makes this protein as part of your body's response. The high-sensitivity CRP test can measure very small amounts of it in your blood.",
   "what_happens_inside_my_body": [
    "When your body is fighting infection or injury, the liver releases more CRP.",
    "The high-sensitivity test picks up low levels linked with long-term, low-grade inflammation.",
@@ -12465,6 +12925,11 @@
   ],
   "common_misconceptions": [
    "A high hs-CRP after a recent cold does not reflect heart risk. Doctors repeat it when you are well."
+  ],
+  "definition_points": [
+   "When your body responds to injury, illness or certain other stresses, it may produce more of a protein called CRP.",
+   "Your liver makes this protein as part of your body's response.",
+   "The high-sensitivity CRP test can measure very small amounts of it in your blood."
   ]
  },
  {
@@ -12502,7 +12967,7 @@
     }
    ]
   },
-  "short_description": "ESR, or erythrocyte (red blood cell) sedimentation rate, measures how quickly red blood cells settle in a tube of blood. It is a general sign of inflammation and is shown here as part of an inflammation panel.",
+  "short_description": "When your body responds to illness or injury, certain proteins in your blood can increase. These proteins can make red blood cells settle faster when placed in a testing tube. ESR measures how quickly the cells settle and provides general clues about inflammation.",
   "what_happens_inside_my_body": [
    "During inflammation, the liver releases proteins that make red cells clump together.",
    "Clumped cells are heavier and settle faster.",
@@ -12619,6 +13084,11 @@
   ],
   "common_misconceptions": [
    "A normal ESR does not rule out inflammation, and a raised ESR does not show where it is. CRP is often checked alongside it."
+  ],
+  "definition_points": [
+   "When your body responds to illness or injury, certain proteins in your blood can increase.",
+   "These proteins can make red blood cells settle faster when placed in a testing tube.",
+   "ESR measures how quickly the cells settle and provides general clues about inflammation."
   ]
  },
  {
@@ -12657,7 +13127,7 @@
     }
    ]
   },
-  "short_description": "Testosterone is a sex hormone made mainly in the testes in men and in smaller amounts by the ovaries and adrenal glands in women. Total testosterone measures all of it in your blood.",
+  "short_description": "Hormones are chemical messages that help different parts of your body work together. Testosterone is a hormone found in both men and women that supports muscles, bones, sexual health and development. This test measures the total amount of testosterone in your blood.",
   "what_happens_inside_my_body": [
    "In men, testosterone supports sex drive, sperm production, muscle, bone strength and energy.",
    "In women, smaller amounts support sex drive, bone and muscle.",
@@ -12766,6 +13236,11 @@
   ],
   "common_misconceptions": [
    "Low energy in men is not always low testosterone. Sleep, mood, thyroid and anaemia are common causes too."
+  ],
+  "definition_points": [
+   "Hormones are chemical messages that help different parts of your body work together.",
+   "Testosterone is a hormone found in both men and women that supports muscles, bones, sexual health and development.",
+   "This test measures the total amount of testosterone in your blood."
   ]
  },
  {
@@ -12795,7 +13270,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "DHEA-S is a hormone made mainly by the adrenal glands, which sit on top of your kidneys. Your body can turn it into other sex hormones.",
+  "short_description": "Above your kidneys are two small glands that make different hormones. These glands produce DHEA-S, which your body can use to make other hormones, including sex hormones. Measuring DHEA-S gives doctors clues about this hormone-producing system.",
   "what_happens_inside_my_body": [
    "The adrenal glands make DHEA-S in large amounts in young adults.",
    "DHEA-S is a building block for testosterone and oestrogen.",
@@ -12889,6 +13364,11 @@
   ],
   "common_misconceptions": [
    "DHEA supplements are not proven to slow ageing, and they can raise testosterone in women."
+  ],
+  "definition_points": [
+   "Above your kidneys are two small glands that make different hormones.",
+   "These glands produce DHEA-S, which your body can use to make other hormones, including sex hormones.",
+   "Measuring DHEA-S gives doctors clues about this hormone-producing system."
   ]
  },
  {
@@ -12915,7 +13395,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "IGF-1 is a hormone made mainly by the liver in response to growth hormone. It reflects how much growth hormone your body has been making.",
+  "short_description": "Your body uses special chemical messages to help cells grow and repair themselves. IGF-1 is one of these messages and is made mainly by your liver in response to growth hormone. It helps support the growth of bones, muscles and other tissues.",
   "what_happens_inside_my_body": [
    "Growth hormone from the pituitary gland tells the liver to make IGF-1.",
    "IGF-1 helps build bone and muscle and repair tissue.",
@@ -13010,6 +13490,11 @@
   ],
   "common_misconceptions": [
    "IGF-1 is only meaningful against an age-matched range."
+  ],
+  "definition_points": [
+   "Your body uses special chemical messages to help cells grow and repair themselves.",
+   "IGF-1 is one of these messages and is made mainly by your liver in response to growth hormone.",
+   "It helps support the growth of bones, muscles and other tissues."
   ]
  },
  {
@@ -13037,7 +13522,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "Cortisol is a hormone made by your adrenal glands. It helps your body respond to stress, control blood sugar and blood pressure, and regulate your sleep and wake cycle.",
+  "short_description": "Your body needs to respond when you are under stress, unwell or facing other challenges. Cortisol is a hormone that helps manage these situations and also helps control energy use and blood sugar. Measuring cortisol gives clues about this important hormone system.",
   "what_happens_inside_my_body": [
    "Cortisol is highest in the early morning and lowest around midnight.",
    "Cortisol rises during physical or emotional stress.",
@@ -13138,6 +13623,11 @@
   ],
   "common_misconceptions": [
    "A single cortisol result cannot diagnose stress or adrenal fatigue. Adrenal fatigue is not a recognised medical condition."
+  ],
+  "definition_points": [
+   "Your body needs to respond when you are under stress, unwell or facing other challenges.",
+   "Cortisol is a hormone that helps manage these situations and also helps control energy use and blood sugar.",
+   "Measuring cortisol gives clues about this important hormone system."
   ]
  },
  {
@@ -13179,7 +13669,7 @@
     }
    ]
   },
-  "short_description": "Parathyroid hormone, or PTH, is made by four tiny glands in your neck. It controls the calcium level in your blood.",
+  "short_description": "Your body needs to keep the right amount of calcium in your blood. Small glands near your thyroid make a hormone called PTH that helps control this balance. It works with your bones, kidneys and Vitamin D to regulate calcium.",
   "what_happens_inside_my_body": [
    "When blood calcium falls, PTH rises.",
    "PTH releases calcium from bones, helps kidneys keep calcium and activates vitamin D to absorb more from food.",
@@ -13277,6 +13767,11 @@
   ],
   "common_misconceptions": [
    "A high PTH with low vitamin D often settles once vitamin D is corrected, rather than meaning a gland problem."
+  ],
+  "definition_points": [
+   "Your body needs to keep the right amount of calcium in your blood.",
+   "Small glands near your thyroid make a hormone called PTH that helps control this balance.",
+   "It works with your bones, kidneys and Vitamin D to regulate calcium."
   ]
  },
  {
@@ -13314,7 +13809,7 @@
     }
    ]
   },
-  "short_description": "Prolactin is a hormone made by the pituitary gland in your brain. Its main job is to help make breast milk after childbirth.",
+  "short_description": "A small gland beneath your brain makes different hormones that help control your body. One of these is prolactin, which helps the body prepare for and produce breast milk. Prolactin is present in both men and women and can also influence reproductive health.",
   "what_happens_inside_my_body": [
    "Prolactin rises in pregnancy and breastfeeding.",
    "Prolactin also affects periods and fertility in women and sex drive in men.",
@@ -13416,6 +13911,11 @@
   ],
   "common_misconceptions": [
    "A mildly high prolactin is often from stress or medicines and is usually rechecked before further tests."
+  ],
+  "definition_points": [
+   "A small gland beneath your brain makes different hormones that help control your body.",
+   "One of these is prolactin, which helps the body prepare for and produce breast milk.",
+   "Prolactin is present in both men and women and can also influence reproductive health."
   ]
  },
  {
@@ -13455,7 +13955,7 @@
     }
    ]
   },
-  "short_description": "Luteinising hormone, or LH, is made by the pituitary gland. It signals the ovaries to release an egg and the testes to make testosterone.",
+  "short_description": "Your brain sends chemical messages to the organs that make sex hormones. LH is one of these messages and helps control the release of eggs in women and testosterone production in men. Measuring LH helps doctors understand parts of reproductive and hormonal health.",
   "what_happens_inside_my_body": [
    "In women, LH rises sharply in the middle of the cycle to trigger ovulation.",
    "In men, LH tells the testes to make testosterone.",
@@ -13556,6 +14056,11 @@
   ],
   "common_misconceptions": [
    "An LH result means little without knowing the cycle day."
+  ],
+  "definition_points": [
+   "Your brain sends chemical messages to the organs that make sex hormones.",
+   "LH is one of these messages and helps control the release of eggs in women and testosterone production in men.",
+   "Measuring LH helps doctors understand parts of reproductive and hormonal health."
   ]
  },
  {
@@ -13594,7 +14099,7 @@
     }
    ]
   },
-  "short_description": "Follicle-stimulating hormone, or FSH, is made by the pituitary gland. It helps eggs develop in the ovaries and sperm develop in the testes.",
+  "short_description": "Your brain uses hormones to help control your reproductive system. FSH helps eggs develop in the ovaries and supports sperm production in the testes. Measuring FSH provides information about how this reproductive hormone system is working.",
   "what_happens_inside_my_body": [
    "In women, FSH helps egg follicles grow early in each cycle.",
    "In men, it supports sperm production.",
@@ -13691,6 +14196,11 @@
   ],
   "common_misconceptions": [
    "A single FSH cannot confirm menopause in women who still have periods; levels swing from month to month."
+  ],
+  "definition_points": [
+   "Your brain uses hormones to help control your reproductive system.",
+   "FSH helps eggs develop in the ovaries and supports sperm production in the testes.",
+   "Measuring FSH provides information about how this reproductive hormone system is working."
   ]
  },
  {
@@ -13728,7 +14238,7 @@
     }
    ]
   },
-  "short_description": "This result measures calcium, the mineral that keeps bones strong and helps muscles, nerves and the heart work. The lab has not confirmed whether it is total or free (ionised) calcium.",
+  "short_description": "Calcium is an important mineral that helps build strong bones and teeth. Your muscles, nerves and heart also need calcium to work properly. A calcium test measures calcium in your blood, although the exact type measured depends on the laboratory method.",
   "what_happens_inside_my_body": [
    "Most calcium is stored in bones.",
    "A small amount in blood is carefully controlled by parathyroid hormone and vitamin D.",
@@ -13833,6 +14343,11 @@
   ],
   "common_misconceptions": [
    "Blood calcium does not show bone strength."
+  ],
+  "definition_points": [
+   "Calcium is an important mineral that helps build strong bones and teeth.",
+   "Your muscles, nerves and heart also need calcium to work properly.",
+   "A calcium test measures calcium in your blood, although the exact type measured depends on the laboratory method."
   ]
  },
  {
@@ -13861,7 +14376,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "PSA, or prostate-specific antigen, is a protein made by the prostate gland, a small gland below the bladder in men.",
+  "short_description": "The prostate is a small gland found in males that helps produce fluid that carries sperm. This gland makes a protein called prostate-specific antigen, or PSA. Measuring PSA gives information about the prostate, but changes can happen for several reasons, not just cancer.",
   "what_happens_inside_my_body": [
    "The prostate makes PSA to help semen stay liquid.",
    "A small amount enters the blood.",
@@ -13960,6 +14475,11 @@
   ],
   "common_misconceptions": [
    "A high PSA does not mean cancer. Most raised PSA results come from enlargement or inflammation."
+  ],
+  "definition_points": [
+   "The prostate is a small gland found in males that helps produce fluid that carries sperm.",
+   "This gland makes a protein called prostate-specific antigen, or PSA.",
+   "Measuring PSA gives information about the prostate, but changes can happen for several reasons, not just cancer."
   ]
  },
  {
@@ -13988,7 +14508,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "CEA, or carcinoembryonic antigen, is a protein that is normally present only in very small amounts in adult blood.",
+  "short_description": "Some cells in your body produce a protein called carcinoembryonic antigen, or CEA. Doctors sometimes measure it to follow how certain cancers are responding to treatment. CEA can also change for reasons unrelated to cancer, so this test cannot confirm cancer on its own.",
   "what_happens_inside_my_body": [
    "Some cells, especially in the bowel, make CEA.",
    "Levels can rise with some cancers, but also with smoking and inflammation."
@@ -14083,6 +14603,11 @@
   ],
   "common_misconceptions": [
    "Tumour markers are not cancer screening tests for most people. Many non-cancer conditions raise them, and a normal result does not rule out cancer."
+  ],
+  "definition_points": [
+   "Some cells in your body produce a protein called carcinoembryonic antigen, or CEA.",
+   "Doctors sometimes measure it to follow how certain cancers are responding to treatment.",
+   "CEA can also change for reasons unrelated to cancer, so this test cannot confirm cancer on its own."
   ]
  },
  {
@@ -14111,7 +14636,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "AFP, or alpha-fetoprotein, is a protein made by a developing baby and, in adults, in small amounts by the liver. The report labels this as an amniotic fluid test, so the lab needs to confirm which sample was used.",
+  "short_description": "A developing baby naturally produces a protein called alpha-fetoprotein. Doctors measure this protein for different reasons during pregnancy and in certain liver or other health conditions. The meaning of the result depends on why the test was performed and the type of sample collected.",
   "what_happens_inside_my_body": [
    "In pregnancy, AFP passes from the baby into the mother's blood and the fluid around the baby.",
    "In adults, high blood AFP can be linked with some liver conditions and some cancers."
@@ -14177,6 +14702,11 @@
   ],
   "common_misconceptions": [
    "Tumour markers are not cancer screening tests for most people. Many non-cancer conditions raise them, and a normal result does not rule out cancer."
+  ],
+  "definition_points": [
+   "A developing baby naturally produces a protein called alpha-fetoprotein.",
+   "Doctors measure this protein for different reasons during pregnancy and in certain liver or other health conditions.",
+   "The meaning of the result depends on why the test was performed and the type of sample collected."
   ]
  },
  {
@@ -14214,7 +14744,7 @@
     }
    ]
   },
-  "short_description": "CA 19-9 is a protein found on some cells of the pancreas, bile ducts and gut. It is mainly used to follow pancreatic and bile duct conditions.",
+  "short_description": "Certain cells in your body carry a substance called CA 19-9 on their surfaces. Doctors sometimes measure it to follow certain cancers, particularly those involving the pancreas or bile ducts. Its level can also change because of non-cancerous conditions.",
   "what_happens_inside_my_body": [
    "Small amounts are normal in the blood.",
    "CA 19-9 rises when bile flow is blocked or the pancreas is inflamed, as well as with some cancers."
@@ -14310,6 +14840,11 @@
   ],
   "common_misconceptions": [
    "Tumour markers are not cancer screening tests for most people. Many non-cancer conditions raise them, and a normal result does not rule out cancer."
+  ],
+  "definition_points": [
+   "Certain cells in your body carry a substance called CA 19-9 on their surfaces.",
+   "Doctors sometimes measure it to follow certain cancers, particularly those involving the pancreas or bile ducts.",
+   "Its level can also change because of non-cancerous conditions."
   ]
  },
  {
@@ -14338,7 +14873,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "CA 125 is a protein found on some cells, including those lining the ovaries, womb, tummy and chest. It is mainly used to follow ovarian conditions.",
+  "short_description": "Some cells in your body produce a substance called CA 125. Doctors sometimes measure it when investigating or monitoring certain conditions involving the ovaries. Its level can also change during periods, pregnancy and other non-cancerous conditions.",
   "what_happens_inside_my_body": [
    "Small amounts are normal in the blood.",
    "CA 125 can rise with many conditions that irritate these linings."
@@ -14438,6 +14973,11 @@
   ],
   "common_misconceptions": [
    "Tumour markers are not cancer screening tests for most people. Many non-cancer conditions raise them, and a normal result does not rule out cancer."
+  ],
+  "definition_points": [
+   "Some cells in your body produce a substance called CA 125.",
+   "Doctors sometimes measure it when investigating or monitoring certain conditions involving the ovaries.",
+   "Its level can also change during periods, pregnancy and other non-cancerous conditions."
   ]
  },
  {
@@ -14465,7 +15005,7 @@
    "default": "current_result_if_personalised",
    "conditional_questions": []
   },
-  "short_description": "CA 15-3 is a protein made by breast cells. It is mainly used to follow people being treated for breast cancer.",
+  "short_description": "Certain cells in your body produce a substance that can be measured using the CA 15-3 test. Doctors sometimes use this test to follow how certain breast cancers respond to treatment. The result alone cannot tell whether someone has cancer.",
   "what_happens_inside_my_body": [
    "Small amounts are normal in the blood.",
    "Levels can rise with some breast cancers and with some non-cancer conditions."
@@ -14550,6 +15090,11 @@
   "common_misconceptions": [
    "Tumour markers are not cancer screening tests for most people. Many non-cancer conditions raise them, and a normal result does not rule out cancer.",
    "CA 15-3 is not a breast cancer screening test; mammography and breast examination are."
+  ],
+  "definition_points": [
+   "Certain cells in your body produce a substance that can be measured using the CA 15-3 test.",
+   "Doctors sometimes use this test to follow how certain breast cancers respond to treatment.",
+   "The result alone cannot tell whether someone has cancer."
   ]
  },
  {
@@ -14587,7 +15132,7 @@
     }
    ]
   },
-  "short_description": "Lipoprotein(a), or Lp(a), is a type of cholesterol-carrying particle whose level is set mostly by the genes you inherit.",
+  "short_description": "Cholesterol travels through your blood inside tiny carrying particles. Lipoprotein(a) is a special type of cholesterol-carrying particle, and its amount is strongly influenced by the genes you inherit. Higher levels are linked with a greater chance of certain heart and blood vessel problems.",
   "what_happens_inside_my_body": [
    "Lp(a) looks like an LDL particle with an extra protein attached.",
    "Lipoprotein(a) can add to plaque build-up in arteries and may make blood clots more likely.",
@@ -14692,7 +15237,12 @@
   "common_misconceptions": [
    "A high Lp(a) is not something you caused by eating badly. It is mainly inherited."
   ],
-  "reference_range_note": "Labs often use fixed risk cut-offs for Lp(a), such as above 50 mg/dL or 125 nmol/L, and the units differ between labs, so compare with the cut-off printed on your report."
+  "reference_range_note": "Labs often use fixed risk cut-offs for Lp(a), such as above 50 mg/dL or 125 nmol/L, and the units differ between labs, so compare with the cut-off printed on your report.",
+  "definition_points": [
+   "Cholesterol travels through your blood inside tiny carrying particles.",
+   "Lipoprotein(a) is a special type of cholesterol-carrying particle, and its amount is strongly influenced by the genes you inherit.",
+   "Higher levels are linked with a greater chance of certain heart and blood vessel problems."
+  ]
  },
  {
   "content_key": "WB-111",
@@ -14733,7 +15283,7 @@
     }
    ]
   },
-  "short_description": "Apolipoprotein B, or ApoB, is a protein found on each particle that can carry cholesterol into artery walls. Measuring it gives a count of those particles.",
+  "short_description": "Your blood uses tiny particles to carry cholesterol and other fats around your body. Many particles that can contribute to cholesterol build-up in blood vessels contain a protein called ApoB. Measuring ApoB helps estimate how many of these particles are travelling through your blood.",
   "what_happens_inside_my_body": [
    "Each LDL, VLDL and Lp(a) particle carries one ApoB protein.",
    "So ApoB shows how many plaque-forming particles are in your blood, not just how much cholesterol they hold.",
@@ -14845,7 +15395,12 @@
   "common_misconceptions": [
    "ApoB is not another kind of cholesterol. It counts the particles that can enter artery walls, so it can add information when LDL and triglycerides disagree."
   ],
-  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another."
+  "reference_range_note": "Many labs print a desirable cut-off rather than a range drawn from healthy people. The level a doctor aims for depends on your overall heart risk, including blood pressure, blood sugar, smoking and family history, so the same number can be fine for one person and too high for another.",
+  "definition_points": [
+   "Your blood uses tiny particles to carry cholesterol and other fats around your body.",
+   "Many particles that can contribute to cholesterol build-up in blood vessels contain a protein called ApoB.",
+   "Measuring ApoB helps estimate how many of these particles are travelling through your blood."
+  ]
  },
  {
   "content_key": "WB-112",
@@ -14884,7 +15439,7 @@
     }
    ]
   },
-  "short_description": "Serum iron measures the iron travelling in your blood right now. Iron is needed to make haemoglobin, which carries oxygen.",
+  "short_description": "Your body needs iron to make haemoglobin, which carries oxygen throughout your body. Iron travels through your blood so it can reach the places where it is needed. Serum iron measures how much iron is travelling in your blood at the time of the test.",
   "what_happens_inside_my_body": [
    "Iron from food is absorbed in the gut.",
    "Iron travels in the blood attached to a carrier protein called transferrin.",
@@ -14995,6 +15550,11 @@
   ],
   "common_misconceptions": [
    "Serum iron changes hour to hour, so ferritin is a better guide to stores."
+  ],
+  "definition_points": [
+   "Your body needs iron to make haemoglobin, which carries oxygen throughout your body.",
+   "Iron travels through your blood so it can reach the places where it is needed.",
+   "Serum iron measures how much iron is travelling in your blood at the time of the test."
   ]
  },
  {
@@ -15035,7 +15595,7 @@
     }
    ]
   },
-  "short_description": "TIBC, or total iron-binding capacity, measures how much iron your blood could carry if all its carrier protein were full.",
+  "short_description": "Iron needs a special protein called transferrin to carry it through your blood. This protein has spaces where iron can attach, like seats in a vehicle. TIBC estimates how much iron these carrying proteins could hold altogether.",
   "what_happens_inside_my_body": [
    "Iron travels in the blood on a protein called transferrin.",
    "When iron stores are low, the liver makes more transferrin, so TIBC rises."
@@ -15133,6 +15693,11 @@
   ],
   "common_misconceptions": [
    "A high TIBC is not too much iron. It usually means the body is hungry for iron."
+  ],
+  "definition_points": [
+   "Iron needs a special protein called transferrin to carry it through your blood.",
+   "This protein has spaces where iron can attach, like seats in a vehicle.",
+   "TIBC estimates how much iron these carrying proteins could hold altogether."
   ]
  },
  {
@@ -15171,7 +15736,7 @@
     }
    ]
   },
-  "short_description": "UIBC, or unsaturated iron-binding capacity, measures how much spare room is left on the iron carrier protein in your blood.",
+  "short_description": "Your blood contains special proteins that carry iron to different parts of your body. Some of the spaces on these proteins may already contain iron, while others are empty. UIBC measures how much additional iron could attach to those empty spaces.",
   "what_happens_inside_my_body": [
    "Iron travels on a protein called transferrin.",
    "UIBC is the part of that carrier that is still empty."
@@ -15255,6 +15820,11 @@
   ],
   "common_misconceptions": [
    "UIBC adds little on its own; it is read with iron and TIBC."
+  ],
+  "definition_points": [
+   "Your blood contains special proteins that carry iron to different parts of your body.",
+   "Some of the spaces on these proteins may already contain iron, while others are empty.",
+   "UIBC measures how much additional iron could attach to those empty spaces."
   ]
  },
  {
@@ -15294,7 +15864,7 @@
     }
    ]
   },
-  "short_description": "Transferrin saturation shows what percentage of the iron carrier protein in your blood is filled with iron.",
+  "short_description": "Your blood contains a protein called transferrin that carries iron around your body. Some of its iron-carrying spaces are filled, while others are empty. Transferrin saturation tells us what percentage of those spaces are filled with iron.",
   "what_happens_inside_my_body": [
    "Transferrin carries iron around your body.",
    "This result is worked out by dividing serum iron by TIBC."
@@ -15387,6 +15957,11 @@
   ],
   "common_misconceptions": [
    "A high saturation is worth checking even if you feel well, because iron overload can quietly damage the liver and heart."
+  ],
+  "definition_points": [
+   "Your blood contains a protein called transferrin that carries iron around your body.",
+   "Some of its iron-carrying spaces are filled, while others are empty.",
+   "Transferrin saturation tells us what percentage of those spaces are filled with iron."
   ]
  },
  {
@@ -15431,7 +16006,7 @@
     }
    ]
   },
-  "short_description": "Ferritin is a protein that stores iron inside your body. The amount in your blood reflects how much iron you have in reserve.",
+  "short_description": "Your body stores extra iron so that it can use it whenever it needs more. Ferritin is a protein that helps store this iron safely. Measuring ferritin in your blood gives doctors clues about how much iron your body has stored.",
   "what_happens_inside_my_body": [
    "Your body keeps spare iron in ferritin, mostly in the liver.",
    "When you need more iron to make red blood cells, it is released from these stores.",
@@ -15550,7 +16125,12 @@
   "common_misconceptions": [
    "A high ferritin does not always mean too much iron. Inflammation, liver disease, obesity and alcohol can also raise it."
   ],
-  "reference_range_note": "Many labs print a lower limit for ferritin that is lower than the level doctors use to diagnose iron deficiency, so a result at the bottom of the range can still mean low stores."
+  "reference_range_note": "Many labs print a lower limit for ferritin that is lower than the level doctors use to diagnose iron deficiency, so a result at the bottom of the range can still mean low stores.",
+  "definition_points": [
+   "Your body stores extra iron so that it can use it whenever it needs more.",
+   "Ferritin is a protein that helps store this iron safely.",
+   "Measuring ferritin in your blood gives doctors clues about how much iron your body has stored."
+  ]
  },
  {
   "content_key": "WB-117",
@@ -15587,7 +16167,7 @@
     }
    ]
   },
-  "short_description": "Creatine kinase, or CK, is an enzyme found mainly in your muscles, including the heart. It leaks into the blood when muscles are strained or damaged.",
+  "short_description": "Your muscles need energy to move, exercise and perform everyday activities. Creatine kinase is a protein that helps muscle cells manage the energy they need. When muscle cells are damaged or stressed, more of this protein can enter your blood.",
   "what_happens_inside_my_body": [
    "Muscles use CK to make energy quickly.",
    "After hard exercise or an injury, some CK passes into the blood.",
@@ -15687,6 +16267,11 @@
   ],
   "common_misconceptions": [
    "A high CK after a heavy workout is common and settles. It is the combination with muscle pain, weakness or dark urine that needs urgent care."
+  ],
+  "definition_points": [
+   "Your muscles need energy to move, exercise and perform everyday activities.",
+   "Creatine kinase is a protein that helps muscle cells manage the energy they need.",
+   "When muscle cells are damaged or stressed, more of this protein can enter your blood."
   ]
  },
  {
@@ -15722,7 +16307,7 @@
     }
    ]
   },
-  "short_description": "Lactate dehydrogenase, or LDH, is an enzyme found in almost every tissue in your body. It rises in the blood when cells are damaged.",
+  "short_description": "Your body contains special proteins that help cells turn nutrients into usable energy. LDH is one of these proteins and is found in many parts of your body. More LDH can enter your blood when cells are damaged, although the test alone cannot tell where the damage is.",
   "what_happens_inside_my_body": [
    "LDH helps cells turn sugar into energy.",
    "LDH is found in the heart, liver, muscles, kidneys, lungs and blood cells.",
@@ -15818,6 +16403,11 @@
   ],
   "common_misconceptions": [
    "A raised LDH does not point to one organ. It shows that some tissue damage may be present and needs other tests to place it."
+  ],
+  "definition_points": [
+   "Your body contains special proteins that help cells turn nutrients into usable energy.",
+   "LDH is one of these proteins and is found in many parts of your body.",
+   "More LDH can enter your blood when cells are damaged, although the test alone cannot tell where the damage is."
   ]
  },
  {

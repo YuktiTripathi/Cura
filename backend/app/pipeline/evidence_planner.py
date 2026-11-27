@@ -217,9 +217,25 @@ def reconcile_query_plan(plan: QueryPlan, semantic: SemanticHealthPlan) -> tuple
     clarifying = plan.intent == IntentType.ambiguous_clarification
     general_routed = plan.knowledge_scope == KnowledgeScope.general or not plan.needs_personal_data
     if not personal_needed:
-        if clarifying:
-            changes.append("clarification_removed:general_answer")
-            plan = plan.model_copy(update={"intent": IntentType.general_health_question, "knowledge_scope": KnowledgeScope.general, "source": QuerySource.general, "needs_general": True})
+        body_function = bool(re.search(
+            r"\b(?:what|how) (?:does|do)\b.{0,80}\b(?:do|work|works|function|functions)\b|\binside (?:my|the|your) body\b",
+            plan.raw_message or "",
+            re.I,
+        )) and not re.search(r"\b(?:result|results|report|reports|score|scores|level|levels|value|values)\b", plan.raw_message or "", re.I)
+        if clarifying or body_function:
+            changes.append("clarification_removed:general_answer" if clarifying else "body_function_not_a_record")
+            plan = plan.model_copy(update={
+                "intent": IntentType.general_health_question,
+                "knowledge_scope": KnowledgeScope.general,
+                "source": QuerySource.general,
+                "needs_general": True,
+                "needs_blood": False,
+                "needs_bio_ai": False,
+                "needs_questionnaire": False,
+                "needs_lifestyle": False,
+                "needs_profile": False,
+                "needs_supershyft": False,
+            })
         return plan, changes
 
     wanted = _sources_to_fetch(semantic)

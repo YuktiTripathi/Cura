@@ -270,8 +270,8 @@ def test_accepted_jev_plan_preserves_the_user_task_contract(monkeypatch):
 
     assert trace.validated and not trace.fallback
     assert plan.task_contract["response_type"] == "PERSONAL_RISK_EXPLANATION"
-    assert set(plan.task_contract["required_sources"]) == {"blood_report", "bio_ai"}
-    assert plan.needs_blood and plan.needs_bio_ai
+    assert set(plan.task_contract["required_sources"]) == {"blood_report", "bio_ai", "questionnaire"}
+    assert plan.needs_blood and plan.needs_bio_ai and plan.needs_questionnaire
 
 
 def test_invalid_personal_decision_falls_back_to_personal_deterministic_plan(monkeypatch):

@@ -94,7 +94,7 @@ def test_modes_never_break_the_prompt(monkeypatch, mode):
     monkeypatch.setattr(pm, "house_system", spy)
     res = TestClient(app).post("/api/v1/chat", headers={"X-Cura-User-Id": "demo-user-001"}, json={"message": "What does my latest HbA1c mean?"})
     assert res.status_code == 200
-    assert seen["system"].startswith("# CURA, personal health companion")
+    assert seen["system"].startswith("# CURA, your personal health companion")
     assert "ANSWER PLAN" not in seen["system"] and "Begin with ONE short friendly sentence" not in seen["system"]
 
 

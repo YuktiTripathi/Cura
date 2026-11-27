@@ -120,7 +120,7 @@ export function MessageList({
                 ) : null}
               <>
                 {topHeadline(m.presentation) ? <h3 className="answer-headline">{topHeadline(m.presentation)}</h3> : null}
-                {m.presentation?.risk_explanation ? <RiskExplanationView data={m.presentation.risk_explanation} onAsk={onFollowUp} /> : <MarkdownAnswer content={m.content} />}
+                {m.presentation?.risk_explanation ? <RiskExplanationView data={m.presentation.risk_explanation} onAsk={onFollowUp} /> : <MarkdownAnswer content={m.content} findings={m.presentation?.findings || []} />}
                 {m.semantic?.blocks?.length ? <SemanticBlocks blocks={m.semantic.blocks} answer={m.content} /> : null}
                 {m.presentation ? (
                   <PresentedAnswer

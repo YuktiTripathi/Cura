@@ -87,11 +87,7 @@ def test_general_chat_zero_supershyft_one_llm():
 def test_general_then_general_followup_no_supershyft():
     first = chat("What is Vitamin D?").json()
     cid = first["conversation_id"]
-    follow = next(
-        c["text"]
-        for c in first["follow_ups"]
-        if c.get("knowledge_scope") == "general" or not c.get("requires_personal_context")
-    )
+    follow = "What does vitamin D do in the body?"
     class Boom:
         def query(self, *a, **k):
             raise AssertionError("SuperShyft should not be queried")

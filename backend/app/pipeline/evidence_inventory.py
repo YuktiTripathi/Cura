@@ -6,8 +6,11 @@ payload the answer model should see for a contracted question.
 
 from __future__ import annotations
 
+import logging
 import re
 from enum import Enum
+
+logger = logging.getLogger("cura.evidence")
 from types import SimpleNamespace
 
 from pydantic import BaseModel, Field
@@ -311,6 +314,13 @@ def _select_risks(kind: str, message: str, risks: list) -> list:
     if kind == "CROSS_SOURCE_EXPLANATION" and "liver" in text:
         matched = [item for item in chosen if _key(getattr(item, "code", None)) in _LIVER_RISK or "liver" in (getattr(item, "name", "") or "").lower()]
         return matched
+    named = [
+        item for item in chosen
+        if _key(getattr(item, "code", None)).replace("_", " ") in text
+        or (getattr(item, "name", "") or "").lower() in text
+    ]
+    if named:
+        return named
     return chosen[:16]
 
 
@@ -516,7 +526,9 @@ def _complete_required_facts(
         restored.append(row["fact_id"])
     asked = bool(plan.needs_questionnaire or re.search(r"\bquestionnaire\b", message or "", re.I))
     if asked and not questionnaire:
-        unavailable.append("questionnaire:required")
+        reason = "not_loaded" if not (context.questionnaire or []) else "filtered"
+        logger.info("questionnaire_unavailable reason=%s", reason)
+        unavailable.append(f"questionnaire:{reason}")
     return measurements, questionnaire, restored, unavailable
 
 
@@ -605,6 +617,12 @@ def _questionnaire_rows(plan: QueryPlan, context: HealthContext, message: str) -
             continue
         from app.pipeline.query_planner import _personal_lifestyle_theme
 
+        if (plan.task_contract or {}).get("response_type") == "PERSONAL_RISK_EXPLANATION" and plan.topic:
+            from app.pipeline.questionnaire_relevance import relevant_questionnaire_keys
+
+            allowed = set(relevant_questionnaire_keys([plan.topic]))
+            if allowed and getattr(answer, "question_key", None) not in allowed:
+                continue
         theme = _personal_lifestyle_theme(message)
         if theme == "sleep" and not re.search(r"\bsleep", label, re.I):
             continue

@@ -154,7 +154,10 @@ def _journey_follow_ups(
     overview = plan.intent in _OVERVIEW_INTENTS and len(context.markers or []) + len(context.bio_ai_risks or []) > 2
     # A clinical-context question (its reply continues the interpretation) and the
     # "Show all results" action are flows of their own; grounded questions fill the rest.
-    kept = list(keep or [])
+    metabolic_age_turn = bool(re.search(r"\bmetabolic age\b", plan.raw_message or "", re.I))
+    # This turn is about the age estimate as a whole. Precomputed marker chips
+    # (often HDL) must not replace the model's conversational next questions.
+    kept = [] if metabolic_age_turn else list(keep or [])
     questions = select_followups(
         brief,
         current_question=plan.raw_message,
@@ -426,7 +429,6 @@ class ResponseComposer:
                         finding.label = friendly_text(finding.label)
             if plan.intent not in {IntentType.trend, IntentType.previous_result, IntentType.bio_ai_comparison}:
                 presentation.proactive_insights = []
-        presentation.related_findings = _related_findings(context, experience)
         presentation.suggestion_chips = [item.text for item in chips]
         if experience.topic_summary and not is_explicit_catalog_lookup(plan.raw_message or ""):
             presentation.topic_summary = experience.topic_summary.model_dump(mode="json")
@@ -518,33 +520,6 @@ class ResponseComposer:
                 combined = _to_suggestions(on_topic_chips, personal=False)
                 presentation.suggestion_chips = [item.text for item in combined]
                 presentation.follow_up = None
-            presentation.suggestion_chips = [item.text for item in combined]
-        definition = bool(
-            re.search(r"\b(?:what is|what are|what does|what do|how does|how do)\b", plan.raw_message or "", re.I)
-            and not re.search(r"\b(?:my|mine|me|i)\b", plan.raw_message or "", re.I)
-        )
-        if not combined and definition and not answer_turn and context.status != "ambiguous":
-            # The model offered no usable next questions. Stay on this topic rather than offering stock health
-            # questions or an empty row; these are general questions and need no personal data.
-            from app.pipeline.followup_generator import general_continuations, to_suggestions as _general_suggestions
-
-            topical = [q for q in general_continuations(plan.raw_message or "") if q not in (shown_follow_ups or [])][:3]
-            if topical:
-                combined = _general_suggestions(topical, personal=False)
-                presentation.suggestion_chips = [item.text for item in combined]
-        if not combined and not answer_turn and context.status != "ambiguous" and not definition:
-            # Never an empty row: a few general, clinically safe questions.
-            from app.pipeline.followup_generator import FollowUpBrief, fallback_questions, to_suggestions
-
-            # A person with results on record gets questions about those results, not stock health questions.
-            has_blood, has_risks = bool(context.markers), bool(context.bio_ai_risks)
-            on_record = plan.knowledge_scope == KnowledgeScope.personal and (has_blood or has_risks)
-            kind = ("both" if has_blood and has_risks else "blood" if has_blood else "bio") if on_record else None
-            general = fallback_questions(
-                FollowUpBrief(asked=list(history or []), shown=list(shown_follow_ups or [])),
-                count=4, current=plan.raw_message, kind=kind,
-            )
-            combined = to_suggestions(general, personal=on_record)
             presentation.suggestion_chips = [item.text for item in combined]
         presentation, policy_trace = apply_presentation_policy(presentation, follow_up_count=len(combined))
         if context.answer_evidence_trace is not None:

@@ -64,7 +64,8 @@ def _codes(facts) -> set[str]:
 # ------------------------------------------------------------ reasoning strategies
 
 
-def test_personalized_single_marker_answer_uses_report_range_and_explains():
+def test_personalized_single_marker_answer_uses_report_range_and_explains(monkeypatch):
+    monkeypatch.setattr(settings, "cura_prompt_variant", "house")
     _, evidence, prompt = _evidence("What does my HbA1c mean?")
     fact = next(f for f in evidence.primary_facts if f["code"] == "hba1c")
     assert fact["value"] == 6.1 and fact["unit"] == "%"
@@ -73,9 +74,8 @@ def test_personalized_single_marker_answer_uses_report_range_and_explains():
     payload = evidence.payload()
     _assert_purpose_not_template(payload["how_to_answer"])
     system = prompt[0]["content"]
-    assert "reference range printed on the person's own report" in system
-    assert "Explain, do not just report" in system
-    assert "no mandatory template" in system.lower()
+    assert "Answer the actual question directly" in system
+    assert "unnecessary headings" in system.lower()
 
 
 def test_multi_marker_reasoning_does_not_concatenate_templates():

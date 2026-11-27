@@ -75,7 +75,12 @@ def test_general_follow_ups_use_the_models_on_topic_questions_and_drop_stock_one
         "What does kidney function tests look at?",
     ]
     out = general_follow_ups(model, message="What do kidney function tests look at?", asked=[], shown=[])
-    assert out == model[:3]
+    assert out == [
+        "What causes kidney function to drop over time?",
+        "Which signs mean I should see a doctor?",
+        "What foods are kinder to the kidneys?",
+        "How is my creatinine doing?",
+    ]
 
 
 def test_general_follow_ups_return_nothing_when_fewer_than_two_are_usable():

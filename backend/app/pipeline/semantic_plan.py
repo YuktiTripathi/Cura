@@ -384,6 +384,20 @@ def build_semantic_plan(
         elif jev_level != Personalization.required:
             personalization = jev_level if personalization != Personalization.required or not self_ref else personalization
 
+    # "What does my liver do inside my body?" names an organ, not a stored result.
+    body_function = bool(re.search(
+        r"\b(?:what|how) (?:does|do)\b.{0,80}\b(?:do|work|works|function|functions)\b|\binside (?:my|the|your) body\b",
+        text,
+        re.I,
+    ))
+    owns_record = bool(re.search(
+        r"\b(?:result|results|report|reports|score|scores|level|levels|value|values|reading|readings)\b",
+        text,
+        re.I,
+    ))
+    if body_function and not owns_record and primary != ReasoningGoal.document_lookup:
+        personalization = Personalization.none
+
     if personalization == Personalization.none and primary not in {ReasoningGoal.document_lookup}:
         secondary = [g for g in [primary, *secondary] if g not in {ReasoningGoal.general_education}][:3]
         primary = ReasoningGoal.general_education

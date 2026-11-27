@@ -78,7 +78,7 @@ class Settings(BaseSettings):
     llm_reasoning_effort: str = "low"
     # "langchain": the chat turn runs as a langchain-core sequence (app/orchestration/chain.py).
     # "native": the same four steps called in order. Same answers either way. CURA_ORCHESTRATION=native is the kill switch.
-    orchestration_engine: str = Field("langchain", validation_alias=AliasChoices("CURA_ORCHESTRATION", "orchestration_engine"))
+    orchestration_engine: str = Field("native", validation_alias=AliasChoices("CURA_ORCHESTRATION", "orchestration_engine"))
     llm_reasoning_output_cap: int = 2000
     enable_llm: bool = False
     # Explanations of an uploaded document only. Does not turn on chat, routing, or fact extraction.
@@ -195,6 +195,10 @@ class Settings(BaseSettings):
     member_snapshot_lock_seconds: int = 20
     member_snapshot_wait_seconds: float = 5.0
     member_snapshot_schema_version: str = "1"
+    # Local file traces of one turn. Development only. Never enable in production.
+    response_diagnostics: bool = Field(
+        False, validation_alias=AliasChoices("RESPONSE_DIAGNOSTICS", "CURA_RESPONSE_DIAGNOSTICS", "response_diagnostics")
+    )
     document_encryption_key: str = ""
     document_retention_days: int = 90
     # Conversations untouched for this many days are purged with their derived rows. 0 disables.

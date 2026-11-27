@@ -35,7 +35,7 @@ def _personal_lifestyle_theme(message: str) -> str | None:
         return "activity"
     if re.search(r"\b(eating habits|eat|diet|food)\b", text, re.I):
         return "food"
-    if re.search(r"\bstress\b", text, re.I):
+    if re.search(r"\bstress\b", text, re.I) and not re.search(r"\boxidative stress\b", text, re.I):
         return "stress"
     return None
 
@@ -185,16 +185,18 @@ def build_query_plan(
     explicit_answer_lookup = intent == IntentType.questionnaire_lookup and not named_personal_sources(message) - {"questionnaire"}
     theme = _personal_lifestyle_theme(message)
     links_to_results = bool(re.search(
-        r"\b(affect|affects|affecting|impact|results?|health|report|blood|improve|help|helps|risk|score|why|connect|relate|related|levels?)\b",
+        r"\b(affect|affects|affecting|impact|results?|report|blood|risk|score|levels?)\b",
         message or "", re.I,
     ))
-    if theme and not explicit_answer_lookup and not links_to_results and intent != IntentType.nutrition_guidance:
-        # "What is my sleep?" asks about the habit itself: the questionnaire answer is the relevant personal data.
+    asks_for_profile = bool(re.search(r"\b(?:profile|based on my)\b", message or "", re.I))
+    if theme and theme != "food" and not explicit_answer_lookup and not links_to_results and not asks_for_profile and intent != IntentType.nutrition_guidance:
+        # "What is my sleep?" and "Am I physically active enough?" ask about the habit, not the whole report.
         scope = KnowledgeScope.personal
         personal = True
         wants_questionnaire = True
         needs_blood = needs_bio_ai = needs_profile = False
         needs_lifestyle = True
+        intent = IntentType.questionnaire_lookup
     elif theme and not explicit_answer_lookup:
         # "How is my sleep affecting my health?" connects a habit to results. "What did I answer about my
         # sleep?" asks only for the questionnaire answer, so it stays a questionnaire lookup.
@@ -202,6 +204,8 @@ def build_query_plan(
         # person's habits, not every Bio-AI score.
         scope = KnowledgeScope.personal
         personal = True
+        if theme == "food" and intent == IntentType.general_health_question:
+            intent = IntentType.nutrition_guidance
         needs_blood = True
         needs_bio_ai = needs_bio_ai or not match_lab_keys(message)
         needs_lifestyle = True

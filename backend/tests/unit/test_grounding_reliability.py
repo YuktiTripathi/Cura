@@ -23,8 +23,8 @@ def test_absence_sentence_is_replaced_when_the_panel_has_the_marker():
     )
     text = "I don't see VLDL Cholestrol in the latest blood report, so that value is not available."
     revised, flags = correct_false_absence(text, context)
-    assert "false_absence_corrected" in flags
-    assert "30.8" in revised
+    assert "false_absence_removed" in flags
+    assert "30.8" not in revised
     assert "not available" not in revised.lower()
 
 

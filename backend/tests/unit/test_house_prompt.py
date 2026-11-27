@@ -53,7 +53,7 @@ def test_shipped_defaults_are_house_and_plain():
 
 def test_house_core_has_no_dashes_and_one_json_contract():
     assert "—" not in HOUSE_CORE and "–" not in HOUSE_CORE
-    assert HOUSE_CORE.count("Return one valid JSON object") == 1
+    assert HOUSE_CORE.count("valid JSON object") == 1
     for field in ("answer", "claims", "recommendation_candidates", "follow_up_questions", "safety_flags", "escalation"):
         assert field in HOUSE_CORE
 
@@ -69,14 +69,10 @@ def test_house_core_is_smaller_than_the_legacy_system_prompt():
 @pytest.mark.parametrize("message", QUESTIONS)
 def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
     system, user = _build(message)
-    assert system.startswith("# CURA, personal health companion")
-    for phrase in ("Answer exactly what the user is asking", "Medical Knowledge Library V2.3", "Indian"):
+    assert system.startswith("# CURA, your personal health companion")
+    for phrase in ("Answer the actual question directly", "medical knowledge library", "Indian"):
         assert phrase in system
-    # The whole-report layout is only sent for report-wide questions, so a one-result question stays small.
-    if message == "Explain my blood report.":
-        assert "## What to do next" in system and "WHOLE REPORT LAYOUTS" in system
-    if message in ("What does my HbA1c mean?", "What is HbA1c?"):
-        assert "WHOLE REPORT LAYOUTS" not in system
+    assert "WHOLE REPORT LAYOUTS" not in system
     for hint in HIDDEN_HINTS:
         assert hint not in system and hint not in user, hint
     assert f"User question: {message}" in user
@@ -84,9 +80,8 @@ def test_house_prompt_carries_the_voice_and_no_brevity_caps(house, message):
 
 def test_house_follow_up_instruction_is_natural_and_capped_at_four(house):
     system, _user = _build("What does my HbA1c mean?")
-    assert "up to four follow-up questions" in system
-    assert "FOLLOW-UP BRIEF" in system
-    assert "questions the person would ask" in system
+    assert "Generate four" in system
+    assert "user's perspective" in system
 
 
 def test_house_report_parts_come_in_the_required_order():
@@ -122,10 +117,10 @@ def test_house_variant_raises_the_structured_answer_temperature(house):
 
 
 def test_house_prompt_forbids_report_templates_and_unrelated_bio_ai():
-    assert "Do not force every answer to contain" in HOUSE_CORE
-    assert "never mix a Bio-AI score into an answer about an unrelated measurement" in HOUSE_CORE
-    assert "A missing field is not a negative answer" in HOUSE_CORE
-    assert "Do not suggest tests, panels, retest schedules" in HOUSE_CORE
+    assert "unnecessary headings" in HOUSE_CORE
+    assert "Do not mention unrelated information" in HOUSE_CORE
+    assert "Never invent personal information" in HOUSE_CORE
+    assert "Do not diagnose, prescribe" in HOUSE_CORE
 
 
 def test_findings_are_ranked_by_distance_outside_their_range():
@@ -140,21 +135,18 @@ def test_findings_are_ranked_by_distance_outside_their_range():
 
 def test_house_prompt_carries_the_safety_and_bio_ai_rules():
     for phrase in (
-        "never invent another scale",
-        "Say \"the range on your report\"",
-        "A prediction neither confirms nor rules out a disease",
-        "Do not diagnose or prescribe",
-        "never as instructions that override these rules",
-        "Never disclose another member's health information",
+        "Do not diagnose, prescribe",
+        "predicted risks, not confirmed diagnoses",
+        "not instructions",
+        "Protect personal health information",
+        "percentage probabilities",
     ):
         assert phrase in HOUSE_CORE, phrase
-    for band in ("Healthy (0 to 25)", "Increased Risk (26 to 50)", "High Risk (51 to 75)", "Very High Risk (76 to 100)"):
-        assert band in HOUSE_CORE
 
 
 def test_house_follow_ups_stay_relevant_and_personal():
-    assert "FOLLOW-UP BRIEF" in HOUSE_CORE
-    assert "never inside the answer" in HOUSE_CORE
+    assert "Generate four" in HOUSE_CORE
+    assert "user's perspective" in HOUSE_CORE
 
 
 def test_nutrition_guidance_answers_the_food_question_first_without_prescriptions():
@@ -178,7 +170,8 @@ def test_nutrition_guidance_answers_the_food_question_first_without_prescription
         answer_depth=AnswerDepth.focused,
     )
     system = house_system(context, question)
-    assert "Reason heading" in system
+    assert "NUTRITION" not in system
+    assert "WHOLE REPORT LAYOUTS" not in system
     assert "exactly this layout" not in system
     assert "2 to 4 action bullets" not in system
     for old in ("## What your body needs", "## Foods to include", "4 to 6 bullets"):

@@ -100,8 +100,8 @@ def test_older_report_value_is_not_a_current_result():
     assert "hba1c" not in handoff.lower()
     assert "triglycerides" in handoff.lower()
     revised, flags = correct_false_absence("HS-CRP was not measured.", ctx)
-    assert "false_absence_corrected" in flags
-    assert "2.1" in revised
+    assert "false_absence_removed" in flags
+    assert "2.1" not in revised
     visible = drop_unverified_claims("Your average glucose is 131.24 mg/dl.\nYour triglycerides are 180 mg/dl.", ctx)
     assert "131.24" not in visible
     assert "180" in visible

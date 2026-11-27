@@ -47,4 +47,37 @@ describe("ExploreJourney", () => {
     expect(screen.getByText("Liver cells contain ALT.")).toBeTruthy();
     expect(screen.getByText(/range on your report: 0 to 40/)).toBeTruthy();
   });
+
+  it("sends the visible metabolic-age snapshot and report identity", () => {
+    const onAsk = vi.fn();
+    const metabolicView = {
+      ...view,
+      snapshot_version: "snapshot-42",
+      metabolic_age_insight: {
+        actual_age_years: 31,
+        metabolic_age_years: 35,
+        difference_years: 4,
+        direction: "higher",
+        comparison: "Your metabolic age is estimated to be 4 years above your actual age.",
+        assessed_on: "2026-08-25",
+      },
+      findings: {
+        ...view.findings,
+        "risk:nafld": {
+          ...view.findings["risk:nafld"],
+          measured_on: "2026-08-25",
+          report_id: "bio-report-7",
+        },
+      },
+    } as unknown as HealthView;
+
+    render(
+      <ExploreJourney view={metabolicView} loading={false} error={false} name="Alex" place="overview" categoryId={null} findingId={null} onPlace={vi.fn()} onAsk={onAsk} />,
+    );
+    fireEvent.click(screen.getByRole("button", { name: /What's behind my metabolic age/i }));
+    expect(onAsk).toHaveBeenCalledWith(
+      "What does my metabolic age say about my health?",
+      expect.objectContaining({ report_id: "bio-report-7", snapshot_version: "snapshot-42" }),
+    );
+  });
 });

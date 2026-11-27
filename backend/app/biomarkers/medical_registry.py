@@ -35,7 +35,7 @@ def _identity_by_content_key() -> dict[str, str]:
 
 
 @lru_cache(maxsize=1)
-def biomarker_content() -> dict[str, dict]:
+def _biomarker_index() -> dict[str, dict]:
     from app.biomarkers.resolver import resolve_marker
 
     identities = _identity_by_content_key()
@@ -51,6 +51,15 @@ def biomarker_content() -> dict[str, dict]:
             row = {**row, "biomarker_id": marker_id}
             index.setdefault(marker_id, row)
     return index
+
+
+def biomarker_content() -> dict[str, dict]:
+    path = LIBRARY / "content/biomarker_content.json"
+    stamp = path.stat().st_mtime_ns
+    if getattr(biomarker_content, "_stamp", None) != stamp:
+        _biomarker_index.cache_clear()
+        biomarker_content._stamp = stamp
+    return _biomarker_index()
 
 
 @lru_cache(maxsize=1)
@@ -213,6 +222,10 @@ _ABOUT_TEST = re.compile(r"\bwhat (?:does|do) .+? (?:measure|measures|show|shows
 
 
 def question_mode(text: str) -> str:
+    if not re.search(r"\bwhat (?:is|are)\b", text or "") and re.search(
+        r"\b(habit|habits|lifestyle|sleep|smoking|exercise|food|diet)\b", text or ""
+    ):
+        return "improvement"
     if not _PERSONAL.search(text) and _ABOUT_TEST.search(text):
         # "What does HbA1c measure?" asks about the test, not a result.
         return "body" if re.search(r"\b(do|does)\??$", text.strip()) else "definition"
@@ -328,6 +341,20 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
 
         if is_risk and mode != "definition":
             add(88 * weight, f"{name}, what a Bio-AI band means", _clean_lines(row.get("risk_meaning"))[:3])
+            if mode in {"possible_causes", "interpretation", "relationship", "improvement"}:
+                note = row.get("influencing_factors_note")
+                if note:
+                    add(86 * weight, f"{name}, these factors are not a score breakdown", _clean_lines(note)[:1])
+                linked = []
+                for item in row.get("relevant_biomarker_context") or []:
+                    reason = str(item.get("reason") or "").strip()
+                    if not reason:
+                        continue
+                    if item.get("model_contributor_confirmed") is False:
+                        reason = reason.rstrip(".") + ". This blood test is not a confirmed input to this person's score"
+                    linked.append(reason)
+                if linked:
+                    add(87 * weight, f"{name}, related blood tests, not a direct measurement", linked[:4])
             if key == "metabolic_age":
                 add(80, "MetSights inputs, not a formula", _clean_lines(row.get("product_inputs")))
         if state and mode != "definition":
@@ -339,7 +366,7 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
         elif mode in {"interpretation", "improvement"}:
             add(55 * weight, f"{name}, how influencing factors act", _factor_lines(row, 3))
 
-        if mode in {"nutrition", "improvement"} or (mode == "interpretation" and state):
+        if mode in {"nutrition", "improvement", "possible_causes"} or (mode == "interpretation" and state):
             boost = 1.0 if mode in {"nutrition", "improvement"} else 0.75
             if state == "normal" or not state:
                 add(80 * weight * boost, f"{name}, keeping it healthy", _clean_lines(row.get("keeping_healthy"))[:2])
@@ -362,7 +389,9 @@ def chat_passages(message: str, keys: list[str], sides: dict[str, str] | None = 
         for rel in sorted(relationships(), key=lambda r: 0 if r.get("priority") == "primary" else 1):
             if added >= (5 if mode == "relationship" else 3):
                 break
-            if not eligible_for_chat(rel) or (mode not in (rel.get("retrieve_when") or []) and len(used_keys) < 2):
+            if not eligible_for_chat(rel) or (
+                mode not in (rel.get("retrieve_when") or []) and mode != "possible_causes" and len(used_keys) < 2
+            ):
                 continue
             left, right = _endpoint(rel, "source"), _endpoint(rel, "related")
             both = left in used and right in used
@@ -393,7 +422,8 @@ def entry_for(biomarker_id: str | None) -> dict | None:
 
 def invalidate() -> None:
     inventory.cache_clear()
-    biomarker_content.cache_clear()
+    _biomarker_index.cache_clear()
+    biomarker_content._stamp = None
     allergy_content.cache_clear()
     bio_ai_content.cache_clear()
     relationships.cache_clear()

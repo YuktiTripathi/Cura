@@ -18,12 +18,18 @@ def _subject(subject_id: str) -> str:
     return hashlib.sha256(subject_id.encode()).hexdigest()[:24]
 
 
+def _library() -> str:
+    from app.biomarkers.medical_registry import library_revision
+
+    return library_revision()
+
+
 def overview_key(subject_id: str) -> str:
-    return f"user:{_subject(subject_id)}:cura:overview_v2"
+    return f"user:{_subject(subject_id)}:cura:overview:{_library()}"
 
 
 def system_key(subject_id: str, system_slug: str) -> str:
-    return f"user:{_subject(subject_id)}:cura:system:{system_slug}"
+    return f"user:{_subject(subject_id)}:cura:system:{system_slug}:{_library()}"
 
 
 def read_payload(key: str):

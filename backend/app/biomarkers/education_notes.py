@@ -48,7 +48,10 @@ def _note(row: dict, canonical_id: str | None) -> EducationNote:
     seen: set[str] = set()
     # Short introduction first, then the biology, then why it matters. Each field of the V2.3 entry is
     # used for its own purpose and a sentence is never shown twice.
-    short = _distinct(_lines(row.get("short_description")), seen)
+    points = [str(line).strip() for line in (row.get("definition_points") or []) if str(line).strip()][:3]
+    for line in points:
+        seen.add(" ".join(line.lower().split()).rstrip("."))
+    short = " ".join(points) if points else _distinct(_lines(row.get("short_description")), seen)
     body = _distinct(_lines(row.get("what_happens_inside_my_body")), seen)
     # Sentences used for the result explanations are not repeated under "why this test matters".
     for side in ("high", "above_range", "low", "below_range", "normal", "within_range"):
@@ -57,6 +60,7 @@ def _note(row: dict, canonical_id: str | None) -> EducationNote:
     return EducationNote(
         name=row.get("display_name") or row.get("clinical_name") or canonical_id or "",
         what_it_is=short or body,
+        definition_points=points,
         body=body if short else "",
         why_it_matters=why,
         if_high=_join(explanations.get("high") or explanations.get("above_range")),

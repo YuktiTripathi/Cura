@@ -81,7 +81,7 @@ class ResponseValidator:
         coverage = _entity_coverage(answer, plan, context)
         flags.extend(coverage.flags)
         if coverage.repairs:
-            answer = (answer.rstrip() + " " + " ".join(coverage.repairs)).strip()
+            flags.append("coverage_repair_withheld")
         if "backend_leak" in flags:
             answer = self.renderer.render(message, context)
         return answer, list(dict.fromkeys(flags)), list(dict.fromkeys(grounding_flags))
@@ -98,6 +98,30 @@ def _entity_coverage(answer: str, plan: QueryPlan, context: HealthContext) -> Qu
         # The answer asks which report to use; nothing has been looked up yet.
         return QualityGateResult(passed=True, flags=flags, repairs=repairs)
     blob = (answer or "").lower()
+    if re.search(r"\bmetabolic age\b", plan.raw_message or "", re.I) and context.metabolic_age is not None:
+        from app.biomarkers.metabolic_age_insight import build_metabolic_age_insight
+
+        insight = build_metabolic_age_insight(
+            actual_age=context.profile_age,
+            metabolic_age=context.metabolic_age,
+            assessed_on=context.bio_report_date,
+        )
+        if insight is not None:
+            has_actual = str(insight.actual_age_years) in blob
+            has_metabolic = str(insight.metabolic_age_years) in blob
+            if not (has_actual and has_metabolic):
+                if insight.direction == "same":
+                    comparison = "the two estimates match"
+                else:
+                    comparison = (
+                        f"the metabolic-age estimate is {abs(insight.difference_years)} "
+                        f"{'year' if abs(insight.difference_years) == 1 else 'years'} {insight.direction}"
+                    )
+                repairs.append(
+                    f"At the assessment, your actual age was estimated as {insight.actual_age_years} and "
+                    f"your metabolic age was {insight.metabolic_age_years}; {comparison}."
+                )
+                flags.append("metabolic_age_comparison_restored")
     already_discloses_missing = any(
         token in blob
         for token in ("not available", "not present", "couldn't find", "not found", "missing")

@@ -74,6 +74,7 @@ def stub_model(monkeypatch):
 
 
 def test_every_question_and_chain_gives_the_same_response_on_both_engines(monkeypatch):
+    pytest.importorskip("langchain_core")
     # Every fourth question and every chain by default; CURA_FULL_PARITY=1 runs all 57 (about 2.5 minutes).
     singles = QUESTIONS["single"] if os.environ.get("CURA_FULL_PARITY") else QUESTIONS["single"][::4]
     turns = [[q] for q in singles] + [list(chain) for chain in QUESTIONS["chains"]]
@@ -84,6 +85,7 @@ def test_every_question_and_chain_gives_the_same_response_on_both_engines(monkey
 
 
 def test_langchain_engine_really_runs_the_sequence(monkeypatch):
+    pytest.importorskip("langchain_core")
     calls = []
     real = chain_module.run_chat_chain
     monkeypatch.setattr("app.orchestration.chain.run_chat_chain", lambda *a, **k: (calls.append(1), real(*a, **k))[1])
@@ -93,6 +95,7 @@ def test_langchain_engine_really_runs_the_sequence(monkeypatch):
 
 
 def test_errors_propagate_unchanged_and_nothing_is_retried(monkeypatch):
+    pytest.importorskip("langchain_core")
     attempts = []
 
     def boom(self, principal, payload, request_id, eval_turn):
@@ -121,6 +124,7 @@ def test_native_is_used_when_langchain_is_missing_or_switched_off(monkeypatch):
 
 
 def test_tracing_is_off_and_no_callbacks_see_the_state(monkeypatch):
+    pytest.importorskip("langchain_core")
     monkeypatch.setenv("LANGSMITH_TRACING", "true")
     monkeypatch.setenv("LANGCHAIN_TRACING_V2", "true")
     monkeypatch.setenv("LANGSMITH_API_KEY", "ls-secret")

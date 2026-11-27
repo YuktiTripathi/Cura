@@ -31,7 +31,9 @@ export function RangeBar({
   return (
     <div className="range" data-relation={g.relation}>
       <div className="range-track" role="img" aria-label={description} title={description}>
-        <span className="range-band" style={{ left: `${g.bandStart}%`, width: `${g.bandEnd - g.bandStart}%` }} />
+        <span className="range-zone" data-zone="low" style={{ left: 0, width: `${g.bandStart}%` }} />
+        <span className="range-zone" data-zone="within" style={{ left: `${g.bandStart}%`, width: `${g.bandEnd - g.bandStart}%` }} />
+        <span className="range-zone" data-zone="high" style={{ left: `${g.bandEnd}%`, right: 0 }} />
         <span className="range-dot" style={{ left: `${g.position}%` }} />
       </div>
       <div className="range-meta">

@@ -13,7 +13,7 @@ _ABSOLUTE = re.compile(r"\b(always|never|must|cure[sd]?|prevents|guaranteed safe
 _NUMBER = re.compile(r"\d+(?:\.\d+)?")
 _MARKER_CLAIM = re.compile(
     r"\b(ldl|hdl|hba1c|triglycerides?|vitamin d|tsh|glucose|cholesterol|crp|hs-crp|alt|ast|insulin|"
-    r"vldl|phosphorus|homocysteine|bmi|dyslipidemia|metabolic age|metabolic score|"
+    r"vldl|phosphorus|homocysteine|bmi|dyslipidemia|actual age|profile age|metabolic age|metabolic score|"
     r"type 2 diabetes|nafld|oxidative stress)\b"
     r"[^.]{0,40}?(\d+(?:\.\d+)?)(\s*(?:%|mg/dl|mg/l|mmol/l|u/l|kg/m2))?",
     re.I,
@@ -115,6 +115,17 @@ class GroundingChecker:
         _mark_current(measured)
         if context.metabolic_age is not None:
             bio.setdefault(_canonical_code("metabolic age"), set()).add(_norm(float(context.metabolic_age)))
+            from app.biomarkers.metabolic_age_insight import build_metabolic_age_insight
+
+            insight = build_metabolic_age_insight(
+                actual_age=context.profile_age,
+                metabolic_age=context.metabolic_age,
+                assessed_on=context.bio_report_date,
+            )
+            if insight is not None:
+                actual = _norm(float(insight.actual_age_years))
+                bio.setdefault(_canonical_code("actual age"), set()).add(actual)
+                bio.setdefault(_canonical_code("profile age"), set()).add(actual)
         if context.metabolic_score is not None:
             bio.setdefault(_canonical_code("metabolic score"), set()).add(_norm(float(context.metabolic_score)))
         return {"measured": measured, "ranges": ranges, "bio": bio, "derived": derived}
@@ -357,5 +368,7 @@ def _canonical_marker(name: str) -> str:
         "dyslipidemia": "dyslipidemia",
         "metabolicscore": "metabolicscore",
         "metabolicage": "metabolicage",
+        "actualage": "actualage",
+        "profileage": "actualage",
     }
     return aliases.get(key, key)

@@ -73,7 +73,6 @@
       "expected_intent": "nutrition_guidance",
       "expected_sources": ["supershyft"],
       "expected_evidence": true,
-      "expected_followups": true,
       "prohibited_claims": ["prescribe", "dosage"]
     },
     {

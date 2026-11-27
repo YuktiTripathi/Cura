@@ -48,7 +48,8 @@ _UNSAFE = re.compile(
 )
 _GENERIC = re.compile(
     r"\b(any (?:new )?(?:symptoms|medications?)|anything else|other questions?|how (?:are|do) you feel|"
-    r"tell me more|learn more|what else|more information|what does (?:this|that) topic mean|in general)\b",
+    r"tell me more|learn more|what else|more information|everything about every|"
+    r"what does (?:this|that) topic mean|in general)\b",
     re.I,
 )
 # A chip is the member asking Cura. Questions Cura would ask the member ("Would you like a
@@ -436,7 +437,7 @@ def is_cross_source(text: str) -> bool:
 
 def valid_question(text: str, brief: FollowUpBrief, *, current: str | None = None, chosen: list[str] = ()) -> bool:
     q = (text or "").strip()
-    if not q.endswith("?") or len(q) > 90 or len(q.split()) > 12 or len(q.split()) < 3:
+    if not q.endswith("?") or len(q) > 120 or len(q.split()) < 3:
         return False
     if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q):
         return False
@@ -456,6 +457,10 @@ _ASSUMED_LIFESTYLE = re.compile(
     re.I,
 )
 _ASKS_TO_SHARE = re.compile(r"\b(share|tell you|give you|add)\b", re.I)
+_SCORE_ATTRIBUTION = re.compile(
+    r"\b(?:caused|contributed to|contribution to|how much)\b.{0,60}\b(?:score|scores)\b",
+    re.I,
+)
 
 
 def _fits_available_data(q: str, brief: FollowUpBrief) -> bool:
@@ -468,6 +473,8 @@ def _fits_available_data(q: str, brief: FollowUpBrief) -> bool:
         return False  # no earlier report to compare with
     if not brief.has_lifestyle and _ASSUMED_LIFESTYLE.search(q) and not _ASKS_TO_SHARE.search(q):
         return False  # do not assume diet, sleep or symptoms that are not on record
+    if _SCORE_ATTRIBUTION.search(q):
+        return False  # a score's individual causes are not supplied, so do not ask as if they were confirmed
     return True
 
 
@@ -688,6 +695,8 @@ def _select_base(
             stages_used.add(stage_of(text) or "")
         if len(chosen) >= count:
             return chosen
+    if model_questions is not None:
+        return chosen[:count]
     # When the model already offered usable questions, refill only with next steps about the result being
     # asked about, never with abnormal-result templates for unrelated markers (the 0b591ae intent). Returning
     # early left nothing when a later check removed the model's only question.
@@ -797,10 +806,13 @@ def select_followups(
     count: int = 4,
 ) -> list[str]:
     chosen = _select_base(brief, current_question=current_question, model_questions=model_questions, count=count)
+    if model_questions is not None:
+        # The model's questions stay as written. A question that fails validation is already dropped.
+        return chosen
     out = _diversify(chosen, brief, current_question)
     diet = _DIET_WORD.search(brief.diet or "")
     if diet:
-        # Food questions fit the member's own diet: "What can I eat to lower my X?" -> "Which vegetarian foods can help my X?"
+        # Template questions can name the recorded diet. Model wording is not rewritten.
         out = [re.sub(r"^What can I eat to (?:lower|raise) my (.+)\?$", rf"Which {diet.group(1).lower()} foods can help my \1?", q) for q in out]
     return out
 
@@ -820,9 +832,7 @@ def general_follow_ups(
         words = q.split()
         if not q.endswith("?") or len(words) < 3:
             continue
-        if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q):
-            continue
-        if re.search(r"\b(my|mine|me)\b|\b(report|results?|scores?)\b", q, re.I):
+        if _UNSAFE.search(q) or _GENERIC.search(q) or _CURA_VOICE.search(q) or is_cross_source(q) or _SCORE_ATTRIBUTION.search(q):
             continue
         if re.search(r"\b(routine blood test|overall health|health checks?)\b", q, re.I) and not re.search(
             r"\b(routine blood test|overall health|health check)", message or "", re.I

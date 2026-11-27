@@ -15,6 +15,7 @@ from app.contracts.query import QueryPlan
 from app.core.config import settings
 from app.core.consent import has_current_consent
 from app.core.errors import ProviderUnavailableError
+from app.health_explanation.category_guidance import category_guidance
 from app.health_explanation.category_story import CategoryProfile, build_story, load_profile
 from app.pipeline.unified_wording import model_wording
 from app.providers.registry import ProviderRegistry
@@ -104,6 +105,7 @@ def build_category(principal: AuthenticatedPrincipal, registry: ProviderRegistry
     profile = load_profile(principal, registry, entities) if consent else CategoryProfile(None, None, [])
     use_model = settings.enable_llm and consent if allow_model is None else bool(allow_model and consent)
     detail.story = build_story(detail, profile, principal.subject_id, allow_model=use_model)
+    detail.guidance = category_guidance(detail, profile, principal.subject_id, allow_model=use_model)
     return detail
 
 

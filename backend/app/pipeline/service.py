@@ -153,6 +153,59 @@ from app.routing.model_tier import assess_answer_complexity, promote_for_retriev
 logger = logging.getLogger("cura.pipeline")
 
 
+def _write_response_trace(response, payload, eval_turn) -> None:
+    """Development-only local comparison of the raw model answer and the final answer."""
+    if not settings.is_development or not settings.response_diagnostics:
+        return
+    from pathlib import Path
+
+    stages = eval_turn.get("answer_stages") or {}
+    plan = eval_turn.get("routing_plan")
+    raw = stages.get("raw_llm_answer")
+    final = getattr(response, "answer", None)
+    context = eval_turn.get("context")
+    medical = []
+    for hit in eval_turn.get("medical") or []:
+        medical.append(
+            {
+                "id": getattr(hit, "content_id", None) or getattr(hit, "id", None),
+                "title": getattr(hit, "title", None),
+            }
+        )
+    personal = None
+    if context is not None:
+        personal = {
+            "marker_count": len(getattr(context, "markers", None) or []),
+            "risk_count": len(getattr(context, "risks", None) or []),
+            "questionnaire_count": len(getattr(context, "questionnaire", None) or []),
+            "missing": [
+                {"key": getattr(item, "key", None), "reason": getattr(item, "reason", None)}
+                for item in (getattr(context, "missing", None) or [])
+            ],
+        }
+    body = {
+        "intent": getattr(getattr(plan, "intent", None), "value", None),
+        "model": getattr(eval_turn.get("llm_result"), "model", None),
+        "model_tier": stages.get("model_tier"),
+        "retrieved_personal_context": personal,
+        "retrieved_medical_knowledge": medical or [
+            str(line)[:180] for line in (getattr(context, "medical_passages", None) or [])[:8]
+        ],
+        "raw_answer": raw,
+        "parsed_answer": stages.get("reasoner_answer"),
+        "post_validator_answer": stages.get("post_validator_answer"),
+        "final_answer": final,
+        "answer_unchanged": raw == final,
+        "validation_flags": list(getattr(getattr(response, "meta", None), "safety_flags", None) or []),
+        "raw_follow_ups": list(eval_turn.get("model_follow_ups") or []),
+        "final_follow_ups": [getattr(item, "text", None) or getattr(item, "prompt", None) for item in (getattr(response, "follow_ups", None) or [])],
+    }
+    folder = Path(__file__).resolve().parents[2] / "var" / "response-traces"
+    folder.mkdir(parents=True, exist_ok=True)
+    stamp = str(getattr(getattr(response, "meta", None), "request_id", None) or "turn")
+    (folder / f"{stamp}.json").write_text(json.dumps(body, ensure_ascii=False, default=str), encoding="utf-8")
+
+
 def _topic_follow_ups(items, message: str, answer: str):
     """Keep model and engine chips that stay on this question. Drops repeats."""
     from app.pipeline.followup_generator import on_topic
@@ -350,7 +403,9 @@ class ChatService:
     def _step_finalize(self, response, payload, eval_turn):
         # Last pass over everything visible: no em dashes, repeated disclaimers, duplicate
         # paragraphs, "None to None" ranges, or full report tables under other answers.
-        return finalize_response(response, payload.message, eval_turn.get("routing_plan"), eval_turn.get("context"))
+        response = finalize_response(response, payload.message, eval_turn.get("routing_plan"), eval_turn.get("context"))
+        _write_response_trace(response, payload, eval_turn)
+        return response
 
     def _step_persist(self, response, eval_turn, request_perf):
         with perf.stage("persistence"):
@@ -1434,19 +1489,42 @@ class ChatService:
                 from app.pipeline.evidence_inventory import requested_marker_keys
 
                 keys = list(requested_marker_keys(payload.message))
-                if re.search(r"\bmetabolic age\b", payload.message or "", re.I) and "metabolic_age" not in keys:
+                organ_function = bool(re.search(
+                    r"\b(?:what|how) (?:does|do)\b.{0,80}\b(?:do|work|works|function|functions)\b|\binside (?:my|the|your) body\b",
+                    payload.message or "",
+                    re.I,
+                )) and not re.search(
+                    r"\b(?:result|results|report|reports|score|scores|level|levels|value|values|reading|readings)\b",
+                    payload.message or "",
+                    re.I,
+                )
+                from app.pipeline.lab_parameters import FAMILY_QUERY_KEYS
+
+                named_markers = [key for key in keys if key not in FAMILY_QUERY_KEYS]
+                organ_only = organ_function and not named_markers
+                if organ_only:
+                    # "What does my liver do?" is organ education. Do not pull ALT because the liver family lists it first.
+                    keys = []
+                else:
+                    if organ_function:
+                        keys = named_markers
+                    topic_key = getattr(plan, "topic", None)
+                    if topic_key and topic_key not in keys and not (organ_function and topic_key not in named_markers):
+                        keys.insert(0, topic_key)
+                if not organ_only and re.search(r"\bmetabolic age\b", payload.message or "", re.I) and "metabolic_age" not in keys:
                     keys.insert(0, "metabolic_age")
-                keys += [getattr(r, "code", None) for r in (context.bio_ai_risks or []) if getattr(r, "code", None) and not keys][:2]
-                if not keys:
+                if not organ_only:
+                    keys += [getattr(r, "code", None) for r in (context.bio_ai_risks or []) if getattr(r, "code", None) and not keys][:2]
+                if not keys and not organ_only:
                     keys = [k for k in [*(context.requested_entity_codes or []), *(context.display_entity_codes or [])] if k][:3]
-                if not keys:
+                if not keys and not organ_only:
                     # Food advice: the passages for the results outside their range that food can influence.
                     keys = [
                         m.key for m in (context.markers or [])
                         if getattr(m, "flag", None) is not None and str(getattr(m.flag, "value", m.flag)) in {"low", "high"} and m.value is not None
                     ][:3]
                 food_question = bool(re.search(r"\b(eat|diet|food|foods|nutrition|meal|meals)\b", (payload.message or "").lower()))
-                for key in ([] if food_question else list(keys)):
+                for key in ([] if food_question or organ_only else list(keys)):
                     for other in related_ids(key)[:4]:
                         if other not in keys:
                             keys.append(other)
@@ -1666,10 +1744,6 @@ class ChatService:
                 text = question.strip()
                 if not text:
                     continue
-                if plan.knowledge_scope == KnowledgeScope.general and (
-                    requires_personal_record(text) or is_personal_utterance(text)
-                ):
-                    continue
                 llm_follow.append(text)
         from app.pipeline.followup_generator import is_member_question, on_topic
 
@@ -1787,6 +1861,18 @@ class ChatService:
             safety_mode=SafetyLayer.request_safety_mode(pre_safety),
             escalation=escalation,
         )
+        asked_for_records = bool(re.search(
+            r"\b(?:view|show) all (?:my )?(?:results|values|markers)\b", payload.message or "", re.I
+        ))
+        if presentation is not None and not asked_for_records:
+            # Cards and library blocks stay off the chat answer. Source facts were already copied
+            # into the turn experience for the source view.
+            presentation.related_findings = []
+            presentation.headline = None
+            presentation.findings = []
+            presentation.raw_findings = []
+            presentation.blocks = []
+            presentation.themes = []
         if turn_experience.stream_policy.value == "SEMANTIC_BLOCKS" and not getattr(self._progress, "tokens_streamed", False):
             # Once the answer has streamed as text, blocks built from the same answer would repeat it.
             for block in turn_experience.blocks:

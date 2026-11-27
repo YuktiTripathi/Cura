@@ -75,8 +75,11 @@ def test_bio_ai_rules_only_for_bio_ai_questions():
     from app.contracts.health_context import HealthContext
 
     context = HealthContext(intent=IntentType.general_health_question, answer_depth=AnswerDepth.focused)
-    assert BIO_AI_RULES in house_system(context, "What is my Bio-AI score?")
-    assert BIO_AI_RULES not in house_system(context, "What is my LDL?")
+    score = house_system(context, "What is my Bio-AI score?")
+    ldl = house_system(context, "What is my LDL?")
+    assert score == ldl
+    assert "predicted risks, not confirmed diagnoses" in score
+    assert BIO_AI_RULES not in score
 
 
 def test_response_never_shows_reviewer_or_review_date():

@@ -24,7 +24,11 @@ _BIO_LIST = re.compile(
     r"|\bmy bio-?ai risk scores?\b",
     re.I,
 )
-_WHY_RISK = re.compile(r"\bwhy\b.{0,40}\b(?:my )?.{0,24}\brisk\b", re.I)
+_WHY_RISK = re.compile(
+    r"\bwhy\b.{0,80}\bmy\b.{0,40}\b(?:risk|score|increased|high|elevated|raised)\b"
+    r"|\b(?:lower|reduce|improve|bring down)\b.{0,40}\b(?:my )?(?:risk|score)\b",
+    re.I,
+)
 _DISCREPANCY = re.compile(
     r"\b(?:but|although|even though)\b.{0,80}\bbio-?ai\b|\bbio-?ai\b.{0,40}\b(?:but|although)\b",
     re.I,
@@ -226,7 +230,7 @@ def build_task_contract(message: str | None) -> TaskContract:
         response = "CROSS_SOURCE_EXPLANATION"
     elif _WHY_RISK.search(text):
         ops.append(ReasoningOperation.explain)
-        sources.extend(["bio_ai", "blood_report"])
+        sources.extend(["bio_ai", "blood_report", "questionnaire"])
         response = "PERSONAL_RISK_EXPLANATION"
     elif _PRIORITIZE.search(text):
         ops.append(ReasoningOperation.prioritize)
@@ -275,6 +279,9 @@ def reapply_stored_contract(plan: QueryPlan) -> QueryPlan:
     if "bio_ai" in sources:
         plan.needs_bio_ai = True
         plan.needs_supershyft = True
+    if "questionnaire" in sources:
+        plan.needs_questionnaire = True
+        plan.needs_lifestyle = True
     if raw.get("response_type") == "BIO_AI_SCORE_LIST":
         plan.needs_blood = False
         plan.intent = IntentType.bio_ai_score
@@ -301,6 +308,12 @@ def apply_task_contract(plan: QueryPlan, message: str | None = None) -> QueryPla
         update["needs_blood"] = True
     if "bio_ai" in contract.required_sources:
         update["needs_bio_ai"] = True
+    if "questionnaire" in contract.required_sources:
+        update["needs_questionnaire"] = True
+        update["needs_lifestyle"] = True
+        if contract.response_type == "PERSONAL_RISK_EXPLANATION":
+            # Loading habits for a risk explanation is not a request to compare two reports.
+            update["compare"] = False
     if contract.response_type == "BIO_AI_SCORE_LIST":
         update.update(
             intent=IntentType.bio_ai_score,

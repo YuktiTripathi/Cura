@@ -257,23 +257,6 @@ def repair_incomplete_output(text: str, context: HealthContext) -> str:
     for segment in _segments(text):
         if segment not in bad:
             kept.append(segment)
-            continue
-        already = "\n".join(kept)
-        for marker in context.markers or []:
-            if getattr(marker, "value", None) is None:
-                continue
-            if _stated_number(segment, marker.value) and not _stated_number(already, marker.value):
-                kept.append(_fact_line(marker))
-                break
-        else:
-            for risk in context.bio_ai_risks or []:
-                if risk.score is None:
-                    continue
-                if _stated_number(segment, risk.score) and not _stated_number(already, risk.score):
-                    name = risk.name or risk.code or "This score"
-                    status = f", {risk.status}" if risk.status else ""
-                    kept.append(f"{name} is {float(risk.score):g}{status}.")
-                    break
     return "\n".join(kept).strip()
 
 

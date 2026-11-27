@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { LineIcon } from "../LineIcon";
+import { bioTone, measuredTone } from "../../lib/healthTone";
 import { BODY_AT_WORK, CATEGORY_PLACEHOLDER, friendlyBiomarkerName } from "./bodyAtWork";
 import type { ChatMessage } from "../../hooks/useCuraChat";
 import { MessageList } from "../MessageList";
@@ -11,6 +12,7 @@ import type { HealthView } from "../../lib/api";
 type Place = "home" | "overview" | "category" | "marker" | "risk";
 
 type Edu = NonNullable<Finding["education"]> & {
+  definition_points?: string[];
   body?: string;
   why_it_matters?: string;
   limitations?: string;
@@ -41,15 +43,16 @@ function friendlyDate(value?: string | null): string | null {
   return date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric", timeZone: "UTC" });
 }
 
-function ResultRow({ title, value, note, open, onOpen }: { title: string; value?: string | null; note?: string | null; open?: boolean; onOpen: () => void }) {
+function ResultRow({ title, value, note, tone = "unknown", open, onOpen }: { title: string; value?: string | null; note?: string | null; tone?: string; open?: boolean; onOpen: () => void }) {
+  const arrow = tone === "above" ? "↑ " : tone === "below" ? "↓ " : "";
   return (
-    <div className="result-row">
+    <div className="result-row" data-tone={tone}>
       <button type="button" className="result-row-button" aria-expanded={open} onClick={onOpen}>
         <span className="result-row-main">
           <strong>{title}</strong>
           {note ? <span className="muted">{note}</span> : null}
         </span>
-        {value ? <span className="result-row-value">{value}</span> : null}
+        {value ? <span className="result-row-value" data-tone={tone}>{arrow}{value}</span> : null}
         <span className="result-row-chevron" aria-hidden="true">{open ? "▾" : "›"}</span>
       </button>
     </div>
@@ -66,13 +69,11 @@ function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?
   const predicted = finding.source_type === "predicted_risk";
   const name = friendlyBiomarkerName(finding.name);
   const calm = finding.status === "within_range" || finding.status === "risk_healthy";
-  const needsSteps = finding.status === "above_range" || finding.status === "below_range" || finding.status === "critical" || finding.status === "risk_raised";
-  const about = sentences(edu?.what_it_is, calm ? 2 : 2);
+  const points = (edu?.definition_points || []).slice(0, 3);
+  const about = points.length ? "" : sentences(edu?.what_it_is, calm ? 2 : 2);
   const why = predicted ? sentences(edu?.why_it_matters, 1) : "";
   const meaning = predicted ? "" : calm ? "Your result is within the expected range." : sentences(resultMeaning(finding, edu), 2);
   const limit = sentences(edu?.limitations, 1);
-  const factors = (edu?.factors || []).slice(0, 6);
-  const actions = needsSteps ? (edu?.actions || []).slice(0, 3) : [];
   const related = (edu?.related_markers || []).map((code) => code.toLowerCase());
   const linked = siblings.filter((item) => {
     const codeOnRow = ((item as Finding & { marker_code?: string | null }).marker_code || "").toLowerCase();
@@ -82,10 +83,10 @@ function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?
   const alongsideNames = alongside.map((item) => friendlyBiomarkerName(item.name));
   return (
     <div className="inline-finding">
-      {about ? (
+      {points.length || about ? (
         <section>
           <h3>What is {name}?</h3>
-          <p>{about}</p>
+          {points.length ? <ul>{points.map((line) => <li key={line}>{line}</li>)}</ul> : <p>{about}</p>}
         </section>
       ) : null}
       {why && why !== about ? (
@@ -101,19 +102,6 @@ function InlineFinding({ finding, siblings = [] }: { finding: Finding; siblings?
         <RangeNote finding={finding} />
         {alongsideNames.length ? <p>{alongsideNames.join(" and ")} {alongsideNames.length === 1 ? "is" : "are"} a measured result in this area. {alongsideNames.length === 1 ? "It does" : "They do"} not directly measure this assessment.</p> : null}
       </section>
-      {factors.length ? (
-        <section>
-          <h3>What can affect {predicted ? "it" : name}?</h3>
-          <ul className="factor-list">{factors.map((item) => <li key={item}>{item}</li>)}</ul>
-          <p className="muted">General influences, not confirmed reasons for this result.</p>
-        </section>
-      ) : null}
-      {actions.length ? (
-        <section>
-          <h3>Small changes that can help</h3>
-          <ul>{actions.map((item) => <li key={item}>{item}</li>)}</ul>
-        </section>
-      ) : null}
       {limit && limit !== about && limit !== why ? <p className="muted">{limit}</p> : null}
     </div>
   );
@@ -214,6 +202,18 @@ export function ExploreJourney({
   const categories = (view.overview?.categories || []).filter((card) => (card.measured?.total || 0) + (card.risks?.assessed || 0) > 0);
   const detail: CategoryDetail | undefined = categoryId ? view.categories?.[categoryId] : undefined;
   const finding = findingId ? view.findings?.[findingId] : undefined;
+  const metabolicReportId = view.metabolic_age_insight
+    ? Object.values(view.findings || {}).find(
+        (item) =>
+          item.source_type === "predicted_risk" &&
+          item.measured_on === view.metabolic_age_insight?.assessed_on &&
+          item.report_id
+      )?.report_id ||
+      Object.values(view.findings || {}).find(
+        (item) => item.source_type === "predicted_risk" && item.report_id
+      )?.report_id ||
+      null
+    : null;
 
   if (place === "overview") {
     return (
@@ -228,7 +228,13 @@ export function ExploreJourney({
           <button
             type="button"
             className="metabolic-age-card"
-            onClick={() => onAsk("What does my metabolic age say about my health?", { type: "bio_ai_report", source: "supershyft", entry_point: "health_area" })}
+            onClick={() => onAsk("What does my metabolic age say about my health?", {
+              type: "bio_ai_report",
+              source: "supershyft",
+              entry_point: "health_area",
+              report_id: metabolicReportId,
+              snapshot_version: view.snapshot_version,
+            })}
           >
             <strong>Your age, beyond birthdays.</strong>
             <span>There's the age on your birthday cake, and then there's what your health data says about your metabolism.</span>
@@ -279,9 +285,11 @@ export function ExploreJourney({
   if (place === "category" && detail) {
     const measured = (detail.findings || []).filter((item) => item.source_type === "measured");
     const risks = (detail.findings || []).filter((item) => item.source_type === "predicted_risk");
-    const pointers = BODY_AT_WORK[detail.id] || [];
+    const pointers = (BODY_AT_WORK[detail.id] || []).slice(0, 3);
+    const guide = (detail as CategoryDetail & { guidance?: { influencing_factors?: { text: string }[]; health_guidance?: { text: string }[] } }).guidance;
+    const influences = (guide?.influencing_factors || []).map((item) => item.text).filter(Boolean).slice(0, 3);
+    const care = (guide?.health_guidance || []).map((item) => item.text).filter(Boolean).slice(0, 3);
     const askHere = (text: string) => (onCategoryAsk ? onCategoryAsk(text) : onAsk(text, refFor(view, categoryId)));
-    const summary = detail.insight || detail.summary;
     return (
       <section className="cura-category">
         <h1>{detail.name}</h1>
@@ -293,12 +301,6 @@ export function ExploreJourney({
             </ul>
           </>
         ) : null}
-        {summary ? (
-          <>
-            <h2>What your results say</h2>
-            <p>{summary}</p>
-          </>
-        ) : null}
         {measured.length ? <h2>From your blood report</h2> : null}
         <ul className="finding-list">
           {measured.map((item) => (
@@ -307,6 +309,7 @@ export function ExploreJourney({
                 title={friendlyBiomarkerName(item.name)}
                 value={item.value != null ? `${item.value}${item.unit ? " " + item.unit : ""}` : null}
                 note={item.status_label}
+                tone={measuredTone(item.status)}
                 open={openFinding === item.id}
                 onOpen={() => setOpenFinding(openFinding === item.id ? null : item.id)}
               />
@@ -322,6 +325,7 @@ export function ExploreJourney({
                 title={item.name}
                 value={[item.score != null ? String(item.score) : "", cap(item.classification)].filter(Boolean).join(" · ") || null}
                 note="Predicted risk"
+                tone={bioTone(item.classification, item.name)}
                 open={openFinding === item.id}
                 onOpen={() => setOpenFinding(openFinding === item.id ? null : item.id)}
               />
@@ -329,6 +333,18 @@ export function ExploreJourney({
             </li>
           ))}
         </ul>
+        {influences.length ? (
+          <>
+            <h2>What may be influencing your health?</h2>
+            <ul className="body-at-work">{influences.map((line) => <li key={line}>{line}</li>)}</ul>
+          </>
+        ) : null}
+        {care.length ? (
+          <>
+            <h2>Taking care of your health</h2>
+            <ul className="body-at-work">{care.map((line) => <li key={line}>{line}</li>)}</ul>
+          </>
+        ) : null}
         <QuestionList prompts={questions(view, categoryId)} onAsk={askHere} />
         {categoryChat && onCategoryAsk ? (
           <div className="category-chat">
@@ -359,7 +375,9 @@ export function ExploreJourney({
         <p className="eyebrow">Measured blood result</p>
         <h1>{edu?.name || finding.name}</h1>
         {finding.medical_name ? <p className="muted">{finding.medical_name}</p> : null}
-        {edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
+        {(edu?.definition_points || []).length ? (
+          <ul>{(edu?.definition_points || []).slice(0, 3).map((line) => <li key={line}>{line}</li>)}</ul>
+        ) : edu?.what_it_is ? <p>{edu.what_it_is}</p> : null}
         <section className="result-card">
           {finding.value != null ? (
             <>
@@ -497,7 +515,9 @@ function RangeNote({ finding }: { finding: Finding }) {
     return (
       <div className="range-viz" data-relation={relation} aria-label={`Result ${value} ${unit}, ${words}, range ${low} to ${high}`}>
         <div className="range-track">
-          <span className="range-band" style={{ left: at(low), width: `${(((high - low) / (max - min)) * 100).toFixed(1)}%` }} />
+          <span className="range-zone" data-zone="low" style={{ left: 0, width: at(low) }} />
+          <span className="range-zone" data-zone="within" style={{ left: at(low), width: `${(((high - low) / (max - min)) * 100).toFixed(1)}%` }} />
+          <span className="range-zone" data-zone="high" style={{ left: at(high), right: 0 }} />
           <span className="range-mark" style={{ left: at(value) }} />
         </div>
         <p className="muted">Your result is {words}: {low} to {high} {unit}</p>

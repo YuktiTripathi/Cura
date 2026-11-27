@@ -754,52 +754,27 @@ def _metabolic_age_opening(message: str) -> str:
     if not re.search(r"\b(what does|say about|mean|means|health)\b", message or "", re.I):
         return ""
     return (
+        "Metabolic age is an age-based estimate, not a disease risk score. Do not attach the generic Bio-AI risk-score disclaimer to it. "
         "Use metabolic_comparison in the evidence for the ages, the difference, the direction and the assessment date. "
+        "When both actual_age_years and metabolic_age_years are supplied, state both ages and their comparison plainly; do not omit them. "
         "If this idea has not already been explained, say in everyday words that the body turns food into energy, manages blood sugar and handles fats, and that this is metabolic health. "
-        "It is not how fast someone burns calories. Then interpret their comparison. A higher age is not accelerated ageing. A lower age does not prove the organs are younger. "
+        "It is not how fast someone burns calories. Then interpret their comparison and connect only the most relevant supplied measurements and habits in a short narrative, not a list. "
+        "Acknowledge an existing healthy habit before suggesting a meaningful improvement. A higher age is not accelerated ageing. A lower age does not prove the organs are younger. "
         "The actual age is an estimate when the note says so. Do not claim a blood result or habit caused the metabolic age. "
         "Use only the supplied measurements, risks and habits, and do not ask for a value that is already in the evidence.\n"
     )
 
 
 def _lifestyle_opening(message: str) -> str:
-    from app.pipeline.query_planner import _personal_lifestyle_theme
-
-    if not _personal_lifestyle_theme(message or ""):
-        return ""
-    return (
-        "This is about their own habit. Use the recorded habit in the evidence, then the related blood results and Bio-AI assessments that are supplied. "
-        "If the habit is already in a healthy range, say so and talk about the next useful part, such as consistency or quality, instead of telling them to do what they already do. "
-        "Do not say the habit caused a result or a score.\n"
-    )
+    return ""
 
 
 def _bio_ai_opening(message: str) -> str:
-    import re
-
-    text = message or ""
-    if re.search(r"\bmetabolic age\b", text, re.I):
-        return ""
-    if not re.search(r"\b(risk|score|bio-?ai|pcos|pcod|diabetes|heart|cardiac|blood pressure|hypertension|obesity|fatty liver|cholesterol|thyroid|oxidative|kidney)\b", text, re.I):
-        return ""
-    if not re.search(r"\b(my|i|me)\b", text, re.I):
-        return ""
-    return (
-        "Explain this person's reported classification and the related measurements and habits that are actually supplied. "
-        "Do not open by repeating that a Bio-AI score uses blood results and questionnaires unless they asked how it is calculated. "
-        "A possible influence is not a confirmed contributor, and a low score does not rule a condition out.\n"
-    )
+    return ""
 
 
 def _nutrition_opening(message: str) -> str:
-    from app.pipeline.prompt_modules import is_nutrition_overview
-
-    if not is_nutrition_overview(message or ""):
-        return ""
-    return (
-        "Open with the relevant blood results and Bio-AI assessments in the evidence, then the recorded eating habits, then a few meal changes. "
-        "Do not open with the diet label.\n"
-    )
+    return ""
 
 
 def _asked_task(message: str, context: HealthContext | None = None) -> str:

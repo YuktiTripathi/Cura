@@ -91,7 +91,9 @@ def test_risk_explainer_prompt_is_added_only_for_the_explainer():
         assert heading in RISK_EXPLAINER
     on = house_system(_ctx(), "What does my Type 2 diabetes risk result mean?")
     off_ctx = HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=list(AnswerDepth)[0])
-    assert RISK_EXPLAINER in on and RISK_EXPLAINER not in house_system(off_ctx, "What can I do about my Type 2 diabetes risk?")
+    assert RISK_EXPLAINER not in on
+    assert RISK_EXPLAINER not in house_system(off_ctx, "What can I do about my Type 2 diabetes risk?")
+    assert on == house_system(off_ctx, "What can I do about my Type 2 diabetes risk?")
 
 
 def test_points_are_bullets_and_stock_notes_are_dropped():
@@ -143,7 +145,7 @@ def test_overview_context_sees_the_whole_panel_and_gets_the_area_prompt():
     marker = BloodMarker(id="1", key="ldl", name="LDL", value=120, unit="mg/dL", reference_low=0, reference_high=100)
     ctx = HealthContext(intent=IntentType.bio_ai_explanation, answer_depth=list(AnswerDepth)[0], turn_kind="health_area", markers=[marker])
     assert _relevant_markers(ctx) == [marker]
-    assert HEALTH_AREA in house_system(ctx, "What do my blood tests say about my heart health?")
+    assert HEALTH_AREA not in house_system(ctx, "What do my blood tests say about my heart health?")
     assert "—" not in HEALTH_AREA and "–" not in HEALTH_AREA
 
 

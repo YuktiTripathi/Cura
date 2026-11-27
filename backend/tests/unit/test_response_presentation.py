@@ -110,6 +110,6 @@ def test_complex_review_is_structured_overview():
     assert pres["mode"] == "HEALTH_OVERVIEW"
     assert pres.get("summary_style") == "NARRATIVE_HEALTH_SUMMARY"
     assert pres.get("overall_summary") or pres.get("summary")
-    assert 3 <= len(pres.get("themes") or []) <= 5
+    assert not pres.get("themes")
     assert pres.get("findings") == []
-    assert pres.get("raw_findings")
+    assert not pres.get("raw_findings")

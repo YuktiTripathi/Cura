@@ -123,11 +123,13 @@ def correct_false_absence(answer: str, context: HealthContext) -> tuple[str, lis
             names = [marker.name or "", marker.key or "", code, *aliases_for(code)]
             if not any(name and name.lower() in low for name in names):
                 continue
-            unit = f" {marker.unit}" if marker.unit else ""
-            replacement = f"Your {marker.name or code} result on file is {marker.value}{unit}."
-            flags.append("false_absence_corrected")
+            # A result elsewhere in the record is not evidence for this question. Drop the
+            # false "missing" sentence. Do not insert the stored value.
+            flags.append("false_absence_removed")
+            replacement = ""
             break
-        kept.append(replacement or sentence)
+        if replacement is None:
+            kept.append(sentence)
     return " ".join(part for part in kept if part).strip(), flags
 
 
@@ -188,6 +190,12 @@ def drop_unsupported_trends(answer: str, context: HealthContext) -> tuple[str, l
             if not supported:
                 flags.append("unsupported_trend_removed")
                 continue
+        # "Increased risk" names the current band. It is a change only with a time comparison.
+        if re.search(r"\b(?:increased|decreased)\s+(?:risk|score)\b|\bis (?:increased|decreased)\b", low) and not re.search(
+            r"\b(?:since|compared|previously|earlier|last time|over time|from)\b", low
+        ):
+            kept.append(sentence)
+            continue
         direction = None
         if re.search(r"\b(increased|getting worse|worsened)\b", low):
             direction = "increased"

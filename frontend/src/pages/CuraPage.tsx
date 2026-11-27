@@ -194,7 +194,11 @@ export function CuraPage() {
         <ConversationSidebar
           refreshKey={conversationEpoch}
           activeId={conversationId}
-          onOpen={resumeConversation}
+          onOpen={(detail) => {
+            resumeConversation(detail);
+            setShowExplore(false);
+            setDrawerOpen(false);
+          }}
           onNew={startNew}
           onDeleted={(id) => {
             if (id === conversationId) startNew();

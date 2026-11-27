@@ -36,6 +36,7 @@ class EducationNote(BaseModel):
 
     name: str
     what_it_is: str
+    definition_points: list[str] = Field(default_factory=list)
     if_high: str = ""
     if_low: str = ""
     next_step: str = ""
@@ -183,8 +184,21 @@ class CategoryStory(BaseModel):
     questions: list[str]
 
 
+class GuidancePoint(BaseModel):
+    text: str
+    evidence_ids: list[str] = Field(default_factory=list)
+    basis: str = ""
+    purpose: str = ""
+
+
+class CategoryGuidance(BaseModel):
+    influencing_factors: list[GuidancePoint] = Field(default_factory=list)
+    health_guidance: list[GuidancePoint] = Field(default_factory=list)
+
+
 class CategoryDetail(CategoryCard):
     story: CategoryStory | None = None
+    guidance: CategoryGuidance | None = None
     about: str = ""
     findings: list[Finding] = Field(default_factory=list)
     interpretation: list[str] = Field(default_factory=list)

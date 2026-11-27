@@ -654,6 +654,16 @@ class ReasoningService:
             except LLMUnavailableError as exc:
                 logger.warning("llm_unavailable tier=%s", plan.answer_model_tier.value if plan.answer_model_tier else None)
                 privacy = _privacy_block(exc)
+                if getattr(context, "rewrite_previous_answer", None):
+                    from app.pipeline.education_answer import REWRITE_UNAVAILABLE
+
+                    return ReasoningResult(
+                        answer=REWRITE_UNAVAILABLE,
+                        llm_called=True,
+                        llm_mode="unavailable",
+                        fallback_reason="privacy" if privacy else "model_unavailable",
+                        latency_ms=int((time.perf_counter() - started) * 1000),
+                    )
                 from app.pipeline.evidence_inventory import classify_marker_trends, render_partial_trend
 
                 coverage = classify_marker_trends(message, context.markers, context.comparisons)

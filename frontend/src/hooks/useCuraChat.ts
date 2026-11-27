@@ -212,6 +212,10 @@ export function useCuraChat() {
   async function newConversation() {
     setMessages([]);
     setError(null);
+    // Drop the previous identity before the request starts. A fast action from the
+    // new screen must never be appended to the conversation the user just left.
+    setConversationId(null);
+    window.sessionStorage.removeItem("cura_conversation_id");
     try {
       const created = await createConversation();
       setConversationId(created.id);
@@ -220,7 +224,6 @@ export function useCuraChat() {
     } catch (err) {
       setConversationId(null);
       setSuggestions([]);
-      window.sessionStorage.removeItem("cura_conversation_id");
       setError(err instanceof Error ? err.message : "Could not start a conversation.");
     }
     setConversationEpoch((n) => n + 1);

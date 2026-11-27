@@ -55,10 +55,8 @@ def test_typed_text_only_matches_the_nutrition_overview():
 @pytest.mark.parametrize("kind,module", [(TurnKind.bio_ai_risk, "RISK_EXPLAINER"), (TurnKind.health_area, "HEALTH_AREA"), (TurnKind.nutrition_overview, "NUTRITION_OVERVIEW")])
 def test_each_kind_adds_its_own_prompt_module_and_no_other(kind, module):
     system = house_system(_ctx(kind.value), "a question")
-    assert getattr(prompt_modules, module) in system
-    for other in ("RISK_EXPLAINER", "HEALTH_AREA", "NUTRITION_OVERVIEW"):
-        if other != module:
-            assert getattr(prompt_modules, other) not in system
+    assert getattr(prompt_modules, module) not in system
+    assert "valid JSON object" in system
 
 
 def test_card_kinds_keep_their_layout_and_the_rest_do_not():

@@ -7,7 +7,7 @@
 .starter-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-top: 1rem; }
 .result-card { background: var(--surface-subtle); border: 1px solid var(--border-subtle); border-radius: 16px; padding: 1rem; }
 .health-card span { display: block; font-weight: 400; color: var(--text-muted); }
-.range-track { position: relative; height: 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border-subtle); margin: 0.5rem 0; }
+.range-track { position: relative; height: 8px; border-radius: 999px; background: var(--surface); border: 1px solid var(--border-subtle); margin: 0.5rem 0; overflow: hidden; }
 .range-mark { position: absolute; top: -4px; width: 14px; height: 14px; border-radius: 50%; background: var(--accent); transform: translateX(-50%); }
 .cura-detail, .cura-category, .cura-overview, .cura-home { overflow-wrap: anywhere; }
 .composer-dock { position: sticky; bottom: 0; }
@@ -48,10 +48,28 @@
   --recording-border: #d97a7a;
   --backdrop: rgba(16, 35, 61, 0.28);
   /* Status (reserved: never used for anything but in/out of range). Always paired with icon + text. */
-  --status-good: #0ca30c;
-  --status-out: #d9622b;
+  --status-good: #1f8a4c;
+  --status-out: #b42318;
+  --health-green: #1f8a4c;
+  --health-green-bg: #eef8f1;
+  --health-green-border: #b7dfc4;
+  --health-yellow: #8a5a00;
+  --health-yellow-bg: #fff8e6;
+  --health-yellow-border: #f0d48a;
+  --health-orange: #c2410c;
+  --health-orange-bg: #fff1e8;
+  --health-orange-border: #f3c4a8;
+  --health-red: #b42318;
+  --health-red-bg: #fdecec;
+  --health-red-border: #f3b4b4;
+  --health-grey: #667085;
+  --health-grey-bg: #f4f6f8;
+  --health-grey-border: #d8dee6;
+  --range-low: #f8d4d4;
+  --range-ok: #d7f0df;
+  --range-high: #f8d4d4;
   --range-track: #e8eef5;
-  --range-band: #cfe0f5;
+  --range-band: var(--range-ok);
   --highlight: #ffe9a8;
   color-scheme: light;
 }
@@ -87,10 +105,28 @@
   --recording-bg: #3b1d1d;
   --recording-border: #a35454;
   --backdrop: rgba(0, 0, 0, 0.5);
-  --status-good: #3fbf3f;
-  --status-out: #ec835a;
+  --status-good: #6dce86;
+  --status-out: #ffb4ab;
+  --health-green: #8ee0a8;
+  --health-green-bg: #173224;
+  --health-green-border: #2f6b45;
+  --health-yellow: #f5d27a;
+  --health-yellow-bg: #332a12;
+  --health-yellow-border: #7a6230;
+  --health-orange: #f3b08a;
+  --health-orange-bg: #3a2418;
+  --health-orange-border: #8a4e32;
+  --health-red: #ffb4ab;
+  --health-red-bg: #3b1d1d;
+  --health-red-border: #8a3d3d;
+  --health-grey: #b7c0cc;
+  --health-grey-bg: #222a34;
+  --health-grey-border: #445062;
+  --range-low: #5a3030;
+  --range-ok: #234232;
+  --range-high: #5a3030;
   --range-track: #243345;
-  --range-band: #2f4b6e;
+  --range-band: var(--range-ok);
   --highlight: #4d3d10;
   color-scheme: dark;
 }
@@ -589,8 +625,8 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 .trend-grid text, .trend-axis { fill: var(--text-faint); font-size: 10px; font-variant-numeric: tabular-nums; }
 .trend-band { fill: var(--range-band); opacity: 0.7; }
 .trend-line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
-.trend-point { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
-.trend-point.out { fill: var(--status-out); }
+.trend-point { fill: var(--health-green); stroke: var(--surface); stroke-width: 2; }
+.trend-point.out { fill: var(--health-red); }
 .trend-crosshair { stroke: var(--text-faint); stroke-width: 1; stroke-dasharray: 3 3; }
 .trend-hit { fill: transparent; cursor: pointer; outline: none; }
 .trend-hit:focus-visible { stroke: var(--link); stroke-width: 1; }
@@ -1364,8 +1400,31 @@ mark.page-line { background: var(--highlight); color: var(--text); box-shadow: i
 
 /* Overview cards: introduce the area only. Colour carries the status and nothing else. */
 button.health-card { text-align: left; font: inherit; color: inherit; cursor: pointer; display: grid; grid-template-rows: auto auto 1fr auto auto; gap: 6px; min-height: 0; padding: 16px; background: #FFFFFF; border-color: #DFE6EF; }
-button.health-card[data-risk="increased"] { background: #FFF1F1; border-color: #EAC0C0; }
-button.health-card[data-risk="very_high"] { background: #FDE8E8; border-color: #E5A0A0; }
+button.health-card[data-risk="increased"] { background: var(--health-yellow-bg); border-color: var(--health-yellow-border); }
+button.health-card[data-risk="very_high"] { background: var(--health-red-bg); border-color: var(--health-red-border); }
+.result-row[data-tone] .result-row-button { background: transparent; border-color: transparent; }
+.result-row[data-tone="within"], .result-card[data-tone="within"] { background: var(--health-green-bg); border-color: var(--health-green-border); }
+.result-row[data-tone="above"], .result-row[data-tone="below"], .result-card[data-tone="above"], .result-card[data-tone="below"] { background: var(--health-red-bg); border-color: var(--health-red-border); }
+.result-row[data-tone="unknown"], .result-card[data-tone="unknown"] { background: var(--health-grey-bg); border-color: var(--health-grey-border); }
+.result-row[data-tone="healthy"] { background: var(--health-green-bg); border-color: var(--health-green-border); }
+.result-row[data-tone="increased"] { background: var(--health-yellow-bg); border-color: var(--health-yellow-border); }
+.result-row[data-tone="high"] { background: var(--health-orange-bg); border-color: var(--health-orange-border); }
+.result-row[data-tone="very_high"] { background: var(--health-red-bg); border-color: var(--health-red-border); }
+.result-row-value[data-tone="within"], .result-row-value[data-tone="healthy"] { color: var(--health-green); font-weight: 700; }
+.result-row-value[data-tone="above"], .result-row-value[data-tone="below"], .result-row-value[data-tone="very_high"] { color: var(--health-red); font-weight: 700; }
+.result-row-value[data-tone="increased"] { color: var(--health-yellow); font-weight: 700; }
+.result-row-value[data-tone="high"] { color: var(--health-orange); font-weight: 700; }
+.result-row-value[data-tone="unknown"] { color: var(--health-grey); }
+.range-zone { position: absolute; top: 0; bottom: 0; }
+.range-zone[data-zone="low"], .range-zone[data-zone="high"] { background: var(--range-low); }
+.range-zone[data-zone="within"] { background: var(--range-ok); }
+.range-viz[data-relation="within"] .range-mark, .range[data-relation="within"] .range-dot { background: var(--health-green); }
+.range-viz[data-relation="above"] .range-mark, .range-viz[data-relation="below"] .range-mark,
+.range[data-relation="above"] .range-dot, .range[data-relation="below"] .range-dot { background: var(--health-red); }
+.verified-value[data-tone="within"], .verified-value[data-tone="healthy"] { color: var(--health-green); font-weight: 700; }
+.verified-value[data-tone="above"], .verified-value[data-tone="below"], .verified-value[data-tone="very_high"] { color: var(--health-red); font-weight: 700; }
+.verified-value[data-tone="increased"] { color: var(--health-yellow); font-weight: 700; }
+.verified-value[data-tone="high"] { color: var(--health-orange); font-weight: 700; }
 .health-card-risk { font-size: 0.82rem; color: #6d4a4a; }
 .health-risk-note { margin-top: 12px; }
 .body-at-work { margin: 0 0 16px; padding-left: 1.1rem; }
@@ -1379,8 +1438,8 @@ button.health-card[data-risk="very_high"] { background: #FDE8E8; border-color: #
 .category-composer input { flex: 1; border: 1px solid var(--border); border-radius: 999px; padding: 10px 14px; font: inherit; }
 .category-answer, .category-user { margin: 0; }
 :root[data-theme="dark"] button.health-card { background: var(--surface); border-color: #3a4656; }
-:root[data-theme="dark"] button.health-card[data-risk="increased"] { background: #3a2428; border-color: #a56b6b; }
-:root[data-theme="dark"] button.health-card[data-risk="very_high"] { background: #4a2226; border-color: #c48484; }
+:root[data-theme="dark"] button.health-card[data-risk="increased"] { background: var(--health-yellow-bg); border-color: var(--health-yellow-border); }
+:root[data-theme="dark"] button.health-card[data-risk="very_high"] { background: var(--health-red-bg); border-color: var(--health-red-border); }
 :root[data-theme="dark"] .health-card-risk { color: #f0d0d0; }
 button.health-card:hover, button.health-card:focus-visible { border-color: var(--accent); box-shadow: 0 2px 10px rgba(16, 35, 61, 0.08); }
 .health-card .health-card-icon { color: var(--text-muted); }

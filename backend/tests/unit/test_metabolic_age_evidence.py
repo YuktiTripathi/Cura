@@ -8,6 +8,7 @@ from app.contracts.health_context import HealthContext
 from app.contracts.query import QueryPlan
 from app.contracts.questionnaire import QuestionnaireAnswer
 from app.pipeline.evidence_inventory import assemble_evidence
+from app.pipeline.prompt_builder import _metabolic_age_opening
 
 
 def _marker(key, value):
@@ -90,3 +91,79 @@ def test_missing_metabolic_age_does_not_invent_a_comparison():
     plan = QueryPlan(intent=IntentType.bio_ai_score, raw_message="What does my metabolic age say about my health?")
     payload = assemble_evidence(plan, context).prompt_payload()
     assert "metabolic_comparison" not in payload
+
+
+def test_metabolic_age_prompt_requires_the_personal_comparison_without_risk_language():
+    instruction = _metabolic_age_opening("What does my metabolic age say about my health?")
+    assert "state both ages" in instruction
+    assert "not a disease risk score" in instruction
+    assert "generic Bio-AI risk-score disclaimer" in instruction
+    assert "short narrative, not a list" in instruction
+
+
+def test_metabolic_age_followups_do_not_refill_with_unrelated_marker_templates():
+    from app.pipeline.followup_generator import build_brief, select_followups
+
+    brief = build_brief(
+        markers=[_marker("hdl", 35), _marker("hba1c", 5.4)],
+        risks=[],
+    )
+    questions = select_followups(
+        brief,
+        current_question="What does my metabolic age say about my health?",
+        model_questions=["How do my everyday habits relate to metabolic health?"],
+    )
+    assert questions == ["How do my everyday habits relate to metabolic health?"]
+
+    library_questions = select_followups(
+        brief,
+        current_question="What does my metabolic age say about my health?",
+        model_questions=[],
+    )
+    assert library_questions == []
+
+
+def test_grounding_accepts_both_ages_from_the_verified_comparison():
+    from app.pipeline.grounding import GroundingChecker
+
+    context = HealthContext(
+        intent=IntentType.bio_ai_score,
+        answer_depth=AnswerDepth.simple,
+        knowledge_scope=KnowledgeScope.personal,
+        metabolic_age=34,
+        profile_age=30,
+        bio_report_date="2024-08-01",
+    )
+    insight = build_metabolic_age_insight(
+        actual_age=30,
+        metabolic_age=34,
+        assessed_on="2024-08-01",
+        today=date.today(),
+    )
+    answer = (
+        f"Your actual age at the assessment was estimated as {insight.actual_age_years}, "
+        f"while your metabolic age was {insight.metabolic_age_years}."
+    )
+    assert GroundingChecker().unsupported_number_sentences(answer, context) == []
+
+
+def test_validator_restores_the_verified_age_comparison_when_model_omits_it():
+    from app.pipeline.validator import _entity_coverage
+
+    context = HealthContext(
+        intent=IntentType.bio_ai_score,
+        answer_depth=AnswerDepth.simple,
+        knowledge_scope=KnowledgeScope.personal,
+        metabolic_age=34,
+        profile_age=30,
+        bio_report_date="2024-08-01",
+    )
+    plan = QueryPlan(
+        intent=IntentType.bio_ai_score,
+        knowledge_scope=KnowledgeScope.personal,
+        raw_message="What does my metabolic age say about my health?",
+        needs_bio_ai=True,
+    )
+    result = _entity_coverage("Metabolic health describes how your body handles energy.", plan, context)
+    assert "metabolic_age_comparison_restored" in result.flags
+    assert any("actual age" in repair and "metabolic age" in repair for repair in result.repairs)

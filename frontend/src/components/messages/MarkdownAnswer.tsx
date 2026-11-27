@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
-import { displayAssistantText } from "../../types/chat";
+import { bioTone, measuredTone } from "../../lib/healthTone";
+import { displayAssistantText, type PresentedFinding } from "../../types/chat";
 import { debugMode } from "./debug";
 
 /**
@@ -9,9 +10,9 @@ import { debugMode } from "./debug";
  * bullet and numbered lists, and small tables. Builds React elements only (no HTML
  * injection), and never restructures the answer.
  */
-export function MarkdownAnswer({ content }: { content: string }) {
+export function MarkdownAnswer({ content, findings = [] }: { content: string; findings?: PresentedFinding[] }) {
   const text = displayAssistantText(content, debugMode());
-  return <div className="markdown-answer">{renderBlocks(text)}</div>;
+  return <div className="markdown-answer">{renderBlocks(text, findings)}</div>;
 }
 
 type Block =
@@ -104,18 +105,18 @@ function cells(row: string): string[] {
   return row.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map((cell) => cell.trim());
 }
 
-function renderBlocks(text: string): ReactNode {
+function renderBlocks(text: string, findings: PresentedFinding[]): ReactNode {
   return parseMarkdown(text).map((block, index) => {
     switch (block.kind) {
       case "heading": {
         const Tag = (block.level <= 2 ? "h3" : "h4") as "h3" | "h4";
-        return <Tag key={index}>{inline(block.text)}</Tag>;
+        return <Tag key={index}>{inline(block.text, findings)}</Tag>;
       }
       case "ul":
         return (
           <ul key={index}>
             {block.items.map((item, k) => (
-              <li key={k}>{withBreaks(item)}</li>
+              <li key={k}>{withBreaks(item, findings)}</li>
             ))}
           </ul>
         );
@@ -123,7 +124,7 @@ function renderBlocks(text: string): ReactNode {
         return (
           <ol key={index} start={block.start}>
             {block.items.map((item, k) => (
-              <li key={k}>{withBreaks(item)}</li>
+              <li key={k}>{withBreaks(item, findings)}</li>
             ))}
           </ol>
         );
@@ -133,7 +134,7 @@ function renderBlocks(text: string): ReactNode {
             <thead>
               <tr>
                 {block.header.map((cell, k) => (
-                  <th key={k}>{inline(cell)}</th>
+                  <th key={k}>{inline(cell, findings)}</th>
                 ))}
               </tr>
             </thead>
@@ -141,7 +142,7 @@ function renderBlocks(text: string): ReactNode {
               {block.rows.map((row, r) => (
                 <tr key={r}>
                   {row.map((cell, k) => (
-                    <td key={k}>{inline(cell)}</td>
+                    <td key={k}>{inline(cell, findings)}</td>
                   ))}
                 </tr>
               ))}
@@ -149,28 +150,51 @@ function renderBlocks(text: string): ReactNode {
           </table>
         );
       default:
-        return <p key={index}>{withBreaks(block.lines.join("\n"))}</p>;
+        return <p key={index}>{withBreaks(block.lines.join("\n"), findings)}</p>;
     }
   });
 }
 
-function withBreaks(text: string): ReactNode {
+function withBreaks(text: string, findings: PresentedFinding[]): ReactNode {
   return text.split("\n").map((line, k) => (
     <span key={k}>
       {k > 0 ? <br /> : null}
-      {inline(line.trim())}
+      {inline(line.trim(), findings)}
     </span>
   ));
 }
 
-/** **bold** and *italic* only; everything else is literal text. */
-export function inline(text: string): ReactNode[] {
+function verifiedMark(text: string, findings: PresentedFinding[]): { tone: string; value: string } | null {
+  const lower = text.toLowerCase();
+  const match = findings.find((finding) => {
+    const value = finding.numeric_value != null ? String(finding.numeric_value) : finding.value;
+    const name = (finding.label || "").toLowerCase();
+    return Boolean(value && name && lower.includes(name) && text.includes(String(value)));
+  });
+  if (!match) return null;
+  const value = match.numeric_value != null ? String(match.numeric_value) : String(match.value);
+  const tone = match.source_type === "bio_ai_report" || match.source_type === "predicted_risk" ? bioTone(match.status, match.label) : measuredTone(match.status);
+  return { tone, value };
+}
+
+/** **bold** and *italic* only; a verified value is coloured only beside its own finding name. */
+export function inline(text: string, findings: PresentedFinding[] = []): ReactNode[] {
   const parts = text.split(/(\*\*[^*]+\*\*|\*[^*\s][^*]*\*)/g).filter((part) => part.length > 0);
   return parts.map((part, k) => {
     const bold = part.match(/^\*\*([^*]+)\*\*$/);
     if (bold) return <strong key={k}>{bold[1]}</strong>;
     const italic = part.match(/^\*([^*]+)\*$/);
     if (italic) return <em key={k}>{italic[1]}</em>;
-    return <span key={k}>{part}</span>;
+    const mark = verifiedMark(part, findings);
+    if (!mark) return <span key={k}>{part}</span>;
+    const at = part.indexOf(mark.value);
+    if (at < 0) return <span key={k}>{part}</span>;
+    return (
+      <span key={k}>
+        {part.slice(0, at)}
+        <span className="verified-value" data-tone={mark.tone}>{mark.value}</span>
+        {part.slice(at + mark.value.length)}
+      </span>
+    );
   });
 }

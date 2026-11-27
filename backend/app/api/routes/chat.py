@@ -1,5 +1,6 @@
 import asyncio
 import json
+import logging
 
 from fastapi import APIRouter, Depends, Header, Request
 from fastapi.concurrency import run_in_threadpool
@@ -20,6 +21,7 @@ from app.pipeline.service import ChatService
 from app.providers.registry import get_registry
 
 router = APIRouter()
+logger = logging.getLogger(__name__)
 
 
 @router.post("/chat", response_model=ChatResponse)
@@ -119,6 +121,7 @@ async def chat_stream(
         except CuraError as exc:
             put("error", {"code": exc.code, "message": exc.message})
         except Exception:
+            logger.exception("chat_stream_worker_failed request_id=%s", request_id)
             put("error", {"code": "INTERNAL_ERROR", "message": "Something went wrong. Please try again."})
         finally:
             session.close()
